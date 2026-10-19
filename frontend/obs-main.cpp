@@ -534,6 +534,8 @@ static int run_program(fstream &logFile, int argc, char *argv[])
 	 * elements (e.g. Hotkeys) and it is actually faster to disable it. */
 	qputenv("QT_NO_SUBTRACTOPAQUESIBLINGS", "1");
 
+	// Qt platform services register with the host portal during construction.
+	QGuiApplication::setDesktopFileName("io.github.SigmaCodez.PenguinStudio");
 	OBSApp program(argc, argv, profilerNameStore.get());
 	try {
 		QAccessible::installFactory(accessibleFactory);

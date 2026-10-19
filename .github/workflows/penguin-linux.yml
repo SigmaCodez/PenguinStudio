@@ -28,6 +28,8 @@ jobs:
         run: |
           python3 scripts/check-branding.py
           python3 scripts/check-penguin-locales.py
+      - name: Check optional Linux runtime diagnostics
+        run: bash scripts/packaging/test-optional-library.sh
       - name: Compile and run configuration isolation checks
         run: |
           c++ -std=c++17 -Wall -Wextra -Werror -I. test/penguin-config-paths.cpp -o /tmp/penguin-config-paths-test

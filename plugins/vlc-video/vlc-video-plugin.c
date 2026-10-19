@@ -3,6 +3,7 @@
 #endif
 
 #include <util/platform.h>
+#include <util/optional-library.h>
 #include "vlc-video-plugin.h"
 
 OBS_DECLARE_MODULE()
@@ -190,7 +191,11 @@ static bool load_libvlc_module(void)
 #else
 #define LIBVLC_FILE "libvlc.so.5"
 #endif
+#ifdef __linux__
+	libvlc_module = os_dlopen_optional(LIBVLC_FILE);
+#else
 	libvlc_module = os_dlopen(LIBVLC_FILE);
+#endif
 
 #endif
 

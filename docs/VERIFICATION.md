@@ -226,3 +226,25 @@ editable portrait scenes and a Meld-identical editor are not implemented.
 - Inspect all source/license contents, package metadata and artifact checksums. Test on at least one AMD/Intel and one NVIDIA system before publishing compatibility claims.
 
 Account approval, streaming service availability, GPU drivers and compositor behavior cannot be certified by static checks. No live broadcast should be started by automated repository validation.
+
+## Startup diagnostics — revision 6 work
+
+The startup audit of the installed Ubuntu 26.04 revision 5 package found a
+nonexistent legacy scene file being migrated on fresh profiles, missing DeckLink
+UI locale resources, and optional Linux runtimes being reported as load errors.
+Revision 6 checks that the legacy file exists, includes the small DeckLink UI
+catalogues (English fallback where untranslated), and distinguishes an absent
+optional runtime from an installed but broken library. NVENC unload now checks
+whether its encoder resources were initialized. An unavailable v4l2loopback
+capability is informational; camera runtime failures retain their severity.
+Application identity is assigned before icon and portal-related initialization.
+
+`test-optional-library.sh` exercises absence, successful loading, invalid ELF and
+missing dependent libraries. Only absence of the exact requested SONAME becomes
+informational. Other loader failures remain errors. The existing Qt diagnostic
+boundary remains unchanged: QTBUG-141475 affects real text-input focus handling,
+so its non-null mismatch warning must not be hidden as a shutdown false positive.
+
+The native shutdown report now includes every startup warning and error, plus a
+`startup_clean` flag. Passing shutdown checks alone does not prove a clean start.
+Installed revision 6 results are pending; no warning-free startup claim is made.

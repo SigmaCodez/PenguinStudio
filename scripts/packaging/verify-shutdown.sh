@@ -79,7 +79,10 @@ shutdown_warnings = re.findall(r'^warning:.*$', shutdown_log, re.MULTILINE)
 assert not shutdown_warnings, shutdown_warnings
 focus_debug = re.findall(r'^debug:' + focus_message + '$', log, re.MULTILINE)
 assert 'Number of memory leaks: 0' in shutdown_log
-report.update(platform='wayland', exit_code=0, shutdown_errors=errors,
+startup_warnings = re.findall(r'^warning:.*$', startup_log, re.MULTILINE)
+startup_errors = re.findall(r'^error:.*$', startup_log, re.MULTILINE)
+report.update(startup_warnings=startup_warnings, startup_errors=startup_errors,
+              startup_clean=not startup_warnings and not startup_errors, platform='wayland', exit_code=0, shutdown_errors=errors,
               shutdown_warnings=shutdown_warnings,
               qt_focus_warnings=focus_warnings,
               qt_teardown_focus_warnings=teardown_focus_warnings,
@@ -87,6 +90,7 @@ report.update(platform='wayland', exit_code=0, shutdown_errors=errors,
               qt_teardown_focus_debug_messages=[line for line in focus_debug if re.search(null_surface, line)],
               sentinel_files_after_exit=0, obs_memory_leaks=0)
 (case / 'verified.json').write_text(json.dumps(report, indent=2) + '\n')
+print(f'STARTUP: {scenario}: {len(startup_warnings)} warnings, {len(startup_errors)} errors')
 print(f'PASS: {scenario}: zero late unregisters, zero shutdown warnings/errors, zero Qt teardown focus warnings, zero OBS memory leaks')
 PY
 done

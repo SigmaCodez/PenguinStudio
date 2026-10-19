@@ -921,17 +921,16 @@ OBSApp::OBSApp(int &argc, char **argv, profiler_name_store_t *store)
 		crashHandler_ = std::make_unique<OBS::CrashHandler>(appLaunchUUID_);
 	}
 
+	setApplicationName("PenguinStudio");
+	setApplicationVersion(PENGUIN_VERSION);
+	setApplicationDisplayName("Penguin Studio");
+
 	sleepInhibitor = os_inhibit_sleep_create("Penguin Studio Video/audio");
 
 #ifndef __APPLE__
 	setWindowIcon(QIcon::fromTheme("io.github.SigmaCodez.PenguinStudio",
 				     QIcon(":/res/images/penguin-studio.png")));
 #endif
-
-	setApplicationName("PenguinStudio");
-	setApplicationVersion(PENGUIN_VERSION);
-	setApplicationDisplayName("Penguin Studio");
-	setDesktopFileName("io.github.SigmaCodez.PenguinStudio");
 
 	pluginManager_ = std::make_unique<OBS::PluginManager>();
 }
@@ -1028,7 +1027,11 @@ static void move_basic_to_scene_collections(void)
 		return;
 	}
 
+	const std::filesystem::path sourceFile = basicPath / std::filesystem::u8path("scenes.json");
 	try {
+		// Fresh profiles have no legacy scene collection to migrate.
+		if (!std::filesystem::exists(sourceFile))
+			return;
 		std::filesystem::create_directories(sceneCollectionPath);
 	} catch (const std::filesystem::filesystem_error &error) {
 		blog(LOG_ERROR,
@@ -1037,7 +1040,6 @@ static void move_basic_to_scene_collections(void)
 		return;
 	}
 
-	const std::filesystem::path sourceFile = basicPath / std::filesystem::u8path("scenes.json");
 	const std::filesystem::path destinationFile =
 		(sceneCollectionPath / std::filesystem::u8path(Str("Untitled"))).replace_extension(".json");
 

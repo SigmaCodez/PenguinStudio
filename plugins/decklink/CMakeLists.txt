@@ -92,3 +92,6 @@ if(OS_WINDOWS)
 endif()
 
 set_target_properties_obs(decklink PROPERTIES FOLDER plugins/decklink PREFIX "")
+
+# Optional Linux runtime probes call the system dynamic loader directly.
+target_link_libraries(decklink PRIVATE ${CMAKE_DL_LIBS})

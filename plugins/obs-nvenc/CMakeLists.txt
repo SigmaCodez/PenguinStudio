@@ -57,3 +57,6 @@ if(OS_WINDOWS)
 endif()
 
 set_target_properties_obs(obs-nvenc PROPERTIES FOLDER plugins/obs-nvenc PREFIX "")
+
+# Optional Linux runtime probes call the system dynamic loader directly.
+target_link_libraries(obs-nvenc PRIVATE ${CMAKE_DL_LIBS})

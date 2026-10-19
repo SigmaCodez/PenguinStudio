@@ -44,3 +44,6 @@ if(OS_WINDOWS)
 endif()
 
 set_target_properties_obs(vlc-video PROPERTIES FOLDER plugins PREFIX "")
+
+# Optional Linux runtime probes call the system dynamic loader directly.
+target_link_libraries(vlc-video PRIVATE ${CMAKE_DL_LIBS})

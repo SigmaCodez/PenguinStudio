@@ -1,4 +1,5 @@
 #include <obs-module.h>
+#include <util/optional-library.h>
 #include "decklink-devices.hpp"
 
 OBS_DECLARE_MODULE()
@@ -45,6 +46,15 @@ bool log_sdk_version()
 
 bool obs_module_load(void)
 {
+#ifdef __linux__
+	// Probe before the vendor SDK prints an unconditional stderr error.
+	void *runtime = os_dlopen_optional("libDeckLinkAPI.so");
+	if (!runtime) {
+		blog(LOG_INFO, "DeckLink runtime unavailable; Blackmagic devices are disabled");
+		return true;
+	}
+	dlclose(runtime);
+#endif
 	if (!log_sdk_version()) {
 		return false;
 	}

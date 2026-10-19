@@ -2,6 +2,7 @@
 #include "nvenc-helpers.h"
 
 #include <util/platform.h>
+#include <util/optional-library.h>
 #include <util/threading.h>
 #include <util/config-file.h>
 #include <util/dstr.h>
@@ -103,6 +104,8 @@ bool load_nvenc_lib(void)
 {
 #ifdef _WIN32
 	nvenc_lib = os_dlopen("nvEncodeAPI64.dll");
+#elif defined(__linux__)
+	nvenc_lib = os_dlopen_optional("libnvidia-encode.so.1");
 #else
 	nvenc_lib = os_dlopen("libnvidia-encode.so.1");
 #endif

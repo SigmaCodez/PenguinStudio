@@ -8,7 +8,7 @@ package_options=()
 if [[ "$package_format" == DEB ]]; then
   # Native packages must identify the distribution whose library ABI they use.
   source /etc/os-release
-  package_options+=("-DCPACK_DEBIAN_PACKAGE_RELEASE=5+${ID}${VERSION_ID}")
+  package_options+=("-DCPACK_DEBIAN_PACKAGE_RELEASE=6+${ID}${VERSION_ID}")
   package_options+=("-DPENGUIN_PACKAGE_DISTRO=${ID} ${VERSION_ID}")
 fi
 cef_dir=${CEF_ROOT_DIR:-"$project_root/.deps/cef"}

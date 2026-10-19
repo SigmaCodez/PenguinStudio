@@ -5,7 +5,7 @@
 #include "decklink-captions.h"
 
 OBS_DECLARE_MODULE()
-OBS_MODULE_USE_DEFAULT_LOCALE("decklink-captons", "en-US")
+OBS_MODULE_USE_DEFAULT_LOCALE("decklink-captions", "en-US")
 
 struct obs_captions {
 	std::string source_name;

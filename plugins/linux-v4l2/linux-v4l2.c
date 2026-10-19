@@ -35,7 +35,7 @@ bool obs_module_load(void)
 	if (loopback_module_available()) {
 		obs_register_output(&virtualcam_info);
 	} else {
-		blog(LOG_WARNING, "v4l2loopback not installed, virtual camera not registered");
+		blog(LOG_INFO, "v4l2loopback not installed; virtual camera is unavailable");
 	}
 
 	return true;
