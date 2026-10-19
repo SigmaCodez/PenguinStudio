@@ -9,20 +9,25 @@
 #include <QAbstractScrollArea>
 #include <QAbstractSpinBox>
 #include <QApplication>
+#include <QCheckBox>
 #include <QComboBox>
 #include <QDialog>
+#include <QDialogButtonBox>
 #include <QDir>
 #include <QFile>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QLayout>
 #include <QLineEdit>
 #include <QListWidget>
 #include <QMainWindow>
 #include <QPointer>
+#include <QPushButton>
 #include <QScreen>
 #include <QScrollBar>
 #include <QStyle>
+#include <QStyleOptionButton>
 #include <QStyleOptionComboBox>
 #include <QStyleOptionFrame>
 #include <QStyleOptionSpinBox>
@@ -112,7 +117,11 @@ void Capture(QDialog *dialog, const QString &name)
 		widgets.append(QJsonObject{{"name", widget->objectName()},
 					  {"class", QString::fromLatin1(widget->metaObject()->className())},
 					  {"text", text}, {"x", bounds.x()}, {"y", bounds.y()},
-					  {"width", bounds.width()}, {"height", bounds.height()}});
+					  {"width", bounds.width()}, {"height", bounds.height()},
+					  {"minimumWidth", widget->minimumWidth()},
+					  {"minimumSizeHintWidth", widget->minimumSizeHint().width()},
+					  {"layoutMinimumWidth", widget->layout() ?
+						  widget->layout()->minimumSize().width() : -1}});
 	}
 	report.insert("widgets", widgets);
 	report.insert("inputs", inputs);
@@ -144,6 +153,44 @@ void Capture(QDialog *dialog, const QString &name)
 		report.insert("navigationLabelWidth", labelWidth);
 		report.insert("navigationAvailableWidth", availableWidth);
 		report.insert("navigationFits", labelWidth <= availableWidth);
+	}
+	if (name == QStringLiteral("settings-advanced")) {
+		auto *preserve = dialog->findChild<QCheckBox *>("streamDelayPreserve");
+		auto *enable = dialog->findChild<QCheckBox *>("streamDelayEnable");
+		QJsonObject check{{"found", preserve && enable}};
+		if (preserve && enable) {
+			QStyleOptionButton option;
+			option.initFrom(preserve);
+			option.text = preserve->text();
+			const QRect content = preserve->style()->subElementRect(QStyle::SE_CheckBoxContents,
+								      &option, preserve);
+			const QSize textSize = preserve->fontMetrics().size(Qt::TextShowMnemonic, preserve->text());
+			const bool enabledBefore = enable->isChecked();
+			const bool checkedBefore = preserve->isChecked();
+			if (!enabledBefore)
+				enable->click();
+			const bool active = preserve->isEnabled();
+			preserve->click();
+			const bool toggled = preserve->isChecked() != checkedBefore;
+			preserve->click();
+			const bool restored = preserve->isChecked() == checkedBefore;
+			if (!enabledBefore)
+				enable->click();
+			const bool captionFits = textSize.width() <= content.width() &&
+						 textSize.height() <= content.height();
+			const bool accessible = preserve->accessibleName().simplified() == preserve->text().simplified();
+			const int lineCount = preserve->text().count(QLatin1Char('\n')) + 1;
+			const bool heightFits = preserve->height() >= lineCount * preserve->fontMetrics().height();
+			check.insert("text", preserve->text());
+			check.insert("accessibleName", preserve->accessibleName());
+			check.insert("height", preserve->height());
+			check.insert("fontHeight", preserve->fontMetrics().height());
+			check.insert("lineCount", lineCount);
+			check.insert("captionFits", captionFits);
+			check.insert("passed", active && toggled && restored && captionFits && accessible && heightFits);
+			check.insert("captured", preserve->grab().save(Results().filePath("stream-delay-checkbox.png")));
+		}
+		report.insert("streamDelayPreserve", check);
 	}
 	const bool saved = dialog->grab().save(Results().filePath(name + QStringLiteral(".png")));
 	report.insert("captured", saved);
@@ -250,7 +297,9 @@ void Tick()
 			QString::fromLatin1(pages[(ticks - 75) / 8]) + QStringLiteral("-bottom"));
 	if (ticks == 144) {
 		if (auto *dialog = FindDialog("OBSBasicSettings"))
-			dialog->reject();
+			if (auto *buttons = dialog->findChild<QDialogButtonBox *>("buttonBox"))
+				if (auto *cancel = buttons->button(QDialogButtonBox::Cancel))
+					cancel->click();
 		obs_source_release(source);
 		source = nullptr;
 		SaveReport();

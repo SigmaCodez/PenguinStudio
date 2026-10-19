@@ -2647,6 +2647,10 @@ void OBSBasicSettings::LoadAdvancedSettings()
 	ui->reconnectMaxRetries->setValue(maxRetries);
 
 	ui->streamDelaySec->setValue(delaySec);
+	// Put the explanatory clause on its own line so large translations fit narrow forms.
+	const QString preserveDelayText = QTStr("Basic.Settings.Advanced.StreamDelay.Preserve");
+	ui->streamDelayPreserve->setAccessibleName(preserveDelayText);
+	ui->streamDelayPreserve->setText(QString(preserveDelayText).replace(QStringLiteral(" ("), QStringLiteral("\n(")));
 	ui->streamDelayPreserve->setChecked(preserveDelay);
 	ui->streamDelayEnable->setChecked(enableDelay);
 	ui->autoRemux->setChecked(autoRemux);
