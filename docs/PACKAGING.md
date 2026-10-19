@@ -33,29 +33,30 @@ PackageKit reports `dependencyResolutionFailed`. Waiting or retrying that DEB
 will not resolve the incompatibility.
 
 New native builds include the distribution release in the Debian revision,
-for example `penguin-studio_0.2.0-1+ubuntu26.04_amd64.deb`. Ubuntu 26.04.1 uses
+for example `penguin-studio_0.2.0-2+ubuntu26.04_amd64.deb`. Ubuntu 26.04.1 uses
 the Ubuntu 26.04 package. Do not mix 24.04 repositories into 26.04, remove
 package dependencies, or create compatibility library symlinks to force an
 older binary to load.
 
-The corrected [Ubuntu 26.04 DEB artifact](https://github.com/SigmaCodez/PenguinStudio/actions/runs/39273592623/artifacts/12197582045)
-was built from `254e43ccf18e661ec17d9825bd3c287b97fa5d95`. The
-[verification run](https://github.com/SigmaCodez/PenguinStudio/actions/runs/39273592623)
+The corrected [Ubuntu 26.04 DEB artifact](https://github.com/SigmaCodez/PenguinStudio/actions/runs/39309790303/artifacts/12216651809)
+was built from `94736f20afdaddbda7c0941664b39a7f00656dbc`. The
+[verification run](https://github.com/SigmaCodez/PenguinStudio/actions/runs/39309790303)
 passed compilation, output-safety/platform-flow/wizard tests, package installation
 and `penguin-studio --version` on Ubuntu 26.04. The downloaded archive and DEB
 checksums were verified, and APT dependency resolution passed on Ubuntu 26.04.1
-without requiring package removals. See [the installation report](validation/ubuntu-26.04-installation.json).
+without requiring package removals. The original installation is recorded in [the installation report](validation/ubuntu-26.04-installation.json);
+the new revision fixes compact wizard layout and is tracked in [the native Wayland report](validation/ubuntu-26.04-wayland.json).
 These checks do not replace live streaming or hardware-specific validation.
 
-The local package is `dist/penguin-studio_0.2.0-1+ubuntu26.04_amd64.deb`.
-Its SHA-256 is `db31277e2839a8940990aca89349f34e12f5d05201147dd8feb321184d8b2fb9`.
+The local package is `dist/penguin-studio_0.2.0-2+ubuntu26.04_amd64.deb`.
+Its SHA-256 is `a51a9c017af72382d4a42d326987185bd3ce1990f14e3e30f14db812b0bc4688`.
 
 After downloading the matching DEB, the repository's installer checks the
 release, architecture and APT dependency resolution before installation:
 
 ```sh
-bash scripts/packaging/install-deb.sh --check /path/to/penguin-studio_0.2.0-1+ubuntu26.04_amd64.deb
-bash scripts/packaging/install-deb.sh /path/to/penguin-studio_0.2.0-1+ubuntu26.04_amd64.deb
+bash scripts/packaging/install-deb.sh --check /path/to/penguin-studio_0.2.0-2+ubuntu26.04_amd64.deb
+bash scripts/packaging/install-deb.sh /path/to/penguin-studio_0.2.0-2+ubuntu26.04_amd64.deb
 ```
 
 The first command makes no system changes. The second uses the normal Ubuntu
@@ -157,8 +158,8 @@ supported target distribution:
 
 ```sh
 # Ubuntu 26.04 / 26.04.1, after downloading the matching build:
-sudo apt install --no-remove ./penguin-studio_0.2.0-1+ubuntu26.04_amd64.deb
-# The original unlabelled DEB above is for Ubuntu 24.04 only.
+sudo apt install --no-remove ./penguin-studio_0.2.0-2+ubuntu26.04_amd64.deb
+# Use a package built for your Ubuntu release.
 # Fedora 44:
 sudo dnf install ./penguin-studio-0.2.0-1.x86_64.rpm
 ```

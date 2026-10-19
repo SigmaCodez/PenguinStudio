@@ -2,6 +2,37 @@
 
 This is a development preview based on OBS Studio 32.2.2. The new Penguin code must not be described as fully production-tested until the checks below have real recorded results.
 
+## Native Ubuntu 26.04.1 Wayland follow-up — 2026-10-19
+
+The native DEB was exercised on the user's Wayland desktop with isolated test
+profiles. [The detailed report](validation/ubuntu-26.04-wayland.json) records
+117 workspace checks, a real H.264/AAC recording with decoded image and audible
+test tones, portal screen capture at 2560 × 1440, and simultaneous local
+1280 × 720 / 1080 × 1920 streams including reconnect and shutdown.
+An additional browser-source run passed 118 checks; its offline HTML fixture was
+verified in a [decoded recording frame](validation/ubuntu-26.04-browser-frame.png).
+All nine settings pages, source properties and filters opened under native Qt
+6.10.2; [video settings](validation/ubuntu-26.04-settings-video.png) show the form
+rendering. These are Qt widget renders, not compositor screenshots.
+
+A compact auto-configuration wizard reproduced clipped text (a 2-pixel text area
+for an 18-pixel font). The fix gives inputs a minimum content height and prevents
+the wizard from shrinking below its natural page size. The
+[regression probe and instructions](../test/README-native-wayland.md) cover text
+height and overlapping fields. The installed `0.2.0-2+ubuntu26.04` package also passes all 118 workspace/browser
+checks, produces a verified H.264/AAC recording, and passes the wizard probe in English, German
+and at font scale 14. Compare [before](validation/ubuntu-26.04-wizard-before.png)
+with [after](validation/ubuntu-26.04-wizard-en.png),
+[German](validation/ubuntu-26.04-wizard-de.png) and
+[larger text](validation/ubuntu-26.04-wizard-large.png).
+
+Streaming-account authorization and title updates were checked with mocked
+providers only. No public broadcast, physical camera/microphone recording or
+hardware-encoder benchmark was performed. Optional NVIDIA/DeckLink drivers,
+VLC runtime and the v4l2loopback virtual-camera module are absent on this host.
+
+## Historical results
+
 The results below predate the [independent `main` history](HISTORY.md). Their
 original source hashes, branch names and CI links remain historical evidence;
 they do not assert that the new root commit was tested. Old commit links may

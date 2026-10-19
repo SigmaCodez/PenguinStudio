@@ -150,10 +150,25 @@ void AddFixture()
 	backgroundItem = background ? obs_scene_add(scene, background) : nullptr;
 	Check(backgroundItem != nullptr, QStringLiteral("real-obs-background-created"));
 	obs_source_release(background);
+	const QByteArray browserFile = qgetenv("PENGUIN_SMOKE_BROWSER");
+	if (!browserFile.isEmpty()) {
+		obs_data_t *browserSettings = obs_data_create();
+		obs_data_set_bool(browserSettings, "is_local_file", true);
+		obs_data_set_string(browserSettings, "local_file", browserFile.constData());
+		obs_data_set_int(browserSettings, "width", video.base_width);
+		obs_data_set_int(browserSettings, "height", video.base_height);
+		obs_source_t *browser =
+			obs_source_create("browser_source", "Local browser fixture", browserSettings, nullptr);
+		obs_data_release(browserSettings);
+		Check(browser && obs_scene_add(scene, browser), QStringLiteral("browser-source-created"));
+		obs_source_release(browser);
+	}
 	for (uint32_t channel = 1; channel <= 6; ++channel)
 		obs_set_output_source(channel, nullptr);
 	for (const char *name : {"Microphone test tone", "Desktop test tone"}) {
-		obs_data_clear(settings);
+		// Sources retain their settings; do not mutate another fixture's object.
+		obs_data_release(settings);
+		settings = obs_data_create();
 		const auto file = Results().filePath(QString::fromUtf8(name) + QStringLiteral(".wav")).toUtf8();
 		obs_data_set_bool(settings, "is_local_file", true);
 		obs_data_set_bool(settings, "looping", true);
@@ -165,7 +180,8 @@ void AddFixture()
 			audioFixtures.push_back(audioItem);
 		obs_source_release(tone);
 	}
-	obs_data_clear(settings);
+	obs_data_release(settings);
+	settings = obs_data_create();
 	const QByteArray image = qgetenv("PENGUIN_SMOKE_IMAGE");
 	obs_data_set_string(settings, "file", image.constData());
 	obs_source_t *logo = obs_source_create("image_source", "Penguin Studio logo", settings, nullptr);
