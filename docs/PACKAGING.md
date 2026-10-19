@@ -11,7 +11,7 @@ from OBS Studio.
 | Package | Build environment | Architecture | Distribution scope |
 | --- | --- | --- | --- |
 | Flatpak | Freedesktop SDK 25.08, pinned OBS dependencies | x86_64 | Linux distributions with Flatpak and working graphics/desktop portals |
-| DEB | Ubuntu 24.04 | amd64 | Ubuntu 24.04 and compatible derivatives; rebuild for other library ABIs |
+| DEB | Ubuntu 24.04 and Ubuntu 26.04, built separately | amd64 | Install only the package matching the host Ubuntu release |
 | RPM | Fedora 44 with RPM Fusion free build dependencies | x86_64 | Fedora 44; rebuild for other RPM distributions |
 | Snap | core24 / Ubuntu 24.04 | amd64 | Hosts with snapd; development grade until confinement tests pass |
 
@@ -22,6 +22,46 @@ Fedora, openSUSE, Ubuntu, Mint, and other distributions. Its bundled runtime
 avoids depending on the host's Qt and FFmpeg versions. ARM builds require
 separate dependency manifests and validation; the current Flatpak and Snap
 recipes deliberately target x86_64 only.
+
+## Ubuntu 26.04 / 26.04.1 installation
+
+The original `penguin-studio_0.2.0_amd64.deb` was built for **Ubuntu 24.04**.
+It cannot be installed on Ubuntu 26.04: it requires FFmpeg 6, Python 3.12,
+Mbed TLS 2 and Qt library package names unavailable in the newer distribution.
+The Ubuntu App Center may leave an installation spinner visible even after
+PackageKit reports `dependencyResolutionFailed`. Waiting or retrying that DEB
+will not resolve the incompatibility.
+
+New native builds include the distribution release in the Debian revision,
+for example `penguin-studio_0.2.0-1+ubuntu26.04_amd64.deb`. Ubuntu 26.04.1 uses
+the Ubuntu 26.04 package. Do not mix 24.04 repositories into 26.04, remove
+package dependencies, or create compatibility library symlinks to force an
+older binary to load.
+
+The corrected [Ubuntu 26.04 DEB artifact](https://github.com/SigmaCodez/PenguinStudio/actions/runs/39273592623/artifacts/12197582045)
+was built from `254e43ccf18e661ec17d9825bd3c287b97fa5d95`. The
+[verification run](https://github.com/SigmaCodez/PenguinStudio/actions/runs/39273592623)
+passed compilation, output-safety/platform-flow/wizard tests, package installation
+and `penguin-studio --version` on Ubuntu 26.04. The downloaded archive and DEB
+checksums were verified, and APT dependency resolution passed on Ubuntu 26.04.1
+without requiring package removals. See [the installation report](validation/ubuntu-26.04-installation.json).
+These checks do not replace live streaming or hardware-specific validation.
+
+The local package is `dist/penguin-studio_0.2.0-1+ubuntu26.04_amd64.deb`.
+Its SHA-256 is `db31277e2839a8940990aca89349f34e12f5d05201147dd8feb321184d8b2fb9`.
+
+After downloading the matching DEB, the repository's installer checks the
+release, architecture and APT dependency resolution before installation:
+
+```sh
+bash scripts/packaging/install-deb.sh --check /path/to/penguin-studio_0.2.0-1+ubuntu26.04_amd64.deb
+bash scripts/packaging/install-deb.sh /path/to/penguin-studio_0.2.0-1+ubuntu26.04_amd64.deb
+```
+
+The first command makes no system changes. The second uses the normal Ubuntu
+administrator prompt and refuses package removals. Alternatively, open the
+matching DEB in the App Center. Flatpak remains the option that does not depend
+on the host's Qt, Python or FFmpeg library versions.
 
 ## Current 0.2 development downloads — 2026-10-19
 
@@ -116,8 +156,9 @@ installation. After extracting the matching artifact ZIP, install only on its
 supported target distribution:
 
 ```sh
-# Ubuntu 24.04:
-sudo apt install ./penguin-studio_0.2.0_amd64.deb
+# Ubuntu 26.04 / 26.04.1, after downloading the matching build:
+sudo apt install --no-remove ./penguin-studio_0.2.0-1+ubuntu26.04_amd64.deb
+# The original unlabelled DEB above is for Ubuntu 24.04 only.
 # Fedora 44:
 sudo dnf install ./penguin-studio-0.2.0-1.x86_64.rpm
 ```
@@ -128,7 +169,7 @@ To build from source, use the target distribution and start from a recursive che
 git clone --recurse-submodules --branch main https://github.com/SigmaCodez/PenguinStudio.git
 cd PenguinStudio
 sudo bash scripts/packaging/install-build-deps.sh
-bash scripts/packaging/build-native.sh DEB  # Ubuntu 24.04
+bash scripts/packaging/build-native.sh DEB  # Build on the intended Ubuntu 24.04 or 26.04 host
 # Or, inside Fedora 44:
 bash scripts/packaging/build-native.sh RPM
 ```
@@ -136,7 +177,7 @@ bash scripts/packaging/build-native.sh RPM
 The scripts download CEF from the URL and SHA-256 pinned in `CMakePresets.json`,
 build Penguin Studio with Wayland and browser support, and invoke CPack. DEB runtime
 dependencies are derived with `dpkg-shlibdeps`; RPM dependency generation is
-enabled. Output is under `build_penguin_deb/` or `build_penguin_rpm/`.
+enabled. DEB revisions and descriptions identify the build distribution release. Output is under `build_penguin_deb/` or `build_penguin_rpm/`.
 
 The native, Flatpak and Snap recipes explicitly pass
 `-DOBS_VERSION_OVERRIDE=32.2.2` to CMake. Include the same option when configuring

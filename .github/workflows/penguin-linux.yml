@@ -77,6 +77,10 @@ jobs:
         run: sudo bash scripts/packaging/install-build-deps.sh
       - name: Compile and package
         run: bash scripts/packaging/build-native.sh DEB
+      - name: Validate DEB preflight
+        run: |
+          python3 test/penguin-deb-install.py
+          bash scripts/packaging/install-deb.sh --check build_penguin_deb/penguin-studio_*.deb
       - name: Inspect package metadata
         run: dpkg-deb --info build_penguin_deb/penguin-studio_*.deb
       - name: Install DEB and verify launcher

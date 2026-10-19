@@ -27,6 +27,10 @@ The workspace takes inspiration from modern broadcasting tools such as Meld Stud
 
 ## Get started
 
+**Ubuntu 26.04 / 26.04.1:** use a DEB built specifically for Ubuntu 26.04 or the
+Flatpak bundle. The original unlabelled 0.2.0 DEB targets Ubuntu 24.04 and cannot
+be installed on 26.04. See [installation and troubleshooting](docs/PACKAGING.md#ubuntu-2604--26041-installation).
+
 1. Build or install a verified Penguin Studio package following [PACKAGING.md](docs/PACKAGING.md).
 2. Launch `penguin-studio`. Finish the OBS hardware configuration assistant and Penguin's destination assistant.
 3. Choose a platform, copy its RTMP(S) server and stream key from its creator dashboard, and choose landscape or portrait output.
