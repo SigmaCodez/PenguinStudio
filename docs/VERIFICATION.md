@@ -2,6 +2,46 @@
 
 This is a development preview based on OBS Studio 32.2.2. The new Penguin code must not be described as fully production-tested until the checks below have real recorded results.
 
+## Modern workspace and responsive dialogs — 2026-10-19
+
+Ubuntu package `0.2.0-4+ubuntu26.04` contains the third workspace layout:
+searchable layers and numbered scenes, an integrated Inspector/Outputs/Details
+sidebar, a reorganized source inspector, destination cards and wider audio
+channel strips. Settings, properties, filters and the setup assistant share the
+new theme. Settings navigation follows translated labels; long form rows can
+stack vertically. A long stream-delay explanation now occupies two lines while
+retaining the original checkbox and its complete accessible name.
+
+The installed package passes **840 workspace assertions** across English and
+German at normal and larger text sizes under native Qt 6.10.2 Wayland. Each run
+exercises 1440 × 900 and 1280 × 800 windows, source transforms and undo, filtering,
+scene renaming, production navigation and a real local H.264/AAC recording.
+All four setup-wizard cases pass. The dialog suite covers all nine Settings pages,
+source properties and filters in 35 captures with 370 input-height
+checks. Navigation labels fit and all tested Settings pages have zero horizontal
+overflow, including German FontScale 14 in a 1040-pixel settings window.
+
+All six shutdown scenarios pass again with exit code 0, no shutdown errors,
+no late callback removals, no remaining crash sentinels and zero OBS memory leaks.
+Qt Wayland focus warnings during some dialog closures remain recorded; these
+results do not claim that every log is warning-free. Layout migration preserves
+the previous dock state, and a custom arrangement survives restart.
+
+The SDK build separately passed 209 X11 and 210 Wayland workspace assertions,
+16 narrow-sidebar cases, output-safety, wizard-lifecycle and mocked OAuth checks.
+Live provider accounts and physical hardware were not newly tested by this
+layout change. [Detailed results](validation/workspace-modern.json) record the
+exact package source, build and checksums. [Reproduction instructions](../test/README-native-wayland.md)
+and the [workspace guide](WORKSPACE.md) describe the controls and test probes.
+
+Screenshots: [workspace](validation/workspace-modern-en.png),
+[compact workspace](validation/workspace-modern-compact.png),
+[large German text](validation/workspace-modern-de-large.png),
+[video settings](validation/workspace-modern-settings-video.png), and
+[advanced settings](validation/workspace-modern-settings-de-large.png).
+The first two are actual X11 application captures including the preview. The
+Wayland images are Qt widget renders; separate decoded recordings validate video.
+
 ## Native shutdown cleanup — 2026-10-19
 
 Installed Ubuntu package `0.2.0-3+ubuntu26.04` passes six native Wayland exit

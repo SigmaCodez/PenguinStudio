@@ -10,7 +10,8 @@
     "Stacked destination cards and scrollable platform forms",
     "Wider native audio channel strips",
     "Consistent charcoal/violet controls, dialogs and settings",
-    "Optional legacy context toolbar hidden by default to preserve compact-window space"
+    "Optional legacy context toolbar hidden by default to preserve compact-window space",
+    "Responsive settings forms and translated navigation, with a multiline stream-delay explanation"
   ],
   "sdk_verification": {
     "english_x11": {
@@ -87,12 +88,14 @@
     "mocked_platform_oauth": "passed",
     "branding": "passed",
     "translation_key_coverage": "English plus seven translations; 77 upstream frontend locales retained",
-    "large_text_compact_fix": "Passed at1280x800 in German with FontScale14: optional redundant source toolbar hidden by default, inspector minimum width340px, short sidebar tabs."
+    "large_text_compact_fix": "Passed at 1280x800 in German with FontScale 14: redundant source toolbar hidden by default, inspector minimum width 340px, short sidebar tabs."
   },
   "screenshots": {
     "workspace-modern-en.png": "Native X11 window capture of the running SDK test application including real preview; synthetic sources only",
     "workspace-modern-compact.png": "Native X11 capture at1280x800",
-    "workspace-modern-de-large.png": "Qt widget render under Wayland with German text at fontscale14; preview pixels are not compositor capture"
+    "workspace-modern-de-large.png": "Qt widget render under Wayland with German text at fontscale14; preview pixels are not compositor capture",
+    "workspace-modern-settings-de-large.png": "Native Qt widget render under Wayland: Advanced settings with German text at FontScale 14",
+    "workspace-modern-settings-video.png": "Native Qt widget render under Wayland: Video settings in English"
   },
   "native_build": {
     "run_id": 39322557237,
@@ -119,7 +122,1009 @@
     ]
   },
   "installed_package_verification": {
-    "status": "awaiting Ubuntu administrator confirmation"
+    "passed": true,
+    "package_version": "0.2.0-4+ubuntu26.04",
+    "platform": "wayland",
+    "installation_exit_code": 0,
+    "dpkg_audit": "clean",
+    "launcher": "Penguin Studio 0.2.0 (OBS 32.2.2)",
+    "qt_version": "6.10.2",
+    "workspace_cases": {
+      "en": {
+        "passed": true,
+        "checks": 210,
+        "capture_method": "Qt QWidget render; recorded video validated separately",
+        "warnings": [
+          "warning: Failed to load 'en-US' text for module: 'decklink-captions.so'",
+          "warning: Failed to load 'en-US' text for module: 'decklink-output-ui.so'",
+          "warning: A DeckLink iterator could not be created.  The DeckLink drivers may not be installed",
+          "warning: Failed to initialize module 'decklink.so'",
+          "warning: v4l2loopback not installed, virtual camera not registered",
+          "warning: Failed to initialize module 'obs-nvenc.so'",
+          "warning: Failed to register with host portal QDBusError(\"org.freedesktop.portal.Error.Failed\", \"Could not register app ID: Connection already associated with an application ID\")",
+          "warning: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Try to disable surface 0x55fa73087d70 with focusing surface 0x55fa727a3900",
+          "warning: Attempted to add Scene without specifying a canvas! Using default canvas instead."
+        ],
+        "window_sizes": [
+          "1440x900",
+          "1280x800"
+        ],
+        "recording_streams": [
+          {
+            "codec_name": "h264",
+            "codec_type": "video",
+            "width": 1280,
+            "height": 720
+          },
+          {
+            "codec_name": "aac",
+            "codec_type": "audio",
+            "sample_rate": "48000"
+          }
+        ],
+        "recording_duration_seconds": 3.366,
+        "audio_verification": {
+          "passed": true,
+          "rms_levels_db": [
+            -16.567182,
+            -18.505776,
+            -17.429197
+          ],
+          "overall_rms_level_db": -17.429197
+        },
+        "exit_code": 0,
+        "obs_memory_leaks": 0
+      },
+      "de": {
+        "passed": true,
+        "checks": 210,
+        "capture_method": "Qt QWidget render; recorded video validated separately",
+        "warnings": [
+          "warning: Failed to load 'en-US' text for module: 'decklink-captions.so'",
+          "warning: Failed to load 'en-US' text for module: 'decklink-output-ui.so'",
+          "warning: A DeckLink iterator could not be created.  The DeckLink drivers may not be installed",
+          "warning: Failed to initialize module 'decklink.so'",
+          "warning: v4l2loopback not installed, virtual camera not registered",
+          "warning: Failed to initialize module 'obs-nvenc.so'",
+          "warning: Failed to register with host portal QDBusError(\"org.freedesktop.portal.Error.Failed\", \"Could not register app ID: Connection already associated with an application ID\")",
+          "warning: Attempted to add Scene without specifying a canvas! Using default canvas instead."
+        ],
+        "window_sizes": [
+          "1440x900",
+          "1280x800"
+        ],
+        "recording_streams": [
+          {
+            "codec_name": "h264",
+            "codec_type": "video",
+            "width": 1280,
+            "height": 720
+          },
+          {
+            "codec_name": "aac",
+            "codec_type": "audio",
+            "sample_rate": "48000"
+          }
+        ],
+        "recording_duration_seconds": 3.366,
+        "audio_verification": {
+          "passed": true,
+          "rms_levels_db": [
+            -16.556952,
+            -18.493571,
+            -17.418197
+          ],
+          "overall_rms_level_db": -17.418197
+        },
+        "exit_code": 0,
+        "obs_memory_leaks": 0
+      },
+      "large": {
+        "passed": true,
+        "checks": 210,
+        "capture_method": "Qt QWidget render; recorded video validated separately",
+        "warnings": [
+          "warning: Failed to load 'en-US' text for module: 'decklink-captions.so'",
+          "warning: Failed to load 'en-US' text for module: 'decklink-output-ui.so'",
+          "warning: A DeckLink iterator could not be created.  The DeckLink drivers may not be installed",
+          "warning: Failed to initialize module 'decklink.so'",
+          "warning: v4l2loopback not installed, virtual camera not registered",
+          "warning: Failed to initialize module 'obs-nvenc.so'",
+          "warning: Failed to register with host portal QDBusError(\"org.freedesktop.portal.Error.Failed\", \"Could not register app ID: Connection already associated with an application ID\")",
+          "warning: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Try to disable surface 0x56ecf885d1b0 with focusing surface 0x56ecf7f81e00",
+          "warning: Attempted to add Scene without specifying a canvas! Using default canvas instead."
+        ],
+        "window_sizes": [
+          "1440x900",
+          "1280x800"
+        ],
+        "recording_streams": [
+          {
+            "codec_name": "h264",
+            "codec_type": "video",
+            "width": 1280,
+            "height": 720
+          },
+          {
+            "codec_name": "aac",
+            "codec_type": "audio",
+            "sample_rate": "48000"
+          }
+        ],
+        "recording_duration_seconds": 3.233,
+        "audio_verification": {
+          "passed": true,
+          "rms_levels_db": [
+            -16.568743,
+            -18.508666,
+            -17.431277
+          ],
+          "overall_rms_level_db": -17.431277
+        },
+        "exit_code": 0,
+        "obs_memory_leaks": 0
+      },
+      "de-large": {
+        "passed": true,
+        "checks": 210,
+        "capture_method": "Qt QWidget render; recorded video validated separately",
+        "warnings": [
+          "warning: Failed to load 'en-US' text for module: 'decklink-captions.so'",
+          "warning: Failed to load 'en-US' text for module: 'decklink-output-ui.so'",
+          "warning: A DeckLink iterator could not be created.  The DeckLink drivers may not be installed",
+          "warning: Failed to initialize module 'decklink.so'",
+          "warning: v4l2loopback not installed, virtual camera not registered",
+          "warning: Failed to initialize module 'obs-nvenc.so'",
+          "warning: Failed to register with host portal QDBusError(\"org.freedesktop.portal.Error.Failed\", \"Could not register app ID: Connection already associated with an application ID\")",
+          "warning: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Try to disable surface 0x5eefb66032d0 with focusing surface 0x5eefb685e360",
+          "warning: Attempted to add Scene without specifying a canvas! Using default canvas instead."
+        ],
+        "window_sizes": [
+          "1440x900",
+          "1280x800"
+        ],
+        "recording_streams": [
+          {
+            "codec_name": "h264",
+            "codec_type": "video",
+            "width": 1280,
+            "height": 720
+          },
+          {
+            "codec_name": "aac",
+            "codec_type": "audio",
+            "sample_rate": "48000"
+          }
+        ],
+        "recording_duration_seconds": 3.233,
+        "audio_verification": {
+          "passed": true,
+          "rms_levels_db": [
+            -16.556756,
+            -18.502155,
+            -17.421425
+          ],
+          "overall_rms_level_db": -17.421425
+        },
+        "exit_code": 0,
+        "obs_memory_leaks": 0
+      }
+    },
+    "wizard_cases": {
+      "en": {
+        "captured": true,
+        "fields": [
+          {
+            "contentHeight": 20,
+            "fontHeight": 18,
+            "height": 38,
+            "name": "canvasRes",
+            "passed": true,
+            "text": "Use Current (1920x1080)",
+            "y": 88
+          },
+          {
+            "contentHeight": 20,
+            "fontHeight": 18,
+            "height": 38,
+            "name": "fps",
+            "passed": true,
+            "text": "Either 60 or 30, but prefer 60 when possible",
+            "y": 132
+          }
+        ],
+        "platform": "wayland"
+      },
+      "de": {
+        "captured": true,
+        "fields": [
+          {
+            "contentHeight": 20,
+            "fontHeight": 18,
+            "height": 38,
+            "name": "canvasRes",
+            "passed": true,
+            "text": "Aktuelle verwenden (1920\u202f\u00d7\u202f1080)",
+            "y": 88
+          },
+          {
+            "contentHeight": 20,
+            "fontHeight": 18,
+            "height": 38,
+            "name": "fps",
+            "passed": true,
+            "text": "Entweder 60 oder 30, aber wenn m\u00f6glich, 60 bevorzugen",
+            "y": 132
+          }
+        ],
+        "platform": "wayland"
+      },
+      "large": {
+        "captured": true,
+        "fields": [
+          {
+            "contentHeight": 32,
+            "fontHeight": 26,
+            "height": 50,
+            "name": "canvasRes",
+            "passed": true,
+            "text": "Use Current (1920x1080)",
+            "y": 112
+          },
+          {
+            "contentHeight": 32,
+            "fontHeight": 26,
+            "height": 50,
+            "name": "fps",
+            "passed": true,
+            "text": "Either 60 or 30, but prefer 60 when possible",
+            "y": 168
+          }
+        ],
+        "platform": "wayland"
+      },
+      "de-large": {
+        "captured": true,
+        "fields": [
+          {
+            "contentHeight": 32,
+            "fontHeight": 26,
+            "height": 50,
+            "name": "canvasRes",
+            "passed": true,
+            "text": "Aktuelle verwenden (1920\u202f\u00d7\u202f1080)",
+            "y": 112
+          },
+          {
+            "contentHeight": 32,
+            "fontHeight": 26,
+            "height": 50,
+            "name": "fps",
+            "passed": true,
+            "text": "Entweder 60 oder 30, aber wenn m\u00f6glich, 60 bevorzugen",
+            "y": 168
+          }
+        ],
+        "platform": "wayland"
+      }
+    },
+    "dialog_cases": {
+      "en": {
+        "passed": true,
+        "captures": 17,
+        "input_height_checks": 182,
+        "navigation_labels_fit": true,
+        "settings_horizontal_overflows": [],
+        "pages": [
+          {
+            "name": "source-properties",
+            "width": 720,
+            "height": 580,
+            "screenName": "DP-2",
+            "screenAvailableGeometry": {
+              "height": 1920,
+              "width": 1080,
+              "x": 0,
+              "y": 0
+            },
+            "configuredFontScale": 10
+          },
+          {
+            "name": "source-filters",
+            "width": 861,
+            "height": 726,
+            "screenName": "DP-2",
+            "screenAvailableGeometry": {
+              "height": 1920,
+              "width": 1080,
+              "x": 0,
+              "y": 0
+            },
+            "configuredFontScale": 10
+          },
+          {
+            "name": "source-filters-bottom",
+            "width": 861,
+            "height": 726,
+            "screenName": "DP-2",
+            "screenAvailableGeometry": {
+              "height": 1920,
+              "width": 1080,
+              "x": 0,
+              "y": 0
+            },
+            "configuredFontScale": 10
+          },
+          {
+            "name": "settings-general",
+            "width": 981,
+            "height": 730,
+            "screenName": "DP-1",
+            "screenAvailableGeometry": {
+              "height": 1440,
+              "width": 2560,
+              "x": 1080,
+              "y": 480
+            },
+            "configuredFontScale": 10,
+            "navigationFits": true,
+            "navigationLabelWidth": 119,
+            "navigationAvailableWidth": 134
+          },
+          {
+            "name": "settings-general-bottom",
+            "width": 981,
+            "height": 730,
+            "screenName": "DP-1",
+            "screenAvailableGeometry": {
+              "height": 1440,
+              "width": 2560,
+              "x": 1080,
+              "y": 480
+            },
+            "configuredFontScale": 10,
+            "navigationFits": true,
+            "navigationLabelWidth": 119,
+            "navigationAvailableWidth": 134
+          },
+          {
+            "name": "settings-appearance",
+            "width": 981,
+            "height": 730,
+            "screenName": "DP-1",
+            "screenAvailableGeometry": {
+              "height": 1440,
+              "width": 2560,
+              "x": 1080,
+              "y": 480
+            },
+            "configuredFontScale": 10,
+            "navigationFits": true,
+            "navigationLabelWidth": 119,
+            "navigationAvailableWidth": 134
+          },
+          {
+            "name": "settings-stream",
+            "width": 981,
+            "height": 730,
+            "screenName": "DP-1",
+            "screenAvailableGeometry": {
+              "height": 1440,
+              "width": 2560,
+              "x": 1080,
+              "y": 480
+            },
+            "configuredFontScale": 10,
+            "navigationFits": true,
+            "navigationLabelWidth": 119,
+            "navigationAvailableWidth": 134
+          },
+          {
+            "name": "settings-output",
+            "width": 981,
+            "height": 730,
+            "screenName": "DP-1",
+            "screenAvailableGeometry": {
+              "height": 1440,
+              "width": 2560,
+              "x": 1080,
+              "y": 480
+            },
+            "configuredFontScale": 10,
+            "navigationFits": true,
+            "navigationLabelWidth": 119,
+            "navigationAvailableWidth": 134
+          },
+          {
+            "name": "settings-output-bottom",
+            "width": 981,
+            "height": 730,
+            "screenName": "DP-1",
+            "screenAvailableGeometry": {
+              "height": 1440,
+              "width": 2560,
+              "x": 1080,
+              "y": 480
+            },
+            "configuredFontScale": 10,
+            "navigationFits": true,
+            "navigationLabelWidth": 119,
+            "navigationAvailableWidth": 134
+          },
+          {
+            "name": "settings-audio",
+            "width": 981,
+            "height": 730,
+            "screenName": "DP-1",
+            "screenAvailableGeometry": {
+              "height": 1440,
+              "width": 2560,
+              "x": 1080,
+              "y": 480
+            },
+            "configuredFontScale": 10,
+            "navigationFits": true,
+            "navigationLabelWidth": 119,
+            "navigationAvailableWidth": 134
+          },
+          {
+            "name": "settings-audio-bottom",
+            "width": 981,
+            "height": 730,
+            "screenName": "DP-1",
+            "screenAvailableGeometry": {
+              "height": 1440,
+              "width": 2560,
+              "x": 1080,
+              "y": 480
+            },
+            "configuredFontScale": 10,
+            "navigationFits": true,
+            "navigationLabelWidth": 119,
+            "navigationAvailableWidth": 134
+          },
+          {
+            "name": "settings-video",
+            "width": 981,
+            "height": 730,
+            "screenName": "DP-1",
+            "screenAvailableGeometry": {
+              "height": 1440,
+              "width": 2560,
+              "x": 1080,
+              "y": 480
+            },
+            "configuredFontScale": 10,
+            "navigationFits": true,
+            "navigationLabelWidth": 119,
+            "navigationAvailableWidth": 134
+          },
+          {
+            "name": "settings-hotkeys",
+            "width": 981,
+            "height": 730,
+            "screenName": "DP-1",
+            "screenAvailableGeometry": {
+              "height": 1440,
+              "width": 2560,
+              "x": 1080,
+              "y": 480
+            },
+            "configuredFontScale": 10,
+            "navigationFits": true,
+            "navigationLabelWidth": 119,
+            "navigationAvailableWidth": 134
+          },
+          {
+            "name": "settings-hotkeys-bottom",
+            "width": 981,
+            "height": 730,
+            "screenName": "DP-1",
+            "screenAvailableGeometry": {
+              "height": 1440,
+              "width": 2560,
+              "x": 1080,
+              "y": 480
+            },
+            "configuredFontScale": 10,
+            "navigationFits": true,
+            "navigationLabelWidth": 119,
+            "navigationAvailableWidth": 134
+          },
+          {
+            "name": "settings-accessibility",
+            "width": 981,
+            "height": 730,
+            "screenName": "DP-1",
+            "screenAvailableGeometry": {
+              "height": 1440,
+              "width": 2560,
+              "x": 1080,
+              "y": 480
+            },
+            "configuredFontScale": 10,
+            "navigationFits": true,
+            "navigationLabelWidth": 119,
+            "navigationAvailableWidth": 134
+          },
+          {
+            "name": "settings-advanced",
+            "width": 981,
+            "height": 730,
+            "screenName": "DP-1",
+            "screenAvailableGeometry": {
+              "height": 1440,
+              "width": 2560,
+              "x": 1080,
+              "y": 480
+            },
+            "configuredFontScale": 10,
+            "navigationFits": true,
+            "navigationLabelWidth": 119,
+            "navigationAvailableWidth": 134,
+            "streamDelayPreserve": {
+              "accessibleName": "Preserve cutoff point (increase delay) when reconnecting",
+              "captionFits": true,
+              "captured": true,
+              "fontHeight": 18,
+              "found": true,
+              "height": 42,
+              "lineCount": 2,
+              "passed": true,
+              "text": "Preserve cutoff point\n(increase delay) when reconnecting"
+            }
+          },
+          {
+            "name": "settings-advanced-bottom",
+            "width": 981,
+            "height": 730,
+            "screenName": "DP-1",
+            "screenAvailableGeometry": {
+              "height": 1440,
+              "width": 2560,
+              "x": 1080,
+              "y": 480
+            },
+            "configuredFontScale": 10,
+            "navigationFits": true,
+            "navigationLabelWidth": 119,
+            "navigationAvailableWidth": 134
+          }
+        ],
+        "exit_code": 0,
+        "obs_memory_leaks": 0,
+        "warnings": [
+          "warning: Failed to load 'en-US' text for module: 'decklink-captions.so'",
+          "warning: Failed to load 'en-US' text for module: 'decklink-output-ui.so'",
+          "warning: A DeckLink iterator could not be created.  The DeckLink drivers may not be installed",
+          "warning: Failed to initialize module 'decklink.so'",
+          "warning: v4l2loopback not installed, virtual camera not registered",
+          "warning: Failed to initialize module 'obs-nvenc.so'",
+          "warning: Failed to register with host portal QDBusError(\"org.freedesktop.portal.Error.Failed\", \"Could not register app ID: Connection already associated with an application ID\")",
+          "warning: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Try to disable surface 0x63fabfa219d0 with focusing surface 0x63fabf187b20",
+          "warning: virtual void QtWaylandClient::QWaylandTextInputv3::zwp_text_input_v3_leave(wl_surface*) Got leave event for surface 0x0 with focusing surface 0x63fabf55e680",
+          "warning: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Try to disable surface 0x0 with focusing surface 0x63fabf55e680",
+          "warning: virtual void QtWaylandClient::QWaylandTextInputv3::zwp_text_input_v3_leave(wl_surface*) Got leave event for surface 0x0 with focusing surface 0x63fabfa219d0",
+          "warning: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Try to disable surface 0x0 with focusing surface 0x63fabfa219d0"
+        ]
+      },
+      "de-large": {
+        "passed": true,
+        "captures": 18,
+        "input_height_checks": 188,
+        "navigation_labels_fit": true,
+        "settings_horizontal_overflows": [],
+        "pages": [
+          {
+            "name": "source-properties",
+            "width": 720,
+            "height": 580,
+            "screenName": "DP-2",
+            "screenAvailableGeometry": {
+              "height": 1920,
+              "width": 1080,
+              "x": 0,
+              "y": 0
+            },
+            "configuredFontScale": 14
+          },
+          {
+            "name": "source-filters",
+            "width": 861,
+            "height": 726,
+            "screenName": "DP-2",
+            "screenAvailableGeometry": {
+              "height": 1920,
+              "width": 1080,
+              "x": 0,
+              "y": 0
+            },
+            "configuredFontScale": 14
+          },
+          {
+            "name": "source-filters-bottom",
+            "width": 861,
+            "height": 726,
+            "screenName": "DP-2",
+            "screenAvailableGeometry": {
+              "height": 1920,
+              "width": 1080,
+              "x": 0,
+              "y": 0
+            },
+            "configuredFontScale": 14
+          },
+          {
+            "name": "settings-general",
+            "width": 1040,
+            "height": 730,
+            "screenName": "DP-1",
+            "screenAvailableGeometry": {
+              "height": 1440,
+              "width": 2560,
+              "x": 1080,
+              "y": 480
+            },
+            "configuredFontScale": 14,
+            "navigationFits": true,
+            "navigationLabelWidth": 197,
+            "navigationAvailableWidth": 212
+          },
+          {
+            "name": "settings-general-bottom",
+            "width": 1040,
+            "height": 730,
+            "screenName": "DP-1",
+            "screenAvailableGeometry": {
+              "height": 1440,
+              "width": 2560,
+              "x": 1080,
+              "y": 480
+            },
+            "configuredFontScale": 14,
+            "navigationFits": true,
+            "navigationLabelWidth": 197,
+            "navigationAvailableWidth": 212
+          },
+          {
+            "name": "settings-appearance",
+            "width": 1040,
+            "height": 730,
+            "screenName": "DP-1",
+            "screenAvailableGeometry": {
+              "height": 1440,
+              "width": 2560,
+              "x": 1080,
+              "y": 480
+            },
+            "configuredFontScale": 14,
+            "navigationFits": true,
+            "navigationLabelWidth": 197,
+            "navigationAvailableWidth": 212
+          },
+          {
+            "name": "settings-stream",
+            "width": 1040,
+            "height": 730,
+            "screenName": "DP-1",
+            "screenAvailableGeometry": {
+              "height": 1440,
+              "width": 2560,
+              "x": 1080,
+              "y": 480
+            },
+            "configuredFontScale": 14,
+            "navigationFits": true,
+            "navigationLabelWidth": 197,
+            "navigationAvailableWidth": 212
+          },
+          {
+            "name": "settings-stream-bottom",
+            "width": 1040,
+            "height": 730,
+            "screenName": "DP-1",
+            "screenAvailableGeometry": {
+              "height": 1440,
+              "width": 2560,
+              "x": 1080,
+              "y": 480
+            },
+            "configuredFontScale": 14,
+            "navigationFits": true,
+            "navigationLabelWidth": 197,
+            "navigationAvailableWidth": 212
+          },
+          {
+            "name": "settings-output",
+            "width": 1040,
+            "height": 730,
+            "screenName": "DP-1",
+            "screenAvailableGeometry": {
+              "height": 1440,
+              "width": 2560,
+              "x": 1080,
+              "y": 480
+            },
+            "configuredFontScale": 14,
+            "navigationFits": true,
+            "navigationLabelWidth": 197,
+            "navigationAvailableWidth": 212
+          },
+          {
+            "name": "settings-output-bottom",
+            "width": 1040,
+            "height": 730,
+            "screenName": "DP-1",
+            "screenAvailableGeometry": {
+              "height": 1440,
+              "width": 2560,
+              "x": 1080,
+              "y": 480
+            },
+            "configuredFontScale": 14,
+            "navigationFits": true,
+            "navigationLabelWidth": 197,
+            "navigationAvailableWidth": 212
+          },
+          {
+            "name": "settings-audio",
+            "width": 1040,
+            "height": 730,
+            "screenName": "DP-1",
+            "screenAvailableGeometry": {
+              "height": 1440,
+              "width": 2560,
+              "x": 1080,
+              "y": 480
+            },
+            "configuredFontScale": 14,
+            "navigationFits": true,
+            "navigationLabelWidth": 197,
+            "navigationAvailableWidth": 212
+          },
+          {
+            "name": "settings-audio-bottom",
+            "width": 1040,
+            "height": 730,
+            "screenName": "DP-1",
+            "screenAvailableGeometry": {
+              "height": 1440,
+              "width": 2560,
+              "x": 1080,
+              "y": 480
+            },
+            "configuredFontScale": 14,
+            "navigationFits": true,
+            "navigationLabelWidth": 197,
+            "navigationAvailableWidth": 212
+          },
+          {
+            "name": "settings-video",
+            "width": 1040,
+            "height": 730,
+            "screenName": "DP-1",
+            "screenAvailableGeometry": {
+              "height": 1440,
+              "width": 2560,
+              "x": 1080,
+              "y": 480
+            },
+            "configuredFontScale": 14,
+            "navigationFits": true,
+            "navigationLabelWidth": 197,
+            "navigationAvailableWidth": 212
+          },
+          {
+            "name": "settings-hotkeys",
+            "width": 1040,
+            "height": 730,
+            "screenName": "DP-1",
+            "screenAvailableGeometry": {
+              "height": 1440,
+              "width": 2560,
+              "x": 1080,
+              "y": 480
+            },
+            "configuredFontScale": 14,
+            "navigationFits": true,
+            "navigationLabelWidth": 197,
+            "navigationAvailableWidth": 212
+          },
+          {
+            "name": "settings-hotkeys-bottom",
+            "width": 1040,
+            "height": 730,
+            "screenName": "DP-1",
+            "screenAvailableGeometry": {
+              "height": 1440,
+              "width": 2560,
+              "x": 1080,
+              "y": 480
+            },
+            "configuredFontScale": 14,
+            "navigationFits": true,
+            "navigationLabelWidth": 197,
+            "navigationAvailableWidth": 212
+          },
+          {
+            "name": "settings-accessibility",
+            "width": 1040,
+            "height": 730,
+            "screenName": "DP-1",
+            "screenAvailableGeometry": {
+              "height": 1440,
+              "width": 2560,
+              "x": 1080,
+              "y": 480
+            },
+            "configuredFontScale": 14,
+            "navigationFits": true,
+            "navigationLabelWidth": 197,
+            "navigationAvailableWidth": 212
+          },
+          {
+            "name": "settings-advanced",
+            "width": 1040,
+            "height": 730,
+            "screenName": "DP-1",
+            "screenAvailableGeometry": {
+              "height": 1440,
+              "width": 2560,
+              "x": 1080,
+              "y": 480
+            },
+            "configuredFontScale": 14,
+            "navigationFits": true,
+            "navigationLabelWidth": 197,
+            "navigationAvailableWidth": 212,
+            "streamDelayPreserve": {
+              "accessibleName": "L\u00fcckenloses Wiederverbinden (erh\u00f6ht Verz\u00f6gerung, um Videoverluste zu vermeiden)",
+              "captionFits": true,
+              "captured": true,
+              "fontHeight": 26,
+              "found": true,
+              "height": 58,
+              "lineCount": 2,
+              "passed": true,
+              "text": "L\u00fcckenloses Wiederverbinden\n(erh\u00f6ht Verz\u00f6gerung, um Videoverluste zu vermeiden)"
+            }
+          },
+          {
+            "name": "settings-advanced-bottom",
+            "width": 1040,
+            "height": 730,
+            "screenName": "DP-1",
+            "screenAvailableGeometry": {
+              "height": 1440,
+              "width": 2560,
+              "x": 1080,
+              "y": 480
+            },
+            "configuredFontScale": 14,
+            "navigationFits": true,
+            "navigationLabelWidth": 197,
+            "navigationAvailableWidth": 212
+          }
+        ],
+        "exit_code": 0,
+        "obs_memory_leaks": 0,
+        "warnings": [
+          "warning: Failed to load 'en-US' text for module: 'decklink-captions.so'",
+          "warning: Failed to load 'en-US' text for module: 'decklink-output-ui.so'",
+          "warning: A DeckLink iterator could not be created.  The DeckLink drivers may not be installed",
+          "warning: Failed to initialize module 'decklink.so'",
+          "warning: v4l2loopback not installed, virtual camera not registered",
+          "warning: Failed to initialize module 'obs-nvenc.so'",
+          "warning: Failed to register with host portal QDBusError(\"org.freedesktop.portal.Error.Failed\", \"Could not register app ID: Connection already associated with an application ID\")",
+          "warning: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Try to disable surface 0x5819e29adf40 with focusing surface 0x5819e2146d40",
+          "warning: virtual void QtWaylandClient::QWaylandTextInputv3::zwp_text_input_v3_leave(wl_surface*) Got leave event for surface 0x0 with focusing surface 0x5819e24c7120",
+          "warning: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Try to disable surface 0x0 with focusing surface 0x5819e24c7120",
+          "warning: virtual void QtWaylandClient::QWaylandTextInputv3::zwp_text_input_v3_leave(wl_surface*) Got leave event for surface 0x0 with focusing surface 0x5819e29adf40",
+          "warning: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Try to disable surface 0x0 with focusing surface 0x5819e29adf40"
+        ]
+      }
+    },
+    "shutdown_cases": {
+      "normal": {
+        "apiInitialized": true,
+        "apiDestroyed": true,
+        "unregisterCalls": 4,
+        "lateUnregisterCalls": 0,
+        "closeRequested": true,
+        "sentinelObserved": true,
+        "wizardVisibleAtClose": false,
+        "statsOpened": false,
+        "platform": "wayland",
+        "exit_code": 0,
+        "shutdown_errors": [],
+        "shutdown_warnings": [],
+        "sentinel_files_after_exit": 0,
+        "obs_memory_leaks": 0
+      },
+      "multi": {
+        "apiInitialized": true,
+        "apiDestroyed": true,
+        "unregisterCalls": 4,
+        "lateUnregisterCalls": 0,
+        "closeRequested": true,
+        "sentinelObserved": false,
+        "wizardVisibleAtClose": false,
+        "statsOpened": false,
+        "platform": "wayland",
+        "exit_code": 0,
+        "shutdown_errors": [],
+        "shutdown_warnings": [],
+        "sentinel_files_after_exit": 0,
+        "obs_memory_leaks": 0
+      },
+      "wizard": {
+        "apiInitialized": true,
+        "apiDestroyed": true,
+        "unregisterCalls": 4,
+        "lateUnregisterCalls": 0,
+        "closeRequested": true,
+        "sentinelObserved": false,
+        "wizardVisibleAtClose": true,
+        "statsOpened": false,
+        "platform": "wayland",
+        "exit_code": 0,
+        "shutdown_errors": [],
+        "shutdown_warnings": [
+          "warning: virtual void QtWaylandClient::QWaylandTextInputv3::zwp_text_input_v3_leave(wl_surface*) Got leave event for surface 0x0 with focusing surface 0x63f8ad117e90",
+          "warning: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Try to disable surface 0x0 with focusing surface 0x63f8ad117e90"
+        ],
+        "sentinel_files_after_exit": 0,
+        "obs_memory_leaks": 0
+      },
+      "stats": {
+        "apiInitialized": true,
+        "apiDestroyed": true,
+        "unregisterCalls": 5,
+        "lateUnregisterCalls": 0,
+        "closeRequested": true,
+        "sentinelObserved": true,
+        "wizardVisibleAtClose": false,
+        "statsOpened": true,
+        "platform": "wayland",
+        "exit_code": 0,
+        "shutdown_errors": [],
+        "shutdown_warnings": [],
+        "sentinel_files_after_exit": 0,
+        "obs_memory_leaks": 0
+      },
+      "restart": {
+        "apiInitialized": true,
+        "apiDestroyed": true,
+        "unregisterCalls": 4,
+        "lateUnregisterCalls": 0,
+        "closeRequested": true,
+        "sentinelObserved": true,
+        "wizardVisibleAtClose": false,
+        "statsOpened": false,
+        "platform": "wayland",
+        "exit_code": 0,
+        "shutdown_errors": [],
+        "shutdown_warnings": [],
+        "sentinel_files_after_exit": 0,
+        "obs_memory_leaks": 0
+      },
+      "signal": {
+        "apiInitialized": true,
+        "apiDestroyed": true,
+        "unregisterCalls": 4,
+        "lateUnregisterCalls": 0,
+        "closeRequested": true,
+        "sentinelObserved": true,
+        "wizardVisibleAtClose": false,
+        "statsOpened": false,
+        "platform": "wayland",
+        "exit_code": 0,
+        "shutdown_errors": [],
+        "shutdown_warnings": [],
+        "sentinel_files_after_exit": 0,
+        "obs_memory_leaks": 0
+      }
+    }
   },
   "limitations": [
     "Provider authorization/title changes were tested only with mocks; no public broadcast was started",
