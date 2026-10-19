@@ -66,5 +66,13 @@
     "removed_packages": 0,
     "upgraded_packages": 0,
     "installed_during_preflight": false
+  },
+  "host_installation": {
+    "status": "passed",
+    "package_status": "install ok installed 0.2.0-1+ubuntu26.04",
+    "installer_exit_code": 0,
+    "dpkg_audit": "clean",
+    "cli_version": "Penguin Studio 0.2.0 (OBS 32.2.2)",
+    "gui_runtime_test": "not performed in this installation check"
   }
 }
