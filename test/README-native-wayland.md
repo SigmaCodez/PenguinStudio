@@ -87,14 +87,19 @@ bash scripts/packaging/verify-shutdown.sh /tmp/penguin-shutdown-probe.so /tmp/pe
 The observer calls the real frontend API unchanged. It counts callback removal
 after frontend destruction and writes the report at process teardown, after the
 WebSocket module has unloaded. It never hides or changes application log messages.
-The runner checks normal exit, `--multi`, an open setup wizard, a separately opened
-and closed statistics window, restart of the same normal profile, and graceful
-SIGTERM handling after startup. Normal
-runs must create a crash sentinel and remove it on clean exit; multi-instance
-runs must never create one. Each process must exit successfully with no errors
-in the shutdown section, no late frontend unregisters, and zero OBS memory leaks.
-Optional hardware-plugin diagnostics during startup are outside this shutdown
-check. Qt warnings are retained in each report rather than filtered out.
+The runner checks nine scenarios: normal exit, `--multi`, an open initial setup
+wizard, connection-wizard cancellation, shutdown with a connection text field
+verified to have native keyboard focus, auto-configuration cancellation, a
+separately opened and closed statistics window, restart of the same normal
+profile, and graceful SIGTERM handling after startup. Normal runs must create a
+crash sentinel and remove it on clean exit; multi-instance runs must never create
+one. Each process must exit successfully with no warnings or errors in the
+shutdown section, no late frontend unregisters, and zero OBS memory leaks.
+The runner rejects the known null-surface Qt focus warnings anywhere in the log,
+including before the shutdown marker. Verbose logging preserves the original
+debug diagnostics from the narrowly scoped [Qt compatibility correction](../docs/QT_WAYLAND_DIAGNOSTICS.md).
+Startup hardware diagnostics and non-null Qt focus warnings are retained in the
+reports separately; they are not reclassified by this correction.
 
 The WebSocket submodule remains pinned to its upstream revision. Its maintained
 fix lives in `patches/obs-websocket-shutdown.patch` and is applied by CMake before

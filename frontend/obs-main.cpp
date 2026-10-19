@@ -24,6 +24,7 @@
 #endif
 #include <utility/BaseLexer.hpp>
 #include <utility/OBSTranslator.hpp>
+#include <utility/QtWaylandDiagnostics.hpp>
 #include <utility/platform.hpp>
 
 #include <qt-wrappers.hpp>
@@ -621,7 +622,13 @@ static int run_program(fstream &logFile, int argc, char *argv[])
 
 		program.checkForUncleanShutdown();
 
-		qInstallMessageHandler([](QtMsgType type, const QMessageLogContext &, const QString &message) {
+		qInstallMessageHandler([](QtMsgType type, const QMessageLogContext &context, const QString &message) {
+			if (IsBenignQtWaylandTeardownWarning(type, context, message, qVersion(),
+							   QGuiApplication::platformName())) {
+				// Keep the original diagnostic available with --verbose, including release builds.
+				blog(LOG_DEBUG, "%s", QT_TO_UTF8(message));
+				return;
+			}
 			switch (type) {
 #ifdef _DEBUG
 			case QtDebugMsg:

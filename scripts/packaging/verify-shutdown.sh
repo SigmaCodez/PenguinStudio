@@ -12,7 +12,7 @@ if [[ -e "$results" ]]; then
   exit 2
 fi
 mkdir -p "$results"
-for scenario in normal multi wizard stats restart signal; do
+for scenario in normal multi wizard wizard-cancel wizard-input auto-config stats restart signal; do
   profile=$scenario
   mode=$scenario
   if [[ "$scenario" == restart ]]; then
@@ -23,7 +23,8 @@ for scenario in normal multi wizard stats restart signal; do
   if [[ "$scenario" != restart ]]; then
     printf '[General]\nLanguage=en-US\n' > "$results/$profile/config/PenguinStudio/user.ini"
   fi
-  args=(--disable-updater)
+  # Retain classified Qt teardown diagnostics at DEBUG level for verification.
+  args=(--disable-updater --verbose)
   if [[ "$scenario" == multi || "$scenario" == wizard ]]; then
     args+=(--multi)
   fi
@@ -46,22 +47,46 @@ assert report['apiInitialized'] and report['apiDestroyed'] and report['closeRequ
 assert '[obs-websocket] [obs_module_load] Module loaded.' in log
 assert '[obs-websocket] [obs_module_unload] Finished shutting down.' in log
 assert report['unregisterCalls'] >= 4 and report['lateUnregisterCalls'] == 0, report
-assert report['sentinelObserved'] == (scenario in ('normal', 'stats', 'restart', 'signal')), report
+assert report['sentinelObserved'] == (scenario not in ('multi', 'wizard')), report
 assert not list((root / profile / 'config/PenguinStudio/.sentinel').glob('run_*'))
 if scenario == 'wizard':
     assert report['wizardVisibleAtClose'], report
+if scenario in ('wizard-cancel', 'wizard-input'):
+    assert report['connectionWizardOpened'] and report['wizardInputFocused'], report
+if scenario == 'wizard-input':
+    assert report['wizardVisibleAtClose'] and report['wizardInputFocusedAtClose'], report
+if scenario in ('wizard-cancel', 'auto-config'):
+    assert report['wizardCancelRequested'] and report['wizardClosedBeforeShutdown'], report
+    assert not report['wizardVisibleAtClose'], report
+if scenario == 'auto-config':
+    assert report['autoConfigOpened'], report
 if scenario == 'stats':
     assert report['statsOpened'], report
 marker = '==== Shutting down'
 assert marker in log
 shutdown_log = log.split(marker, 1)[1]
+startup_log = log.split(marker, 1)[0]
 errors = re.findall(r'^.*\berror:.*$', shutdown_log, re.MULTILINE | re.IGNORECASE)
 assert not errors, errors
+# Cancellation occurs before the main shutdown marker. Inspect the entire run so
+# focus warnings cannot be hidden by moving a dialog's destruction earlier.
+focus_message = r'[^\n]*QWaylandTextInput\w*::(?:zwp_text_input_v\d+_leave|disableSurface)\b[^\n]*'
+null_surface = r'\bsurface (?:0x0+|\(nil\)) with focusing surface\b'
+focus_warnings = re.findall(r'^warning:' + focus_message + '$', log, re.MULTILINE)
+teardown_focus_warnings = [line for line in focus_warnings if re.search(null_surface, line)]
+assert not teardown_focus_warnings, teardown_focus_warnings
+shutdown_warnings = re.findall(r'^warning:.*$', shutdown_log, re.MULTILINE)
+assert not shutdown_warnings, shutdown_warnings
+focus_debug = re.findall(r'^debug:' + focus_message + '$', log, re.MULTILINE)
 assert 'Number of memory leaks: 0' in shutdown_log
 report.update(platform='wayland', exit_code=0, shutdown_errors=errors,
-              shutdown_warnings=re.findall(r'^warning:.*$', shutdown_log, re.MULTILINE),
+              shutdown_warnings=shutdown_warnings,
+              qt_focus_warnings=focus_warnings,
+              qt_teardown_focus_warnings=teardown_focus_warnings,
+              startup_qt_focus_warnings=re.findall(r'^warning:' + focus_message + '$', startup_log, re.MULTILINE),
+              qt_teardown_focus_debug_messages=[line for line in focus_debug if re.search(null_surface, line)],
               sentinel_files_after_exit=0, obs_memory_leaks=0)
 (case / 'verified.json').write_text(json.dumps(report, indent=2) + '\n')
-print(f'PASS: {scenario}: zero late unregisters, zero shutdown errors, zero OBS memory leaks')
+print(f'PASS: {scenario}: zero late unregisters, zero shutdown warnings/errors, zero Qt teardown focus warnings, zero OBS memory leaks')
 PY
 done
