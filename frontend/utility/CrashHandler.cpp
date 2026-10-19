@@ -353,7 +353,9 @@ void CrashHandler::crashLogUploadResultHandler(const std::string &uploadResult, 
 
 void CrashHandler::applicationShutdownHandler() noexcept
 {
-	if (!isSentinelEnabled) {
+	// Multi-instance launches deliberately use an inactive handler. Also make
+	// repeated shutdown notifications harmless after the sentinel was removed.
+	if (!isSentinelEnabled || !isActiveCrashHandler_) {
 		return;
 	}
 

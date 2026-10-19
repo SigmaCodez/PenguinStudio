@@ -1,0 +1,42 @@
+--- a/src/eventhandler/EventHandler.cpp
++++ b/src/eventhandler/EventHandler.cpp
+@@ -24,6 +24,7 @@
+ 	blog_debug("[EventHandler::EventHandler] Setting up...");
+ 
+ 	obs_frontend_add_event_callback(OnFrontendEvent, this);
++	_frontendCallbackRegistered = true;
+ 
+ 	signal_handler_t *coreSignalHandler = obs_get_signal_handler();
+ 	if (coreSignalHandler) {
+@@ -48,7 +49,8 @@
+ {
+ 	blog_debug("[EventHandler::~EventHandler] Shutting down...");
+ 
+-	obs_frontend_remove_event_callback(OnFrontendEvent, this);
++	if (_frontendCallbackRegistered)
++		obs_frontend_remove_event_callback(OnFrontendEvent, this);
+ 
+ 	coreSignals.clear();
+ 
+@@ -262,6 +264,11 @@
+ 	case OBS_FRONTEND_EVENT_FINISHED_LOADING:
+ 		eventHandler->FrontendFinishedLoadingMultiHandler();
+ 		break;
++	case OBS_FRONTEND_EVENT_EXIT:
++		// The frontend API is destroyed immediately after this event.
++		obs_frontend_remove_event_callback(OnFrontendEvent, eventHandler);
++		eventHandler->_frontendCallbackRegistered = false;
++		break;
+ 	case OBS_FRONTEND_EVENT_SCRIPTING_SHUTDOWN:
+ 		eventHandler->FrontendExitMultiHandler();
+ 		break;
+--- a/src/eventhandler/EventHandler.h
++++ b/src/eventhandler/EventHandler.h
+@@ -50,6 +50,7 @@
+ 	ObsReadyCallback _obsReadyCallback;
+ 
+ 	std::atomic<bool> _obsReady = false;
++	bool _frontendCallbackRegistered = false;
+ 
+ 	std::vector<OBSSignal> coreSignals;
+ 	OBSSignal recordFileChangedSignal;

@@ -55,6 +55,7 @@ public:
 	void showMixerContextMenu();
 
 private:
+	bool frontendCallbackRegistered = false;
 	std::vector<OBSSignal> signalHandlers;
 	std::vector<OBSSignal> previewSignals;
 	static void onFrontendEvent(enum obs_frontend_event event, void *data);
