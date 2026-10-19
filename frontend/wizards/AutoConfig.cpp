@@ -199,6 +199,12 @@ AutoConfig::AutoConfig(QWidget *parent) : QWizard(parent)
 	setButtonText(QWizard::BackButton, QTStr("Back"));
 	setButtonText(QWizard::NextButton, QTStr("Next"));
 	setButtonText(QWizard::CancelButton, QTStr("Cancel"));
+
+	// QWizard has no useful minimumSizeHint on Linux. Respect the current
+	// page's natural size so a compact window cannot collapse form rows.
+	connect(this, &QWizard::currentIdChanged, this, [this] { setMinimumSize(sizeHint()); });
+	ensurePolished();
+	setMinimumSize(sizeHint());
 }
 
 AutoConfig::~AutoConfig()

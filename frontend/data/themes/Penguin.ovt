@@ -355,6 +355,10 @@ QHeaderView::section {
 }
 
 /* Reusable form language, shared by inspector, properties and setup dialogs. */
+/* A preferred height alone lets compact wizard layouts clip the text. */
+QLineEdit, QSpinBox, QDoubleSpinBox, QComboBox, QDateTimeEdit {
+    min-height: var(--input_height);
+}
 QLineEdit, QTextEdit, QPlainTextEdit, QSpinBox, QDoubleSpinBox, QComboBox {
     border: 1px solid #343A48;
     border-radius: 5px;
