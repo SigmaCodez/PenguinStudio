@@ -6,7 +6,7 @@
 
 Penguin Studio brings a redesigned production workspace, native multi-destination output controls, portrait output and platform connections to the OBS production engine. It is based on **OBS Studio 32.2.2**, commit `ba2f32bdf791005443988a4955e963663e16b1ed`.
 
-![Penguin Studio 0.2 native workspace with a real canvas, audio channels and source inspector](docs/validation/workspace-0.2-en.png)
+![Penguin Studio modern workspace with searchable layers and scenes, audio channel strips and an integrated inspector](docs/validation/workspace-modern-en.png)
 
 Actual Linux application capture with test media. See the [workspace guide](docs/WORKSPACE.md) for the controls and layout.
 
@@ -14,7 +14,7 @@ Actual Linux application capture with test media. See the [workspace guide](docs
 
 ## What is included
 
-- A native production workspace with scenes and layers on the left, canvas in the center, a channel-strip audio mixer below, and a source inspector on the right. The top bar brings together destinations, live output, recording and replay clips.
+- A native production workspace with searchable layers and numbered scenes on the left, canvas in the center, a channel-strip audio mixer below, and tabbed inspector/output/details tools on the right. The top bar brings together destinations, live output, recording and replay clips.
 - An editable inspector for source position, size, rotation, crop, visibility and locking, with undo/redo, source properties and filters. See the [workspace guide](docs/WORKSPACE.md).
 - Original Penguin Studio logo, a complete dark control theme, English defaults and a separate `PenguinStudio` configuration directory.
 - The upstream OBS capture, scene, recording, mixer, filter, plugin and translation infrastructure, including all 77 frontend locale files.

@@ -181,12 +181,15 @@ env QT_QPA_PLATFORM=wayland XDG_CONFIG_HOME="$qa_dialogs/config" \
 Repeat with a fresh English profile at the default font size. The 14-point case is
 a deliberate stress test above the current Appearance slider's 12-point maximum.
 The JSON report records input content heights versus font heights, full visible
-widget bounds, horizontal scroll ranges and settings navigation label/viewport
-widths. Require every dialog to be found and captured, every input height check to
-pass, and every `navigationFits` value to be true. On the validation desktop,
+widget bounds and minimum sizes, actual screen geometry, horizontal scroll ranges
+and settings navigation label/viewport widths. Require every dialog to be found
+and captured, every input height check to pass, and every `navigationFits` value to be true. On the validation desktop,
 require every settings page's `horizontalOverflow` array to be empty and inspect
 the PNGs for form clipping. Vertical scrolling remains appropriate for long pages;
 navigation labels must always fit without horizontal scrolling. Require all nine settings
 page names, source properties and source filters in the report, and a clean OBS
-shutdown. These images are Qt widget renders, so independently rendered video
-previews must be verified with the workspace recording checks.
+shutdown. The Advanced page's `streamDelayPreserve.passed` must also be true: the
+complete multiline caption fits, its accessible name retains the original text,
+and enabling, toggling and restoring the checkbox still work. Inspect the separate
+`stream-delay-checkbox.png` capture for its full caption. These images are Qt widget
+renders, so independently rendered video previews must be verified with the workspace recording checks.
