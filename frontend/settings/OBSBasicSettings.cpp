@@ -2387,6 +2387,7 @@ void OBSBasicSettings::LoadAudioSources()
 	auto layout = new QFormLayout();
 	layout->setVerticalSpacing(15);
 	layout->setFieldGrowthPolicy(QFormLayout::AllNonFixedFieldsGrow);
+	layout->setRowWrapPolicy(QFormLayout::WrapLongRows);
 
 	audioSourceSignals.clear();
 	audioSources.clear();
@@ -2408,6 +2409,7 @@ void OBSBasicSettings::LoadAudioSources()
 		form->setVerticalSpacing(0);
 		form->setHorizontalSpacing(5);
 		form->setFieldGrowthPolicy(QFormLayout::AllNonFixedFieldsGrow);
+		form->setRowWrapPolicy(QFormLayout::WrapLongRows);
 
 		auto ptmCB = new SilentUpdateCheckBox();
 		ptmCB->setText(enablePtm);
@@ -2808,6 +2810,7 @@ void OBSBasicSettings::LoadHotkeySettings(obs_hotkey_id ignoreKey)
 	QFormLayout *hotkeysLayout = new QFormLayout();
 	hotkeysLayout->setVerticalSpacing(0);
 	hotkeysLayout->setFieldGrowthPolicy(QFormLayout::AllNonFixedFieldsGrow);
+	hotkeysLayout->setRowWrapPolicy(QFormLayout::WrapLongRows);
 	hotkeysLayout->setLabelAlignment(Qt::AlignRight | Qt::AlignTrailing | Qt::AlignVCenter);
 	auto hotkeyChildWidget = new QWidget();
 	hotkeyChildWidget->setLayout(hotkeysLayout);
@@ -3942,6 +3945,22 @@ void OBSBasicSettings::closeEvent(QCloseEvent *event)
 void OBSBasicSettings::showEvent(QShowEvent *event)
 {
 	QDialog::showEvent(event);
+
+	// Stack long label/field pairs on narrow displays instead of clipping the form.
+	for (auto *form : findChildren<QFormLayout *>())
+		form->setRowWrapPolicy(QFormLayout::WrapLongRows);
+
+	// Navigation must accommodate translated labels and the selected font size.
+	// Keep the initial form width proportional to text without exceeding the screen.
+	const int navigationWidth = ui->listWidget->sizeHintForColumn(0) + 2 * ui->listWidget->frameWidth() + 12;
+	ui->listWidget->setFixedWidth(navigationWidth);
+	ui->listWidget->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	const qreal fontScale =
+		std::max<qreal>(1.0, config_get_int(App()->GetUserConfig(), "Appearance", "FontScale") / 10.0);
+	const int availableWidth = screen()->availableGeometry().width() - 40;
+	const int initialWidth = std::min(availableWidth, std::max(width(), qRound(981 * fontScale)));
+	if (width() != initialWidth)
+		resize(initialWidth, height());
 
 	/* Reduce the height of the widget area if too tall compared to the screen
 	 * size (e.g., 720p) with potential window decoration (e.g., titlebar). */

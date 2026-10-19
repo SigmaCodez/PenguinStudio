@@ -149,3 +149,44 @@ with video and audio streams, and zero OBS leaks on shutdown. Also run the compa
 wizard probe in all four language/font cases and the separate shutdown regression
 against the final installed package. Retain warnings in the evidence even when
 they are unrelated to a tested layout assertion.
+
+## Settings and source dialogs
+
+`penguin-dialog-smoke.cpp` opens the real Source properties and Effects and filters
+buttons in the inspector, then the top-bar Settings button. It captures all nine
+settings pages and scrolls long pages to the bottom. It uses a newly created image
+source with a color-correction filter in a disposable profile and closes dialogs
+without saving settings. The helper is test-only and must never be preloaded into
+a personal configuration.
+
+Compile against the installed application's matching Qt and OBS headers/libraries:
+
+```sh
+c++ -std=c++17 -shared -fPIC -Wall -Wextra -Werror -I/usr/include/obs \
+  test/penguin-dialog-smoke.cpp -o /tmp/penguin-dialog-smoke.so \
+  $(pkg-config --cflags --libs Qt6Widgets) -lobs -lobs-frontend-api
+qa_repo=$(pwd)
+qa_dialogs=$(mktemp -d /tmp/penguin-dialogs.XXXXXX)
+mkdir -p "$qa_dialogs/config/PenguinStudio" "$qa_dialogs/cache" "$qa_dialogs/captures"
+printf '[General]\nLanguage=de-DE\n\n[Appearance]\nFontScale=14\n' \
+  > "$qa_dialogs/config/PenguinStudio/user.ini"
+env QT_QPA_PLATFORM=wayland XDG_CONFIG_HOME="$qa_dialogs/config" \
+  XDG_CACHE_HOME="$qa_dialogs/cache" LD_PRELOAD=/tmp/penguin-dialog-smoke.so \
+  PENGUIN_DIALOG_DIR="$qa_dialogs/captures" \
+  PENGUIN_DIALOG_IMAGE="$qa_repo/assets/branding/penguin-studio.png" \
+  timeout --kill-after=5s 70s penguin-studio --multi --disable-updater \
+  > "$qa_dialogs/application.log" 2>&1
+```
+
+Repeat with a fresh English profile at the default font size. The 14-point case is
+a deliberate stress test above the current Appearance slider's 12-point maximum.
+The JSON report records input content heights versus font heights, full visible
+widget bounds, horizontal scroll ranges and settings navigation label/viewport
+widths. Require every dialog to be found and captured, every input height check to
+pass, and every `navigationFits` value to be true. On the validation desktop,
+require every settings page's `horizontalOverflow` array to be empty and inspect
+the PNGs for form clipping. Vertical scrolling remains appropriate for long pages;
+navigation labels must always fit without horizontal scrolling. Require all nine settings
+page names, source properties and source filters in the report, and a clean OBS
+shutdown. These images are Qt widget renders, so independently rendered video
+previews must be verified with the workspace recording checks.

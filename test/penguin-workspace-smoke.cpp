@@ -65,7 +65,8 @@ void Check(bool passed, const QString &name)
 {
 	checks.append(QJsonObject{{QStringLiteral("name"), name}, {QStringLiteral("passed"), passed}});
 	qInfo("Workspace check: %s: %s", qPrintable(name), passed ? "PASS" : "FAIL");
-	QFile progress(QDir(QString::fromLocal8Bit(qgetenv("PENGUIN_SMOKE_DIR"))).filePath(QStringLiteral("checks-progress.json")));
+	const QDir directory(QString::fromLocal8Bit(qgetenv("PENGUIN_SMOKE_DIR")));
+	QFile progress(directory.filePath(QStringLiteral("checks-progress.json")));
 	if (progress.open(QIODevice::WriteOnly))
 		progress.write(QJsonDocument(checks).toJson());
 }
@@ -92,31 +93,33 @@ void SaveReport()
 	QFile report(Results().filePath(QStringLiteral("workspace-checks.json")));
 	const QRect available = mainWindow->screen()->availableGeometry();
 	config_t *config = obs_frontend_get_user_config();
+	const QJsonObject metadata{
+		{QStringLiteral("platform"), QGuiApplication::platformName()},
+		{QStringLiteral("windowWidth"), mainWindow->width()},
+		{QStringLiteral("windowHeight"), mainWindow->height()},
+		{QStringLiteral("screenWidth"), available.width()},
+		{QStringLiteral("screenHeight"), available.height()},
+		{QStringLiteral("devicePixelRatio"), mainWindow->devicePixelRatioF()},
+		{QStringLiteral("workspaceVersion"),
+		 int(config_get_int(config, "BasicWindow", "PenguinWorkspaceVersion"))},
+		{QStringLiteral("previousDockStateSaved"),
+		 config_has_user_value(config, "BasicWindow", "PenguinPreviousDockState")},
+		{QStringLiteral("captureMethod"), QGuiApplication::platformName() == QStringLiteral("xcb")
+						 ? QStringLiteral("native-x11-window")
+						 : QStringLiteral("qt-widget-render")},
+		{QStringLiteral("checks"), checks}, {QStringLiteral("sidebarTabs"), tabMeasurements},
+		{QStringLiteral("capturedLayouts"), capturedLayouts}, {QStringLiteral("widgets"), widgets}};
 	if (report.open(QIODevice::WriteOnly))
-		report.write(QJsonDocument(QJsonObject{{QStringLiteral("platform"), QGuiApplication::platformName()},
-						     {QStringLiteral("windowWidth"), mainWindow->width()},
-						     {QStringLiteral("windowHeight"), mainWindow->height()},
-						     {QStringLiteral("screenWidth"), available.width()},
-						     {QStringLiteral("screenHeight"), available.height()},
-						     {QStringLiteral("devicePixelRatio"), mainWindow->devicePixelRatioF()},
-						     {QStringLiteral("workspaceVersion"), int(config_get_int(config, "BasicWindow", "PenguinWorkspaceVersion"))},
-						     {QStringLiteral("previousDockStateSaved"), config_has_user_value(config, "BasicWindow", "PenguinPreviousDockState")},
-						     {QStringLiteral("captureMethod"), QGuiApplication::platformName() == QStringLiteral("xcb")
-							      ? QStringLiteral("native-x11-window") : QStringLiteral("qt-widget-render")},
-						     {QStringLiteral("checks"), checks},
-						     {QStringLiteral("sidebarTabs"), tabMeasurements},
-						     {QStringLiteral("capturedLayouts"), capturedLayouts},
-						     {QStringLiteral("widgets"), widgets}})
-				     .toJson());
+		report.write(QJsonDocument(metadata).toJson());
 }
 
 void Capture(const QString &filename)
 {
-	capturedLayouts.append(QJsonObject{{"image", filename}, {"width", mainWindow->width()},
-					   {"height", mainWindow->height()}, {"minimumWidth", mainWindow->minimumWidth()},
-					   {"minimumHeight", mainWindow->minimumHeight()},
-					   {"minimumHintWidth", mainWindow->minimumSizeHint().width()},
-					   {"minimumHintHeight", mainWindow->minimumSizeHint().height()}});
+	capturedLayouts.append(QJsonObject{
+		{"image", filename}, {"width", mainWindow->width()}, {"height", mainWindow->height()},
+		{"minimumWidth", mainWindow->minimumWidth()}, {"minimumHeight", mainWindow->minimumHeight()},
+		{"minimumHintWidth", mainWindow->minimumSizeHint().width()},
+		{"minimumHintHeight", mainWindow->minimumSizeHint().height()}});
 	if (QGuiApplication::platformName() != QStringLiteral("xcb")) {
 		const QString widgetFilename = QFileInfo(filename).completeBaseName() + QStringLiteral("-widgets.png");
 		Check(mainWindow->grab().save(Results().filePath(widgetFilename)),
@@ -136,10 +139,14 @@ void Capture(const QString &filename)
 	unsigned int width{}, height{}, border{}, depth{};
 	XGetGeometry(display, pixmap, &root, &x, &y, &width, &height, &border, &depth);
 	QFile geometry(Results().filePath(filename + QStringLiteral(".geometry.json")));
+	const QRect available = mainWindow->screen()->availableGeometry();
+	const QJsonObject captureGeometry{
+		{"qtWidth", mainWindow->width()}, {"qtHeight", mainWindow->height()},
+		{"pixmapWidth", int(width)}, {"pixmapHeight", int(height)},
+		{"screenWidth", available.width()}, {"screenHeight", available.height()},
+		{"devicePixelRatio", mainWindow->devicePixelRatioF()}};
 	if (geometry.open(QIODevice::WriteOnly))
-		geometry.write(QJsonDocument(QJsonObject{{"qtWidth", mainWindow->width()}, {"qtHeight", mainWindow->height()},
-			{"pixmapWidth", int(width)}, {"pixmapHeight", int(height)}, {"screenWidth", mainWindow->screen()->availableGeometry().width()},
-			{"screenHeight", mainWindow->screen()->availableGeometry().height()}, {"devicePixelRatio", mainWindow->devicePixelRatioF()}}).toJson());
+		geometry.write(QJsonDocument(captureGeometry).toJson());
 	XImage *pixels = XGetImage(display, pixmap, 0, 0, width, height, AllPlanes, ZPixmap);
 	bool saved = false;
 	if (pixels) {
@@ -294,7 +301,8 @@ void TestSearch(QListView *view, QLineEdit *search, const QString &query, int na
 	const int originalRows = view->model()->rowCount();
 	const QModelIndexList selected = view->selectionModel()->selectedIndexes();
 	search->setText(query.toUpper());
-	Check(!view->dragEnabled() && !view->acceptDrops(), QStringLiteral("%1-filter-prevents-ambiguous-reorder").arg(label));
+	Check(!view->dragEnabled() && !view->acceptDrops(),
+	      QStringLiteral("%1-filter-prevents-ambiguous-reorder").arg(label));
 	int matches = 0;
 	bool correctRows = originalRows > 0;
 	for (int row = 0; row < originalRows; ++row) {
@@ -316,7 +324,8 @@ void TestSearch(QListView *view, QLineEdit *search, const QString &query, int na
 		restored = restored && !view->isRowHidden(row);
 	Check(restored && selected == view->selectionModel()->selectedIndexes(),
 	      QStringLiteral("%1-search-clear-preserves-items-and-selection").arg(label));
-	Check(view->dragEnabled() && view->acceptDrops(), QStringLiteral("%1-search-clear-restores-reorder").arg(label));
+	Check(view->dragEnabled() && view->acceptDrops(),
+	      QStringLiteral("%1-search-clear-restores-reorder").arg(label));
 }
 
 void TestWorkspaceSearch()
@@ -419,7 +428,8 @@ void TestRightSidebar()
 		if (auto *button = Control<QAbstractButton>(entry.second))
 			button->click();
 		QCoreApplication::processEvents();
-		Check(!dock->visibleRegion().isEmpty(), QStringLiteral("sidebar-tab-can-open-%1").arg(QString::fromLatin1(name)));
+		Check(!dock->visibleRegion().isEmpty(),
+		      QStringLiteral("sidebar-tab-can-open-%1").arg(QString::fromLatin1(name)));
 	}
 	if (auto *button = Control<QAbstractButton>("penguinInspectorButton"))
 		button->click();
@@ -497,7 +507,8 @@ void TestInspector()
 	if (auto *width = Control<QDoubleSpinBox>("inspectorWidth")) {
 		width->setValue(400);
 		obs_sceneitem_get_info2(fixtureItem, &changed);
-		Check(CloseEnough(std::abs(changed.scale.x) * obs_source_get_width(obs_sceneitem_get_source(fixtureItem)), 400),
+		const uint32_t sourceWidth = obs_source_get_width(obs_sceneitem_get_source(fixtureItem));
+		Check(CloseEnough(std::abs(changed.scale.x) * sourceWidth, 400),
 		      QStringLiteral("width-edit-reaches-obs"));
 		Check(CloseEnough(changed.scale.x / original.scale.x, changed.scale.y / original.scale.y),
 		      QStringLiteral("aspect-ratio-preserved"));
@@ -546,9 +557,11 @@ void CheckInspectorWidth(const QString &size)
 	if (!scroll)
 		return;
 	for (const char *name : {"inspectorX", "inspectorY", "inspectorWidth", "inspectorHeight", "inspectorRotation",
-		"inspectorCropLeft", "inspectorCropRight", "inspectorCropTop", "inspectorCropBottom", "inspectorVisible",
+		"inspectorCropLeft", "inspectorCropRight", "inspectorCropTop", "inspectorCropBottom",
+		"inspectorVisible",
 		"inspectorLocked", "inspectorAspectLock", "inspectorFit", "inspectorCenter", "inspectorFlipHorizontal",
-		"inspectorFlipVertical", "inspectorProperties", "inspectorFilters", "inspectorAdvanced", "inspectorReset"}) {
+		"inspectorFlipVertical", "inspectorProperties", "inspectorFilters", "inspectorAdvanced",
+		"inspectorReset"}) {
 		auto *control = mainWindow->findChild<QWidget *>(QString::fromLatin1(name));
 		// A collapsed section has no layout allocation until it is expanded.
 		// Its controls are covered again by the compact run after expansion.
@@ -597,10 +610,12 @@ void PrepareInspectorEdgeCases()
 	info.bounds = {400, 300};
 	obs_sceneitem_set_info2(fixtureItem, &info);
 	RefreshInspector();
-	Check(CloseEnough(width->value(), 400) && CloseEnough(height->value(), 300), QStringLiteral("bounded-dimensions-display"));
+	Check(CloseEnough(width->value(), 400) && CloseEnough(height->value(), 300),
+	      QStringLiteral("bounded-dimensions-display"));
 	width->setValue(600);
 	obs_sceneitem_get_info2(fixtureItem, &info);
-	Check(CloseEnough(info.bounds.x, 600) && CloseEnough(info.bounds.y, 450), QStringLiteral("bounded-width-edit-aspect-link"));
+	Check(CloseEnough(info.bounds.x, 600) && CloseEnough(info.bounds.y, 450),
+	      QStringLiteral("bounded-width-edit-aspect-link"));
 	Trigger("actionMainUndo");
 	obs_sceneitem_get_info2(fixtureItem, &info);
 	Check(CloseEnough(info.bounds.x, 400) && CloseEnough(info.bounds.y, 300), QStringLiteral("bounded-width-undo"));
@@ -611,7 +626,8 @@ void PrepareInspectorEdgeCases()
 	obs_sceneitem_set_info2(fixtureItem, &info);
 	crop = {};
 	obs_sceneitem_set_crop(fixtureItem, &crop);
-	edgeGroup = obs_scene_insert_group2(obs_sceneitem_get_scene(fixtureItem), "Validation group", &fixtureItem, 1, true);
+	edgeGroup = obs_scene_insert_group2(obs_sceneitem_get_scene(fixtureItem),
+					   "Validation group", &fixtureItem, 1, true);
 	Check(edgeGroup != nullptr, QStringLiteral("group-fixture-created"));
 	if (edgeGroup) {
 		obs_sceneitem_select(edgeGroup, false);
@@ -639,7 +655,8 @@ void CheckGroupTransform(int stage)
 		      QStringLiteral("group-child-edit-moves-world-position"));
 		Trigger("actionMainUndo");
 	} else if (stage == 100) {
-		Check(CloseEnough(group.pos.x, originalGroup.pos.x) && CloseEnough(child.pos.x, originalGroupChild.pos.x),
+		Check(CloseEnough(group.pos.x, originalGroup.pos.x) &&
+		      CloseEnough(child.pos.x, originalGroupChild.pos.x),
 		      QStringLiteral("group-child-undo-restores-world-position"));
 		Trigger("actionMainRedo");
 	} else if (stage == 104) {
@@ -768,7 +785,8 @@ void Tick()
 		Check(obs_frontend_preview_program_mode_active(), QStringLiteral("studio-mode-toolbar-enabled"));
 		Click("penguinCanvasMode");
 		if (auto *panel = Control<QWidget>("penguinOutputPanel")) {
-			Check(panel->property("penguinDestinationCount").toInt() == 0, QStringLiteral("no-external-destinations-configured"));
+			Check(panel->property("penguinDestinationCount").toInt() == 0,
+			      QStringLiteral("no-external-destinations-configured"));
 			if (panel->property("penguinDestinationCount").toInt() == 0)
 				Click("penguinLiveButton");
 		}
@@ -795,7 +813,8 @@ void Tick()
 		QTimer::singleShot(1000, qApp, [] {
 			for (auto *widget : QApplication::topLevelWidgets()) {
 				if (auto *dialog = qobject_cast<QMessageBox *>(widget); dialog && dialog->isVisible()) {
-					Check(false, QStringLiteral("recording-modal: %1: %2").arg(dialog->windowTitle(), dialog->text()));
+					Check(false, QStringLiteral("recording-modal: %1: %2")
+						     .arg(dialog->windowTitle(), dialog->text()));
 					dialog->reject();
 				}
 			}
@@ -809,7 +828,8 @@ void Tick()
 	if (ticks == 88) {
 		Check(!obs_frontend_recording_active(), QStringLiteral("record-toolbar-stops-recording"));
 		Check(!Results().entryList({QStringLiteral("recordings/*.mkv")}, QDir::Files).isEmpty() ||
-		      !QDir(Results().filePath(QStringLiteral("recordings"))).entryList({QStringLiteral("*.mkv")}, QDir::Files).isEmpty(),
+		      !QDir(Results().filePath(QStringLiteral("recordings")))
+			       .entryList({QStringLiteral("*.mkv")}, QDir::Files).isEmpty(),
 		      QStringLiteral("local-recording-file-created"));
 		if (closeWizard)
 			Check(false, QStringLiteral("expected-setup-wizard-was-not-seen"));

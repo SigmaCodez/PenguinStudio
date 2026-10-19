@@ -25,6 +25,8 @@ The bottom mixer presents actual OBS volume controls, meters and monitoring sett
 
 The top FPS readout comes from the running video engine. No simulated audio levels, output states or canvas previews are shown.
 
+Settings, source properties, filters, and the setup assistant use the same control theme. Settings navigation measures translated labels, and its initial window width follows the selected text size within the available screen. Long forms retain scrolling, with minimum input heights that keep their text readable.
+
 ## Existing configurations
 
 On the first launch with layout version 3, Penguin applies the new layout and vertical mixer defaults. It saves the current dock arrangement in `BasicWindow/PenguinPreV3DockState`, retains any earlier `PenguinPreviousDockState` backup, and records `PenguinWorkspaceVersion=3` in the separate Penguin configuration. Scene collections, profiles and sources are preserved. Later launches restore the user's saved arrangement instead of resetting it again.
