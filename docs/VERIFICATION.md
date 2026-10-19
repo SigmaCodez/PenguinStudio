@@ -2,6 +2,34 @@
 
 This is a development preview based on OBS Studio 32.2.2. The new Penguin code must not be described as fully production-tested until the checks below have real recorded results.
 
+## Qt Wayland teardown diagnostics — 2026-10-19
+
+Installed Ubuntu package `0.2.0-5+ubuntu26.04`, built from
+`ff9f3334b7d97b71c02bc03b3a0bded4113e5a5c`, passes all **nine native Wayland shutdown
+scenarios**: normal exit, multiple instances, an open initial setup wizard,
+connection-wizard cancellation, shutdown with a verified focused connection
+text field, auto-configuration cancellation, Statistics, profile restart, and
+SIGTERM. Every case exits with code 0, **zero shutdown warnings or errors**,
+zero late frontend callback removals, no remaining crash sentinels, and zero
+OBS memory leaks. The two previously reported Qt teardown messages are no longer emitted as warnings.
+
+The cause is a Qt 6.10.2 diagnostic false positive for a surface proxy already
+freed during normal window teardown. This is a narrowly scoped diagnostic
+compatibility correction, not a change to focus handling or shutdown timing.
+The original messages remain available as DEBUG output with `--verbose`;
+4 such messages were retained in the installed-package suite.
+All **92 classification boundary checks** pass, including genuine non-null
+mismatches and critical/fatal messages that must keep their original severity.
+Startup diagnostics outside this exact case remain visible and are recorded
+separately; this is not a claim that all startup logs are warning-free.
+
+[Implementation rationale and upstream references](QT_WAYLAND_DIAGNOSTICS.md),
+[installed-package evidence and checksum](validation/ubuntu-26.04-qt-focus.json),
+and [native reproduction instructions](../test/README-native-wayland.md).
+The previous revision-4 GUI and recording results below remain historical
+validation of the unchanged workspace; they were not rerun in full for this
+logging-only correction.
+
 ## Modern workspace and responsive dialogs — 2026-10-19
 
 Ubuntu package `0.2.0-4+ubuntu26.04` contains the third workspace layout:
