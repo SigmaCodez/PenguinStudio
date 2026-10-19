@@ -12,7 +12,7 @@ on:
         description: Package builds to run
         type: choice
         default: all
-        options: [all, snap]
+        options: [all, deb, deb-26.04, snap]
 permissions:
   contents: read
 concurrency:
@@ -61,9 +61,13 @@ jobs:
           build-bundle: true
           cache-key: penguin-flatpak-${{ hashFiles('build-aux/io.github.SigmaCodez.PenguinStudio.json') }}
   deb:
-    name: Ubuntu 24.04 DEB (amd64)
-    if: github.event_name != 'workflow_dispatch' || inputs.packages == 'all'
-    runs-on: ubuntu-24.04
+    name: Ubuntu ${{ matrix.ubuntu }} DEB (amd64)
+    if: github.event_name != 'workflow_dispatch' || inputs.packages == 'all' || startsWith(inputs.packages, 'deb')
+    strategy:
+      fail-fast: false
+      matrix:
+        ubuntu: ${{ fromJSON(inputs.packages == 'deb-26.04' && '["26.04"]' || '["24.04", "26.04"]') }}
+    runs-on: ubuntu-${{ matrix.ubuntu }}
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
@@ -81,7 +85,7 @@ jobs:
           penguin-studio --version
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: penguin-studio-ubuntu-24.04-amd64
+          name: penguin-studio-ubuntu-${{ matrix.ubuntu }}-amd64
           path: build_penguin_deb/*.deb*
           if-no-files-found: error
   rpm:
@@ -113,6 +117,7 @@ jobs:
           if-no-files-found: error
   snap:
     name: Snap core24 (amd64, development)
+    if: github.event_name != 'workflow_dispatch' || inputs.packages == 'all' || inputs.packages == 'snap'
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
