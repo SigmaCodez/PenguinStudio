@@ -38,9 +38,10 @@ QFrame *Card(QWidget *parent, QVBoxLayout *layout, const QString &title)
 	auto *card = new QFrame(parent);
 	card->setObjectName(QStringLiteral("inspectorCard"));
 	auto *box = new QVBoxLayout(card);
-	box->setContentsMargins(12, 12, 12, 12);
+	box->setContentsMargins(0, 12, 0, 0);
 	box->setSpacing(10);
-	box->addWidget(Label(title, card, "inspectorSectionTitle"));
+	if (!title.isEmpty())
+		box->addWidget(Label(title, card, "inspectorSectionTitle"));
 	layout->addWidget(card);
 	return card;
 }
@@ -82,7 +83,7 @@ PenguinInspector::PenguinInspector(OBSBasic *mainWindow, QWidget *parent)
 	: QWidget(parent), main(mainWindow), refreshTimer(this)
 {
 	setObjectName(QStringLiteral("penguinInspector"));
-	setMinimumWidth(300);
+	setMinimumWidth(340);
 	auto *outer = new QVBoxLayout(this);
 	outer->setContentsMargins(0, 0, 0, 0);
 	outer->setSpacing(0);
@@ -94,44 +95,69 @@ PenguinInspector::PenguinInspector(OBSBasic *mainWindow, QWidget *parent)
 	auto *body = new QWidget(scroll);
 	body->setObjectName(QStringLiteral("inspectorBody"));
 	auto *layout = new QVBoxLayout(body);
-	layout->setContentsMargins(14, 16, 14, 16);
+	layout->setContentsMargins(12, 14, 12, 14);
 	layout->setSpacing(12);
 	scroll->setWidget(body);
 	outer->addWidget(scroll);
 
-	emptyTitle = Label(QTStr("Penguin.Inspector.EmptyTitle"), body, "inspectorEmptyTitle");
-	emptyHint = Label(QTStr("Penguin.Inspector.EmptyHint"), body, "inspectorEmptyHint");
+	emptyState = new QWidget(body);
+	emptyState->setObjectName(QStringLiteral("inspectorEmptyState"));
+	auto *emptyLayout = new QVBoxLayout(emptyState);
+	emptyLayout->setContentsMargins(12, 36, 12, 12);
+	emptyLayout->setSpacing(12);
+	auto *emptyIcon = new QLabel(emptyState);
+	emptyIcon->setObjectName(QStringLiteral("inspectorEmptyIcon"));
+	emptyIcon->setPixmap(PenguinStudio::StudioIcon(PenguinStudio::Icon::Inspect).pixmap(32, 32));
+	emptyIcon->setAlignment(Qt::AlignCenter);
+	emptyIcon->setFixedSize(64, 64);
+	emptyLayout->addWidget(emptyIcon, 0, Qt::AlignHCenter);
+	emptyTitle = Label(QTStr("Penguin.Inspector.EmptyTitle"), emptyState, "inspectorEmptyTitle");
+	emptyTitle->setAlignment(Qt::AlignCenter);
+	emptyTitle->setWordWrap(true);
+	emptyHint = Label(QTStr("Penguin.Inspector.EmptyHint"), emptyState, "inspectorEmptyHint");
+	emptyHint->setAlignment(Qt::AlignCenter);
 	emptyHint->setWordWrap(true);
-	layout->addWidget(emptyTitle);
-	layout->addWidget(emptyHint);
+	emptyLayout->addWidget(emptyTitle);
+	emptyLayout->addWidget(emptyHint);
+	layout->addWidget(emptyState);
 	content = new QWidget(body);
+	content->setObjectName(QStringLiteral("inspectorContent"));
 	auto *contents = new QVBoxLayout(content);
 	contents->setContentsMargins(0, 0, 0, 0);
 	contents->setSpacing(14);
 	layout->addWidget(content);
 	layout->addStretch();
 
+	auto *identityCard = new QFrame(content);
+	identityCard->setObjectName(QStringLiteral("inspectorIdentity"));
+	auto *identityLayout = new QVBoxLayout(identityCard);
+	identityLayout->setContentsMargins(10, 10, 10, 10);
+	identityLayout->setSpacing(10);
 	auto *identity = new QHBoxLayout;
-	sourceIcon = new QLabel(content);
-	sourceIcon->setFixedSize(32, 32);
+	identity->setSpacing(10);
+	sourceIcon = new QLabel(identityCard);
+	sourceIcon->setObjectName(QStringLiteral("inspectorSourceIcon"));
+	sourceIcon->setAlignment(Qt::AlignCenter);
+	sourceIcon->setFixedSize(40, 40);
 	identity->addWidget(sourceIcon);
 	auto *names = new QVBoxLayout;
 	names->setSpacing(3);
-	sourceName = Label({}, content, "inspectorSourceName");
+	sourceName = Label({}, identityCard, "inspectorSourceName");
 	sourceName->setWordWrap(true);
-	sourceType = Label({}, content, "inspectorSourceType");
+	sourceType = Label({}, identityCard, "inspectorSourceType");
 	sourceType->setWordWrap(true);
 	names->addWidget(sourceName);
 	names->addWidget(sourceType);
 	identity->addLayout(names, 1);
-	contents->addLayout(identity);
+	identityLayout->addLayout(identity);
 
 	auto *flags = new QHBoxLayout;
-	visible = new QToolButton(content);
+	flags->setSpacing(6);
+	visible = new QToolButton(identityCard);
 	visible->setObjectName(QStringLiteral("inspectorVisible"));
 	visible->setText(QTStr("Penguin.Inspector.Visible"));
 	visible->setCheckable(true);
-	locked = new QToolButton(content);
+	locked = new QToolButton(identityCard);
 	locked->setObjectName(QStringLiteral("inspectorLocked"));
 	locked->setText(QTStr("Penguin.Inspector.Locked"));
 	locked->setCheckable(true);
@@ -140,14 +166,49 @@ PenguinInspector::PenguinInspector(OBSBasic *mainWindow, QWidget *parent)
 		button->setMinimumHeight(32);
 		flags->addWidget(button);
 	}
-	contents->addLayout(flags);
+	identityLayout->addLayout(flags);
+	contents->addWidget(identityCard);
 	connect(visible, &QToolButton::clicked, this, [this](bool value) { ChangeFlag(true, value); });
 	connect(locked, &QToolButton::clicked, this, [this](bool value) { ChangeFlag(false, value); });
 
+	auto addAction = [this](QGridLayout *grid, int row, int column, const char *key, const char *name,
+			       const std::function<void()> &callback) {
+		const QString label = QTStr(key);
+		// Action labels are plain language, not keyboard mnemonics.
+		auto *button = new QPushButton(QString(label).replace(QLatin1Char('&'), QStringLiteral("&&")), content);
+		button->setObjectName(QString::fromUtf8(name));
+		button->setProperty("class", "inspector-action");
+		button->setAccessibleName(label);
+		button->setToolTip(label);
+		button->setMinimumHeight(32);
+		grid->addWidget(button, row, column);
+		connect(button, &QPushButton::clicked, this, [this, callback]() {
+			if (!CurrentItem())
+				return;
+			callback();
+			RefreshSelection();
+		});
+		return button;
+	};
+	auto *sourceActions = new QGridLayout;
+	sourceActions->setSpacing(6);
+	auto *properties = addAction(sourceActions, 0, 0, "Penguin.Inspector.Properties", "inspectorProperties", [this]() {
+		if (auto item = CurrentItem())
+			main->CreatePropertiesWindow(obs_sceneitem_get_source(item));
+	});
+	properties->setIcon(PenguinStudio::StudioIcon(PenguinStudio::Icon::Settings));
+	auto *filters = addAction(sourceActions, 1, 0, "Penguin.Inspector.Filters", "inspectorFilters", [this]() {
+		if (auto item = CurrentItem())
+			main->CreateFiltersWindow(obs_sceneitem_get_source(item));
+	});
+	filters->setIcon(PenguinStudio::StudioIcon(PenguinStudio::Icon::Inspect));
+	contents->addLayout(sourceActions);
+
 	transformCard = Card(content, contents, QTStr("Penguin.Inspector.Transform"));
 	auto *transformLayout = static_cast<QVBoxLayout *>(transformCard->layout());
-	transformLayout->addWidget(Label(QTStr("Penguin.Inspector.Position"), transformCard));
+	transformLayout->addWidget(Label(QTStr("Penguin.Inspector.Position"), transformCard, "inspectorFieldLabel"));
 	auto *position = new QHBoxLayout;
+	position->setSpacing(6);
 	transformFields[0] = Number(transformCard, "inspectorX", QTStr("Basic.TransformWindow.PositionX"));
 	transformFields[1] = Number(transformCard, "inspectorY", QTStr("Basic.TransformWindow.PositionY"));
 	transformFields[0]->setPrefix(QStringLiteral("X  "));
@@ -157,7 +218,7 @@ PenguinInspector::PenguinInspector(OBSBasic *mainWindow, QWidget *parent)
 	transformLayout->addLayout(position);
 
 	auto *dimensionsTitle = new QHBoxLayout;
-	dimensionsTitle->addWidget(Label(QTStr("Penguin.Inspector.Dimensions"), transformCard), 1);
+	dimensionsTitle->addWidget(Label(QTStr("Penguin.Inspector.Dimensions"), transformCard, "inspectorFieldLabel"), 1);
 	aspectLock = new QToolButton(transformCard);
 	aspectLock->setObjectName(QStringLiteral("inspectorAspectLock"));
 	aspectLock->setIcon(PenguinStudio::StudioIcon(PenguinStudio::Icon::Link));
@@ -168,6 +229,7 @@ PenguinInspector::PenguinInspector(OBSBasic *mainWindow, QWidget *parent)
 	dimensionsTitle->addWidget(aspectLock);
 	transformLayout->addLayout(dimensionsTitle);
 	auto *dimensions = new QHBoxLayout;
+	dimensions->setSpacing(6);
 	transformFields[2] = Number(transformCard, "inspectorWidth", QTStr("Penguin.Inspector.Width"));
 	transformFields[3] = Number(transformCard, "inspectorHeight", QTStr("Penguin.Inspector.Height"));
 	transformFields[2]->setPrefix(QStringLiteral("W  "));
@@ -177,10 +239,10 @@ PenguinInspector::PenguinInspector(OBSBasic *mainWindow, QWidget *parent)
 		dimensions->addWidget(transformFields[index]);
 	}
 	transformLayout->addLayout(dimensions);
-	sourceSize = Label({}, transformCard, "inspectorSourceType");
+	sourceSize = Label({}, transformCard, "inspectorSourceSize");
 	transformLayout->addWidget(sourceSize);
 	auto *rotation = new QHBoxLayout;
-	rotation->addWidget(Label(QTStr("Penguin.Inspector.Rotation"), transformCard), 1);
+	rotation->addWidget(Label(QTStr("Penguin.Inspector.Rotation"), transformCard, "inspectorFieldLabel"), 1);
 	transformFields[4] = Number(transformCard, "inspectorRotation", QTStr("Penguin.Inspector.Rotation"));
 	transformFields[4]->setRange(-36000.0, 36000.0);
 	transformFields[4]->setSuffix(QStringLiteral("°"));
@@ -190,36 +252,48 @@ PenguinInspector::PenguinInspector(OBSBasic *mainWindow, QWidget *parent)
 		connect(transformFields[index], &QDoubleSpinBox::valueChanged, this,
 			[this, index](double value) { ChangeTransform(index, value); });
 
-	auto addAction = [this](QGridLayout *grid, int row, int column, const char *key, const char *name,
-			       const std::function<void()> &callback) {
-		auto *button = new QPushButton(QTStr(key), content);
-		button->setObjectName(QString::fromUtf8(name));
-		button->setProperty("class", "inspector-action");
-		button->setMinimumHeight(32);
-		grid->addWidget(button, row, column);
-		connect(button, &QPushButton::clicked, this, [this, callback]() {
-			if (!CurrentItem())
-				return;
-			callback();
-			RefreshSelection();
-		});
-	};
 	auto *arrange = new QGridLayout;
-	addAction(arrange, 0, 0, "Penguin.Inspector.Fit", "inspectorFit", [this]() { main->on_actionFitToScreen_triggered(); });
-	addAction(arrange, 1, 0, "Penguin.Inspector.Center", "inspectorCenter", [this]() { main->on_actionCenterToScreen_triggered(); });
-	addAction(arrange, 2, 0, "Penguin.Inspector.FlipHorizontal", "inspectorFlipHorizontal",
-		  [this]() { main->on_actionFlipHorizontal_triggered(); });
-	addAction(arrange, 3, 0, "Penguin.Inspector.FlipVertical", "inspectorFlipVertical",
-		  [this]() { main->on_actionFlipVertical_triggered(); });
+	arrange->setSpacing(6);
+	const std::array<QPushButton *, 4> arrangeButtons = {
+		addAction(arrange, 0, 0, "Penguin.Inspector.Fit", "inspectorFit", [this]() { main->on_actionFitToScreen_triggered(); }),
+		addAction(arrange, 0, 1, "Penguin.Inspector.Center", "inspectorCenter", [this]() { main->on_actionCenterToScreen_triggered(); }),
+		addAction(arrange, 0, 2, "Penguin.Inspector.FlipHorizontal", "inspectorFlipHorizontal",
+			  [this]() { main->on_actionFlipHorizontal_triggered(); }),
+		addAction(arrange, 0, 3, "Penguin.Inspector.FlipVertical", "inspectorFlipVertical",
+			  [this]() { main->on_actionFlipVertical_triggered(); })};
+	const std::array<PenguinStudio::Icon, 4> arrangeIcons = {PenguinStudio::Icon::Fit, PenguinStudio::Icon::Center,
+		PenguinStudio::Icon::FlipHorizontal, PenguinStudio::Icon::FlipVertical};
+	for (size_t index = 0; index < arrangeButtons.size(); ++index) {
+		auto *button = arrangeButtons[index];
+		button->setProperty("class", "inspector-arrange");
+		button->setText({});
+		button->setIcon(PenguinStudio::StudioIcon(arrangeIcons[index]));
+		button->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+	}
 	transformLayout->addLayout(arrange);
 
-	cropCard = Card(content, contents, QTStr("Penguin.Inspector.Crop"));
-	auto *cropGrid = new QGridLayout;
+	cropCard = Card(content, contents, {});
+	auto *cropLayout = static_cast<QVBoxLayout *>(cropCard->layout());
+	auto *cropToggle = new QToolButton(cropCard);
+	cropToggle->setObjectName(QStringLiteral("inspectorCropToggle"));
+	cropToggle->setText(QTStr("Penguin.Inspector.Crop"));
+	cropToggle->setAccessibleName(QTStr("Penguin.Inspector.Crop"));
+	cropToggle->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+	cropToggle->setArrowType(Qt::RightArrow);
+	cropToggle->setCheckable(true);
+	cropToggle->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+	cropLayout->addWidget(cropToggle);
+	auto *cropBody = new QWidget(cropCard);
+	cropBody->setObjectName(QStringLiteral("inspectorCropFields"));
+	auto *cropGrid = new QGridLayout(cropBody);
+	cropGrid->setContentsMargins(0, 0, 0, 0);
+	cropGrid->setHorizontalSpacing(6);
+	cropGrid->setVerticalSpacing(6);
 	const std::array<const char *, 4> cropNames = {"inspectorCropLeft", "inspectorCropRight", "inspectorCropTop", "inspectorCropBottom"};
 	const std::array<const char *, 4> cropLabels = {"Penguin.Inspector.CropLeft", "Penguin.Inspector.CropRight",
 		"Penguin.Inspector.CropTop", "Penguin.Inspector.CropBottom"};
 	for (size_t index = 0; index < cropFields.size(); ++index) {
-		auto *field = new QSpinBox(cropCard);
+		auto *field = new QSpinBox(cropBody);
 		cropFields[index] = field;
 		field->setObjectName(QString::fromUtf8(cropNames[index]));
 		field->setProperty("class", "inspector-field");
@@ -230,26 +304,27 @@ PenguinInspector::PenguinInspector(OBSBasic *mainWindow, QWidget *parent)
 		field->setMinimumHeight(30);
 		field->setMinimumWidth(0);
 		field->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Fixed);
-		cropGrid->addWidget(Label(QTStr(cropLabels[index]), cropCard), int(index / 2) * 2, int(index % 2));
+		cropGrid->addWidget(Label(QTStr(cropLabels[index]), cropBody, "inspectorFieldLabel"), int(index / 2) * 2, int(index % 2));
 		cropGrid->addWidget(field, int(index / 2) * 2 + 1, int(index % 2));
 		connect(field, &QSpinBox::valueChanged, this, [this, index](int value) { ChangeCrop(index, value); });
 	}
-	static_cast<QVBoxLayout *>(cropCard->layout())->addLayout(cropGrid);
+	cropLayout->addWidget(cropBody);
+	cropBody->hide();
+	connect(cropToggle, &QToolButton::toggled, cropBody, [cropBody, cropToggle](bool expanded) {
+		cropBody->setVisible(expanded);
+		cropToggle->setArrowType(expanded ? Qt::DownArrow : Qt::RightArrow);
+	});
 
-	auto *sourceActions = new QGridLayout;
-	addAction(sourceActions, 0, 0, "Penguin.Inspector.Properties", "inspectorProperties", [this]() {
-		if (auto item = CurrentItem())
-			main->CreatePropertiesWindow(obs_sceneitem_get_source(item));
-	});
-	addAction(sourceActions, 1, 0, "Penguin.Inspector.Filters", "inspectorFilters", [this]() {
-		if (auto item = CurrentItem())
-			main->CreateFiltersWindow(obs_sceneitem_get_source(item));
-	});
-	addAction(sourceActions, 2, 0, "Penguin.Inspector.Advanced", "inspectorAdvanced", [this]() {
+	auto *advancedActions = new QGridLayout;
+	advancedActions->setSpacing(6);
+	addAction(advancedActions, 0, 0, "Penguin.Inspector.Advanced", "inspectorAdvanced", [this]() {
 		main->CreateEditTransformWindow(CurrentItem());
 	});
-	addAction(sourceActions, 3, 0, "Penguin.Inspector.Reset", "inspectorReset", [this]() { main->on_actionResetTransform_triggered(); });
-	contents->addLayout(sourceActions);
+	auto *reset = addAction(advancedActions, 1, 0, "Penguin.Inspector.Reset", "inspectorReset", [this]() {
+		main->on_actionResetTransform_triggered();
+	});
+	reset->setIcon(PenguinStudio::StudioIcon(PenguinStudio::Icon::Reset));
+	contents->addLayout(advancedActions);
 	connect(&refreshTimer, &QTimer::timeout, this, &PenguinInspector::RefreshSelection);
 	refreshTimer.start(200);
 	RefreshSelection();
@@ -282,8 +357,7 @@ void PenguinInspector::RefreshSelection()
 	const auto item = CurrentItem();
 	const int selected = main && obs_initialized() ? main->GetAllSelectedSourceItems().size() : 0;
 	content->setVisible(!!item);
-	emptyTitle->setVisible(!item);
-	emptyHint->setVisible(!item);
+	emptyState->setVisible(!item);
 	if (!item) {
 		selectionToken.clear();
 		emptyTitle->setText(selected > 1 ? QTStr("Penguin.Inspector.Multiple").arg(selected) : QTStr("Penguin.Inspector.EmptyTitle"));

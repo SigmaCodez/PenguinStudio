@@ -54,6 +54,7 @@ VolumeName::VolumeName(obs_source_t *source, QWidget *parent)
 
 	label = new QLabel(this);
 	label->setIndent(0);
+	label->setAlignment(textAlignment | Qt::AlignVCenter);
 	label->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
 	layout->addWidget(label);
 
@@ -69,6 +70,7 @@ void VolumeName::setAlignment(Qt::Alignment alignment_)
 {
 	if (textAlignment != alignment_) {
 		textAlignment = alignment_;
+		label->setAlignment(textAlignment);
 		update();
 	}
 }
@@ -178,6 +180,7 @@ void VolumeName::onRenamed(QString name)
 void VolumeName::setText(const QString &text)
 {
 	QAbstractButton::setText(text);
+	setToolTip(getPlainText(text));
 	updateGeometry();
 	updateLabelText(text);
 }

@@ -29,7 +29,12 @@ enum class Icon {
 	Audio,
 	Folder,
 	Reset,
-	Link
+	Link,
+	Search,
+	Fit,
+	Center,
+	FlipHorizontal,
+	FlipVertical
 };
 
 // Original 24-unit line icons. Rendering both resolutions keeps the studio
@@ -146,6 +151,34 @@ inline QIcon StudioIcon(Icon glyph, QColor color = QColor("#BDC0CB"), int size =
 		case Icon::Reset:
 			p.drawArc(QRectF(5, 5, 15, 15), -50 * 16, 285 * 16);
 			p.drawPolyline(QPolygonF({QPointF(3, 4), QPointF(3, 10), QPointF(9, 10)}));
+			break;
+		case Icon::Search:
+			p.drawEllipse(QPointF(10, 10), 6, 6);
+			line(14.5, 14.5, 21, 21);
+			break;
+		case Icon::Fit:
+			p.drawRect(QRectF(7, 8, 10, 8));
+			p.drawPolyline(QPolygonF({QPointF(3, 8), QPointF(3, 3), QPointF(8, 3)}));
+			p.drawPolyline(QPolygonF({QPointF(16, 3), QPointF(21, 3), QPointF(21, 8)}));
+			p.drawPolyline(QPolygonF({QPointF(3, 16), QPointF(3, 21), QPointF(8, 21)}));
+			p.drawPolyline(QPolygonF({QPointF(16, 21), QPointF(21, 21), QPointF(21, 16)}));
+			break;
+		case Icon::Center:
+			p.drawRect(QRectF(7, 7, 10, 10));
+			line(12, 2, 12, 6);
+			line(12, 18, 12, 22);
+			line(2, 12, 6, 12);
+			line(18, 12, 22, 12);
+			break;
+		case Icon::FlipHorizontal:
+			line(12, 3, 12, 21);
+			p.drawPolygon(QPolygonF({QPointF(3, 17), QPointF(8, 7), QPointF(8, 17)}));
+			p.drawPolygon(QPolygonF({QPointF(21, 17), QPointF(16, 7), QPointF(16, 17)}));
+			break;
+		case Icon::FlipVertical:
+			line(3, 12, 21, 12);
+			p.drawPolygon(QPolygonF({QPointF(7, 3), QPointF(17, 8), QPointF(7, 8)}));
+			p.drawPolygon(QPolygonF({QPointF(7, 21), QPointF(17, 16), QPointF(7, 16)}));
 			break;
 		case Icon::Link: {
 			QPainterPath path;

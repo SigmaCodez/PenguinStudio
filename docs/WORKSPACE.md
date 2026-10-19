@@ -1,21 +1,22 @@
 # Penguin Studio workspace
 
-The 0.2 workspace changes the application's native Qt layout and controls. It draws inspiration from Meld's scene/layer, canvas, mixer and inspector arrangement while keeping Penguin's own branding and the OBS production engine.
+The third workspace layout redesigns the native Qt application around a large canvas, searchable layers and scenes, channel strips, and an integrated production sidebar. Its charcoal surfaces, violet actions, compact headers, and restrained borders are inspired by [Meld Studio](https://meldstudio.co/), with original Penguin icons and the existing OBS production engine.
 
 ## Compose and inspect
 
-Scenes and Layers sit on the left. The **+** buttons run the existing scene and source creation actions; each panel's **More** menu retains remove, reorder and other inherited actions. Source dragging, visibility, locking and scene renaming remain available.
+Layers sit above Scenes on the left. Numbered scene cards make scene order clear. Each list has a case-insensitive search field; filtering only changes the displayed rows, never source visibility or scene contents. Clear the field to restore the complete list. Drag reordering is disabled while a filter is active, to prevent ambiguous ordering. The **+** buttons run the existing scene and source creation actions; each panel's **More** menu retains remove, reorder and other inherited actions. Source dragging, visibility, locking and scene renaming remain available.
 
-The center shows the real OBS canvas, the selected scene name and the configured base resolution. **Studio Mode** switches between the normal editor and preview/program operation. Existing source and media toolbars remain below the preview.
+The center shows the real OBS canvas, the selected scene name and the configured base resolution. **Studio Mode** switches between the normal editor and preview/program operation. Media controls remain below the preview. Source properties and filters are provided by the Inspector; the legacy source toolbar can still be enabled from the View menu.
 
-Select one layer to edit it in the right-hand **Inspector**. Position, size, rotation, crop, visibility and locking update the source itself. Transform changes participate in OBS undo/redo. Fit, center, flips and reset use the existing canvas operations. Source properties, effects/filters and the advanced transform dialog remain directly accessible. Multiple selection displays a prompt to select one layer for numeric inspection.
+The right sidebar uses **Inspector**, **Outputs**, and **Details** tabs, so production tools remain beside the canvas instead of opening as floating windows. Select one layer to edit it in the **Inspector**. Position, size, rotation, crop, visibility and locking update the source itself. Transform changes participate in OBS undo/redo. Properties and effects/filters are available at the top of the Inspector. A compact arrange strip provides fit, center and flip actions through the existing canvas operations. Crop settings expand on demand; reset and the advanced transform dialog remain accessible. Multiple selection displays a prompt to select one layer for numeric inspection.
 
-The bottom mixer uses actual OBS volume controls, meters and monitoring settings in a vertical channel layout. The mixer menu can switch back to horizontal controls. Docks can still be moved and resized.
+The bottom mixer presents actual OBS volume controls, meters and monitoring settings as wider vertical channel strips, ordered from source identity through meter/fader and level to mute/monitor controls. The mixer menu can switch back to horizontal controls. Docks can still be moved and resized.
 
 ## Production controls
 
 - **Penguin Studio** opens the full application menu: File, Edit, View, Docks, Profile, Scene Collection, Tools and Help. On macOS the native system menu is retained as well.
-- **Destinations** opens the Penguin multi-output panel.
+- **Destinations** selects the integrated multi-output sidebar. Destinations appear as stacked cards with name, layout and real output status; editing, removal, individual start/stop and start/stop all remain available.
+- **Stream details** selects the scrollable Twitch/YouTube account and stream-management forms. **Settings** has its own toolbar shortcut.
 - **Go live** runs the destination panel's validated Start All action. With no destinations configured, it opens the setup assistant. While destinations are running, **End stream** runs Stop All.
 - The live button's menu exposes **Stream details** and OBS's separate primary stream toggle. The primary stream's setup and credentials are separate from Penguin destinations.
 - **Record** uses the original recording controller. Its menu offers pause/resume when the recording mode supports it.
@@ -26,7 +27,7 @@ The top FPS readout comes from the running video engine. No simulated audio leve
 
 ## Existing configurations
 
-On the first 0.2 launch, Penguin installs the new dock layout and vertical mixer defaults. It stores the prior dock state as `BasicWindow/PenguinPreviousDockState` and records `PenguinWorkspaceVersion=2` in the isolated Penguin configuration. Scene collections, profiles and sources are preserved. Subsequent launches restore the user's saved dock arrangement instead of resetting it again.
+On the first launch with layout version 3, Penguin applies the new layout and vertical mixer defaults. It saves the current dock arrangement in `BasicWindow/PenguinPreV3DockState`, retains any earlier `PenguinPreviousDockState` backup, and records `PenguinWorkspaceVersion=3` in the separate Penguin configuration. Scene collections, profiles and sources are preserved. Later launches restore the user's saved arrangement instead of resetting it again.
 
 **More → Reset workspace** reapplies the production layout. The complete Docks menu remains available from the Penguin Studio application button.
 

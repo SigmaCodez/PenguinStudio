@@ -27,6 +27,7 @@ class PenguinInspector final : public QWidget {
 	QLabel *sourceSize;
 	QLabel *emptyTitle;
 	QLabel *emptyHint;
+	QWidget *emptyState;
 	QWidget *content;
 	QWidget *transformCard;
 	QWidget *cropCard;

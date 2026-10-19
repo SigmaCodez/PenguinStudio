@@ -11,6 +11,7 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QFormLayout>
+#include <QGridLayout>
 #include <QHeaderView>
 #include <QHBoxLayout>
 #include <QJsonArray>
@@ -19,11 +20,13 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QMessageBox>
+#include <QPainter>
 #include <QPointer>
 #include <QPixmap>
 #include <QPushButton>
 #include <QSaveFile>
 #include <QSpinBox>
+#include <QStyledItemDelegate>
 #include <QTimer>
 #include <QTreeWidget>
 #include <QUrl>
@@ -418,8 +421,56 @@ struct Entry {
 	QString status;
 };
 
+// Keep the item model accessible to keyboard and assistive-technology users,
+// while presenting each destination as one compact, three-line sidebar card.
+class DestinationDelegate final : public QStyledItemDelegate {
+public:
+	using QStyledItemDelegate::QStyledItemDelegate;
+
+	QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &) const override
+	{
+		return {0, option.fontMetrics.height() * 3 + 28};
+	}
+
+	void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override
+	{
+		painter->save();
+		painter->setRenderHint(QPainter::Antialiasing);
+		const bool selected = option.state & QStyle::State_Selected;
+		const QRect card = option.rect.adjusted(2, 3, -2, -3);
+		painter->setPen(Qt::NoPen);
+		painter->setBrush(option.palette.color(selected ? QPalette::Highlight : QPalette::AlternateBase));
+		painter->drawRoundedRect(card, 8, 8);
+		const QRect content = card.adjusted(12, 8, -12, -8);
+		const int lineHeight = option.fontMetrics.height();
+		const auto color = selected ? QPalette::HighlightedText : QPalette::Text;
+		QFont nameFont = option.font;
+		nameFont.setBold(true);
+		painter->setFont(nameFont);
+		painter->setPen(option.palette.color(color));
+		painter->drawText(QRect(content.x(), content.y(), content.width(), lineHeight), Qt::AlignVCenter,
+				  QFontMetrics(nameFont).elidedText(index.data().toString(), Qt::ElideRight, content.width()));
+		painter->setFont(option.font);
+		for (int column = 1; column <= 2; ++column) {
+			painter->setPen(option.palette.color(selected ? QPalette::HighlightedText :
+								       column == 1 ? QPalette::PlaceholderText : QPalette::Text));
+			const QString text = index.siblingAtColumn(column).data().toString();
+			painter->drawText(QRect(content.x(), content.y() + column * (lineHeight + 2), content.width(), lineHeight),
+					  Qt::AlignVCenter, option.fontMetrics.elidedText(text, Qt::ElideRight, content.width()));
+		}
+		if (option.state & QStyle::State_HasFocus) {
+			painter->setBrush(Qt::NoBrush);
+			painter->setPen(option.palette.color(QPalette::Link));
+			painter->drawRoundedRect(card.adjusted(1, 1, -1, -1), 7, 7);
+		}
+		painter->restore();
+	}
+};
+
 class OutputDock final : public QWidget {
 	QTreeWidget *destinations;
+	QWidget *emptyState;
+	QLabel *destinationCount;
 	QPushButton *edit;
 	QPushButton *remove;
 	QPushButton *start;
@@ -488,8 +539,15 @@ class OutputDock final : public QWidget {
 			const char *format = d.layout == Layout::Landscape      ? "Penguin.Landscape"
 					     : d.layout == Layout::PortraitCrop ? "Penguin.PortraitCrop"
 									    : "Penguin.PortraitFit";
-			new QTreeWidgetItem(destinations, {d.name, Text(format), entry->status});
+			auto *item = new QTreeWidgetItem(destinations, {d.name, Text(format), entry->status});
+			const QString description = QStringLiteral("%1\n%2 · %3\n%4")
+						    .arg(d.name, d.platform, Text(format), entry->status);
+			item->setToolTip(0, description);
+			item->setData(0, Qt::AccessibleTextRole, description);
 		}
+		destinations->setVisible(!entries.empty());
+		emptyState->setVisible(entries.empty());
+		destinationCount->setText(QStringLiteral("%1 / %2").arg(entries.size()).arg(MaxDestinations));
 		if (selected >= 0 && selected < destinations->topLevelItemCount())
 			destinations->setCurrentItem(destinations->topLevelItem(selected));
 		UpdateButtons();
@@ -636,31 +694,81 @@ public:
 	{
 		setObjectName(QStringLiteral("penguinOutputPanel"));
 		auto *box = new QVBoxLayout(this);
+		box->setContentsMargins(14, 14, 14, 14);
+		box->setSpacing(10);
+		auto *heading = new QHBoxLayout;
+		auto *title = new QLabel(Text("Penguin.Outputs"));
+		title->setObjectName(QStringLiteral("penguinDestinationHeading"));
+		title->setWordWrap(true);
+		destinationCount = new QLabel;
+		destinationCount->setObjectName(QStringLiteral("penguinDestinationCount"));
+		heading->addWidget(title, 1);
+		heading->addWidget(destinationCount);
+		box->addLayout(heading);
+		auto *hint = new QLabel(Text("Penguin.DestinationHint"));
+		hint->setProperty("penguinHint", true);
+		hint->setWordWrap(true);
+		box->addWidget(hint);
 		destinations = new QTreeWidget;
+		destinations->setObjectName(QStringLiteral("penguinDestinationList"));
 		destinations->setRootIsDecorated(false);
 		destinations->setHeaderLabels({Text("Penguin.Destination"), Text("Penguin.Format"), Text("Penguin.Status")});
-		destinations->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
-		destinations->header()->setStretchLastSection(true);
-		box->addWidget(destinations);
-		auto *actions = new QHBoxLayout;
+		destinations->setHeaderHidden(true);
+		destinations->setColumnHidden(1, true);
+		destinations->setColumnHidden(2, true);
+		destinations->header()->setStretchLastSection(false);
+		destinations->header()->setSectionResizeMode(0, QHeaderView::Stretch);
+		destinations->setItemDelegate(new DestinationDelegate(destinations));
+		destinations->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+		destinations->setSelectionMode(QAbstractItemView::SingleSelection);
+		destinations->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
+		destinations->setMinimumHeight(110);
+		box->addWidget(destinations, 1);
+		emptyState = new QWidget;
+		auto *emptyLayout = new QVBoxLayout(emptyState);
+		emptyLayout->setContentsMargins(12, 20, 12, 20);
+		emptyLayout->addStretch();
+		auto *emptyTitle = new QLabel(Text("Penguin.EmptyTitle"));
+		emptyTitle->setObjectName(QStringLiteral("penguinDestinationEmptyTitle"));
+		auto *emptyText = new QLabel(Text("Penguin.EmptyText"));
+		emptyText->setProperty("penguinHint", true);
+		for (auto *label : {emptyTitle, emptyText}) {
+			label->setAlignment(Qt::AlignCenter);
+			label->setWordWrap(true);
+			emptyLayout->addWidget(label);
+		}
+		emptyLayout->addStretch();
+		box->addWidget(emptyState, 1);
 		auto *add = new QPushButton(Text("Penguin.Add"));
 		add->setObjectName(QStringLiteral("penguinAddDestination"));
-		edit = new QPushButton(Text("Penguin.Edit"));
+		add->setProperty("penguinPrimary", true);
+		box->addWidget(add);
+		auto *actions = new QHBoxLayout;
+		edit = new QPushButton(Text("Penguin.EditShort"));
+		edit->setToolTip(Text("Penguin.Edit"));
 		remove = new QPushButton(Text("Penguin.Remove"));
-		for (auto *button : {add, edit, remove})
+		for (auto *button : {edit, remove})
 			actions->addWidget(button);
 		box->addLayout(actions);
-		auto *outputs = new QHBoxLayout;
-		start = new QPushButton(Text("Penguin.Start"));
-		stop = new QPushButton(Text("Penguin.Stop"));
+		auto *outputs = new QGridLayout;
+		start = new QPushButton(Text("Penguin.StartShort"));
+		start->setToolTip(Text("Penguin.Start"));
+		stop = new QPushButton(Text("Penguin.StopShort"));
+		stop->setToolTip(Text("Penguin.Stop"));
 		auto *startAll = new QPushButton(Text("Penguin.StartAll"));
 		auto *stopAll = new QPushButton(Text("Penguin.StopAll"));
 		startAll->setObjectName(QStringLiteral("penguinStartAll"));
 		stopAll->setObjectName(QStringLiteral("penguinStopAll"));
-		for (auto *button : {start, stop, startAll, stopAll})
-			outputs->addWidget(button);
+		outputs->addWidget(start, 0, 0);
+		outputs->addWidget(stop, 0, 1);
+		outputs->addWidget(startAll, 1, 0);
+		outputs->addWidget(stopAll, 1, 1);
+		outputs->setColumnStretch(0, 1);
+		outputs->setColumnStretch(1, 1);
 		box->addLayout(outputs);
-		auto *note = new QLabel(Text("Penguin.KeysNote"));
+		auto *note = new QLabel(Text("Penguin.SessionKeys"));
+		note->setProperty("penguinHint", true);
+		note->setToolTip(Text("Penguin.KeysNote"));
 		note->setWordWrap(true);
 		box->addWidget(note);
 		connect(add, &QPushButton::clicked, this, [this]() { Configure(false); });

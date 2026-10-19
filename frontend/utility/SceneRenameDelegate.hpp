@@ -25,6 +25,8 @@ class SceneRenameDelegate : public QStyledItemDelegate {
 public:
 	SceneRenameDelegate(QObject *parent);
 	virtual void setEditorData(QWidget *editor, const QModelIndex &index) const override;
+	void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+	QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const override;
 
 protected:
 	virtual bool eventFilter(QObject *editor, QEvent *event) override;

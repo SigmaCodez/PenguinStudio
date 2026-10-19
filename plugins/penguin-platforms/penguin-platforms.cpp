@@ -23,6 +23,7 @@
 #include <QPointer>
 #include <QPushButton>
 #include <QRandomGenerator>
+#include <QScrollArea>
 #include <QSettings>
 #include <QSet>
 #include <QSignalBlocker>
@@ -182,9 +183,15 @@ protected:
 		form->addRow(Text("Title"), title);
 		form->addRow(updateButton);
 		status->setWordWrap(true);
+		status->setObjectName(QStringLiteral("penguinPlatformStatus"));
 		status->setTextFormat(Qt::PlainText);
 		status->setTextInteractionFlags(Qt::TextSelectableByMouse);
 		form->addRow(status);
+		for (int row = 0; row < form->rowCount(); ++row) {
+			auto *item = form->itemAt(row, QFormLayout::LabelRole);
+			if (auto *label = item ? qobject_cast<QLabel *>(item->widget()) : nullptr)
+				label->setWordWrap(true);
+		}
 		SetConnected(false);
 	}
 
@@ -193,6 +200,14 @@ public:
 	PlatformPane(QString name, QWidget *parent, QNetworkAccessManager *transport = nullptr)
 		: QWidget(parent), network(transport ? *transport : ownedNetwork), provider(std::move(name))
 	{
+		setObjectName(QStringLiteral("penguinPlatformPane"));
+		form->setContentsMargins(12, 14, 12, 14);
+		form->setVerticalSpacing(10);
+		form->setRowWrapPolicy(QFormLayout::WrapAllRows);
+		form->setFieldGrowthPolicy(QFormLayout::AllNonFixedFieldsGrow);
+		form->setFormAlignment(Qt::AlignTop);
+		connectButton->setProperty("penguinPrimary", true);
+		updateButton->setProperty("penguinPrimary", true);
 		char *path = obs_module_config_path("platforms.ini");
 		configPath = QString::fromUtf8(path);
 		bfree(path);
@@ -640,15 +655,33 @@ void CreateDock()
 	if (!parent || dock)
 		return;
 	dock = new QWidget(parent);
+	dock->setObjectName(QStringLiteral("penguinPlatformPanel"));
 	auto *layout = new QVBoxLayout(dock);
+	layout->setContentsMargins(14, 14, 14, 14);
+	layout->setSpacing(12);
 	auto *intro = new QLabel(Text("Dock.Intro"), dock);
+	intro->setProperty("penguinHint", true);
 	intro->setWordWrap(true);
 	layout->addWidget(intro);
 	auto *tabs = new QTabWidget(dock);
-	tabs->addTab(new TwitchPane(tabs), "Twitch");
-	tabs->addTab(new YoutubePane(tabs), "YouTube");
-	layout->addWidget(tabs);
-	auto *note = new QLabel(Text("SessionNote"), dock);
+	tabs->setObjectName(QStringLiteral("penguinPlatformTabs"));
+	tabs->setDocumentMode(true);
+	const auto addPlatform = [tabs](PlatformPane *pane, const QString &name) {
+		auto *scroll = new QScrollArea(tabs);
+		scroll->setObjectName(QStringLiteral("penguinPlatformScroll"));
+		scroll->setFrameShape(QFrame::NoFrame);
+		scroll->setWidgetResizable(true);
+		scroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+		scroll->setWidget(pane);
+		tabs->addTab(scroll, name);
+	};
+	addPlatform(new TwitchPane(tabs), QStringLiteral("Twitch"));
+	addPlatform(new YoutubePane(tabs), QStringLiteral("YouTube"));
+	layout->addWidget(tabs, 1);
+	auto *note = new QLabel(Text("SessionNoteShort"), dock);
+	note->setProperty("penguinHint", true);
+	note->setToolTip(Text("SessionNote"));
+	note->setAccessibleDescription(Text("SessionNote"));
 	note->setWordWrap(true);
 	layout->addWidget(note);
 	if (!obs_frontend_add_dock_by_id(DockId, obs_module_text("Dock.Title"), dock.data())) {

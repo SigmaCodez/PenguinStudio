@@ -61,7 +61,7 @@ VolumeControl::VolumeControl(obs_source_t *source, QWidget *parent, bool vertica
 	mainLayout->setSpacing(0);
 	setLayout(mainLayout);
 
-	categoryLabel = new QLabel("Active");
+	categoryLabel = new QLabel;
 	categoryLabel->setAlignment(Qt::AlignCenter);
 	utils->addClass(categoryLabel, "mixer-category");
 	utils->addClass(categoryLabel, "text-tiny");
@@ -245,10 +245,13 @@ void VolumeControl::setLayoutVertical(bool vertical)
 	QBoxLayout *newLayout = new QBoxLayout(QBoxLayout::TopToBottom);
 	newLayout->setContentsMargins(0, 0, 0, 0);
 	newLayout->setSpacing(0);
+	setProperty("penguinChannelStrip", vertical);
 
 	if (vertical) {
-		setMaximumWidth(110);
+		setMaximumWidth(132);
 		setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
+		newLayout->setContentsMargins(8, 8, 8, 8);
+		newLayout->setSpacing(5);
 
 		QHBoxLayout *categoryLayout = new QHBoxLayout;
 		QHBoxLayout *nameLayout = new QHBoxLayout;
@@ -265,8 +268,9 @@ void VolumeControl::setLayoutVertical(bool vertical)
 		slider->setDisplayTicks(true);
 
 		nameButton->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Preferred);
+		nameButton->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
 		categoryLabel->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Preferred);
-		volumeLabel->setAlignment(Qt::AlignLeft);
+		volumeLabel->setAlignment(Qt::AlignCenter);
 
 		categoryLayout->setAlignment(Qt::AlignCenter);
 		nameLayout->setAlignment(Qt::AlignCenter);
@@ -285,34 +289,33 @@ void VolumeControl::setLayoutVertical(bool vertical)
 		nameLayout->addWidget(nameButton);
 
 		controlLayout->setContentsMargins(0, 0, 0, 0);
-		controlLayout->setSpacing(0);
+		controlLayout->setSpacing(6);
 
 		// Add Headphone (audio monitoring) widget here
 		controlLayout->addWidget(muteButton);
 		controlLayout->addWidget(monitorButton);
 
 		meterLayout->setContentsMargins(0, 0, 0, 0);
-		meterLayout->setSpacing(0);
-		meterLayout->addWidget(slider);
+		meterLayout->setSpacing(6);
 		meterLayout->addWidget(volumeMeter);
+		meterLayout->addWidget(slider);
 
 		meterFrame->setLayout(meterLayout);
 
 		volLayout->setContentsMargins(0, 0, 0, 0);
 		volLayout->setSpacing(0);
 		volLayout->addWidget(volumeLabel);
-		volLayout->addItem(new QSpacerItem(0, 0, QSizePolicy::MinimumExpanding, QSizePolicy::Maximum));
 
-		newLayout->addItem(categoryLayout);
 		newLayout->addItem(nameLayout);
-		newLayout->addItem(volLayout);
+		newLayout->addItem(categoryLayout);
 		newLayout->addWidget(meterFrame);
+		newLayout->addItem(volLayout);
 		newLayout->addItem(controlLayout);
 
 		newLayout->setStretch(0, 0);
 		newLayout->setStretch(1, 0);
-		newLayout->setStretch(2, 0);
-		newLayout->setStretch(3, 1);
+		newLayout->setStretch(2, 1);
+		newLayout->setStretch(3, 0);
 		newLayout->setStretch(4, 0);
 
 		volumeMeter->setFocusProxy(slider);
@@ -381,6 +384,8 @@ void VolumeControl::setLayoutVertical(bool vertical)
 
 	setLayout(newLayout);
 	mainLayout = newLayout;
+	style()->unpolish(this);
+	style()->polish(this);
 	updateTabOrder();
 
 	adjustSize();
@@ -783,10 +788,12 @@ void VolumeControl::processMixerState()
 
 	QString muteTooltip = showAsMuted ? QTStr("Unmute") : QTStr("Mute");
 	muteButton->setToolTip(muteTooltip);
+	muteButton->setAccessibleName(muteTooltip);
 
 	QString monitorTooltip = showAsMonitored ? QTStr("Basic.AudioMixer.Monitoring.Disable")
 						 : QTStr("Basic.AudioMixer.Monitoring.Enable");
 	monitorButton->setToolTip(monitorTooltip);
+	monitorButton->setAccessibleName(monitorTooltip);
 
 	if (showWarningIcon) {
 		muteButton->setIcon(getWarningIcon());

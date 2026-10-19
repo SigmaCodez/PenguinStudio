@@ -15,6 +15,7 @@ class QLabel;
 class QToolButton;
 class QToolBar;
 class QAction;
+class QLineEdit;
 
 // Owns the workspace presentation. Output and source state remain owned by OBS.
 class PenguinWorkspace final : public QObject {
@@ -26,6 +27,12 @@ class PenguinWorkspace final : public QObject {
 	QLabel *canvasSize;
 	QLabel *metrics;
 	QLabel *workspaceLabel;
+	QLabel *canvasStatus;
+	QLabel *sceneCount = nullptr;
+	QLabel *layerCount = nullptr;
+	QLineEdit *sceneSearch = nullptr;
+	QLineEdit *layerSearch = nullptr;
+	QToolButton *detailsButton;
 	QToolButton *studioMode;
 	QToolButton *liveButton;
 	QToolButton *recordButton;
@@ -40,6 +47,7 @@ class PenguinWorkspace final : public QObject {
 	void CreateCanvasBar();
 	void CreatePanelHeaders();
 	void Refresh();
+	void FilterLists();
 	void ShowDock(const char *id);
 	void ToggleLive();
 	void ClickControl(const QString &name);

@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 // Optional LD_PRELOAD integration helper. Run only with an isolated test profile.
-// Screenshots are real X11 window captures; native Wayland is tested without them.
+// X11 screenshots include native video surfaces. Wayland captures are explicitly
+// labeled Qt widget renders; decoded recordings validate native video content.
 #include <obs.h>
 #include <obs-frontend-api.h>
 #include <util/platform.h>
@@ -14,9 +15,18 @@
 #include <QDoubleSpinBox>
 #include <QDockWidget>
 #include <QFile>
+#include <QFileInfo>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QLineEdit>
+#include <QKeyEvent>
+#include <QTabBar>
+#include <QStyleOptionTab>
+#include <QListView>
+#include <QListWidget>
+#include <QStyle>
+#include <QStyleOptionFrame>
 #include <QElapsedTimer>
 #include <QMainWindow>
 #include <QMessageBox>
@@ -37,11 +47,14 @@
 #include <chrono>
 #include <thread>
 #include <vector>
+#include <utility>
 
 namespace {
 QPointer<QMainWindow> mainWindow;
 int ticks = 0;
 QJsonArray checks;
+QJsonArray tabMeasurements;
+QJsonArray capturedLayouts;
 obs_sceneitem_t *fixtureItem = nullptr;
 obs_sceneitem_t *backgroundItem = nullptr;
 QString fixtureSceneUuid;
@@ -88,15 +101,28 @@ void SaveReport()
 						     {QStringLiteral("devicePixelRatio"), mainWindow->devicePixelRatioF()},
 						     {QStringLiteral("workspaceVersion"), int(config_get_int(config, "BasicWindow", "PenguinWorkspaceVersion"))},
 						     {QStringLiteral("previousDockStateSaved"), config_has_user_value(config, "BasicWindow", "PenguinPreviousDockState")},
+						     {QStringLiteral("captureMethod"), QGuiApplication::platformName() == QStringLiteral("xcb")
+							      ? QStringLiteral("native-x11-window") : QStringLiteral("qt-widget-render")},
 						     {QStringLiteral("checks"), checks},
+						     {QStringLiteral("sidebarTabs"), tabMeasurements},
+						     {QStringLiteral("capturedLayouts"), capturedLayouts},
 						     {QStringLiteral("widgets"), widgets}})
 				     .toJson());
 }
 
 void Capture(const QString &filename)
 {
-	if (QGuiApplication::platformName() != QStringLiteral("xcb"))
+	capturedLayouts.append(QJsonObject{{"image", filename}, {"width", mainWindow->width()},
+					   {"height", mainWindow->height()}, {"minimumWidth", mainWindow->minimumWidth()},
+					   {"minimumHeight", mainWindow->minimumHeight()},
+					   {"minimumHintWidth", mainWindow->minimumSizeHint().width()},
+					   {"minimumHintHeight", mainWindow->minimumSizeHint().height()}});
+	if (QGuiApplication::platformName() != QStringLiteral("xcb")) {
+		const QString widgetFilename = QFileInfo(filename).completeBaseName() + QStringLiteral("-widgets.png");
+		Check(mainWindow->grab().save(Results().filePath(widgetFilename)),
+		      QStringLiteral("native-wayland-widget-render"));
 		return;
+	}
 	mainWindow->raise();
 	Display *display = XOpenDisplay(nullptr);
 	if (!display) {
@@ -208,6 +234,199 @@ template<typename T> T *Control(const char *name)
 	return control;
 }
 
+QRect BoundsInWindow(QWidget *widget)
+{
+	return {widget->mapTo(mainWindow, QPoint()), widget->size()};
+}
+
+void RaiseInspector()
+{
+	if (auto *dock = mainWindow->findChild<QDockWidget *>(QStringLiteral("penguinInspectorDock")))
+		dock->raise();
+}
+
+void CheckWorkspaceLayout(const QString &size, int requestedWidth, int requestedHeight)
+{
+	auto *layers = Control<QDockWidget>("sourcesDock");
+	auto *scenes = Control<QDockWidget>("scenesDock");
+	auto *mixer = Control<QDockWidget>("mixerDock");
+	auto *inspector = Control<QDockWidget>("penguinInspectorDock");
+	auto *topbar = Control<QWidget>("penguinTopBar");
+	auto *canvas = Control<QWidget>("centralwidget");
+	if (!layers || !scenes || !mixer || !inspector || !topbar || !canvas)
+		return;
+	Check(mainWindow->width() <= requestedWidth && mainWindow->height() <= requestedHeight,
+	      QStringLiteral("workspace-fits-requested-size-%1").arg(size));
+	Check(mainWindow->dockWidgetArea(layers) == Qt::LeftDockWidgetArea &&
+	      mainWindow->dockWidgetArea(scenes) == Qt::LeftDockWidgetArea &&
+	      BoundsInWindow(layers).bottom() < BoundsInWindow(scenes).top(),
+	      QStringLiteral("layers-above-scenes-%1").arg(size));
+	Check(mainWindow->dockWidgetArea(mixer) == Qt::BottomDockWidgetArea &&
+	      BoundsInWindow(mixer).top() > BoundsInWindow(canvas).top() && mixer->height() >= 90,
+	      QStringLiteral("mixer-below-canvas-%1").arg(size));
+	Check(mainWindow->dockWidgetArea(inspector) == Qt::RightDockWidgetArea &&
+	      BoundsInWindow(canvas).right() < BoundsInWindow(inspector).left(),
+	      QStringLiteral("inspector-right-of-canvas-%1").arg(size));
+	Check(canvas->width() >= 320 && canvas->height() >= 240,
+	      QStringLiteral("usable-preview-space-%1").arg(size));
+	for (const char *name : {"penguinBrand", "penguinLiveButton", "penguinRecordButton", "penguinToolbarButton"}) {
+		auto *button = Control<QAbstractButton>(name);
+		Check(button && button->isVisible() && BoundsInWindow(topbar).contains(BoundsInWindow(button)),
+		      QStringLiteral("toolbar-control-fits-%1-%2").arg(size, QString::fromLatin1(name)));
+	}
+	for (const char *name : {"penguinLayerSearch", "penguinSceneSearch"}) {
+		auto *search = Control<QLineEdit>(name);
+		if (!search)
+			continue;
+		QStyleOptionFrame option;
+		option.initFrom(search);
+		const QRect content = search->style()->subElementRect(QStyle::SE_LineEditContents, &option, search);
+		Check(search->isVisible() && !search->placeholderText().isEmpty() &&
+		      !search->accessibleName().isEmpty() && content.height() >= search->fontMetrics().height(),
+		      QStringLiteral("search-field-readable-%1-%2").arg(size, QString::fromLatin1(name)));
+	}
+}
+
+void TestSearch(QListView *view, QLineEdit *search, const QString &query, int nameRole, const QString &label)
+{
+	if (!view || !search)
+		return;
+	const int originalRows = view->model()->rowCount();
+	const QModelIndexList selected = view->selectionModel()->selectedIndexes();
+	search->setText(query.toUpper());
+	Check(!view->dragEnabled() && !view->acceptDrops(), QStringLiteral("%1-filter-prevents-ambiguous-reorder").arg(label));
+	int matches = 0;
+	bool correctRows = originalRows > 0;
+	for (int row = 0; row < originalRows; ++row) {
+		const QString name = view->model()->index(row, 0).data(nameRole).toString();
+		const bool match = name.contains(query, Qt::CaseInsensitive);
+		matches += match;
+		correctRows = correctRows && view->isRowHidden(row) != match;
+	}
+	Check(correctRows && matches > 0, QStringLiteral("%1-search-matches-case-insensitively").arg(label));
+	search->setText(QStringLiteral("Penguin nonexistent fixture 58c30c"));
+	bool noMatches = true;
+	for (int row = 0; row < originalRows; ++row)
+		noMatches = noMatches && view->isRowHidden(row);
+	Check(noMatches && view->model()->rowCount() == originalRows,
+	      QStringLiteral("%1-search-hides-without-removing-items").arg(label));
+	search->clear();
+	bool restored = view->model()->rowCount() == originalRows;
+	for (int row = 0; row < originalRows; ++row)
+		restored = restored && !view->isRowHidden(row);
+	Check(restored && selected == view->selectionModel()->selectedIndexes(),
+	      QStringLiteral("%1-search-clear-preserves-items-and-selection").arg(label));
+	Check(view->dragEnabled() && view->acceptDrops(), QStringLiteral("%1-search-clear-restores-reorder").arg(label));
+}
+
+void TestWorkspaceSearch()
+{
+	TestSearch(Control<QListView>("sources"), Control<QLineEdit>("penguinLayerSearch"),
+		   QStringLiteral("Penguin Studio logo"), Qt::AccessibleTextRole, QStringLiteral("layers"));
+	auto *scenes = Control<QListWidget>("scenes");
+	if (scenes && scenes->currentItem())
+		TestSearch(scenes, Control<QLineEdit>("penguinSceneSearch"), scenes->currentItem()->text(),
+			   Qt::DisplayRole, QStringLiteral("scenes"));
+	Check(fixtureItem && obs_sceneitem_visible(fixtureItem) && obs_sceneitem_selected(fixtureItem),
+	      QStringLiteral("layer-filter-does-not-change-rendered-scene"));
+}
+
+void TestSceneRename()
+{
+	auto *scenes = Control<QListWidget>("scenes");
+	if (!scenes || !scenes->currentItem())
+		return;
+	const QString original = scenes->currentItem()->text();
+	auto edit = [scenes](const QString &text, int key, const QString &label) {
+		// Use the actual Rename action slot: ordinary scene items deliberately
+		// omit ItemIsEditable until this route temporarily enables editing.
+		Check(QMetaObject::invokeMethod(mainWindow, "EditSceneName", Qt::DirectConnection),
+		      QStringLiteral("scene-rename-action-%1").arg(label));
+		QCoreApplication::processEvents();
+		QLineEdit *editor = nullptr;
+		for (auto *candidate : scenes->findChildren<QLineEdit *>())
+			if (candidate->isVisible())
+				editor = candidate;
+		Check(editor != nullptr, QStringLiteral("scene-rename-editor-%1").arg(label));
+		if (!editor)
+			return;
+		editor->selectAll();
+		editor->insert(text);
+		QKeyEvent event(QEvent::KeyPress, key, Qt::NoModifier);
+		QCoreApplication::sendEvent(editor, &event);
+		QCoreApplication::processEvents();
+	};
+	edit(QStringLiteral("Penguin cancelled rename fixture"), Qt::Key_Escape, QStringLiteral("cancel"));
+	Check(scenes->currentItem()->text() == original, QStringLiteral("scene-rename-escape-preserves-name"));
+	const QString renamed = QStringLiteral("Penguin renamed scene fixture");
+	edit(renamed, Qt::Key_Return, QStringLiteral("commit"));
+	obs_source_t *scene = obs_get_source_by_uuid(fixtureSceneUuid.toUtf8().constData());
+	Check(scene && scenes->currentItem()->text() == renamed &&
+	      QString::fromUtf8(obs_source_get_name(scene)) == renamed,
+	      QStringLiteral("scene-rename-editor-updates-obs-source"));
+	edit(original, Qt::Key_Return, QStringLiteral("restore"));
+	Check(scene && scenes->currentItem()->text() == original &&
+	      QString::fromUtf8(obs_source_get_name(scene)) == original,
+	      QStringLiteral("scene-rename-editor-restores-name"));
+	obs_source_release(scene);
+}
+
+void CheckSidebarTabText(const QString &size)
+{
+	auto *inspector = mainWindow->findChild<QDockWidget *>(QStringLiteral("penguinInspectorDock"));
+	if (!inspector)
+		return;
+	bool found = false;
+	for (auto *tabs : mainWindow->findChildren<QTabBar *>()) {
+		bool inspectorTab = false;
+		for (int index = 0; index < tabs->count(); ++index)
+			inspectorTab = inspectorTab || tabs->tabText(index) == inspector->windowTitle();
+		if (!inspectorTab || !tabs->isVisible())
+			continue;
+		found = true;
+		for (int index = 0; index < tabs->count(); ++index) {
+			QStyleOptionTab option;
+			option.initFrom(tabs);
+			option.rect = tabs->tabRect(index);
+			option.text = tabs->tabText(index);
+			option.shape = tabs->shape();
+			const QRect text = tabs->style()->subElementRect(QStyle::SE_TabBarTabText, &option, tabs);
+			const int textWidth = tabs->fontMetrics().horizontalAdvance(option.text);
+			tabMeasurements.append(QJsonObject{{"size", size}, {"index", index}, {"text", option.text},
+						  {"textWidth", textWidth}, {"availableWidth", text.width()},
+						  {"tabWidth", option.rect.width()}, {"barWidth", tabs->width()}});
+			Check(textWidth <= text.width(),
+			      QStringLiteral("sidebar-tab-label-fits-%1-%2").arg(size).arg(index));
+		}
+	}
+	Check(found, QStringLiteral("sidebar-tab-bar-visible-%1").arg(size));
+}
+
+void TestRightSidebar()
+{
+	auto *inspector = Control<QDockWidget>("penguinInspectorDock");
+	if (!inspector)
+		return;
+	for (const auto &entry : {std::pair{"penguin-broadcast-destinations", "penguinDestinationsButton"},
+				  std::pair{"penguin-stream-details", "penguinDetailsButton"}}) {
+		const char *name = entry.first;
+		auto *dock = Control<QDockWidget>(name);
+		if (!dock)
+			continue;
+		Check(!dock->isFloating() && mainWindow->dockWidgetArea(dock) == Qt::RightDockWidgetArea &&
+		      mainWindow->tabifiedDockWidgets(inspector).contains(dock),
+		      QStringLiteral("integrated-sidebar-tab-%1").arg(QString::fromLatin1(name)));
+		if (auto *button = Control<QAbstractButton>(entry.second))
+			button->click();
+		QCoreApplication::processEvents();
+		Check(!dock->visibleRegion().isEmpty(), QStringLiteral("sidebar-tab-can-open-%1").arg(QString::fromLatin1(name)));
+	}
+	if (auto *button = Control<QAbstractButton>("penguinInspectorButton"))
+		button->click();
+	QCoreApplication::processEvents();
+	Check(!inspector->visibleRegion().isEmpty(), QStringLiteral("inspector-tab-can-restore"));
+}
+
 bool CloseEnough(float actual, float expected)
 {
 	return std::abs(actual - expected) < 0.1f;
@@ -283,6 +502,14 @@ void TestInspector()
 		Check(CloseEnough(changed.scale.x / original.scale.x, changed.scale.y / original.scale.y),
 		      QStringLiteral("aspect-ratio-preserved"));
 	}
+	auto *cropToggle = Control<QAbstractButton>("inspectorCropToggle");
+	auto *cropFields = Control<QWidget>("inspectorCropFields");
+	if (cropToggle && cropFields) {
+		Check(cropToggle->isCheckable() && !cropToggle->isChecked() && !cropFields->isVisible(),
+		      QStringLiteral("crop-section-collapsed-by-default"));
+		cropToggle->click();
+		Check(cropToggle->isChecked() && cropFields->isVisible(), QStringLiteral("crop-section-opens"));
+	}
 	if (auto *crop = Control<QSpinBox>("inspectorCropLeft")) {
 		crop->setValue(10);
 		obs_sceneitem_crop value{};
@@ -323,6 +550,10 @@ void CheckInspectorWidth(const QString &size)
 		"inspectorLocked", "inspectorAspectLock", "inspectorFit", "inspectorCenter", "inspectorFlipHorizontal",
 		"inspectorFlipVertical", "inspectorProperties", "inspectorFilters", "inspectorAdvanced", "inspectorReset"}) {
 		auto *control = mainWindow->findChild<QWidget *>(QString::fromLatin1(name));
+		// A collapsed section has no layout allocation until it is expanded.
+		// Its controls are covered again by the compact run after expansion.
+		if (control && !control->isVisible())
+			continue;
 		const int left = control ? control->mapTo(scroll->viewport(), QPoint()).x() : -1;
 		Check(control && left >= 0 && left + control->width() <= scroll->viewport()->width(),
 		      QStringLiteral("inspector-horizontal-fit-%1-%2").arg(size, QString::fromLatin1(name)));
@@ -473,7 +704,12 @@ void Tick()
 		Trigger("actionScaleWindow");
 	if (ticks == 36) {
 		Capture(QStringLiteral("workspace-1440.png"));
+		CheckWorkspaceLayout(QStringLiteral("large"), 1440, 900);
 		CheckInspectorWidth(QStringLiteral("large"));
+		TestWorkspaceSearch();
+		TestSceneRename();
+		TestRightSidebar();
+		CheckSidebarTabText(QStringLiteral("large"));
 	}
 	if (ticks == 37 && qEnvironmentVariableIsSet("PENGUIN_SMOKE_EXPECT_REDESIGN"))
 		TestInspector();
@@ -481,7 +717,9 @@ void Tick()
 		mainWindow->resize(1280, 800);
 	if (ticks == 48) {
 		Capture(QStringLiteral("workspace-1280.png"));
+		CheckWorkspaceLayout(QStringLiteral("compact"), 1280, 800);
 		CheckInspectorWidth(QStringLiteral("compact"));
+		CheckSidebarTabText(QStringLiteral("compact"));
 	}
 	if (ticks == 49 && fixtureItem && qEnvironmentVariableIsSet("PENGUIN_SMOKE_EXPECT_REDESIGN")) {
 		Click("inspectorFlipHorizontal");
@@ -520,7 +758,9 @@ void Tick()
 		Click("penguinDestinationsButton");
 		if (auto *dock = Control<QDockWidget>("penguin-broadcast-destinations")) {
 			Check(dock->isVisible(), QStringLiteral("destinations-toolbar-opens-panel"));
-			dock->hide();
+			Check(!dock->isFloating() && !dock->visibleRegion().isEmpty(),
+			      QStringLiteral("destinations-toolbar-selects-integrated-tab"));
+			RaiseInspector();
 		}
 		Click("penguinCanvasMode");
 	}
@@ -542,6 +782,7 @@ void Tick()
 			}
 		}
 		Check(found, QStringLiteral("go-live-opens-real-connection-wizard"));
+		RaiseInspector();
 		Check(!obs_frontend_preview_program_mode_active(), QStringLiteral("studio-mode-toolbar-disabled"));
 		Results().mkpath(QStringLiteral("recordings"));
 		const auto path = Results().filePath(QStringLiteral("recordings")).toUtf8();
