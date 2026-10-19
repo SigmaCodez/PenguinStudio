@@ -72,3 +72,34 @@ absolute path of `test/fixtures/penguin-browser.html` in the native workspace ru
 The helper adds the HTML source behind the image fixture. Decode a recorded frame
 and confirm the green bar and white fixture text appear; a source-created check
 alone does not prove CEF rendered its content. The fixture makes no web requests.
+
+## Shutdown lifetime regression
+
+Build the observer against the installed native Qt/OBS development headers:
+
+```sh
+c++ -std=c++17 -shared -fPIC -Wall -Wextra -Werror -I/usr/include/obs \
+  test/penguin-shutdown-probe.cpp -o /tmp/penguin-shutdown-probe.so \
+  $(pkg-config --cflags --libs Qt6Widgets) -ldl
+bash scripts/packaging/verify-shutdown.sh /tmp/penguin-shutdown-probe.so /tmp/penguin-shutdown-new
+```
+
+The observer calls the real frontend API unchanged. It counts callback removal
+after frontend destruction and writes the report at process teardown, after the
+WebSocket module has unloaded. It never hides or changes application log messages.
+The runner checks normal exit, `--multi`, an open setup wizard, a separately opened
+and closed statistics window, restart of the same normal profile, and graceful
+SIGTERM handling after startup. Normal
+runs must create a crash sentinel and remove it on clean exit; multi-instance
+runs must never create one. Each process must exit successfully with no errors
+in the shutdown section, no late frontend unregisters, and zero OBS memory leaks.
+Optional hardware-plugin diagnostics during startup are outside this shutdown
+check. Qt warnings are retained in each report rather than filtered out.
+
+The WebSocket submodule remains pinned to its upstream revision. Its maintained
+fix lives in `patches/obs-websocket-shutdown.patch` and is applied by CMake before
+building the plugin. Reconfiguration is idempotent; incompatible upstream changes
+fail configuration and require patch review. This intentionally modifies the
+submodule working tree during configuration, without changing its pinned commit.
+`python3 test/penguin-websocket-patch.py` checks application, repeated application,
+and rejection of an incompatible source copy without editing the real submodule.

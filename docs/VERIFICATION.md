@@ -2,6 +2,27 @@
 
 This is a development preview based on OBS Studio 32.2.2. The new Penguin code must not be described as fully production-tested until the checks below have real recorded results.
 
+## Native shutdown cleanup — 2026-10-19
+
+Installed Ubuntu package `0.2.0-3+ubuntu26.04` passes six native Wayland exit
+scenarios: normal close, multi-instance mode, an open setup wizard, opening and
+closing Statistics, restart with the same profile, and graceful SIGTERM.
+Each exits with code 0, zero shutdown errors, zero late frontend callback
+removals, zero remaining crash sentinels, and zero OBS-reported memory leaks.
+Closing with the setup wizard open still emits two Qt 6.10.2 Wayland text-input
+focus warnings; they are retained in the report. The other five shutdown logs
+contain no warnings. These warnings do not prevent a successful exit.
+The observer forwards all API calls unchanged; the previous package fails the
+same regression test with two late callback removals.
+
+Inactive crash handlers now skip sentinel cleanup. AudioMixer and the WebSocket
+plugin remove callbacks before frontend destruction and avoid removing them
+again in their destructors. The pinned upstream WebSocket revision is retained
+with a checked, idempotent build patch. See [the evidence](validation/ubuntu-26.04-shutdown.json)
+and [reproduction instructions](../test/README-native-wayland.md).
+These checks cover shutdown; optional hardware-plugin startup diagnostics and
+live-provider validation remain outside this test.
+
 ## Native Ubuntu 26.04.1 Wayland follow-up — 2026-10-19
 
 The native DEB was exercised on the user's Wayland desktop with isolated test

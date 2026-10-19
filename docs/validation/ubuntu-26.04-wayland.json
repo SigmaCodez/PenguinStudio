@@ -1279,5 +1279,10 @@
     "No crash sentinel location set for crash handler",
     "Tried to call obs_frontend_remove_event_callback with no callbacks"
   ],
-  "nonfatal_shutdown_diagnostics_note": "Observed on clean exits, including the original package. No shutdown crash or OBS-reported memory leak occurred; origins of these remaining log diagnostics were not isolated."
+  "nonfatal_shutdown_diagnostics_note": "Observed on clean exits, including the original package. No shutdown crash or OBS-reported memory leak occurred; origins of these remaining log diagnostics were not isolated.",
+  "shutdown_follow_up": {
+    "report": "ubuntu-26.04-shutdown.json",
+    "package": "0.2.0-3+ubuntu26.04",
+    "result": "Both previously reported shutdown error categories resolved; six native Wayland exit cases passed."
+  }
 }
