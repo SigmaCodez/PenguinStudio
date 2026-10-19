@@ -240,8 +240,9 @@ capability is informational; camera runtime failures retain their severity.
 Application identity is assigned before icon and portal-related initialization.
 
 `test-optional-library.sh` exercises absence, successful loading, invalid ELF and
-missing dependent libraries. Only absence of the exact requested SONAME becomes
-informational. Other loader failures remain errors. The existing Qt diagnostic
+missing dependent libraries. The tests also cover German Germany and German Switzerland locales. Only absence
+of the exact requested SONAME becomes informational, using the localized ENOENT
+suffix rather than an English-only loader message. Other loader failures remain errors. The existing Qt diagnostic
 boundary remains unchanged: QTBUG-141475 affects real text-input focus handling,
 so its non-null mismatch warning must not be hidden as a shutdown false positive.
 

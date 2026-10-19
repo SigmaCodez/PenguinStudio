@@ -39,3 +39,22 @@ is recorded rather than required for every scenario.
 
 See [VERIFICATION.md](VERIFICATION.md) for the installed-package results and
 [the native test guide](../test/README-native-wayland.md) for reproduction steps.
+
+## Startup audit (Ubuntu 26.04, Qt 6.10.2)
+
+Assigning the desktop file ID before constructing `QApplication` prevents the
+host-portal duplicate-registration warning; moving it only within the application
+constructor is too late for Qt platform-service construction. Nine isolated
+Wayland runs verified the early-ID change without duplicate-registration warnings.
+
+The remaining non-null `disableSurface` warning is associated with
+[QTBUG-141475](https://github.com/qt/qtbase/commit/a2bc24c05189f9d39c034560f163ad1490c37996).
+The upstream fix changes text-input state transitions, not just logging. It is
+therefore not covered by the null-surface diagnostic classification above.
+
+An experiment preferring the desktop's existing IBus context removed the focus
+warning and passed wizard focus/cancellation checks, but introduced
+`QSocketNotifier: Can only be used with threads started with QThread` during Qt
+construction, reproduced in a minimal native Qt application. This workaround was
+not shipped. Both direct IBus and its portal path reproduced that warning. The
+application continues to honor the user's existing input-method settings.
