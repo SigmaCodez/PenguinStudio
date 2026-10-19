@@ -1,0 +1,932 @@
+{
+  "schema_version": 1,
+  "observed_at_utc": "2026-10-19T14:16:37.970Z",
+  "repository": "SigmaCodez/PenguinStudio",
+  "version": "0.2.0",
+  "application_source_commit": "8c1d5113a19fa90a5c604e79d81e6e0c60208dbc",
+  "scope_note": "The final artifacts below match application source 8c1d5113a19fa90a5c604e79d81e6e0c60208dbc, including the Qt standard-button translation fix. Both complete successful runs are preserved; artifacts from the earlier 6ed830 source are listed separately as superseded. Later documentation-only commits do not change the compiled application source.",
+  "runs": [
+    {
+      "id": 39261456151,
+      "url": "https://github.com/SigmaCodez/PenguinStudio/actions/runs/39261456151",
+      "commit": "6ed8300525b17e1fd0597389a2b139956228240d",
+      "branch": "penguin/main",
+      "event": "push",
+      "attempt": 1,
+      "created_at": "2026-10-19T13:35:28Z",
+      "updated_at": "2026-10-19T13:53:55Z",
+      "status": "completed",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "id": 118089880213,
+          "name": "Flatpak (x86_64)",
+          "url": "https://github.com/SigmaCodez/PenguinStudio/actions/runs/39261456151/job/118089880213",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-19T13:35:32Z",
+          "completed_at": "2026-10-19T13:53:55Z",
+          "scope": [
+            "Full application build and staged installation in the Flatpak SDK",
+            "Desktop/metainfo export and x86_64 Flatpak bundle generation"
+          ],
+          "steps": [
+            {
+              "number": 1,
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 2,
+              "name": "Initialize containers",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 3,
+              "name": "Run actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 4,
+              "name": "Run flatpak/flatpak-github-actions/flatpak-builder@401fe28a8384095fc1531b9d320b292f0ee45adb",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 7,
+              "name": "Post Run actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 8,
+              "name": "Stop containers",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 9,
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success"
+            }
+          ]
+        },
+        {
+          "id": 118089880505,
+          "name": "Fedora 44 RPM (x86_64)",
+          "url": "https://github.com/SigmaCodez/PenguinStudio/actions/runs/39261456151/job/118089880505",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-19T13:35:31Z",
+          "completed_at": "2026-10-19T13:46:52Z",
+          "scope": [
+            "Full native application build with browser and Wayland support, then CPack packaging",
+            "Output destination validation, key omission and failed/live/stopped destruction regression",
+            "Simulated remote platform HTTP, real local OAuth callback listener, token rotation, polling/backoff, title-update exclusion, pagination, snippet preservation, revocation and shutdown regressions",
+            "Asynchronous setup wizard/warnings, parent destruction, shutdown cancellation, duplicate guard, first-run dismissal and frontend unload regressions",
+            "Inspect package metadata, install generated package and run penguin-studio --version"
+          ],
+          "steps": [
+            {
+              "number": 1,
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 2,
+              "name": "Initialize containers",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 3,
+              "name": "Install checkout prerequisites",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 4,
+              "name": "Run actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 5,
+              "name": "Install build dependencies",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 6,
+              "name": "Compile and package",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 7,
+              "name": "Inspect package metadata",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 8,
+              "name": "Install RPM and verify launcher",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 9,
+              "name": "Run actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 17,
+              "name": "Post Run actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 18,
+              "name": "Stop containers",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 19,
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success"
+            }
+          ]
+        },
+        {
+          "id": 118089880538,
+          "name": "Branding, translations, configuration, and OAuth",
+          "url": "https://github.com/SigmaCodez/PenguinStudio/actions/runs/39261456151/job/118089880538",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-19T13:35:31Z",
+          "completed_at": "2026-10-19T13:35:52Z",
+          "scope": [
+            "Branding and inherited locale availability validation (77 locales)",
+            "Complete English plus seven translations: outputs 54 keys, platforms 27 keys, workspace 50 keys",
+            "Compile and run isolated configuration-path checks",
+            "Compile and run OAuth callback validation, PKCE and form encoding checks"
+          ],
+          "steps": [
+            {
+              "number": 1,
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 2,
+              "name": "Run actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 3,
+              "name": "Validate branding and translations",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 4,
+              "name": "Compile and run configuration isolation checks",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 5,
+              "name": "Compile and run OAuth callback checks",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 10,
+              "name": "Post Run actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 11,
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success"
+            }
+          ]
+        },
+        {
+          "id": 118089880667,
+          "name": "Ubuntu 24.04 DEB (amd64)",
+          "url": "https://github.com/SigmaCodez/PenguinStudio/actions/runs/39261456151/job/118089880667",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-19T13:35:31Z",
+          "completed_at": "2026-10-19T13:46:21Z",
+          "scope": [
+            "Full native application build with browser and Wayland support, then CPack packaging",
+            "Output destination validation, key omission and failed/live/stopped destruction regression",
+            "Simulated remote platform HTTP, real local OAuth callback listener, token rotation, polling/backoff, title-update exclusion, pagination, snippet preservation, revocation and shutdown regressions",
+            "Asynchronous setup wizard/warnings, parent destruction, shutdown cancellation, duplicate guard, first-run dismissal and frontend unload regressions",
+            "Inspect package metadata, install generated package and run penguin-studio --version"
+          ],
+          "steps": [
+            {
+              "number": 1,
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 2,
+              "name": "Run actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 3,
+              "name": "Install build dependencies",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 4,
+              "name": "Compile and package",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 5,
+              "name": "Inspect package metadata",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 6,
+              "name": "Install DEB and verify launcher",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 7,
+              "name": "Run actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 14,
+              "name": "Post Run actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 15,
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success"
+            }
+          ]
+        },
+        {
+          "id": 118089880770,
+          "name": "Snap core24 (amd64, development)",
+          "url": "https://github.com/SigmaCodez/PenguinStudio/actions/runs/39261456151/job/118089880770",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-19T13:35:31Z",
+          "completed_at": "2026-10-19T13:47:03Z",
+          "scope": [
+            "Snapcraft core24 amd64 build and lint",
+            "Install generated development Snap with --dangerous and run confined launcher --version"
+          ],
+          "steps": [
+            {
+              "number": 1,
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 2,
+              "name": "Run actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 3,
+              "name": "Install Snapcraft",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 4,
+              "name": "Build snap",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 5,
+              "name": "Install Snap and verify confined launcher",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 6,
+              "name": "Run actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 12,
+              "name": "Post Run actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 13,
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 39264364809,
+      "url": "https://github.com/SigmaCodez/PenguinStudio/actions/runs/39264364809",
+      "commit": "8c1d5113a19fa90a5c604e79d81e6e0c60208dbc",
+      "branch": "penguin/main",
+      "event": "push",
+      "attempt": 1,
+      "created_at": "2026-10-19T13:55:41Z",
+      "updated_at": "2026-10-19T14:14:03Z",
+      "status": "completed",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "id": 118099965292,
+          "name": "Fedora 44 RPM (x86_64)",
+          "url": "https://github.com/SigmaCodez/PenguinStudio/actions/runs/39264364809/job/118099965292",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-19T13:55:44Z",
+          "completed_at": "2026-10-19T14:09:53Z",
+          "scope": [
+            "Full native application build with browser and Wayland support, then CPack packaging",
+            "Output destination validation, key omission and failed/live/stopped destruction regression",
+            "Simulated remote platform HTTP, real local OAuth callback listener, token rotation, polling/backoff, title-update exclusion, pagination, snippet preservation, revocation and shutdown regressions",
+            "Asynchronous setup wizard/warnings, parent destruction, shutdown cancellation, duplicate guard, first-run dismissal and frontend unload regressions",
+            "Inspect package metadata, install generated package and run penguin-studio --version"
+          ],
+          "steps": [
+            {
+              "number": 1,
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 2,
+              "name": "Initialize containers",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 3,
+              "name": "Install checkout prerequisites",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 4,
+              "name": "Run actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 5,
+              "name": "Install build dependencies",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 6,
+              "name": "Compile and package",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 7,
+              "name": "Inspect package metadata",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 8,
+              "name": "Install RPM and verify launcher",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 9,
+              "name": "Run actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 17,
+              "name": "Post Run actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 18,
+              "name": "Stop containers",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 19,
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success"
+            }
+          ]
+        },
+        {
+          "id": 118099965553,
+          "name": "Ubuntu 24.04 DEB (amd64)",
+          "url": "https://github.com/SigmaCodez/PenguinStudio/actions/runs/39264364809/job/118099965553",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-19T13:55:44Z",
+          "completed_at": "2026-10-19T14:08:26Z",
+          "scope": [
+            "Full native application build with browser and Wayland support, then CPack packaging",
+            "Output destination validation, key omission and failed/live/stopped destruction regression",
+            "Simulated remote platform HTTP, real local OAuth callback listener, token rotation, polling/backoff, title-update exclusion, pagination, snippet preservation, revocation and shutdown regressions",
+            "Asynchronous setup wizard/warnings, parent destruction, shutdown cancellation, duplicate guard, first-run dismissal and frontend unload regressions",
+            "Inspect package metadata, install generated package and run penguin-studio --version"
+          ],
+          "steps": [
+            {
+              "number": 1,
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 2,
+              "name": "Run actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 3,
+              "name": "Install build dependencies",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 4,
+              "name": "Compile and package",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 5,
+              "name": "Inspect package metadata",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 6,
+              "name": "Install DEB and verify launcher",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 7,
+              "name": "Run actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 14,
+              "name": "Post Run actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 15,
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success"
+            }
+          ]
+        },
+        {
+          "id": 118099965613,
+          "name": "Snap core24 (amd64, development)",
+          "url": "https://github.com/SigmaCodez/PenguinStudio/actions/runs/39264364809/job/118099965613",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-19T13:55:44Z",
+          "completed_at": "2026-10-19T14:08:22Z",
+          "scope": [
+            "Snapcraft core24 amd64 build and lint",
+            "Install generated development Snap with --dangerous and run confined launcher --version"
+          ],
+          "steps": [
+            {
+              "number": 1,
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 2,
+              "name": "Run actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 3,
+              "name": "Install Snapcraft",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 4,
+              "name": "Build snap",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 5,
+              "name": "Install Snap and verify confined launcher",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 6,
+              "name": "Run actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 12,
+              "name": "Post Run actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 13,
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success"
+            }
+          ]
+        },
+        {
+          "id": 118099965939,
+          "name": "Flatpak (x86_64)",
+          "url": "https://github.com/SigmaCodez/PenguinStudio/actions/runs/39264364809/job/118099965939",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-19T13:55:45Z",
+          "completed_at": "2026-10-19T14:14:02Z",
+          "scope": [
+            "Full application build and staged installation in the Flatpak SDK",
+            "Desktop/metainfo export and x86_64 Flatpak bundle generation"
+          ],
+          "steps": [
+            {
+              "number": 1,
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 2,
+              "name": "Initialize containers",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 3,
+              "name": "Run actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 4,
+              "name": "Run flatpak/flatpak-github-actions/flatpak-builder@401fe28a8384095fc1531b9d320b292f0ee45adb",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 7,
+              "name": "Post Run actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 8,
+              "name": "Stop containers",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 9,
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success"
+            }
+          ]
+        },
+        {
+          "id": 118099965956,
+          "name": "Branding, translations, configuration, and OAuth",
+          "url": "https://github.com/SigmaCodez/PenguinStudio/actions/runs/39264364809/job/118099965956",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-19T13:55:44Z",
+          "completed_at": "2026-10-19T13:56:14Z",
+          "scope": [
+            "Branding and inherited locale availability validation (77 locales)",
+            "Complete English plus seven translations: outputs 54 keys, platforms 27 keys, workspace 50 keys",
+            "Compile and run isolated configuration-path checks",
+            "Compile and run OAuth callback validation, PKCE and form encoding checks",
+            "Compile and run Qt standard-button translation checks, including mnemonic markers and context-scoped fallback"
+          ],
+          "steps": [
+            {
+              "number": 1,
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 2,
+              "name": "Run actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 3,
+              "name": "Validate branding and translations",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 4,
+              "name": "Compile and run configuration isolation checks",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 5,
+              "name": "Compile and run OAuth callback checks",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 6,
+              "name": "Compile and run Qt button translation checks",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 12,
+              "name": "Post Run actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 13,
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "artifacts": [
+    {
+      "format": "snap",
+      "id": 12193486708,
+      "name": "penguin-studio-core24-amd64",
+      "url": "https://github.com/SigmaCodez/PenguinStudio/actions/runs/39264364809/artifacts/12193486708",
+      "run_id": 39264364809,
+      "application_source_commit": "8c1d5113a19fa90a5c604e79d81e6e0c60208dbc",
+      "size_in_bytes": 498817649,
+      "archive_digest": "sha256:6014bb96b94ffdbf0b23b6f6a42935937dddbc2ad962bf3a8c2464e8cef7b02d",
+      "digest_scope": "GitHub artifact ZIP archive, not extracted package file",
+      "expired_at_observation": false,
+      "created_at": "2026-10-19T14:08:20Z",
+      "expires_at": "2027-01-17T13:55:42Z"
+    },
+    {
+      "format": "deb",
+      "id": 12193416845,
+      "name": "penguin-studio-ubuntu-24.04-amd64",
+      "url": "https://github.com/SigmaCodez/PenguinStudio/actions/runs/39264364809/artifacts/12193416845",
+      "run_id": 39264364809,
+      "application_source_commit": "8c1d5113a19fa90a5c604e79d81e6e0c60208dbc",
+      "size_in_bytes": 134882266,
+      "archive_digest": "sha256:344c97d455c172af2c1ac3cafb9bfaa3e8983d1bf1d247f60a3098701fb691d2",
+      "digest_scope": "GitHub artifact ZIP archive, not extracted package file",
+      "expired_at_observation": false,
+      "created_at": "2026-10-19T14:08:25Z",
+      "expires_at": "2027-01-17T13:55:42Z"
+    },
+    {
+      "format": "rpm",
+      "id": 12193337597,
+      "name": "penguin-studio-fedora-44-x86_64",
+      "url": "https://github.com/SigmaCodez/PenguinStudio/actions/runs/39264364809/artifacts/12193337597",
+      "run_id": 39264364809,
+      "application_source_commit": "8c1d5113a19fa90a5c604e79d81e6e0c60208dbc",
+      "size_in_bytes": 118796900,
+      "archive_digest": "sha256:e98671546d599bd27bcbb8da7a68331bd7ca70f5d7d3b3011cd1d7fdea6d077c",
+      "digest_scope": "GitHub artifact ZIP archive, not extracted package file",
+      "expired_at_observation": false,
+      "created_at": "2026-10-19T14:09:43Z",
+      "expires_at": "2027-01-17T13:55:42Z"
+    },
+    {
+      "format": "flatpak",
+      "id": 12192348657,
+      "name": "penguin-studio-x86_64-x86_64.flatpak",
+      "url": "https://github.com/SigmaCodez/PenguinStudio/actions/runs/39264364809/artifacts/12192348657",
+      "run_id": 39264364809,
+      "application_source_commit": "8c1d5113a19fa90a5c604e79d81e6e0c60208dbc",
+      "size_in_bytes": 142576802,
+      "archive_digest": "sha256:74a89d450670f6d8157a7b261318e263e5634d56760be544042779ea48960189",
+      "digest_scope": "GitHub artifact ZIP archive, not extracted package file",
+      "expired_at_observation": false,
+      "created_at": "2026-10-19T14:13:55Z",
+      "expires_at": "2027-01-17T13:55:42Z"
+    }
+  ],
+  "launcher_checks": {
+    "deb": {
+      "job_id": 118099965553,
+      "exit_status": 0,
+      "stdout": "Penguin Studio 0.2.0 (OBS 32.2.2)",
+      "undefined_symbol_warning": false
+    },
+    "rpm": {
+      "job_id": 118099965292,
+      "exit_status": 0,
+      "stdout": "Penguin Studio 0.2.0 (OBS 32.2.2)",
+      "undefined_symbol_warning": false
+    },
+    "snap": {
+      "job_id": 118099965613,
+      "exit_status": 0,
+      "stdout": "Penguin Studio 0.2.0 (OBS 32.2.2)",
+      "undefined_symbol_warning": false
+    }
+  },
+  "snap_lint": {
+    "job_id": 118099965613,
+    "warnings": [
+      "- gpu: usr/lib/x86_64-linux-gnu/obs-plugins/libvulkan.so.1: GPU support library should be provided by a content interface. (https://ubuntu.com/frame/docs/24/how-to/use-snap-graphics/)",
+      "- library: libcaca++.so.0: unused library 'usr/lib/x86_64-linux-gnu/libcaca++.so.0.99.20'. (https://documentation.ubuntu.com/snapcraft/stable/how-to/debugging/use-the-library-linter)",
+      "- library: libcjson_utils.so.1: unused library 'usr/lib/x86_64-linux-gnu/libcjson_utils.so.1.7.17'. (https://documentation.ubuntu.com/snapcraft/stable/how-to/debugging/use-the-library-linter)",
+      "- library: libfftw3_omp.so.3: unused library 'usr/lib/x86_64-linux-gnu/libfftw3_omp.so.3.6.10'. (https://documentation.ubuntu.com/snapcraft/stable/how-to/debugging/use-the-library-linter)",
+      "- library: libfftw3_threads.so.3: unused library 'usr/lib/x86_64-linux-gnu/libfftw3_threads.so.3.6.10'. (https://documentation.ubuntu.com/snapcraft/stable/how-to/debugging/use-the-library-linter)",
+      "- library: libflite_cmu_grapheme_lang.so.1: unused library 'usr/lib/x86_64-linux-gnu/libflite_cmu_grapheme_lang.so.2.2'. (https://documentation.ubuntu.com/snapcraft/stable/how-to/debugging/use-the-library-linter)",
+      "- library: libflite_cmu_grapheme_lex.so.1: unused library 'usr/lib/x86_64-linux-gnu/libflite_cmu_grapheme_lex.so.2.2'. (https://documentation.ubuntu.com/snapcraft/stable/how-to/debugging/use-the-library-linter)",
+      "- library: libflite_cmu_indic_lex.so.1: unused library 'usr/lib/x86_64-linux-gnu/libflite_cmu_indic_lex.so.2.2'. (https://documentation.ubuntu.com/snapcraft/stable/how-to/debugging/use-the-library-linter)",
+      "- library: libflite_cmu_time_awb.so.1: unused library 'usr/lib/x86_64-linux-gnu/libflite_cmu_time_awb.so.2.2'. (https://documentation.ubuntu.com/snapcraft/stable/how-to/debugging/use-the-library-linter)",
+      "- library: libfreebl3.so: unused library 'usr/lib/x86_64-linux-gnu/libfreebl3.so'. (https://documentation.ubuntu.com/snapcraft/stable/how-to/debugging/use-the-library-linter)",
+      "- library: libfreeblpriv3.so: unused library 'usr/lib/x86_64-linux-gnu/libfreeblpriv3.so'. (https://documentation.ubuntu.com/snapcraft/stable/how-to/debugging/use-the-library-linter)",
+      "- library: libhwy_contrib.so.1: unused library 'usr/lib/x86_64-linux-gnu/libhwy_contrib.so.1.0.7'. (https://documentation.ubuntu.com/snapcraft/stable/how-to/debugging/use-the-library-linter)",
+      "- library: libhwy_test.so.1: unused library 'usr/lib/x86_64-linux-gnu/libhwy_test.so.1.0.7'. (https://documentation.ubuntu.com/snapcraft/stable/how-to/debugging/use-the-library-linter)",
+      "- library: libjacknet.so.0: unused library 'usr/lib/x86_64-linux-gnu/libjacknet.so.0.1.0'. (https://documentation.ubuntu.com/snapcraft/stable/how-to/debugging/use-the-library-linter)",
+      "- library: libjackserver.so.0: unused library 'usr/lib/x86_64-linux-gnu/libjackserver.so.0.1.0'. (https://documentation.ubuntu.com/snapcraft/stable/how-to/debugging/use-the-library-linter)",
+      "- library: libnssckbi.so: unused library 'usr/lib/x86_64-linux-gnu/libnssckbi.so'. (https://documentation.ubuntu.com/snapcraft/stable/how-to/debugging/use-the-library-linter)",
+      "- library: libnssdbm3.so: unused library 'usr/lib/x86_64-linux-gnu/libnssdbm3.so'. (https://documentation.ubuntu.com/snapcraft/stable/how-to/debugging/use-the-library-linter)",
+      "- library: libobs-opengl.so.30: unused library 'usr/lib/x86_64-linux-gnu/libobs-opengl.so.30'. (https://documentation.ubuntu.com/snapcraft/stable/how-to/debugging/use-the-library-linter)",
+      "- library: libsoftokn3.so: unused library 'usr/lib/x86_64-linux-gnu/libsoftokn3.so'. (https://documentation.ubuntu.com/snapcraft/stable/how-to/debugging/use-the-library-linter)",
+      "- library: libsphinxad.so.3: unused library 'usr/lib/x86_64-linux-gnu/libsphinxad.so.3.0.0'. (https://documentation.ubuntu.com/snapcraft/stable/how-to/debugging/use-the-library-linter)",
+      "- library: libssl3.so: unused library 'usr/lib/x86_64-linux-gnu/libssl3.so'. (https://documentation.ubuntu.com/snapcraft/stable/how-to/debugging/use-the-library-linter)",
+      "- library: libtheora.so.0: unused library 'usr/lib/x86_64-linux-gnu/libtheora.so.0.3.10'. (https://documentation.ubuntu.com/snapcraft/stable/how-to/debugging/use-the-library-linter)",
+      "- library: libzvbi-chains.so.0: unused library 'usr/lib/x86_64-linux-gnu/libzvbi-chains.so.0.0.0'. (https://documentation.ubuntu.com/snapcraft/stable/how-to/debugging/use-the-library-linter)"
+    ],
+    "warning_count": 23,
+    "gpu_content_advisories": 1,
+    "unused_library_advisories": 22,
+    "note": "Advisories remain for CEF's bundled Vulkan loader and dynamically loaded or unused libraries. They are not proof of browser rendering or GPU compatibility."
+  },
+  "limits": [
+    "Native and Snap CI launcher checks use --version; these jobs do not exercise the desktop GUI.",
+    "The new workspace/inspector GUI, resizing, recording, scene switching and undo tests were run separately on the local test build and are described in workspace-0.2.json.",
+    "Platform regressions simulate remote HTTP responses and use a real local OAuth callback listener. No live Twitch/YouTube account, metadata change or authenticated internet stream was tested by CI.",
+    "Wayland/X11 portal permissions, capture devices and hardware encoders across other distributions remain outside this CI scope.",
+    "Snap is a development package installed with --dangerous; Snap Store review/publication is not covered.",
+    "Flatpak CI generates a bundle. Installed GUI checks and extracted package-file SHA-256 digests are separate evidence.",
+    "Build logs retain upstream compiler warnings; successful jobs are not a claim of warning-free or exhaustive runtime validation."
+  ],
+  "related_evidence": [
+    "linux-ci.json",
+    "workspace-0.2.json",
+    "output-validation.json",
+    "snap-svg-loader.json",
+    "native-packages-0.2.json",
+    "flatpak-0.2-metadata.ini"
+  ],
+  "superseded_artifacts": [
+    {
+      "format": "flatpak",
+      "id": 12191814242,
+      "name": "penguin-studio-x86_64-x86_64.flatpak",
+      "url": "https://github.com/SigmaCodez/PenguinStudio/actions/runs/39261456151/artifacts/12191814242",
+      "run_id": 39261456151,
+      "application_source_commit": "6ed8300525b17e1fd0597389a2b139956228240d",
+      "size_in_bytes": 142591565,
+      "archive_digest": "sha256:e454293fbd14166ecd47bbe7b821c803a68b33672cf0335a06260a710b414830",
+      "digest_scope": "GitHub artifact ZIP archive, not extracted package file",
+      "expired_at_observation": false,
+      "created_at": "2026-10-19T13:53:45Z",
+      "expires_at": "2027-01-17T13:35:29Z"
+    },
+    {
+      "format": "snap",
+      "id": 12191467960,
+      "name": "penguin-studio-core24-amd64",
+      "url": "https://github.com/SigmaCodez/PenguinStudio/actions/runs/39261456151/artifacts/12191467960",
+      "run_id": 39261456151,
+      "application_source_commit": "6ed8300525b17e1fd0597389a2b139956228240d",
+      "size_in_bytes": 498816653,
+      "archive_digest": "sha256:085cd1b3f3d07d8628a84a806170a2e5a12507689087138ed57bb8ed92c3e4ca",
+      "digest_scope": "GitHub artifact ZIP archive, not extracted package file",
+      "expired_at_observation": false,
+      "created_at": "2026-10-19T13:47:00Z",
+      "expires_at": "2027-01-17T13:35:29Z"
+    },
+    {
+      "format": "rpm",
+      "id": 12190768720,
+      "name": "penguin-studio-fedora-44-x86_64",
+      "url": "https://github.com/SigmaCodez/PenguinStudio/actions/runs/39261456151/artifacts/12190768720",
+      "run_id": 39261456151,
+      "application_source_commit": "6ed8300525b17e1fd0597389a2b139956228240d",
+      "size_in_bytes": 118810365,
+      "archive_digest": "sha256:e53410f39bec5447fe856f5a4e5334493ed5f5180c5eb0b2605b845ba8718e42",
+      "digest_scope": "GitHub artifact ZIP archive, not extracted package file",
+      "expired_at_observation": false,
+      "created_at": "2026-10-19T13:46:42Z",
+      "expires_at": "2027-01-17T13:35:29Z"
+    },
+    {
+      "format": "deb",
+      "id": 12190034481,
+      "name": "penguin-studio-ubuntu-24.04-amd64",
+      "url": "https://github.com/SigmaCodez/PenguinStudio/actions/runs/39261456151/artifacts/12190034481",
+      "run_id": 39261456151,
+      "application_source_commit": "6ed8300525b17e1fd0597389a2b139956228240d",
+      "size_in_bytes": 134884768,
+      "archive_digest": "sha256:6b893417b7c100b5e3dbbf1c6e0208c6792a98b5f5e71c1a18b5f47d7ef69597",
+      "digest_scope": "GitHub artifact ZIP archive, not extracted package file",
+      "expired_at_observation": false,
+      "created_at": "2026-10-19T13:46:18Z",
+      "expires_at": "2027-01-17T13:35:29Z"
+    }
+  ],
+  "superseded_launcher_checks": {
+    "deb": {
+      "job_id": 118089880667,
+      "exit_status": 0,
+      "stdout": "Penguin Studio 0.2.0 (OBS 32.2.2)",
+      "undefined_symbol_warning": false
+    },
+    "rpm": {
+      "job_id": 118089880505,
+      "exit_status": 0,
+      "stdout": "Penguin Studio 0.2.0 (OBS 32.2.2)",
+      "undefined_symbol_warning": false
+    },
+    "snap": {
+      "job_id": 118089880770,
+      "exit_status": 0,
+      "stdout": "Penguin Studio 0.2.0 (OBS 32.2.2)",
+      "undefined_symbol_warning": false
+    }
+  }
+}

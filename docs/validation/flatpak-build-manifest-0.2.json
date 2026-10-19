@@ -1,0 +1,201 @@
+{
+  "schema_version": 1,
+  "validation_date": "2026-10-19",
+  "product": "Penguin Studio",
+  "upstream": {
+    "version": "32.2.2",
+    "commit": "ba2f32bdf791005443988a4955e963663e16b1ed"
+  },
+  "recipe": {
+    "path": "build-aux/io.github.SigmaCodez.PenguinStudio.json",
+    "sha256": "9995e89ef761ec027e955284c5b70232180b32f02e9369462aefb53e619eab23"
+  },
+  "architecture": "x86_64",
+  "toolchain": {
+    "compiler": "GCC 15.2.0",
+    "cmake": "4.4.4",
+    "ninja": "1.13.2",
+    "qt": "6.11.1"
+  },
+  "sdk": {
+    "ref": "org.freedesktop.Sdk/x86_64/25.08",
+    "commit": "18fa1be304b09e42dd3606f6d933e2d6a27513dd3aeee1203b2b58d59ad3db71"
+  },
+  "runtime": {
+    "ref": "org.freedesktop.Platform/x86_64/25.08",
+    "commit": "b7aba340fd291e08bf26442d43a0e4adb6733da5a06d47ff4296a964af40cc8a"
+  },
+  "cmake_options": {
+    "CMAKE_BUILD_TYPE": "RelWithDebInfo",
+    "CMAKE_COMPILE_WARNING_AS_ERROR": "OFF",
+    "CMAKE_INSTALL_PREFIX": "/app",
+    "ENABLE_AJA": "ON",
+    "ENABLE_ALSA": "OFF",
+    "ENABLE_BROWSER": "ON",
+    "ENABLE_BROWSER_PANELS": "ON",
+    "ENABLE_CCACHE": "OFF",
+    "ENABLE_COMPILER_TRACE": "OFF",
+    "ENABLE_DECKLINK": "OFF",
+    "ENABLE_FFMPEG_LOGGING": "OFF",
+    "ENABLE_FFMPEG_MUX_DEBUG": "OFF",
+    "ENABLE_FFMPEG_NVENC": "OFF",
+    "ENABLE_FREETYPE": "ON",
+    "ENABLE_FRONTEND": "ON",
+    "ENABLE_HEVC": "ON",
+    "ENABLE_IDIAN_PLAYGROUND": "OFF",
+    "ENABLE_JACK": "ON",
+    "ENABLE_LIBFDK": "ON",
+    "ENABLE_NEW_MPEGTS_OUTPUT": "ON",
+    "ENABLE_NVENC": "ON",
+    "ENABLE_NVENC_FFMPEG_IDS": "ON",
+    "ENABLE_PIPEWIRE": "ON",
+    "ENABLE_PLUGINS": "ON",
+    "ENABLE_PORTABLE_CONFIG": "OFF",
+    "ENABLE_PULSEAUDIO": "ON",
+    "ENABLE_QSV11": "ON",
+    "ENABLE_RELOCATABLE": "OFF",
+    "ENABLE_RNNOISE": "ON",
+    "ENABLE_SCRIPTING": "ON",
+    "ENABLE_SCRIPTING_LUA": "ON",
+    "ENABLE_SCRIPTING_PYTHON": "ON",
+    "ENABLE_SERVICE_UPDATES": "ON",
+    "ENABLE_SNDIO": "OFF",
+    "ENABLE_SPEEXDSP": "ON",
+    "ENABLE_TEST_INPUT": "OFF",
+    "ENABLE_UDEV": "ON",
+    "ENABLE_V4L2": "ON",
+    "ENABLE_VLC": "OFF",
+    "ENABLE_VST": "ON",
+    "ENABLE_WAYLAND": "ON",
+    "ENABLE_WEBRTC": "ON",
+    "ENABLE_WEBSOCKET": "ON",
+    "ENABLE_WHATSNEW": "ON",
+    "OBS_VERSION_OVERRIDE": "32.2.2",
+    "PENGUIN_BUILD_TESTS": "ON",
+    "ENABLE_BROWSER_PANELS-ADVANCED": "1",
+    "ENABLE_COMPILER_TRACE-ADVANCED": "1",
+    "ENABLE_NVENC_FFMPEG_IDS-ADVANCED": "1"
+  },
+  "version": "0.2.0",
+  "application_source_commit": "8c1d5113a19fa90a5c604e79d81e6e0c60208dbc",
+  "build_method": "Retained full flatpak-builder dependency/application build with incremental CMake recompilation of the complete native workspace redesign and final standard-button translation repair. Application source was compared with the published commit before export; rebuilt installed files were staged in a separate release tree, exported, bundled, and installed into an isolated Flatpak user directory.",
+  "source_comparison": {
+    "source_commit": "8c1d5113a19fa90a5c604e79d81e6e0c60208dbc",
+    "method": "Compare Git blob SHA-1 of every staged file under application/build/branding source roots against git ls-tree at the published source commit; symlinks hashed as link targets. Gitlinks listed separately. Git-mandated CRLF checkout line endings in three Windows project files are normalized to LF for their blob comparisons.",
+    "roots": [
+      "frontend",
+      "plugins",
+      "libobs",
+      "libobs-opengl",
+      "libobs-d3d11",
+      "libobs-metal",
+      "deps",
+      "cmake",
+      "assets",
+      "CMakeLists.txt",
+      "CMakePresets.json",
+      "AUTHORS",
+      "COPYING",
+      "packaging/version.txt",
+      ".gitmodules"
+    ],
+    "checked_file_count": 4871,
+    "all_checked_files_match": true,
+    "mismatches": [],
+    "submodule_gitlinks": [
+      {
+        "path": "deps/libdshowcapture/src",
+        "commit": "8878638324393815512f802640b0d5ce940161f1",
+        "staged_checkout_head_matches": true
+      },
+      {
+        "path": "plugins/obs-browser",
+        "commit": "3f0a2cdf378939ebe3c6f9ab36d4ea100c25aac2",
+        "staged_checkout_head_matches": true
+      },
+      {
+        "path": "plugins/obs-websocket",
+        "commit": "1ef34bf48110c2a18184e50e41cd0b1a855e2147",
+        "staged_checkout_head_matches": true
+      }
+    ],
+    "line_ending_normalized_files": [
+      "deps/w32-pthreads/pthread.sln",
+      "deps/w32-pthreads/pthread.vcxproj",
+      "deps/w32-pthreads/pthread.vcxproj.filters"
+    ],
+    "retained_build_tree_git_head": "ba2f32bdf791005443988a4955e963663e16b1ed",
+    "generated_build_metadata": {
+      "OBS_VERSION_CANONICAL": "32.2.2",
+      "OBS_COMMIT": "",
+      "PENGUIN_VERSION": "0.2.0"
+    },
+    "metadata_note": "The retained incremental build tree keeps the upstream Git metadata. Application source content was independently compared with the published Penguin Studio commit; the embedded OBS version override does not claim that Git HEAD."
+  },
+  "artifact": {
+    "filename": "penguin-studio-0.2.0-x86_64.flatpak",
+    "size_bytes": 142757376,
+    "sha256": "bcfaa6fecf3f3e9e3b1135ccbbf1d8277989ddabff10994137bc3a1cc261c968",
+    "flatpak_commit": "8dc4982afb7aa9b560fba9d4a4a271082df5399b7b8ea647217941b3d8848c6d",
+    "signed": false,
+    "channel": "development"
+  },
+  "staged_binary_sha256": {
+    "files/bin/obs": "55f0df5768c01427371cb7fb58d5646e2fb613c5b5517c0a0d40bfa854c12a9b",
+    "files/bin/penguin-studio": "6dbeb7008e29c712c4c3f4c836dabca199ac99d0f0f54dcb964deb3398b67274",
+    "files/lib/obs-plugins/penguin-outputs.so": "52e46ca5cb02135edddb01810939d17d407819f94658bda19d3f8378ed13d6b0",
+    "files/lib/obs-plugins/penguin-platforms.so": "2cfe35e5c49b50965eb0b72fd7b256601f4701550b39129cdbd6a3f9215d8ae4"
+  },
+  "installed_binary_sha256": {
+    "files/bin/obs": "55f0df5768c01427371cb7fb58d5646e2fb613c5b5517c0a0d40bfa854c12a9b",
+    "files/bin/penguin-studio": "6dbeb7008e29c712c4c3f4c836dabca199ac99d0f0f54dcb964deb3398b67274",
+    "files/lib/obs-plugins/penguin-outputs.so": "52e46ca5cb02135edddb01810939d17d407819f94658bda19d3f8378ed13d6b0",
+    "files/lib/obs-plugins/penguin-platforms.so": "2cfe35e5c49b50965eb0b72fd7b256601f4701550b39129cdbd6a3f9215d8ae4"
+  },
+  "staged_and_installed_binaries_match": true,
+  "checks": {
+    "application_and_both_modules_compiled": true,
+    "configuration_isolation_cpp": "passed before final translation-only repair",
+    "oauth_helpers_cpp": "passed before final translation-only repair",
+    "output_safety_cpp": "passed before final translation-only repair",
+    "platform_flow_cpp": "passed before final translation-only repair",
+    "wizard_lifecycle_cpp": "passed before final translation-only repair",
+    "qt_standard_button_translation_cpp": "passed; see dialogs-0.2.json",
+    "source_content_matches_published_commit": true,
+    "bundle_isolated_install": "passed",
+    "installed_cli_version": "Penguin Studio 0.2.0 (OBS 32.2.2)",
+    "installed_wayland_gui_and_active_wizard_close": {
+      "source_commit": "8c1d5113a19fa90a5c604e79d81e6e0c60208dbc",
+      "exit_code": 0,
+      "obs_reported_memory_leaks": 0,
+      "fresh_configuration": true,
+      "network_disabled": true,
+      "pulseaudio_socket_disabled": true,
+      "configuration_isolation": "XDG directories set inside sandbox command after Flatpak environment initialization",
+      "checks": [
+        {
+          "name": "close-with-active-setup-wizard",
+          "passed": true
+        }
+      ],
+      "log_sha256": "b89f582ec4a5113c1b10a4254f9fb110f3f75603c6fbc66df2bd82c86247b6d3",
+      "native_widget_report_sha256": "eaa7a30e14ed5df7fd1b860d909f7e37c946a8099ccfe74d8d1792c6d049a6a3"
+    },
+    "native_workspace_integration": "passed on 6ed8300525b17e1fd0597389a2b139956228240d before the translation-only repair; see workspace-0.2.json",
+    "final_english_and_german_dialogs": "passed on final source; see dialogs-0.2.json",
+    "retained_license_files_verified": 95
+  },
+  "notices_manifest": "flatpak-0.2-licenses.sha256",
+  "metadata": "flatpak-0.2-metadata.ini",
+  "gui_evidence": [
+    "workspace-0.2.json",
+    "dialogs-0.2.json"
+  ],
+  "scope_limits": [
+    "No live Twitch or YouTube account or external stream was used in these release checks.",
+    "The workspace tests recorded generated local audio/video fixtures; no physical capture or GPU encoder compatibility claim follows.",
+    "Portal capture, HiDPI coverage, and broad distribution compatibility remain separate checks.",
+    "DEB, RPM and Snap outcomes are tracked in CI rather than established by this local Flatpak manifest.",
+    "The bundle is an unsigned development build; no claim of store publication or production certification is made."
+  ]
+}

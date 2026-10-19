@@ -1,0 +1,121 @@
+{
+  "schema_version": 1,
+  "validation_date": "2026-10-19",
+  "product": "Penguin Studio",
+  "version": "0.1.0",
+  "upstream": {
+    "version": "32.2.2",
+    "commit": "ba2f32bdf791005443988a4955e963663e16b1ed"
+  },
+  "application_source_commit": "5d4956d1577d6b57d7fb74533f5cbaeaf8b82414",
+  "build_method": "Full flatpak-builder application build followed by incremental recompilation of all reviewed final application changes in the retained CMake build tree; installed files exported and bundled after regression tests.",
+  "recipe": {
+    "path": "build-aux/io.github.SigmaCodez.PenguinStudio.json",
+    "sha256": "9995e89ef761ec027e955284c5b70232180b32f02e9369462aefb53e619eab23"
+  },
+  "architecture": "x86_64",
+  "toolchain": {
+    "compiler": "GCC 15.2.0",
+    "cmake": "4.4.4",
+    "ninja": "1.13.2",
+    "qt": "6.11.1"
+  },
+  "sdk": {
+    "ref": "org.freedesktop.Sdk/x86_64/25.08",
+    "commit": "18fa1be304b09e42dd3606f6d933e2d6a27513dd3aeee1203b2b58d59ad3db71"
+  },
+  "runtime": {
+    "ref": "org.freedesktop.Platform/x86_64/25.08",
+    "commit": "b7aba340fd291e08bf26442d43a0e4adb6733da5a06d47ff4296a964af40cc8a"
+  },
+  "cmake_options": {
+    "CMAKE_BUILD_TYPE": "RelWithDebInfo",
+    "CMAKE_COMPILE_WARNING_AS_ERROR": "OFF",
+    "CMAKE_INSTALL_PREFIX": "/app",
+    "ENABLE_AJA": "ON",
+    "ENABLE_ALSA": "OFF",
+    "ENABLE_BROWSER": "ON",
+    "ENABLE_BROWSER_PANELS": "ON",
+    "ENABLE_CCACHE": "OFF",
+    "ENABLE_COMPILER_TRACE": "OFF",
+    "ENABLE_DECKLINK": "OFF",
+    "ENABLE_FFMPEG_LOGGING": "OFF",
+    "ENABLE_FFMPEG_MUX_DEBUG": "OFF",
+    "ENABLE_FFMPEG_NVENC": "OFF",
+    "ENABLE_FREETYPE": "ON",
+    "ENABLE_FRONTEND": "ON",
+    "ENABLE_HEVC": "ON",
+    "ENABLE_IDIAN_PLAYGROUND": "OFF",
+    "ENABLE_JACK": "ON",
+    "ENABLE_LIBFDK": "ON",
+    "ENABLE_NEW_MPEGTS_OUTPUT": "ON",
+    "ENABLE_NVENC": "ON",
+    "ENABLE_NVENC_FFMPEG_IDS": "ON",
+    "ENABLE_PIPEWIRE": "ON",
+    "ENABLE_PLUGINS": "ON",
+    "ENABLE_PORTABLE_CONFIG": "OFF",
+    "ENABLE_PULSEAUDIO": "ON",
+    "ENABLE_QSV11": "ON",
+    "ENABLE_RELOCATABLE": "OFF",
+    "ENABLE_RNNOISE": "ON",
+    "ENABLE_SCRIPTING": "ON",
+    "ENABLE_SCRIPTING_LUA": "ON",
+    "ENABLE_SCRIPTING_PYTHON": "ON",
+    "ENABLE_SERVICE_UPDATES": "ON",
+    "ENABLE_SNDIO": "OFF",
+    "ENABLE_SPEEXDSP": "ON",
+    "ENABLE_TEST_INPUT": "OFF",
+    "ENABLE_UDEV": "ON",
+    "ENABLE_V4L2": "ON",
+    "ENABLE_VLC": "OFF",
+    "ENABLE_VST": "ON",
+    "ENABLE_WAYLAND": "ON",
+    "ENABLE_WEBRTC": "ON",
+    "ENABLE_WEBSOCKET": "ON",
+    "ENABLE_WHATSNEW": "ON",
+    "OBS_VERSION_OVERRIDE": "32.2.2",
+    "PENGUIN_BUILD_TESTS": "ON",
+    "ENABLE_BROWSER_PANELS-ADVANCED": "1",
+    "ENABLE_COMPILER_TRACE-ADVANCED": "1",
+    "ENABLE_NVENC_FFMPEG_IDS-ADVANCED": "1"
+  },
+  "artifact": {
+    "filename": "penguin-studio-0.1.0-x86_64.flatpak",
+    "size_bytes": 142571656,
+    "sha256": "8615ed676aa290d74f59efa371ed37c8fb7b636e3d6a2e6be3205147e9a9f471",
+    "flatpak_commit": "c855cfd7dfecd0ebafca2421d6808b2f32651659274c93e25602a9beaafcdb29",
+    "signed": false,
+    "channel": "development"
+  },
+  "installed_binary_sha256": {
+    "files/bin/obs": "9b3a1eb81808db119f4f99c4cb518acb8bb2357d99b23877fae1e38f8ba90d93",
+    "files/bin/penguin-studio": "6dbeb7008e29c712c4c3f4c836dabca199ac99d0f0f54dcb964deb3398b67274",
+    "files/lib/obs-plugins/penguin-outputs.so": "3308f8f2ce9ece753fdec02c8b29b45a8f8ba8bf3ef6f22111b05fd988ced1e8",
+    "files/lib/obs-plugins/penguin-platforms.so": "2cfe35e5c49b50965eb0b72fd7b256601f4701550b39129cdbd6a3f9215d8ae4"
+  },
+  "checks": {
+    "application_and_both_modules_compiled": true,
+    "configuration_isolation_cpp": "passed",
+    "oauth_helpers_cpp": "passed",
+    "output_safety_cpp": "passed",
+    "platform_flow_cpp": "passed",
+    "wizard_lifecycle_cpp": "passed",
+    "local_rtmp_landscape_and_portrait": "passed; see output-validation.json",
+    "bundle_isolated_install": "passed",
+    "installed_cli_version": "Penguin Studio 0.1.0 (OBS 32.2.2)",
+    "installed_wayland_gui_and_active_wizard_close": {
+      "exit_code": 0,
+      "obs_reported_memory_leaks": 0,
+      "fresh_configuration": true,
+      "network_disabled": true,
+      "configuration_isolation": "XDG directories set inside sandbox command after Flatpak environment initialization"
+    }
+  },
+  "scope_limits": [
+    "No live Twitch or YouTube account was used.",
+    "GPU encoder, portal capture, and broad distribution matrix validation remain separate checks.",
+    "DEB, RPM, and Snap outcomes are tracked in CI, not asserted by this local Flatpak manifest."
+  ],
+  "notices_manifest": "flatpak-licenses.sha256",
+  "gui_evidence": "first-run-wizard-wayland.png"
+}

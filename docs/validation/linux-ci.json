@@ -1,0 +1,234 @@
+{
+  "schema_version": 1,
+  "observed_at_utc": "2026-10-19T13:13:34.991Z",
+  "repository": "SigmaCodez/PenguinStudio",
+  "application_source_commit": "5d4956d1577d6b57d7fb74533f5cbaeaf8b82414",
+  "scope_note": "This report covers the listed commits. Subsequent source or visual-design changes are not covered.",
+  "runs": [
+    {
+      "id": 39252629193,
+      "url": "https://github.com/SigmaCodez/PenguinStudio/actions/runs/39252629193",
+      "commit": "3d068c2c528aa554525bbedf1868838b1a356b80",
+      "event": "push",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "id": 118060033108,
+          "name": "Fedora 44 RPM (x86_64)",
+          "conclusion": "success",
+          "scope": [
+            "Full native application build and CPack packaging",
+            "Output safety, simulated platform HTTP/real loopback OAuth, and wizard lifecycle regressions",
+            "Install generated package and run launcher --version"
+          ]
+        },
+        {
+          "id": 118060033492,
+          "name": "Branding, translations, configuration, and OAuth",
+          "conclusion": "success",
+          "scope": [
+            "Branding/locales validation",
+            "Configuration isolation and OAuth callback/PKCE/form encoding regressions"
+          ]
+        },
+        {
+          "id": 118060033594,
+          "name": "Flatpak (x86_64)",
+          "conclusion": "success",
+          "scope": [
+            "Full application build, staging install, desktop/metainfo export and Flatpak bundle"
+          ]
+        },
+        {
+          "id": 118060033623,
+          "name": "Ubuntu 24.04 DEB (amd64)",
+          "conclusion": "success",
+          "scope": [
+            "Full native application build and CPack packaging",
+            "Output safety, simulated platform HTTP/real loopback OAuth, and wizard lifecycle regressions",
+            "Install generated package and run launcher --version"
+          ]
+        },
+        {
+          "id": 118060033759,
+          "name": "Snap core24 (amd64, development)",
+          "conclusion": "success",
+          "scope": [
+            "Snapcraft build and lint",
+            "Install generated development Snap and run confined launcher --version"
+          ]
+        }
+      ]
+    },
+    {
+      "id": 39255511684,
+      "url": "https://github.com/SigmaCodez/PenguinStudio/actions/runs/39255511684",
+      "commit": "30f6279c14fa879df18b52ed219b5bef2fa6ed78",
+      "event": "workflow_dispatch",
+      "package_selector": "snap",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "id": 118069685950,
+          "name": "Snap core24 (amd64, development)",
+          "conclusion": "success",
+          "scope": [
+            "Snapcraft build and lint",
+            "Install generated development Snap and run confined launcher --version"
+          ]
+        },
+        {
+          "id": 118069686473,
+          "name": "Branding, translations, configuration, and OAuth",
+          "conclusion": "success",
+          "scope": [
+            "Branding/locales validation",
+            "Configuration isolation and OAuth callback/PKCE/form encoding regressions"
+          ]
+        },
+        {
+          "id": 118069688305,
+          "name": "Fedora 44 RPM (x86_64)",
+          "conclusion": "skipped",
+          "scope": [
+            "Intentionally skipped by package=snap selector"
+          ]
+        },
+        {
+          "id": 118069688495,
+          "name": "Ubuntu 24.04 DEB (amd64)",
+          "conclusion": "skipped",
+          "scope": [
+            "Intentionally skipped by package=snap selector"
+          ]
+        },
+        {
+          "id": 118069688614,
+          "name": "Flatpak (x86_64)",
+          "conclusion": "skipped",
+          "scope": [
+            "Intentionally skipped by package=snap selector"
+          ]
+        }
+      ]
+    }
+  ],
+  "artifacts": [
+    {
+      "format": "deb",
+      "id": 12187735388,
+      "name": "penguin-studio-ubuntu-24.04-amd64",
+      "url": "https://github.com/SigmaCodez/PenguinStudio/actions/runs/39252629193/artifacts/12187735388",
+      "run_id": 39252629193,
+      "size_in_bytes": 134845522,
+      "archive_digest": "sha256:2e72cc0e6db6ae41771da0badc4e45e6c7f65ce91b53901592a136a886eaf89b",
+      "digest_scope": "GitHub artifact ZIP archive, not extracted package file",
+      "expired_at_observation": false
+    },
+    {
+      "format": "flatpak",
+      "id": 12187163630,
+      "name": "penguin-studio-x86_64-x86_64.flatpak",
+      "url": "https://github.com/SigmaCodez/PenguinStudio/actions/runs/39252629193/artifacts/12187163630",
+      "run_id": 39252629193,
+      "size_in_bytes": 142594254,
+      "archive_digest": "sha256:f544dc1a9354f01a30279ce1343ceda48209dad8f1bdca6fcebb9704d59d4151",
+      "digest_scope": "GitHub artifact ZIP archive, not extracted package file",
+      "expired_at_observation": false
+    },
+    {
+      "format": "rpm",
+      "id": 12186562225,
+      "name": "penguin-studio-fedora-44-x86_64",
+      "url": "https://github.com/SigmaCodez/PenguinStudio/actions/runs/39252629193/artifacts/12186562225",
+      "run_id": 39252629193,
+      "size_in_bytes": 118737547,
+      "archive_digest": "sha256:66833c86c14c708c72370eef905251df2a6a62e6f90b91b8fb66c3f04b861b7e",
+      "digest_scope": "GitHub artifact ZIP archive, not extracted package file",
+      "expired_at_observation": false
+    },
+    {
+      "format": "snap",
+      "id": 12188535043,
+      "name": "penguin-studio-core24-amd64",
+      "url": "https://github.com/SigmaCodez/PenguinStudio/actions/runs/39255511684/artifacts/12188535043",
+      "run_id": 39255511684,
+      "size_in_bytes": 498785655,
+      "archive_digest": "sha256:9641ad051bb529212504b3eae3952a3ddf550ac7ad0d1931408e368caca17241",
+      "digest_scope": "GitHub artifact ZIP archive, not extracted package file",
+      "expired_at_observation": false
+    }
+  ],
+  "launcher_checks": {
+    "deb": {
+      "job_id": 118060033623,
+      "exit_status": 0,
+      "stdout": "Penguin Studio 0.1.0 (OBS 32.2.2)"
+    },
+    "rpm": {
+      "job_id": 118060033108,
+      "exit_status": 0,
+      "stdout": "Penguin Studio 0.1.0 (OBS 32.2.2)"
+    },
+    "snap": {
+      "job_id": 118069685950,
+      "exit_status": 0,
+      "stdout": "Penguin Studio 0.1.0 (OBS 32.2.2)",
+      "svg_loader_undefined_symbol_warning": false,
+      "missing_runtime_dependency_lint": false,
+      "missing_desktop_icon_warning": false
+    }
+  },
+  "snap_lint": {
+    "warnings": [
+      "- gpu: usr/lib/x86_64-linux-gnu/obs-plugins/libvulkan.so.1: GPU support library should be provided by a content interface. (https://ubuntu.com/frame/docs/24/how-to/use-snap-graphics/)",
+      "- library: libcaca++.so.0: unused library 'usr/lib/x86_64-linux-gnu/libcaca++.so.0.99.20'. (https://documentation.ubuntu.com/snapcraft/stable/how-to/debugging/use-the-library-linter)",
+      "- library: libcjson_utils.so.1: unused library 'usr/lib/x86_64-linux-gnu/libcjson_utils.so.1.7.17'. (https://documentation.ubuntu.com/snapcraft/stable/how-to/debugging/use-the-library-linter)",
+      "- library: libfftw3_omp.so.3: unused library 'usr/lib/x86_64-linux-gnu/libfftw3_omp.so.3.6.10'. (https://documentation.ubuntu.com/snapcraft/stable/how-to/debugging/use-the-library-linter)",
+      "- library: libfftw3_threads.so.3: unused library 'usr/lib/x86_64-linux-gnu/libfftw3_threads.so.3.6.10'. (https://documentation.ubuntu.com/snapcraft/stable/how-to/debugging/use-the-library-linter)",
+      "- library: libflite_cmu_grapheme_lang.so.1: unused library 'usr/lib/x86_64-linux-gnu/libflite_cmu_grapheme_lang.so.2.2'. (https://documentation.ubuntu.com/snapcraft/stable/how-to/debugging/use-the-library-linter)",
+      "- library: libflite_cmu_grapheme_lex.so.1: unused library 'usr/lib/x86_64-linux-gnu/libflite_cmu_grapheme_lex.so.2.2'. (https://documentation.ubuntu.com/snapcraft/stable/how-to/debugging/use-the-library-linter)",
+      "- library: libflite_cmu_indic_lex.so.1: unused library 'usr/lib/x86_64-linux-gnu/libflite_cmu_indic_lex.so.2.2'. (https://documentation.ubuntu.com/snapcraft/stable/how-to/debugging/use-the-library-linter)",
+      "- library: libflite_cmu_time_awb.so.1: unused library 'usr/lib/x86_64-linux-gnu/libflite_cmu_time_awb.so.2.2'. (https://documentation.ubuntu.com/snapcraft/stable/how-to/debugging/use-the-library-linter)",
+      "- library: libfreebl3.so: unused library 'usr/lib/x86_64-linux-gnu/libfreebl3.so'. (https://documentation.ubuntu.com/snapcraft/stable/how-to/debugging/use-the-library-linter)",
+      "- library: libfreeblpriv3.so: unused library 'usr/lib/x86_64-linux-gnu/libfreeblpriv3.so'. (https://documentation.ubuntu.com/snapcraft/stable/how-to/debugging/use-the-library-linter)",
+      "- library: libhwy_contrib.so.1: unused library 'usr/lib/x86_64-linux-gnu/libhwy_contrib.so.1.0.7'. (https://documentation.ubuntu.com/snapcraft/stable/how-to/debugging/use-the-library-linter)",
+      "- library: libhwy_test.so.1: unused library 'usr/lib/x86_64-linux-gnu/libhwy_test.so.1.0.7'. (https://documentation.ubuntu.com/snapcraft/stable/how-to/debugging/use-the-library-linter)",
+      "- library: libjacknet.so.0: unused library 'usr/lib/x86_64-linux-gnu/libjacknet.so.0.1.0'. (https://documentation.ubuntu.com/snapcraft/stable/how-to/debugging/use-the-library-linter)",
+      "- library: libjackserver.so.0: unused library 'usr/lib/x86_64-linux-gnu/libjackserver.so.0.1.0'. (https://documentation.ubuntu.com/snapcraft/stable/how-to/debugging/use-the-library-linter)",
+      "- library: libnssckbi.so: unused library 'usr/lib/x86_64-linux-gnu/libnssckbi.so'. (https://documentation.ubuntu.com/snapcraft/stable/how-to/debugging/use-the-library-linter)",
+      "- library: libnssdbm3.so: unused library 'usr/lib/x86_64-linux-gnu/libnssdbm3.so'. (https://documentation.ubuntu.com/snapcraft/stable/how-to/debugging/use-the-library-linter)",
+      "- library: libobs-opengl.so.30: unused library 'usr/lib/x86_64-linux-gnu/libobs-opengl.so.30'. (https://documentation.ubuntu.com/snapcraft/stable/how-to/debugging/use-the-library-linter)",
+      "- library: libsoftokn3.so: unused library 'usr/lib/x86_64-linux-gnu/libsoftokn3.so'. (https://documentation.ubuntu.com/snapcraft/stable/how-to/debugging/use-the-library-linter)",
+      "- library: libsphinxad.so.3: unused library 'usr/lib/x86_64-linux-gnu/libsphinxad.so.3.0.0'. (https://documentation.ubuntu.com/snapcraft/stable/how-to/debugging/use-the-library-linter)",
+      "- library: libssl3.so: unused library 'usr/lib/x86_64-linux-gnu/libssl3.so'. (https://documentation.ubuntu.com/snapcraft/stable/how-to/debugging/use-the-library-linter)",
+      "- library: libtheora.so.0: unused library 'usr/lib/x86_64-linux-gnu/libtheora.so.0.3.10'. (https://documentation.ubuntu.com/snapcraft/stable/how-to/debugging/use-the-library-linter)",
+      "- library: libzvbi-chains.so.0: unused library 'usr/lib/x86_64-linux-gnu/libzvbi-chains.so.0.0.0'. (https://documentation.ubuntu.com/snapcraft/stable/how-to/debugging/use-the-library-linter)"
+    ],
+    "warning_count": 23,
+    "gpu_content_advisories": 1,
+    "unused_library_advisories": 22,
+    "note": "CEF's Vulkan-loader asset remains bundled. Some libraries are loaded dynamically. Browser rendering and GPU behavior are not established by the launcher check."
+  },
+  "superseded_snap": {
+    "artifact_id": 12187775454,
+    "run_id": 39252629193,
+    "runtime_warning": "GNOME SVG loader: undefined symbol rsvg_handle_get_pixbuf_and_error",
+    "resolution": "Exclude staged librsvg-2.so.* so the GNOME content runtime provides its matching library. Follow-up build and confined launcher succeeded without the warning.",
+    "probe_evidence": "snap-svg-loader.json"
+  },
+  "limits": [
+    "Native and Snap CI launchers use --version; no GUI or desktop capture was tested in these jobs.",
+    "Wayland/X11 portal permissions, audio/video device access and hardware encoders across all distributions remain outside this CI scope.",
+    "Platform regressions simulate remote HTTP responses. No live Twitch/YouTube credentials, channel updates or authenticated internet stream were tested by CI.",
+    "The Snap is a development package installed with --dangerous. Store publication and interface review are not tested.",
+    "Flatpak CI generates a bundle; installed Flatpak GUI/runtime checks and local package-file digests are separate evidence."
+  ],
+  "related_evidence": [
+    "gui-validation.txt",
+    "output-validation.json",
+    "flatpak-build-manifest.json",
+    "snap-svg-loader.json",
+    "local-packages.json"
+  ]
+}

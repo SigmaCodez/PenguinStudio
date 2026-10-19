@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github.SigmaCodez.PenguinStudio</id>
+  <launchable type="desktop-id">io.github.SigmaCodez.PenguinStudio.desktop</launchable>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-2.0-or-later</project_license>
+  <name>Penguin Studio</name>
+  <developer id="io.github.sigmacodez">
+    <name>SigmaCodez</name>
+  </developer>
+  <summary>Produce live streams and recordings with a Linux-focused studio</summary>
+  <description>
+    <p>Penguin Studio is an independent open-source streaming and recording application built on OBS Studio.</p>
+    <p>Compose scenes, mix audio, capture cameras and displays, and stream to services that support RTMP. A redesigned native workspace places scenes and layers on the left, an editable source inspector on the right, channel-strip audio controls below the canvas, and production actions across the top.</p>
+    <ul>
+      <li>Scenes, sources, audio filters, transitions, recording, and the inherited OBS language catalogue.</li>
+      <li>Wayland screen capture through PipeWire and desktop portals on supported systems.</li>
+      <li>Separate Penguin Studio settings and profiles, with English as the initial language.</li>
+    </ul>
+    <p>Penguin Studio is maintained by SigmaCodez. It is not affiliated with OBS Project or Meld Studio. This development build requires testing with your devices and streaming services before production use.</p>
+  </description>
+  <url type="homepage">https://github.com/SigmaCodez/PenguinStudio</url>
+  <url type="bugtracker">https://github.com/SigmaCodez/PenguinStudio/issues</url>
+  <url type="vcs-browser">https://github.com/SigmaCodez/PenguinStudio</url>
+  <recommends>
+    <control>pointing</control>
+    <control>keyboard</control>
+    <internet>always</internet>
+  </recommends>
+  <supports>
+    <internet>offline-only</internet>
+  </supports>
+  <branding>
+    <color type="primary">#59e6b3</color>
+  </branding>
+  <content_rating type="oars-1.1"/>
+  <releases>
+    <release version="@PENGUIN_VERSION@" date="2026-10-19" type="development">
+      <url type="details">https://github.com/SigmaCodez/PenguinStudio/releases</url>
+    </release>
+  </releases>
+</component>

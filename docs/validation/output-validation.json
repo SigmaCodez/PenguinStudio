@@ -1,0 +1,39 @@
+{
+  "date": "2026-10-19",
+  "baseline": "OBS Studio 32.2.2",
+  "environment": {
+    "rendering": "native Wayland EGL",
+    "qt_test_surface": "offscreen",
+    "video_encoder": "obs_x264",
+    "audio_encoder": "ffmpeg_aac",
+    "fps": 30
+  },
+  "passed": [
+    "C++/Qt compilation with pinned OBS headers",
+    "endpoint validation and session-key omission",
+    "failed/live/stopped output destruction order",
+    "simultaneous local 1280x720 landscape and 1080x1920 portrait H.264/AAC",
+    "portrait center crop and fit",
+    "normal output stop and restart",
+    "destruction of two active outputs",
+    "unreachable RTMP receiver cleanup",
+    "decoded portrait picture contains the expected synthetic source",
+    "first-run wizard screenshots inspected and clipped subtitle fixed",
+    "automatic RTMP recovery after terminating and restarting a loopback receiver"
+  ],
+  "not_tested": [
+    "real Twitch/YouTube/Kick/Facebook/TikTok ingestion",
+    "RTMPS/TLS connectivity",
+    "hardware encoder sessions",
+    "PipeWire portal capture",
+    "microphone/device capture",
+    "all distributions and package formats",
+    "OAuth account authorization with real registered applications"
+  ],
+  "streaming_destinations": "127.0.0.1 only; synthetic source; no account credentials or desktop capture",
+  "test_program": "plugins/penguin-outputs/tests/local-stream.cpp",
+  "screenshots": [
+    "setup-welcome.png",
+    "setup-connection.png"
+  ]
+}

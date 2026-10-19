@@ -1,0 +1,26 @@
+Penguin Studio 0.1.0 native Wayland GUI validation — 2026-10-19
+
+The installed Flatpak bundle was launched on its Freedesktop 25.08 runtime
+with QT_QPA_PLATFORM=wayland, fresh configuration/cache/data directories,
+and networking disabled. The XDG directories were set inside the sandbox
+command after Flatpak initialized its environment. No account, stream key, recording, or existing OBS
+configuration was used. A temporary Qt helper captured only the application's
+own widgets; it was not included in the package.
+
+The default dark/teal workspace, left Scenes/Sources stack, bottom controls,
+Stream details dock, Broadcast destinations dock, and initial setup dialog
+were inspected. The attached PNG shows the actual first-run wizard. Native
+OpenGL child surfaces are not faithfully captured by QWidget::grab, so the
+main preview capture is deliberately not retained as a product screenshot.
+
+The smoke helper dismissed the upstream auto-configuration dialog, waited
+for the Penguin Studio welcome wizard, then closed the main window while
+that wizard was still active. This previously crashed with exit code 139.
+After the asynchronous wizard lifetime fix, both the development build and
+the installed Flatpak passed with exit code 0 and zero reported OBS memory
+leaks. A separate dismiss-wizard-then-close flow also passed.
+
+Fresh-profile crash sentinel creation was checked after its parent-directory
+fix. No sentinel initialization error remained. This check does not certify
+live platform authorization, screen-capture portals, hardware encoders, or
+all desktop/distribution combinations.

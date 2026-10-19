@@ -1,0 +1,164 @@
+name: penguin-studio
+title: Penguin Studio
+icon: assets/branding/penguin-studio.svg
+version: '0.2.0'
+summary: A Linux streaming studio with horizontal and vertical outputs
+description: |
+  Penguin Studio is an independent application by SigmaCodez based on OBS Studio.
+  Record, compose scenes, and stream with native Wayland capture support.
+base: core24
+grade: devel
+confinement: strict
+license: GPL-2.0+
+platforms:
+  amd64:
+apps:
+  penguin-studio:
+    command: usr/bin/penguin-studio
+    extensions: [gnome]
+    common-id: io.github.SigmaCodez.PenguinStudio
+    desktop: usr/share/applications/io.github.SigmaCodez.PenguinStudio.desktop
+    environment:
+      QT_PLUGIN_PATH: $SNAP/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/qt6/plugins
+      QT_QPA_PLATFORM_PLUGIN_PATH: $SNAP/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/qt6/plugins/platforms
+      LD_LIBRARY_PATH: $SNAP/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR:$SNAP/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/obs-plugins:$SNAP/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/pulseaudio
+    plugs:
+      - audio-playback
+      - audio-record
+      - camera
+      - browser-support
+      - home
+      - network
+      - network-bind
+      - opengl
+      - removable-media
+      - screen-inhibit-control
+      - wayland
+      - x11
+parts:
+  penguin-studio:
+    plugin: cmake
+    source: .
+    cmake-generator: Ninja
+    cmake-parameters:
+      - -DCMAKE_BUILD_TYPE=Release
+      - -DCMAKE_INSTALL_PREFIX=/usr
+      - -DCMAKE_INSTALL_LIBDIR=lib/x86_64-linux-gnu
+      - -DENABLE_RELOCATABLE=ON
+      - -DOBS_VERSION_OVERRIDE=32.2.2
+      - -DENABLE_WAYLAND=ON
+      - -DENABLE_BROWSER=ON
+      - -DCEF_ROOT_DIR=$CRAFT_PART_SRC/.deps/cef
+      - -DENABLE_AJA=OFF
+      - -DENABLE_VLC=OFF
+      - -DENABLE_WEBRTC=OFF
+      - -DENABLE_LIBFDK=OFF
+      - -DOBS_COMPILE_DEPRECATION_AS_WARNING=ON
+    override-build: |
+      python3 "$CRAFT_PART_SRC/scripts/packaging/fetch-cef.py" "$CRAFT_PART_SRC/.deps/cef"
+      craftctl default
+      # Snapcraft resolves this installed icon and rewrites the desktop launcher.
+      sed -i 's|^Icon=.*|Icon=/usr/share/icons/hicolor/scalable/apps/io.github.SigmaCodez.PenguinStudio.svg|' "$CRAFT_PART_INSTALL/usr/share/applications/io.github.SigmaCodez.PenguinStudio.desktop"
+    build-packages:
+      - build-essential
+      - cmake
+      - ninja-build
+      - pkg-config
+      - git
+      - python3
+      - extra-cmake-modules
+      - libavcodec-dev
+      - libavdevice-dev
+      - libavfilter-dev
+      - libavformat-dev
+      - libavutil-dev
+      - libswresample-dev
+      - libswscale-dev
+      - libx264-dev
+      - libcurl4-openssl-dev
+      - libmbedtls-dev
+      - libjansson-dev
+      - libluajit-5.1-dev
+      - python3-dev
+      - libx11-dev
+      - libxcb-randr0-dev
+      - libxcb-shm0-dev
+      - libxcb-xinerama0-dev
+      - libxcb-composite0-dev
+      - libxcomposite-dev
+      - libxinerama-dev
+      - libxcb1-dev
+      - libx11-xcb-dev
+      - libxcb-xfixes0-dev
+      - libxkbcommon-dev
+      - libxdamage-dev
+      - libatk1.0-dev
+      - libatk-bridge2.0-dev
+      - swig
+      - libxss-dev
+      - libglvnd-dev
+      - libgles2-mesa-dev
+      - libwayland-dev
+      - librist-dev
+      - libsrt-openssl-dev
+      - libpci-dev
+      - libpipewire-0.3-dev
+      - libqrcodegencpp-dev
+      - uthash-dev
+      - libsimde-dev
+      - qt6-base-dev
+      - qt6-base-private-dev
+      - qt6-svg-dev
+      - libasound2-dev
+      - libfontconfig-dev
+      - libfreetype-dev
+      - libjack-jackd2-dev
+      - libpulse-dev
+      - libsndio-dev
+      - libspeexdsp-dev
+      - libudev-dev
+      - libv4l-dev
+      - libva-dev
+      - libvpl-dev
+      - libdrm-dev
+      - nlohmann-json3-dev
+      - libwebsocketpp-dev
+      - libasio-dev
+      - libffmpeg-nvenc-dev
+    stage-packages:
+      - libxcb-composite0
+      - libavdevice60
+      - libavfilter9
+      - libswscale7
+      - libx264-164
+      - libcurl4t64
+      - libmbedtls14t64
+      - libjansson4
+      - libluajit-5.1-2
+      - libpython3.12t64
+      - libqt6widgets6t64
+      - libqt6network6t64
+      - libqt6xml6t64
+      - libqt6dbus6t64
+      - libqt6svg6
+      - qt6-wayland
+      - qt6-image-formats-plugins
+      - libpipewire-0.3-0t64
+      - libpulse0
+      - libjack-jackd2-0
+      - libsndio7.0
+      - libspeexdsp1
+      - libv4l-0t64
+      - libpci3
+      - librist4
+      - libsrt1.5-openssl
+      - libqrcodegencpp1
+      - libvpl2
+      - libnss3
+      - libnspr4
+      - libatk-bridge2.0-0t64
+      - libxss1
+    # The GNOME content snap supplies the SVG loader and its matching librsvg.
+    # Noble's transitive FFmpeg dependency is older and shadows that ABI.
+    prime:
+      - -usr/lib/x86_64-linux-gnu/librsvg-2.so.*

@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "packages": [
+    {
+      "package": "deb",
+      "filename": "penguin-studio_0.2.0_amd64.deb",
+      "size_bytes": 135474856,
+      "sha256": "e7cbcf03deee58504b7abea02e8d52e05136601dedab1cb0f9ccd0a7e72f07e6",
+      "sha256_sidecar": "penguin-studio_0.2.0_amd64.deb.sha256",
+      "sidecar_from_ci": true,
+      "artifact_id": 12193416845,
+      "run_id": 39264364809,
+      "archive_sha256": "344c97d455c172af2c1ac3cafb9bfaa3e8983d1bf1d247f60a3098701fb691d2",
+      "artifact_url": "https://github.com/SigmaCodez/PenguinStudio/actions/runs/39264364809/artifacts/12193416845",
+      "application_source_commit": "8c1d5113a19fa90a5c604e79d81e6e0c60208dbc",
+      "archive_digest_verified_against_github_metadata": true,
+      "package_digest_verified_against_sidecar": true
+    },
+    {
+      "package": "snap",
+      "filename": "penguin-studio_0.2.0_amd64.snap",
+      "size_bytes": 499036160,
+      "sha256": "f1435e932a3d266d9ed0bd451d70e8e5c04439d164e69229b69e2b4ed183707d",
+      "sha256_sidecar": "penguin-studio_0.2.0_amd64.snap.sha256",
+      "sidecar_from_ci": false,
+      "artifact_id": 12193486708,
+      "run_id": 39264364809,
+      "archive_sha256": "6014bb96b94ffdbf0b23b6f6a42935937dddbc2ad962bf3a8c2464e8cef7b02d",
+      "artifact_url": "https://github.com/SigmaCodez/PenguinStudio/actions/runs/39264364809/artifacts/12193486708",
+      "application_source_commit": "8c1d5113a19fa90a5c604e79d81e6e0c60208dbc",
+      "archive_digest_verified_against_github_metadata": true,
+      "package_digest_verified_against_sidecar": true
+    },
+    {
+      "package": "rpm",
+      "filename": "penguin-studio-0.2.0-1.x86_64.rpm",
+      "size_bytes": 119183454,
+      "sha256": "04544fa96fd56563417a86a5ab8bc347a72a79ffaaf3f5e075c381777ed242da",
+      "sha256_sidecar": "penguin-studio-0.2.0-1.x86_64.rpm.sha256",
+      "sidecar_from_ci": true,
+      "artifact_id": 12193337597,
+      "run_id": 39264364809,
+      "archive_sha256": "e98671546d599bd27bcbb8da7a68331bd7ca70f5d7d3b3011cd1d7fdea6d077c",
+      "artifact_url": "https://github.com/SigmaCodez/PenguinStudio/actions/runs/39264364809/artifacts/12193337597",
+      "application_source_commit": "8c1d5113a19fa90a5c604e79d81e6e0c60208dbc",
+      "archive_digest_verified_against_github_metadata": true,
+      "package_digest_verified_against_sidecar": true
+    }
+  ],
+  "observed_at_utc": "2026-10-19T14:12:20.993721+00:00",
+  "repository": "SigmaCodez/PenguinStudio",
+  "application_source_commit": "8c1d5113a19fa90a5c604e79d81e6e0c60208dbc",
+  "scope_note": "Downloaded GitHub Actions artifacts were verified against GitHub archive SHA-256 metadata before extraction. Package hashes and sidecars were verified locally. Native installation and --version results are recorded in linux-ci-0.2.json; these local files were not installed on the host."
+}

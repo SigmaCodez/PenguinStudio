@@ -1,0 +1,270 @@
+{
+  "schema_version": 1,
+  "version": "0.2.0",
+  "source_commit": "8c1d5113a19fa90a5c604e79d81e6e0c60208dbc",
+  "checked_at": "2026-10-19T13:57:53.502620+00:00",
+  "method": "Real native Qt dialogs in the rebuilt application; XComposite window captures and widget text/geometry inspection through a temporary LD_PRELOAD test helper.",
+  "environment": {
+    "platform": "X11 (xcb) on the development host",
+    "runtime": "Existing isolated Flatpak development SDK/application prefix",
+    "device_pixel_ratio": 1,
+    "profiles": "Fresh isolated en-US and de-DE profiles under /tmp; personal profiles were not used.",
+    "network": "Disabled for both runs."
+  },
+  "coverage": {
+    "source_properties": "Real image source using the Penguin Studio PNG, including native preview and file property.",
+    "source_filters": "Real color-correction filter, native source preview, sliders, numeric fields and lower color controls.",
+    "settings_pages": [
+      "General",
+      "Appearance",
+      "Stream",
+      "Output",
+      "Audio",
+      "Video",
+      "Hotkeys",
+      "Accessibility",
+      "Advanced"
+    ],
+    "lower_scrollable_sections": [
+      "General",
+      "Output",
+      "Audio",
+      "Hotkeys",
+      "Advanced"
+    ],
+    "output_mode": "Simple",
+    "dialog_structure": "Inherited native dialog layout with the Penguin visual theme."
+  },
+  "fixed_issue": {
+    "before": "GNOME standard buttons displayed English Cancel in the German application.",
+    "root_cause": "QGnomeTheme requests &Cancel, but the existing OBS translator looked up only the space-stripped literal key; the German catalogue contains Cancel.",
+    "repair": "Preserve existing exact lookup, then remove mnemonic markers only for QGnomeTheme, QPlatformTheme and QDialogButtonBox. Escaped && remains one literal ampersand.",
+    "regression_test": "test/penguin-qt-translation.cpp",
+    "regression_result": "Passed with C++17, -Wall -Wextra -Werror and Qt6Core in the SDK; wired into the Linux CI checks job.",
+    "runtime_result": "Both real source-properties and all Settings views display Abbrechen in German; English still displays Cancel."
+  },
+  "runs": [
+    {
+      "locale": "en-US",
+      "exit_code": 0,
+      "obs_reported_memory_leaks": 0,
+      "capture_count": 17,
+      "all_captures_saved": true,
+      "observed_cancel_button": "Cancel",
+      "visual_review": "No unresolved horizontal clipping or unreadable active labels in the reviewed views.",
+      "views": [
+        {
+          "name": "source-properties",
+          "width": 720,
+          "height": 580
+        },
+        {
+          "name": "source-filters",
+          "width": 861,
+          "height": 726
+        },
+        {
+          "name": "source-filters-bottom",
+          "width": 861,
+          "height": 726
+        },
+        {
+          "name": "settings-general",
+          "width": 981,
+          "height": 730
+        },
+        {
+          "name": "settings-general-bottom",
+          "width": 981,
+          "height": 730
+        },
+        {
+          "name": "settings-appearance",
+          "width": 981,
+          "height": 730
+        },
+        {
+          "name": "settings-stream",
+          "width": 981,
+          "height": 730
+        },
+        {
+          "name": "settings-output",
+          "width": 981,
+          "height": 730
+        },
+        {
+          "name": "settings-output-bottom",
+          "width": 981,
+          "height": 730
+        },
+        {
+          "name": "settings-audio",
+          "width": 981,
+          "height": 730
+        },
+        {
+          "name": "settings-audio-bottom",
+          "width": 981,
+          "height": 730
+        },
+        {
+          "name": "settings-video",
+          "width": 981,
+          "height": 730
+        },
+        {
+          "name": "settings-hotkeys",
+          "width": 981,
+          "height": 730
+        },
+        {
+          "name": "settings-hotkeys-bottom",
+          "width": 981,
+          "height": 730
+        },
+        {
+          "name": "settings-accessibility",
+          "width": 981,
+          "height": 730
+        },
+        {
+          "name": "settings-advanced",
+          "width": 981,
+          "height": 730
+        },
+        {
+          "name": "settings-advanced-bottom",
+          "width": 981,
+          "height": 730
+        }
+      ]
+    },
+    {
+      "locale": "de-DE",
+      "exit_code": 0,
+      "obs_reported_memory_leaks": 0,
+      "capture_count": 17,
+      "all_captures_saved": true,
+      "observed_cancel_button": "Abbrechen",
+      "visual_review": "No unresolved horizontal clipping or unreadable active labels in the reviewed views.",
+      "views": [
+        {
+          "name": "source-properties",
+          "width": 720,
+          "height": 580
+        },
+        {
+          "name": "source-filters",
+          "width": 861,
+          "height": 726
+        },
+        {
+          "name": "source-filters-bottom",
+          "width": 861,
+          "height": 726
+        },
+        {
+          "name": "settings-general",
+          "width": 981,
+          "height": 730
+        },
+        {
+          "name": "settings-general-bottom",
+          "width": 981,
+          "height": 730
+        },
+        {
+          "name": "settings-appearance",
+          "width": 981,
+          "height": 730
+        },
+        {
+          "name": "settings-stream",
+          "width": 981,
+          "height": 730
+        },
+        {
+          "name": "settings-output",
+          "width": 981,
+          "height": 730
+        },
+        {
+          "name": "settings-output-bottom",
+          "width": 981,
+          "height": 730
+        },
+        {
+          "name": "settings-audio",
+          "width": 981,
+          "height": 730
+        },
+        {
+          "name": "settings-audio-bottom",
+          "width": 981,
+          "height": 730
+        },
+        {
+          "name": "settings-video",
+          "width": 981,
+          "height": 730
+        },
+        {
+          "name": "settings-hotkeys",
+          "width": 981,
+          "height": 730
+        },
+        {
+          "name": "settings-hotkeys-bottom",
+          "width": 981,
+          "height": 730
+        },
+        {
+          "name": "settings-accessibility",
+          "width": 981,
+          "height": 730
+        },
+        {
+          "name": "settings-advanced",
+          "width": 981,
+          "height": 730
+        },
+        {
+          "name": "settings-advanced-bottom",
+          "width": 981,
+          "height": 730
+        }
+      ]
+    }
+  ],
+  "screenshots": [
+    {
+      "path": "docs/validation/dialogs-0.2-source-properties-de.png",
+      "locale": "de-DE",
+      "view": "source-properties",
+      "sha256": "8f0c0354d4dd0b57efb76821628b13fdd448ef6ef68feb8403c6e4d3c4caccea",
+      "bytes": 59089
+    },
+    {
+      "path": "docs/validation/dialogs-0.2-source-filters-en.png",
+      "locale": "en-US",
+      "view": "source-filters",
+      "sha256": "61202051f720493229d2475bf756d52e03d434a8f7ac880baecffbe1b8f8ea0b",
+      "bytes": 93406
+    },
+    {
+      "path": "docs/validation/dialogs-0.2-settings-output-en.png",
+      "locale": "en-US",
+      "view": "settings-output",
+      "sha256": "db3780b05caed892085e82759b400a9aab0858534d3ea85355837579f42d7a80",
+      "bytes": 76646
+    }
+  ],
+  "limits": [
+    "This is visual and dialog navigation validation, not an exhaustive test of every setting or filter behavior.",
+    "Only English and German at the reported dialog dimensions and 1x scale were visually reviewed.",
+    "Advanced output-mode tabs, all source/plugin property types, native file pickers, other platform themes and HiDPI variants were not covered by this pass.",
+    "No live streaming accounts, stream credentials, hardware capture devices or external services were tested.",
+    "Network-disabled SDK warnings about unavailable portals or optional hardware do not establish packaged desktop integration behavior."
+  ]
+}

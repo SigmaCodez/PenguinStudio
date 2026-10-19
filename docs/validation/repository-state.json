@@ -1,0 +1,12 @@
+{
+  "checked_date": "2026-10-19",
+  "source": "https://api.github.com/repos/SigmaCodez/PenguinStudio",
+  "full_name": "SigmaCodez/PenguinStudio",
+  "html_url": "https://github.com/SigmaCodez/PenguinStudio",
+  "fork": false,
+  "default_branch": "penguin/main",
+  "private": false,
+  "has_issues": true,
+  "upstream_source": "https://github.com/obsproject/obs-studio",
+  "note": "Standalone GitHub repository. OBS attribution and Git ancestry are retained."
+}

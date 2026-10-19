@@ -1,0 +1,8 @@
+# Run the command in the root of the repository to make it take effect:
+#
+# git config blame.ignoreRevsFile .git-blame-ignore-revs
+
+# No revisions are ignored in the new Penguin Studio history yet.
+# The former OBS formatting revisions belong to the retired history and are
+# preserved in the maintainer backup. See docs/HISTORY.md for source provenance.
+# Add only formatting commit hashes reachable from the new history below.

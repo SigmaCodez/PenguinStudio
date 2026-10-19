@@ -1,0 +1,134 @@
+name: Penguin Studio Linux packages
+on:
+  push:
+    branches: [main, master, penguin/**]
+    tags: [penguin-v*]
+    paths-ignore: ['**.md', 'docs/validation/**']
+  pull_request:
+    paths-ignore: ['**.md', 'docs/validation/**']
+  workflow_dispatch:
+    inputs:
+      packages:
+        description: Package builds to run
+        type: choice
+        default: all
+        options: [all, snap]
+permissions:
+  contents: read
+concurrency:
+  group: penguin-linux-${{ github.ref }}-${{ inputs.packages || 'all' }}
+  cancel-in-progress: true
+jobs:
+  checks:
+    name: Branding, translations, configuration, and OAuth
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Validate branding and translations
+        run: |
+          python3 scripts/check-branding.py
+          python3 scripts/check-penguin-locales.py
+      - name: Compile and run configuration isolation checks
+        run: |
+          c++ -std=c++17 -Wall -Wextra -Werror -I. test/penguin-config-paths.cpp -o /tmp/penguin-config-paths-test
+          /tmp/penguin-config-paths-test
+      - name: Compile and run OAuth callback checks
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends qt6-base-dev
+          c++ -std=c++17 -Wall -Wextra -Werror -fPIC -I. test/penguin-oauth.cpp $(pkg-config --cflags --libs Qt6Core) -o /tmp/penguin-oauth-test
+          /tmp/penguin-oauth-test
+      - name: Compile and run Qt button translation checks
+        run: |
+          c++ -std=c++17 -Wall -Wextra -Werror -fPIC -I. test/penguin-qt-translation.cpp $(pkg-config --cflags --libs Qt6Core) -o /tmp/penguin-qt-translation-test
+          /tmp/penguin-qt-translation-test
+  flatpak:
+    name: Flatpak (x86_64)
+    if: github.event_name != 'workflow_dispatch' || inputs.packages == 'all'
+    runs-on: ubuntu-24.04
+    container:
+      image: ghcr.io/flathub-infra/flatpak-github-actions:freedesktop-25.08
+      options: --privileged
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          submodules: recursive
+          fetch-depth: 0
+      - uses: flatpak/flatpak-github-actions/flatpak-builder@401fe28a8384095fc1531b9d320b292f0ee45adb # v6.7
+        with:
+          manifest-path: build-aux/io.github.SigmaCodez.PenguinStudio.json
+          bundle: penguin-studio-x86_64.flatpak
+          build-bundle: true
+          cache-key: penguin-flatpak-${{ hashFiles('build-aux/io.github.SigmaCodez.PenguinStudio.json') }}
+  deb:
+    name: Ubuntu 24.04 DEB (amd64)
+    if: github.event_name != 'workflow_dispatch' || inputs.packages == 'all'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          submodules: recursive
+          fetch-depth: 0
+      - name: Install build dependencies
+        run: sudo bash scripts/packaging/install-build-deps.sh
+      - name: Compile and package
+        run: bash scripts/packaging/build-native.sh DEB
+      - name: Inspect package metadata
+        run: dpkg-deb --info build_penguin_deb/penguin-studio_*.deb
+      - name: Install DEB and verify launcher
+        run: |
+          sudo apt-get install -y ./build_penguin_deb/penguin-studio_*.deb
+          penguin-studio --version
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: penguin-studio-ubuntu-24.04-amd64
+          path: build_penguin_deb/*.deb*
+          if-no-files-found: error
+  rpm:
+    name: Fedora 44 RPM (x86_64)
+    if: github.event_name != 'workflow_dispatch' || inputs.packages == 'all'
+    runs-on: ubuntu-24.04
+    container: fedora:44
+    steps:
+      - name: Install checkout prerequisites
+        run: dnf install -y git tar gzip ca-certificates
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          submodules: recursive
+          fetch-depth: 0
+      - name: Install build dependencies
+        run: bash scripts/packaging/install-build-deps.sh
+      - name: Compile and package
+        run: bash scripts/packaging/build-native.sh RPM
+      - name: Inspect package metadata
+        run: rpm -qp --info build_penguin_rpm/*.rpm
+      - name: Install RPM and verify launcher
+        run: |
+          dnf install -y ./build_penguin_rpm/penguin-studio-*.rpm
+          penguin-studio --version
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: penguin-studio-fedora-44-x86_64
+          path: build_penguin_rpm/*.rpm*
+          if-no-files-found: error
+  snap:
+    name: Snap core24 (amd64, development)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          submodules: recursive
+          fetch-depth: 0
+      - name: Install Snapcraft
+        run: sudo snap install snapcraft --classic
+      - name: Build snap
+        run: sudo snapcraft --destructive-mode
+      - name: Install Snap and verify confined launcher
+        run: |
+          sudo snap install --dangerous ./penguin-studio_*.snap
+          snap run penguin-studio --version
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: penguin-studio-core24-amd64
+          path: '*.snap'
+          if-no-files-found: error

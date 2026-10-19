@@ -1,0 +1,597 @@
+/* SPDX-License-Identifier: GPL-2.0-or-later */
+@OBSThemeMeta {
+    name: 'Penguin Studio';
+    id: 'io.github.SigmaCodez.PenguinStudio.Dark';
+    extends: 'com.obsproject.Yami';
+    author: 'SigmaCodez';
+    dark: 'true';
+}
+
+@OBSThemeVars {
+    /* Neutral studio surfaces. Indigo identifies selection; mint means live. */
+    --grey1: #626674;
+    --grey2: #4C505D;
+    --grey3: #373B46;
+    --grey4: #2B2E37;
+    --grey5: #22252C;
+    --grey6: #1B1D23;
+    --grey7: #14161B;
+    --grey8: #0B0C10;
+    --bg_window: #14161B;
+    --bg_base: #1B1D23;
+    --bg_preview: #0B0C10;
+    --primary: #384B8B;
+    --primary_light: #465CA3;
+    --primary_lighter: #899BFF;
+    --primary_dark: #29385F;
+    --primary_darker: #202B49;
+    --text: #ECEEF4;
+    --text_light: #FFFFFF;
+    --text_muted: #9B9FAC;
+    --text_disabled: #696E7C;
+    --border_color: #2B2E37;
+    --highlight_color: #899BFF;
+    --border_radius: 5px;
+    --border_radius_small: 3px;
+    --border_radius_large: 7px;
+    --padding_container: 8px;
+    --padding_menu: 10px;
+    --padding_menubar: 7px;
+    --padding_wide: 12px;
+    --spacing_input: 2px;
+    --input_height_base: max(30, calc(var(--font_base_value) * 3));
+    --input_padding: 5px;
+    --input_text_padding: 8px;
+    --input_bg: #15171C;
+    --input_bg_hover: #1C1F26;
+    --input_bg_focus: #181C28;
+    --input_border: #303440;
+    --input_border_hover: #4D5365;
+    --input_border_focus: #7B8EE8;
+    --button_bg: #24272F;
+    --button_bg_hover: #30343F;
+    --button_bg_down: #1C2029;
+    --button_bg_disabled: #1C1E24;
+    --button_border: #343844;
+    --button_border_hover: #51586B;
+    --button_border_focus: #7B8EE8;
+    --list_item_bg_selected: #2C385B;
+    --list_item_bg_hover: #242831;
+    --tab_bg: #191B21;
+    --tab_bg_hover: #292D38;
+    --tab_bg_down: #2B3657;
+    --tab_border: #2B2E37;
+    --tab_border_selected: #899BFF;
+    --scrollbar_size: 8px;
+    --scrollbar_handle: #3C414F;
+    --scrollbar_bg: #17191F;
+    --scrollbar_hover: #565E72;
+    --scrollbar_down: #7180A0;
+}
+
+/* Studio chrome keeps the canvas dominant and controls visually quiet. */
+QMainWindow, QDialog, QWizard {
+    background-color: #14161B;
+}
+QMainWindow::separator {
+    background: #101216;
+    width: 3px;
+    height: 3px;
+}
+QMainWindow::separator:hover {
+    background: #6478C4;
+}
+QSplitter::handle {
+    background: #101216;
+}
+QSplitter::handle:hover {
+    background: #6478C4;
+}
+QMenuBar {
+    background: #111318;
+    color: #AEB3C1;
+    border-bottom: 1px solid #242731;
+    padding: 2px 5px;
+}
+QMenuBar::item {
+    padding: 4px 8px;
+    background: transparent;
+    border-radius: 4px;
+}
+QMenuBar::item:selected {
+    background: #2B3040;
+    color: #F4F5FA;
+}
+QMenu {
+    background: #20232B;
+    border: 1px solid #3B4050;
+    border-radius: 7px;
+    padding: 5px;
+}
+QMenu::item {
+    padding: 7px 28px 7px 12px;
+    border-radius: 4px;
+}
+QMenu::item:selected {
+    background: #35436C;
+    border-color: transparent;
+}
+QMenu::separator {
+    height: 1px;
+    background: #363B48;
+    margin: 5px 8px;
+}
+QToolTip {
+    background: #2B3040;
+    color: #F2F4FA;
+    border: 1px solid #515A70;
+    border-radius: 4px;
+    padding: 6px 9px;
+}
+QStatusBar, OBSBasicStatusBar {
+    background: #111318;
+    color: #9097A8;
+    border-top: 1px solid #292D37;
+    margin-top: 0px;
+}
+QStatusBar::item {
+    border: none;
+}
+
+/* Dedicated application toolbar and production controls. */
+#penguinTopBar {
+    background: #181A20;
+    border: none;
+    border-bottom: 1px solid #30343F;
+}
+#penguinBrand, #penguinBrandName {
+    background: transparent;
+    color: #F2F4FA;
+    font-size: var(--font_large);
+    font-weight: bold;
+    border: none;
+    padding: 3px 5px;
+    icon-size: 28px;
+}
+#penguinWorkspaceLabel {
+    color: #8F97A9;
+    background: transparent;
+    padding: 0px 12px;
+    border-left: 1px solid #3A3F4B;
+}
+#penguinMetric {
+    background: #11141A;
+    color: #B6C0D3;
+    border: 1px solid #2B3241;
+    border-radius: 4px;
+    padding: 5px 9px;
+    font-size: var(--font_small);
+}
+#penguinToolbarButton, #penguinDestinationsButton, #penguinRecordButton, #penguinClipButton,
+#penguinLiveButton {
+    height: 20px;
+    max-height: 20px;
+    padding: 5px 12px;
+    margin: 0px;
+    border: 1px solid #393E4C;
+    border-radius: 5px;
+    background: #20232B;
+    color: #DDE1EB;
+    font-weight: bold;
+    icon-size: 17px;
+}
+#penguinToolbarButton:hover, #penguinDestinationsButton:hover, #penguinRecordButton:hover,
+#penguinClipButton:hover {
+    background: #303644;
+    border-color: #59647B;
+}
+#penguinToolbarButton:checked, #penguinToolbarButton:pressed,
+#penguinClipButton:checked {
+    background: #2E3B62;
+    border-color: #677DC7;
+}
+#penguinRecordButton:checked, #penguinRecordButton[active="true"] {
+    background: #452631;
+    color: #FFB5BF;
+    border-color: #A74D63;
+}
+#penguinLiveButton:enabled, #streamButton:enabled, #broadcastButton:enabled {
+    background: #64DBB0;
+    color: #10241D;
+    border: 1px solid #64DBB0;
+    font-weight: bold;
+}
+#penguinLiveButton:enabled:hover, #streamButton:enabled:hover,
+#broadcastButton:enabled:hover {
+    background: #8BE8C6;
+    color: #10241D;
+    border-color: #B2F1DB;
+}
+#penguinLiveButton:enabled:checked, #penguinLiveButton[active="true"],
+#streamButton:enabled.state-active, #broadcastButton:enabled.state-active {
+    background: #205F4C;
+    color: #D6FFEF;
+    border-color: #64DBB0;
+}
+#penguinLiveButton:enabled:pressed, #streamButton:enabled:pressed,
+#broadcastButton:enabled:pressed {
+    background: #49BE95;
+    color: #10241D;
+}
+#penguinToolbarButton:disabled, #penguinRecordButton:disabled,
+#penguinDestinationsButton:disabled, #penguinClipButton:disabled, #penguinLiveButton:disabled {
+    background: #1C1E24;
+    color: #646B7A;
+    border-color: #2B2F39;
+}
+#penguinLiveButton::menu-button, #penguinRecordButton::menu-button {
+    width: 15px;
+    border-left: 1px solid #475263;
+}
+#penguinLiveButton::menu-button {
+    border-left-color: #3B9F7E;
+}
+
+/* Shared panel headings replace a collection of unrelated dock bars. */
+QDockWidget {
+    font-weight: normal;
+    background: #191B21;
+}
+QDockWidget::title {
+    background: #1B1E25;
+    color: #D4D9E5;
+    padding: 8px 10px;
+    border-radius: 0px;
+    border-bottom: 1px solid #2C303B;
+    font-weight: bold;
+}
+#penguinPanelHeader {
+    background: #1B1E25;
+    border-bottom: 1px solid #2C303B;
+}
+#penguinPanelTitle, #penguinSectionHeading, #inspectorSectionTitle {
+    color: #D2D8E6;
+    background: transparent;
+    font-size: var(--font_small);
+    font-weight: bold;
+}
+#penguinPanelTitle {
+    padding: 3px 0px;
+}
+#penguinPanelAction {
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    padding: 4px;
+    icon-size: 15px;
+}
+#penguinPanelAction:hover {
+    background: #303748;
+    border-color: #45516D;
+}
+#penguinPanelAction:pressed {
+    background: #3B4B72;
+}
+#penguinCanvasBar {
+    background: #15171D;
+    border-bottom: 1px solid #282D37;
+}
+#penguinCanvasTitle {
+    color: #E0E5EF;
+    font-weight: bold;
+    background: transparent;
+}
+#penguinCanvasBadge {
+    color: #9AA5BD;
+    background: #252C3A;
+    border: 1px solid #37435D;
+    border-radius: 3px;
+    padding: 3px 6px;
+    font-size: var(--font_small);
+}
+#penguinCanvasMode {
+    background: transparent;
+    color: #969FB2;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    padding: 4px 9px;
+    icon-size: 15px;
+}
+#penguinCanvasMode:hover {
+    background: #272E3D;
+    color: #E4E9F4;
+}
+#penguinCanvasMode:checked {
+    background: #303D64;
+    color: #DCE4FF;
+    border-color: #4D6095;
+}
+
+/* Scene and layer rows: larger hit areas without oversized controls. */
+#scenes, #sources, SourceTree {
+    background: #17191F;
+    border: none;
+    border-radius: 0px;
+    padding: 6px;
+}
+#scenes::item {
+    min-height: 24px;
+    padding: 5px 9px;
+    margin: 2px 0px;
+    border: 1px solid transparent;
+    border-radius: 5px;
+}
+#scenes::item:selected, #scenes::item:selected:hover {
+    background: #2D3A60;
+    border-color: #4B5F96;
+    color: #F1F4FF;
+}
+#scenes::item:hover {
+    background: #252A36;
+    border-color: #353F54;
+}
+SourceTreeItem {
+    min-height: 22px;
+    padding: 5px 6px;
+    border-radius: 4px;
+}
+SourceTreeItem QLabel {
+    color: #C9CFDD;
+}
+SourceTree::item:selected {
+    background: #2D3A60;
+}
+QTreeView::item:selected, QTableView::item:selected {
+    background: #2D3A60;
+    color: #F1F4FF;
+}
+QHeaderView::section {
+    background: #20242D;
+    color: #AEB7CA;
+    border: none;
+    border-bottom: 1px solid #353D4F;
+    padding: 7px 9px;
+    font-weight: bold;
+}
+
+/* Reusable form language, shared by inspector, properties and setup dialogs. */
+QLineEdit, QTextEdit, QPlainTextEdit, QSpinBox, QDoubleSpinBox, QComboBox {
+    border: 1px solid #343A48;
+    border-radius: 5px;
+    background: #15181F;
+    color: #E0E5EF;
+    selection-background-color: #455C9A;
+    selection-color: #FFFFFF;
+}
+QLineEdit:focus, QTextEdit:focus, QPlainTextEdit:focus,
+QSpinBox:focus, QDoubleSpinBox:focus, QComboBox:focus {
+    border-color: #8297ED;
+    background: #1A2030;
+}
+QLineEdit:disabled, QSpinBox:disabled, QDoubleSpinBox:disabled, QComboBox:disabled {
+    background: #191C23;
+    color: #676F80;
+    border-color: #282F3E;
+}
+QComboBox::drop-down {
+    border-left: 1px solid #30394C;
+}
+QPushButton {
+    font-weight: normal;
+    border-radius: 5px;
+}
+QPushButton:default {
+    background: #354773;
+    border-color: #748BCA;
+    color: #F1F4FC;
+}
+QPushButton:focus, QToolButton:focus {
+    border-color: #8297ED;
+}
+QGroupBox {
+    background: #1B1F28;
+    border: 1px solid #303849;
+    border-radius: 7px;
+    margin-top: 8px;
+    padding: 28px 10px 10px;
+}
+QGroupBox::title {
+    color: #CFD7E8;
+    subcontrol-origin: margin;
+    left: 12px;
+    top: 10px;
+}
+QTabWidget::pane {
+    border: 1px solid #303747;
+    border-radius: 5px;
+    background: #191D26;
+}
+QTabBar::tab {
+    background: #191D26;
+    color: #939EB5;
+    border: none;
+    border-bottom: 2px solid transparent;
+    border-radius: 0px;
+    padding: 8px 14px;
+    margin: 0px;
+}
+QTabBar::tab:hover {
+    color: #D9E1F2;
+    background: #252D3E;
+}
+QTabBar::tab:selected {
+    color: #E4EBFF;
+    background: #29344F;
+    border-bottom-color: #8D9FF0;
+}
+
+/* The inspector is a stack of small editing cards, not a second settings dialog. */
+#penguinInspector, #penguinInspectorPanel, #penguinInspectorDock,
+#inspectorScroll, #inspectorBody {
+    background: #191C23;
+    border: none;
+}
+#inspectorSourceName {
+    color: #F0F3FA;
+    font-size: var(--font_large);
+    font-weight: bold;
+    padding: 2px 0px;
+}
+#inspectorSourceType {
+    color: #919BB0;
+    font-size: var(--font_small);
+    padding-bottom: 6px;
+}
+#inspectorCard {
+    background: #202530;
+    border: 1px solid #343D50;
+    border-radius: 7px;
+}
+#inspectorSectionTitle {
+    padding: 4px 0px;
+    color: #9DABD0;
+}
+#inspectorEmptyTitle {
+    color: #C4CDDF;
+    font-size: var(--font_large);
+    font-weight: bold;
+}
+#inspectorEmptyHint, #penguinInspectorEmpty {
+    color: #8895AE;
+    font-size: var(--font_small);
+}
+#inspectorAction, QPushButton.inspector-action {
+    background: #293347;
+    border: 1px solid #424F6C;
+    color: #D2DCF0;
+    padding: 5px 8px;
+}
+#inspectorAction:hover, QPushButton.inspector-action:hover {
+    background: #384967;
+    border-color: #7188BB;
+}
+#inspectorAspectLock {
+    background: #242C3B;
+    border: 1px solid #3B4863;
+    padding: 5px;
+    border-radius: 4px;
+}
+#inspectorAspectLock:checked {
+    background: #384B77;
+    border-color: #8C9FE3;
+}
+.inspector-field {
+    background: #141B28;
+    border-color: #3D4962;
+    color: #DDE7FF;
+}
+
+/* Audio channel cards retain native meters, faders, mute and monitoring behavior. */
+#vMixerScrollArea, #hMixerScrollArea, #vVolumeWidgets, #hVolumeWidgets {
+    background: #14171E;
+    border: none;
+}
+#vVolumeWidgets VolumeControl {
+    background: #20242D;
+    border: 1px solid #343D4F;
+    border-radius: 6px;
+    padding: 6px 5px 7px;
+    margin: 5px 3px;
+}
+#hVolumeWidgets VolumeControl {
+    background: #20242D;
+    border: 1px solid #343D4F;
+    border-radius: 6px;
+    padding: 5px 8px;
+    margin: 3px 5px;
+}
+VolumeName, VolumeName QLabel {
+    background: transparent;
+    color: #D8E1F0;
+    font-size: var(--font_small);
+    font-weight: bold;
+}
+VolumeName {
+    padding: 4px 3px;
+    border-radius: 4px;
+}
+VolumeName:hover {
+    background: #303B50;
+    border-color: #516586;
+}
+VolumeControl #volLabel {
+    color: #94A2BB;
+    font-size: var(--font_small);
+}
+VolumeControl .mixer-category {
+    color: #7385A6;
+    background: transparent;
+    font-size: var(--font_xsmall);
+    border: none;
+}
+VolumeMeter {
+    background: #20242D;
+    color: #65718A;
+    qproperty-backgroundNominalColor: #18372D;
+    qproperty-foregroundNominalColor: #65D7A7;
+    qproperty-backgroundWarningColor: #463C24;
+    qproperty-foregroundWarningColor: #E6BE60;
+    qproperty-backgroundErrorColor: #462532;
+    qproperty-foregroundErrorColor: #F0788D;
+    qproperty-majorTickColor: #8C9AB3;
+    qproperty-minorTickColor: #52617B;
+}
+QSlider::groove:horizontal {
+    height: 4px;
+    background: #111722;
+    border: none;
+    border-radius: 2px;
+}
+QSlider::sub-page:horizontal {
+    background: #8398D8;
+    border-radius: 2px;
+}
+QSlider::handle:horizontal {
+    width: 10px;
+    margin: -4px 0px;
+    background: #D6DFF0;
+    border: 1px solid #8998B5;
+    border-radius: 3px;
+}
+#vVolumeWidgets VolumeControl QSlider::groove:vertical {
+    width: 4px;
+    background: #101620;
+    border-radius: 2px;
+}
+QSlider::add-page:vertical {
+    background: #8094CE;
+    border-radius: 2px;
+}
+QSlider::handle:vertical {
+    height: 7px;
+    margin: 0px -5px;
+    background: #D6DFF0;
+    border: 1px solid #8998B5;
+    border-radius: 2px;
+}
+QSlider::handle:hover {
+    background: #FFFFFF;
+    border-color: #9EBAFF;
+}
+QSlider::handle:disabled {
+    background: #626E86;
+    border-color: #414D63;
+}
+VolumeControl .btn-mute, VolumeControl .btn-monitor {
+    background: #2A3345;
+    border: 1px solid #3F4F6D;
+    border-radius: 4px;
+}
+VolumeControl .btn-mute.checked {
+    background: #512B38;
+    border-color: #A6536D;
+}
+VolumeControl .btn-monitor.checked {
+    background: #204B41;
+    border-color: #4BAF91;
+}

@@ -1,0 +1,8 @@
+Use case: logo-brand
+Asset type: primary application icon and brand mark for Penguin Studio, an independent open-source Linux live-streaming desktop application
+Primary request: Create an original, exceptionally clean and recognizable penguin emblem, confident and friendly, combining the silhouette of a penguin with a subtle play/streaming motif.
+Scene/backdrop: genuinely transparent background.
+Subject: a single bold compact penguin emblem with a dark midnight outer silhouette, a bright white belly/face, and a restrained vivid mint green accent suggesting a play triangle in the belly. The silhouette must be visible on light and dark desktop backgrounds.
+Style/medium: refined flat vector-like logo rendered as a high-resolution raster, crisp smooth curves, balanced geometry, professional desktop app icon.
+Composition/framing: centered square composition with generous transparent margin, one standalone emblem, no container tile.
+Constraints: original design, no text or letters, no watermark, no existing company logo, no OBS logo, no Tux mascot reproduction, no gradients or drop shadows, no mockup, readable at small icon sizes.

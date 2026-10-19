@@ -1,0 +1,21 @@
+{
+  "date": "2026-10-19",
+  "test": "dlopen of the GNOME content runtime SVG loader",
+  "staged_ubuntu_librsvg_version": "2.58.0",
+  "gnome_46_2404_revision": 177,
+  "gnome_runtime_librsvg_version": "2.61.4",
+  "results": {
+    "staged_noble_first": {
+      "exit_code": 1,
+      "stdout": "/snap/gnome-46-2404/current/usr/lib/x86_64-linux-gnu/gdk-pixbuf-2.0/2.10.0/loaders/libpixbufloader_svg.so: undefined symbol: rsvg_handle_get_pixbuf_and_error",
+      "stderr": ""
+    },
+    "gnome_runtime_only": {
+      "exit_code": 0,
+      "stdout": "SVG loader load passed",
+      "stderr": ""
+    }
+  },
+  "repair": "Exclude the older staged usr/lib/x86_64-linux-gnu/librsvg-2.so.* so the GNOME runtime supplies its matching library.",
+  "scope": "Reproduces and isolates the loader ABI mismatch; rebuilt Snap installation and launcher checks are recorded separately in linux-ci.json."
+}
