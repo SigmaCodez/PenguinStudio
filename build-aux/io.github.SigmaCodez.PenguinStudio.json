@@ -152,7 +152,8 @@
                 "-DBUILD_WITH_QT6=ON",
                 "-DBUILD_TEST_APPLICATION=OFF",
                 "-DBUILD_TRANSLATIONS=OFF",
-                "-DBUILD_TESTING=OFF"
+                "-DBUILD_TESTING=OFF",
+                "-DCMAKE_BUILD_TYPE=Release"
             ],
             "sources": [
                 {
