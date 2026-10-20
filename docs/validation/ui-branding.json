@@ -1,0 +1,76 @@
+{
+  "tested_at": "2026-10-20",
+  "scope": "Unreleased UI branding source; not installed or published as a replacement for 0.2.1",
+  "build": {
+    "source_commit": "d05aaf0f9863bbf477d8129a131ce9ddee5d0c0f",
+    "run_id": 39454064392,
+    "run_url": "https://github.com/SigmaCodez/PenguinStudio/actions/runs/39454064392",
+    "artifact_id": 12279938041,
+    "archive_sha256": "181101ce0f60f845f28d4ebdb012c5e898669641a8f0538b506fb9fab65d8ba8",
+    "package": "penguin-studio_0.2.1-1+ubuntu26.04_amd64.deb",
+    "package_sha256": "545a6bcc5f5f30d3af74f4bd1ffb0ea2aa47fa283c9c7e348544c5217c575673",
+    "package_version": "0.2.1-1+ubuntu26.04",
+    "package_size_bytes": 135631790,
+    "archive_digest_verified": true,
+    "package_digest_verified": true,
+    "ci_installation_and_cli_start": "passed"
+  },
+  "environment": {
+    "os": "Ubuntu 26.04.1",
+    "desktop": "GNOME Wayland",
+    "qt": "6.10.2",
+    "gpu": "AMD Radeon RX 9070 XT"
+  },
+  "method": "Verified DEB extracted and mounted at normal paths in a private bubblewrap filesystem view. Isolated profiles, native Wayland, temporary Qt observer/controller via LD_PRELOAD. No focus shim or warning filter. Dialog images are Qt widget renders.",
+  "scenarios": [
+    "Open About and inspect project and contribution link",
+    "Open Authors and License tabs; compare full displayed texts with installed baseline",
+    "Open Remux and inspect source column",
+    "Open Safe Mode restart confirmation and cancel",
+    "Close main window and check exit status and logs"
+  ],
+  "limitations": [
+    "Only English and German dialogs were exercised natively; all 77 frontend locale catalogues were statically audited.",
+    "This branding check does not retest streaming, recording, authentication, or other package formats."
+  ],
+  "results": {
+    "en-US": {
+      "aboutName": "Penguin Studio",
+      "closeRequested": true,
+      "contributionLink": "&nbsp;&nbsp;<a href='https://github.com/SigmaCodez/PenguinStudio/blob/main/CONTRIBUTING.md'>Get Involved</a>",
+      "remuxSourceHeader": " | Penguin Studio Recording | Target File",
+      "restartText": "Do you want to restart Penguin Studio in Safe Mode (third-party plugins, scripting, and WebSockets disabled)?",
+      "supportLabel": "Penguin Studio &Support",
+      "authors_sha256": "689d9fa40794e65689251eae235982b4193c430a1cb130590852172b270b0362",
+      "authors_characters": 54544,
+      "license_sha256": "8ee8199d65fc4ee104bb8f5e0d36c22f72531a4f6788989fc7d8870fc5d7108e",
+      "license_characters": 14845,
+      "platform": "wayland",
+      "exit_code": 0,
+      "startup_warnings": [],
+      "shutdown_warnings": [],
+      "errors": [],
+      "obs_memory_leaks": 0,
+      "authors_and_license_match_baseline": true
+    },
+    "de-DE": {
+      "aboutName": "Penguin Studio",
+      "closeRequested": true,
+      "contributionLink": "&nbsp;&nbsp;<a href='https://github.com/SigmaCodez/PenguinStudio/blob/main/CONTRIBUTING.md'>Wirken Sie mit</a>",
+      "remuxSourceHeader": " | Penguin Studio-Aufnahme | Zieldatei",
+      "restartText": "Möchten Sie Penguin Studio im abgesicherten Modus (mit deaktivierten Drittanbieter-Plugins, Skripten und WebSockets) neu starten?",
+      "supportLabel": "Penguin Studio – &Hilfe",
+      "authors_sha256": "689d9fa40794e65689251eae235982b4193c430a1cb130590852172b270b0362",
+      "authors_characters": 54544,
+      "license_sha256": "8ee8199d65fc4ee104bb8f5e0d36c22f72531a4f6788989fc7d8870fc5d7108e",
+      "license_characters": 14845,
+      "platform": "wayland",
+      "exit_code": 0,
+      "startup_warnings": [],
+      "shutdown_warnings": [],
+      "errors": [],
+      "obs_memory_leaks": 0,
+      "authors_and_license_match_baseline": true
+    }
+  }
+}

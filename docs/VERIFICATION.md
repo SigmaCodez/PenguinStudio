@@ -2,6 +2,32 @@
 
 This is a development preview based on OBS Studio 32.2.2. The new Penguin code must not be described as fully production-tested until the checks below have real recorded results.
 
+## UI branding audit — unreleased source, 2026-10-20
+
+Source `d05aaf0f9863bbf477d8129a131ce9ddee5d0c0f` passed the Ubuntu 26.04
+build, regression, package installation and CLI checks in
+[the test build](https://github.com/SigmaCodez/PenguinStudio/actions/runs/39454064392).
+Publication was disabled. This is an unreleased source test, not a replacement
+for the published or system-installed 0.2.1 package.
+
+The verified test DEB passed two native GNOME Wayland runs on Ubuntu 26.04.1,
+using English and German isolated profiles. About, Authors, License, Remux and
+the Safe Mode restart confirmation were exercised. Project/support labels and
+the contribution link point to Penguin Studio; the full displayed author and
+license texts match the installed baseline exactly. Dialog renders were also
+visually inspected. Both runs exited with code 0, no logged warnings or errors,
+and zero reported OBS memory leaks.
+
+The extracted package ran at its normal paths in a private filesystem view,
+with a temporary Qt observer/controller and no focus shim or warning filter.
+The system installation and personal profiles were unchanged. Static checks
+covered all 77 frontend locales and plugin locale patches, including preserved
+keys and substitution placeholders. Actual OBS import formats, upstream credits
+and external service identities retain their correct names. Streaming and other
+package formats were not retested for this text-only update.
+
+Evidence: [UI branding results and package digests](validation/ui-branding.json).
+
 ## Installed 0.2.1 validation — 2026-10-20
 
 The published Ubuntu 26.04 package `0.2.1-1+ubuntu26.04` is now installed on
