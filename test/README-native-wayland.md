@@ -200,8 +200,15 @@ and enabling, toggling and restoring the checkbox still work. Inspect the separa
 renders, so independently rendered video previews must be verified with the workspace recording checks.
 
 As of 0.2.1, the native runner also rejects **all startup warnings and errors**
-and confirms the hardware wizard was visible on each fresh-profile run. Set
-`PENGUIN_EXECUTABLE` to test an extracted package's launcher; use its matching
-libraries and resources. The observer must be rebuilt from the same checkout.
+and confirms the hardware wizard was visible on each fresh-profile run.
+`PENGUIN_EXECUTABLE` selects the launcher to test. Prefer an installed package.
+Launching an extracted DEB alongside a system installation discovers both plugin
+directories and produces duplicate-module errors, so that is not a valid package
+test. For validation without installation, use a private mount namespace to map
+the extracted executable, OBS libraries, plugin directories and `usr/share/obs`
+over their normal `/usr` paths, then run `/usr/bin/penguin-studio` inside it.
+Keep profiles and reports in a writable temporary directory, preserve access to
+the desktop session and GPU, and verify each plugin loads only once. These mounts
+must not change the host installation. The observer must be rebuilt from the same checkout.
 `penguin-startup-dialog.cpp` separately checks activation, one-shot dispatch and
 parent destruction with Qt's offscreen platform.

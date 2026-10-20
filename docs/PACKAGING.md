@@ -1,6 +1,6 @@
 # Linux builds and packages
 
-Penguin Studio's current source version is **0.2.0**, based on OBS Studio
+Penguin Studio's current source version is **0.2.1**, based on OBS Studio
 **32.2.2**. The application ID is `io.github.SigmaCodez.PenguinStudio` and the
 launcher is `penguin-studio`. Internal OBS libraries and plugin paths retain
 their names for compatibility. Application settings are stored separately
@@ -25,12 +25,13 @@ recipes deliberately target x86_64 only.
 
 ## Automatic versioned downloads
 
-**[Download Penguin Studio 0.2.0](https://github.com/SigmaCodez/PenguinStudio/releases/tag/penguin-v0.2.0)**
-(published 2026-10-20). All five package jobs and the release job passed in
-[run 39394971754](https://github.com/SigmaCodez/PenguinStudio/actions/runs/39394971754),
-built from `3a229e46eac6b48a50b829e676d361107d9671df`. The uploaded package sizes
+**[Download Penguin Studio 0.2.1](https://github.com/SigmaCodez/PenguinStudio/releases/tag/penguin-v0.2.1)**
+(published 2026-10-20). All five package jobs passed in
+[run 39402886896](https://github.com/SigmaCodez/PenguinStudio/actions/runs/39402886896),
+built from `54c55a73b0091a3324846dcc444a7cfb10674f00`. Publication followed native
+Ubuntu 26.04 Wayland startup/shutdown validation. The uploaded package sizes
 and GitHub SHA-256 digests match the downloaded build manifest and checksum file;
-see [release verification](validation/linux-release-0.2.0.json).
+see [release verification](validation/linux-release-0.2.1.json).
 
 [GitHub Releases](https://github.com/SigmaCodez/PenguinStudio/releases) provides
 permanent downloads of Ubuntu 24.04 and 26.04 DEBs, Fedora 44 RPM, Flatpak and
@@ -81,11 +82,11 @@ Revision 3 additionally fixes crash-sentinel and frontend callback cleanup; all 
 installed Wayland shutdown cases pass in [the shutdown report](validation/ubuntu-26.04-shutdown.json).
 Revision 4 adds the modern workspace, responsive dialogs and their installed Wayland GUI, recording and shutdown checks in [the redesign report](validation/workspace-modern.json).
 Revision 5 corrects the severity of two known Qt 6.10.2 Wayland teardown diagnostics and passes all nine installed shutdown scenarios without shutdown warnings or errors; see [the focused report](validation/ubuntu-26.04-qt-focus.json).
-Revision 6 fixes fresh-profile migration, DeckLink UI locale resources, optional-runtime diagnostics (including German system locales), and early portal registration. The remaining non-null Qt 6.10.2 focus warning is still open; see [the startup report](validation/ubuntu-26.04-startup.json).
+Revision 6 fixes fresh-profile migration, DeckLink UI locale resources, optional-runtime diagnostics (including German system locales), and early portal registration. That revision retained the non-null Qt 6.10.2 startup focus warning; see [the historical startup report](validation/ubuntu-26.04-startup.json). Version 0.2.1 fixes startup dialog sequencing and passes all nine native Wayland startup/shutdown checks; see [the current report](validation/ubuntu-26.04-startup-focus-0.2.1.json).
 These checks do not replace live streaming or hardware-specific validation.
 
-The local package is `dist/penguin-studio_0.2.0-6+ubuntu26.04_amd64.deb`.
-Its SHA-256 is `bb95491596cdc0bf27bc85edbe0e4aa230bd7df1dc7e1e01bc26970b29bfbdd3`.
+The local package is `dist/penguin-studio_0.2.1-1+ubuntu26.04_amd64.deb`.
+Its SHA-256 is `6c910a02b0495cabe5ee7467d78f3179e593a1a913630e636f20ec59dac9b306`.
 
 After downloading the matching DEB, the repository's installer checks the
 release, architecture and APT dependency resolution before installation:

@@ -2,6 +2,38 @@
 
 This is a development preview based on OBS Studio 32.2.2. The new Penguin code must not be described as fully production-tested until the checks below have real recorded results.
 
+## Wayland startup focus correction — 0.2.1, 2026-10-20
+
+[Penguin Studio 0.2.1](https://github.com/SigmaCodez/PenguinStudio/releases/tag/penguin-v0.2.1) fixes the first-run hardware
+wizard opening before main-window activation completes. The connection assistant
+also waits for pending hardware setup and an active main window. No new warning
+filter or input-method override is used.
+
+The unmodified Ubuntu 26.04 executable and libraries extracted from the verified
+release DEB, mounted at their normal paths in a private filesystem view,
+passed **nine native GNOME Wayland scenarios** on Ubuntu 26.04.1,
+Qt 6.10.2 and AMD Radeon RX 9070 XT. Every run exited with code 0, zero startup
+warnings/errors, zero shutdown warnings/errors, zero late frontend callback
+removals, no remaining crash sentinel, and zero reported OBS memory leaks.
+An additional focused-wizard run with German application text and
+`de_CH.UTF-8` also passed, bringing the total to **ten clean runs**.
+The test verifies the initial hardware wizard appears, connection text fields
+receive native keyboard focus, cancellation works, and the same profile reopens
+cleanly. Tests used isolated profiles and an observer-only helper; this package
+was not installed system-wide by this validation.
+
+All five package jobs passed in [the build run](https://github.com/SigmaCodez/PenguinStudio/actions/runs/39402886896).
+The complete set was published using the repository release script after native
+GUI validation. All seven release assets were verified against their sizes and
+SHA-256 digests. The offscreen lifecycle fixture was updated to show and activate
+its window, and now also verifies hidden/pending windows defer first-run setup.
+
+Evidence: [native package results](validation/ubuntu-26.04-startup-focus-0.2.1.json)
+and [release asset verification](validation/linux-release-0.2.1.json).
+Other desktops, GPUs, live provider sessions, and local Snap/Flatpak GUI behavior
+were not retested as part of this focus correction. Earlier results below are
+historical and retain their original findings.
+
 ## Automated Linux release — 2026-10-20
 
 [Penguin Studio 0.2.0](https://github.com/SigmaCodez/PenguinStudio/releases/tag/penguin-v0.2.0)
