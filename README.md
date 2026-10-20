@@ -27,6 +27,8 @@ The workspace takes inspiration from modern broadcasting tools such as Meld Stud
 
 ## Get started
 
+**[Download Linux packages](https://github.com/SigmaCodez/PenguinStudio/releases)** — Ubuntu DEB, Fedora RPM, Flatpak and Snap, with SHA-256 checksums.
+
 **Ubuntu 26.04 / 26.04.1:** use a DEB built specifically for Ubuntu 26.04 or the
 Flatpak bundle. The original unlabelled 0.2.0 DEB targets Ubuntu 24.04 and cannot
 be installed on 26.04. See [installation and troubleshooting](docs/PACKAGING.md#ubuntu-2604--26041-installation).

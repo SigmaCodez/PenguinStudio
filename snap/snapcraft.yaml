@@ -1,7 +1,7 @@
 name: penguin-studio
 title: Penguin Studio
 icon: assets/branding/penguin-studio.svg
-version: '0.2.0'
+adopt-info: penguin-studio
 summary: A Linux streaming studio with horizontal and vertical outputs
 description: |
   Penguin Studio is an independent application by SigmaCodez based on OBS Studio.
@@ -55,6 +55,7 @@ parts:
       - -DENABLE_LIBFDK=OFF
       - -DOBS_COMPILE_DEPRECATION_AS_WARNING=ON
     override-build: |
+      craftctl set version="$(cat "$CRAFT_PART_SRC/packaging/version.txt")"
       python3 "$CRAFT_PART_SRC/scripts/packaging/fetch-cef.py" "$CRAFT_PART_SRC/.deps/cef"
       craftctl default
       # Snapcraft resolves this installed icon and rewrites the desktop launcher.

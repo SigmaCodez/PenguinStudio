@@ -23,6 +23,30 @@ avoids depending on the host's Qt and FFmpeg versions. ARM builds require
 separate dependency manifests and validation; the current Flatpak and Snap
 recipes deliberately target x86_64 only.
 
+## Automatic versioned downloads
+
+[GitHub Releases](https://github.com/SigmaCodez/PenguinStudio/releases) provides
+permanent downloads of Ubuntu 24.04 and 26.04 DEBs, Fedora 44 RPM, Flatpak and
+Snap, plus `SHA256SUMS` and `build-manifest.json`. Releases are marked as
+prereleases while Penguin Studio remains a development preview.
+
+To publish a new version, increase **`packaging/version.txt`** (for example from
+`0.2.0` to `0.2.1`) and push it to `main`. This single file supplies the application,
+native package and Snap versions; the Flatpak filename uses the same value.
+The Linux workflow detects the version change, runs the checks, builds all five
+packages, creates `penguin-v<version>` at the exact build commit, uploads the
+complete download set to a draft, and only then publishes it. A failed build or
+upload cannot publish a partial release. Existing public releases are preserved;
+use a new version for changed binaries. Re-run failed jobs on the original run to
+retry a failed release for the same commit.
+
+For the initial release or a deliberate retry, open **Actions → Penguin Studio
+Linux packages → Run workflow**, select `main`, `packages: all`, and enable
+`publish`. Manual builds default to artifacts only. Matching `penguin-v<version>`
+tag pushes also publish all formats. Pull requests and ordinary pushes without
+a version change only produce CI artifacts. Do not use `[skip ci]` on a version
+bump. Snap Store and Flathub submissions are separate from these direct downloads.
+
 ## Ubuntu 26.04 / 26.04.1 installation
 
 The original `penguin-studio_0.2.0_amd64.deb` was built for **Ubuntu 24.04**.
@@ -239,7 +263,8 @@ Before promoting a package, verify at least:
 - Package install, upgrade, uninstall, and Snap confinement on clean machines.
 
 The workflow `.github/workflows/penguin-linux.yml` builds each target and
-uploads artifacts when successful. It does not publish a release or claim
+uploads artifacts when successful. Version changes also publish the complete
+release download set as described above. Automated builds do not establish that
 unexecuted live-platform tests have passed.
 
 References: [OBS Linux build instructions](https://github.com/obsproject/obs-studio/wiki/Build-Instructions-For-Linux),
