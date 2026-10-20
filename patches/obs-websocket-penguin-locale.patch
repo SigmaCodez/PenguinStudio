@@ -1,0 +1,716 @@
+--- a/data/locale/af-ZA.ini
++++ b/data/locale/af-ZA.ini
+@@ -1,4 +1,4 @@
+-OBSWebSocket.Plugin.Description="Afstandbeheer van OBS deur WebSocket"
++OBSWebSocket.Plugin.Description="Afstandbeheer van Penguin Studio deur WebSocket"
+ OBSWebSocket.Settings.DialogTitle="WebSocket-bedienerinstellings"
+ OBSWebSocket.Settings.PluginSettingsTitle="Inpropinstellings"
+ OBSWebSocket.Settings.ServerEnable="Aktiveer WebSocket-diens"
+--- a/data/locale/ar-SA.ini
++++ b/data/locale/ar-SA.ini
+@@ -1,10 +1,10 @@
+-OBSWebSocket.Plugin.Description="التحكم عن بعد في استوديو OBS من خلال WebSocket"
++OBSWebSocket.Plugin.Description="التحكم عن بعد في استوديو Penguin Studio من خلال WebSocket"
+ OBSWebSocket.Settings.DialogTitle="إعدادات خادم WebSocket"
+ OBSWebSocket.Settings.PluginSettingsTitle="إعدادات الإضافات"
+ OBSWebSocket.Settings.ServerEnable="تمكين خادم WebSocket"
+ OBSWebSocket.Settings.AlertsEnable="تمكين تنبيهات شريط النظام"
+ OBSWebSocket.Settings.DebugEnable="تمكين سجلات التصحيح"
+-OBSWebSocket.Settings.DebugEnableHoverText="تمكين تسجيل التصحيح للجلسة الحالية لـ OBS. لا تستمر عند اعادة الفتح.\nاستخدم --websocket_debug للتفعيل عند فتح البرنامج."
++OBSWebSocket.Settings.DebugEnableHoverText="تمكين تسجيل التصحيح للجلسة الحالية لـ Penguin Studio. لا تستمر عند اعادة الفتح.\nاستخدم --websocket_debug للتفعيل عند فتح البرنامج."
+ OBSWebSocket.Settings.ServerSettingsTitle="إعدادات الخادم"
+ OBSWebSocket.Settings.AuthRequired="تمكين المصادقة"
+ OBSWebSocket.Settings.Password="كلمة مرور الخادم"
+--- a/data/locale/az-AZ.ini
++++ b/data/locale/az-AZ.ini
+@@ -1,10 +1,10 @@
+-OBSWebSocket.Plugin.Description="WebSocket vasitəsilə OBS Studio-un uzaqdan idarə edilməsi"
++OBSWebSocket.Plugin.Description="WebSocket vasitəsilə Penguin Studio-un uzaqdan idarə edilməsi"
+ OBSWebSocket.Settings.DialogTitle="WebSocket Server Parametrləri"
+ OBSWebSocket.Settings.PluginSettingsTitle="Plagin Parametrləri"
+ OBSWebSocket.Settings.ServerEnable="WebSocket serverini aktiv et"
+ OBSWebSocket.Settings.AlertsEnable="Bildiriş Sahəsində Xəbərdarlıqları Aktiv Et"
+ OBSWebSocket.Settings.DebugEnable="Sazlama Jurnalını Aktiv Et"
+-OBSWebSocket.Settings.DebugEnableHoverText="Cari OBS nümunəsi üçün sazlama jurnallaşdırmanı aktiv edir. Yükləndikdə saxlanılmır.\nYüklənmə zamanı aktiv etmək üçün --websocket_debug parametrindən istifadə edin."
++OBSWebSocket.Settings.DebugEnableHoverText="Cari Penguin Studio nümunəsi üçün sazlama jurnallaşdırmanı aktiv edir. Yükləndikdə saxlanılmır.\nYüklənmə zamanı aktiv etmək üçün --websocket_debug parametrindən istifadə edin."
+ OBSWebSocket.Settings.ServerSettingsTitle="Server Parametrləri"
+ OBSWebSocket.Settings.AuthRequired="Autentifikasiyanı Aktiv Et"
+ OBSWebSocket.Settings.Password="Server Şifri"
+--- a/data/locale/be-BY.ini
++++ b/data/locale/be-BY.ini
+@@ -1,10 +1,10 @@
+-OBSWebSocket.Plugin.Description="Аддаленае кіраванне OBS Studio праз WebSocket"
++OBSWebSocket.Plugin.Description="Аддаленае кіраванне Penguin Studio праз WebSocket"
+ OBSWebSocket.Settings.DialogTitle="Налады сервера WebSocket"
+ OBSWebSocket.Settings.PluginSettingsTitle="Налады плагіна"
+ OBSWebSocket.Settings.ServerEnable="Уключыць сервер WebSocket"
+ OBSWebSocket.Settings.AlertsEnable="Уключыць апавяшчэнні ў вобласці апавяшчэнняў"
+ OBSWebSocket.Settings.DebugEnable="Уключыць журнал адладкі"
+-OBSWebSocket.Settings.DebugEnableHoverText="Уключае журнал адладкі толькі для бягучага сеансу OBS. Пасля перазапуску будзе выключана.\nКаб праграма запускалася з уключанай наладай, выкарыстайце параметр --websocket_debug"
++OBSWebSocket.Settings.DebugEnableHoverText="Уключае журнал адладкі толькі для бягучага сеансу Penguin Studio. Пасля перазапуску будзе выключана.\nКаб праграма запускалася з уключанай наладай, выкарыстайце параметр --websocket_debug"
+ OBSWebSocket.Settings.ServerSettingsTitle="Налады сервера"
+ OBSWebSocket.Settings.AuthRequired="Уключыць аўтэнтыфікацыю"
+ OBSWebSocket.Settings.Password="Пароль сервера"
+--- a/data/locale/ca-ES.ini
++++ b/data/locale/ca-ES.ini
+@@ -1,10 +1,10 @@
+-OBSWebSocket.Plugin.Description="Control remot de l'OBS Studio mitjançant WebSocket"
++OBSWebSocket.Plugin.Description="Control remot de l'Penguin Studio mitjançant WebSocket"
+ OBSWebSocket.Settings.DialogTitle="Configuració del servidor WebSocket"
+ OBSWebSocket.Settings.PluginSettingsTitle="Configuració del complement"
+ OBSWebSocket.Settings.ServerEnable="Habilita el servidor WebSocket"
+ OBSWebSocket.Settings.AlertsEnable="Habilita les notificacions a la barra de tasques"
+ OBSWebSocket.Settings.DebugEnable="Habilita l'informe de depuració"
+-OBSWebSocket.Settings.DebugEnableHoverText="Habilita l'informe de depuració només per a la instància actual de l'OBS. No persisteix en inicis posteriors.\nUtilitzeu --websocket_debug si us cal que el canvi sigui persistent."
++OBSWebSocket.Settings.DebugEnableHoverText="Habilita l'informe de depuració només per a la instància actual de l'Penguin Studio. No persisteix en inicis posteriors.\nUtilitzeu --websocket_debug si us cal que el canvi sigui persistent."
+ OBSWebSocket.Settings.ServerSettingsTitle="Configuració del servidor"
+ OBSWebSocket.Settings.AuthRequired="Habilita l'autenticació"
+ OBSWebSocket.Settings.Password="Contrasenya del servidor"
+--- a/data/locale/cs-CZ.ini
++++ b/data/locale/cs-CZ.ini
+@@ -1,10 +1,10 @@
+-OBSWebSocket.Plugin.Description="Vzdálené ovládání OBS Studia přes WebSocket"
++OBSWebSocket.Plugin.Description="Vzdálené ovládání Penguin Studio Studia přes WebSocket"
+ OBSWebSocket.Settings.DialogTitle="Nastavení WebSocket serveru"
+ OBSWebSocket.Settings.PluginSettingsTitle="Nastavení pluginu"
+ OBSWebSocket.Settings.ServerEnable="Povolit WebSocketový server"
+ OBSWebSocket.Settings.AlertsEnable="Povolit upozornění v systémové liště"
+ OBSWebSocket.Settings.DebugEnable="Povolit podrobné protokolování"
+-OBSWebSocket.Settings.DebugEnableHoverText="Zapne podrobné protokolování pro aktuální instanci OBS. Nastavení není zachováno mezi spuštěními.\nPoužijte --websocket_debug pro povlení při spuštění."
++OBSWebSocket.Settings.DebugEnableHoverText="Zapne podrobné protokolování pro aktuální instanci Penguin Studio. Nastavení není zachováno mezi spuštěními.\nPoužijte --websocket_debug pro povlení při spuštění."
+ OBSWebSocket.Settings.ServerSettingsTitle="Nastavení serveru"
+ OBSWebSocket.Settings.AuthRequired="Povolit přihlašování"
+ OBSWebSocket.Settings.Password="Heslo serveru"
+--- a/data/locale/da-DK.ini
++++ b/data/locale/da-DK.ini
+@@ -1,10 +1,10 @@
+-OBSWebSocket.Plugin.Description="Fjernstyring af OBS Studio via WebSocket"
++OBSWebSocket.Plugin.Description="Fjernstyring af Penguin Studio via WebSocket"
+ OBSWebSocket.Settings.DialogTitle="WebSocket-serverindstillinger"
+ OBSWebSocket.Settings.PluginSettingsTitle="Plugin-indstillinger"
+ OBSWebSocket.Settings.ServerEnable="Aktivér WebSocket-server"
+ OBSWebSocket.Settings.AlertsEnable="Aktivér Systembakke Alarmer"
+ OBSWebSocket.Settings.DebugEnable="Aktivér Fejlfindingslogning"
+-OBSWebSocket.Settings.DebugEnableHoverText="Aktivér fejlfindingslogning for den aktuelle forekomst af OBS. Vedvarer ikke ved indlæsning.\nBrug --websocket_debug til at aktivere ved indlæsning."
++OBSWebSocket.Settings.DebugEnableHoverText="Aktivér fejlfindingslogning for den aktuelle forekomst af Penguin Studio. Vedvarer ikke ved indlæsning.\nBrug --websocket_debug til at aktivere ved indlæsning."
+ OBSWebSocket.Settings.ServerSettingsTitle="Serverindstillinger"
+ OBSWebSocket.Settings.AuthRequired="Aktivér godkendelse"
+ OBSWebSocket.Settings.Password="Serveradgangskode"
+--- a/data/locale/de-DE.ini
++++ b/data/locale/de-DE.ini
+@@ -1,10 +1,10 @@
+-OBSWebSocket.Plugin.Description="OBS Studio per WebSocket fernsteuern"
++OBSWebSocket.Plugin.Description="Penguin Studio per WebSocket fernsteuern"
+ OBSWebSocket.Settings.DialogTitle="WebSocket-Servereinstellungen"
+ OBSWebSocket.Settings.PluginSettingsTitle="Plugineinstellungen"
+ OBSWebSocket.Settings.ServerEnable="WebSocket-Server aktivieren"
+ OBSWebSocket.Settings.AlertsEnable="Warnungen im Infobereich aktivieren"
+ OBSWebSocket.Settings.DebugEnable="Debug-Logging aktivieren"
+-OBSWebSocket.Settings.DebugEnableHoverText="Aktiviert Debug-Logging für die aktuelle OBS-Instanz.\nVerwenden Sie „--websocket_debug“, damit die Option beim Starten aktiviert wird."
++OBSWebSocket.Settings.DebugEnableHoverText="Aktiviert Debug-Logging für die aktuelle Penguin Studio-Instanz.\nVerwenden Sie „--websocket_debug“, damit die Option beim Starten aktiviert wird."
+ OBSWebSocket.Settings.ServerSettingsTitle="Servereinstellungen"
+ OBSWebSocket.Settings.AuthRequired="Authentifizierung aktivieren"
+ OBSWebSocket.Settings.Password="Serverpasswort"
+--- a/data/locale/el-GR.ini
++++ b/data/locale/el-GR.ini
+@@ -1,10 +1,10 @@
+-OBSWebSocket.Plugin.Description="Απομακρυσμένος έλεγχος του OBS Studio μέσω WebSocket"
++OBSWebSocket.Plugin.Description="Απομακρυσμένος έλεγχος του Penguin Studio μέσω WebSocket"
+ OBSWebSocket.Settings.DialogTitle="Ρυθμίσεις Διακομιστή WebSocket"
+ OBSWebSocket.Settings.PluginSettingsTitle="Ρυθμίσεις Προσθέτων"
+ OBSWebSocket.Settings.ServerEnable="Ενεργοποίηση διακομιστή WebSocket"
+ OBSWebSocket.Settings.AlertsEnable="Ενεργοποίηση Ειδοποιήσεων στο System Tray"
+ OBSWebSocket.Settings.DebugEnable="Ενεργοποίηση καταγραφής σφαλμάτων"
+-OBSWebSocket.Settings.DebugEnableHoverText="Ενεργοποιεί την καταγραφή σφαλμάτων για την τρέχουσα διεργασία του OBS. Δεν επιμένει κατά τη φόρτωση.\nΧρησιμοποίησε το --websocket_debug για να ενεργοποιηθεί κατά τη φόρτωση."
++OBSWebSocket.Settings.DebugEnableHoverText="Ενεργοποιεί την καταγραφή σφαλμάτων για την τρέχουσα διεργασία του Penguin Studio. Δεν επιμένει κατά τη φόρτωση.\nΧρησιμοποίησε το --websocket_debug για να ενεργοποιηθεί κατά τη φόρτωση."
+ OBSWebSocket.Settings.ServerSettingsTitle="Ρυθμίσεις Διακομιστή"
+ OBSWebSocket.Settings.AuthRequired="Ενεργοποίηση Επαλήθευσης Στοιχείων"
+ OBSWebSocket.Settings.Password="Κωδικός Διακομιστή"
+--- a/data/locale/en-US.ini
++++ b/data/locale/en-US.ini
+@@ -1,4 +1,4 @@
+-OBSWebSocket.Plugin.Description="Remote-control of OBS Studio through WebSocket"
++OBSWebSocket.Plugin.Description="Remote-control of Penguin Studio through WebSocket"
+ 
+ OBSWebSocket.Settings.DialogTitle="WebSocket Server Settings"
+ 
+@@ -6,7 +6,7 @@
+ OBSWebSocket.Settings.ServerEnable="Enable WebSocket server"
+ OBSWebSocket.Settings.AlertsEnable="Enable System Tray Alerts"
+ OBSWebSocket.Settings.DebugEnable="Enable Debug Logging"
+-OBSWebSocket.Settings.DebugEnableHoverText="Enables debug logging for the current instance of OBS. Does not persist on load.\nUse --websocket_debug to enable on load."
++OBSWebSocket.Settings.DebugEnableHoverText="Enables debug logging for the current instance of Penguin Studio. Does not persist on load.\nUse --websocket_debug to enable on load."
+ 
+ OBSWebSocket.Settings.ServerSettingsTitle="Server Settings"
+ OBSWebSocket.Settings.AuthRequired="Enable Authentication"
+--- a/data/locale/es-ES.ini
++++ b/data/locale/es-ES.ini
+@@ -1,10 +1,10 @@
+-OBSWebSocket.Plugin.Description="Control remoto de OBS Studio a través de WebSocket"
++OBSWebSocket.Plugin.Description="Control remoto de Penguin Studio a través de WebSocket"
+ OBSWebSocket.Settings.DialogTitle="Ajustes del servidor WebSocket"
+ OBSWebSocket.Settings.PluginSettingsTitle="Ajustes del plugin"
+ OBSWebSocket.Settings.ServerEnable="Habilitar servidor WebSocket"
+ OBSWebSocket.Settings.AlertsEnable="Habilitar alertas en la bandeja del sistema"
+ OBSWebSocket.Settings.DebugEnable="Habilitar registro de depuración"
+-OBSWebSocket.Settings.DebugEnableHoverText="Habilita el registro de depuración para la instancia actual de OBS. No persiste al cargar.\nUse --websocket_debug para activar al cargar."
++OBSWebSocket.Settings.DebugEnableHoverText="Habilita el registro de depuración para la instancia actual de Penguin Studio. No persiste al cargar.\nUse --websocket_debug para activar al cargar."
+ OBSWebSocket.Settings.ServerSettingsTitle="Ajustes del servidor"
+ OBSWebSocket.Settings.AuthRequired="Habilitar autenticación"
+ OBSWebSocket.Settings.Password="Contraseña del servidor"
+--- a/data/locale/et-EE.ini
++++ b/data/locale/et-EE.ini
+@@ -1,10 +1,10 @@
+-OBSWebSocket.Plugin.Description="OBS Studio kaugjuhtimine WebSocketi kaudu"
++OBSWebSocket.Plugin.Description="Penguin Studio kaugjuhtimine WebSocketi kaudu"
+ OBSWebSocket.Settings.DialogTitle="WebSocket serveri seaded"
+ OBSWebSocket.Settings.PluginSettingsTitle="Plugina seaded"
+ OBSWebSocket.Settings.ServerEnable="Luba WebSocket server"
+ OBSWebSocket.Settings.AlertsEnable="Luba hoiatused tegumireal"
+ OBSWebSocket.Settings.DebugEnable="Luba silumislogimine"
+-OBSWebSocket.Settings.DebugEnableHoverText="Lubab OBS-i praeguse eksemplari silumislogimise. Ei püsi laadimisel.\nLaadimisel lubamiseks kasutage --websocket_debug."
++OBSWebSocket.Settings.DebugEnableHoverText="Lubab Penguin Studio-i praeguse eksemplari silumislogimise. Ei püsi laadimisel.\nLaadimisel lubamiseks kasutage --websocket_debug."
+ OBSWebSocket.Settings.ServerSettingsTitle="Serveri seaded"
+ OBSWebSocket.Settings.AuthRequired="Luba autentimine"
+ OBSWebSocket.Settings.Password="Serveri salasõna"
+--- a/data/locale/eu-ES.ini
++++ b/data/locale/eu-ES.ini
+@@ -1,4 +1,4 @@
+-OBSWebSocket.Plugin.Description="OBS Studioren urruneko kontrolatzailea WebSocket-en bidez"
++OBSWebSocket.Plugin.Description="Penguin Studio Studioren urruneko kontrolatzailea WebSocket-en bidez"
+ OBSWebSocket.Settings.PluginSettingsTitle="Plugin Ezarpenak"
+ OBSWebSocket.Settings.ServerEnable="WebSocket zerbitzaria gaitu"
+ OBSWebSocket.Settings.AlertsEnable="Aktibatu sistema-erretiluko alertak"
+--- a/data/locale/fa-IR.ini
++++ b/data/locale/fa-IR.ini
+@@ -1,10 +1,10 @@
+-OBSWebSocket.Plugin.Description="کنترل از راه دور OBS Studio از طریق WebSocket"
++OBSWebSocket.Plugin.Description="کنترل از راه دور Penguin Studio از طریق WebSocket"
+ OBSWebSocket.Settings.DialogTitle="تنظیمات سرور سوکت وب"
+ OBSWebSocket.Settings.PluginSettingsTitle="تنظیمات پلاگین"
+ OBSWebSocket.Settings.ServerEnable="سرور سوکت وب را فعال کنید"
+ OBSWebSocket.Settings.AlertsEnable="هشدارهای سینی سیستم را فعال کنید"
+ OBSWebSocket.Settings.DebugEnable="فعال کردن گزارش اشکال زدایی"
+-OBSWebSocket.Settings.DebugEnableHoverText="ثبت اشکال زدایی را برای نمونه فعلی OBS فعال می کند. در بارگذاری ادامه نمی‌یابد.\n برای فعال کردن در بارگذاری از --websocket_debug استفاده کنید."
++OBSWebSocket.Settings.DebugEnableHoverText="ثبت اشکال زدایی را برای نمونه فعلی Penguin Studio فعال می کند. در بارگذاری ادامه نمی‌یابد.\n برای فعال کردن در بارگذاری از --websocket_debug استفاده کنید."
+ OBSWebSocket.Settings.ServerSettingsTitle="تنظیمات سرور"
+ OBSWebSocket.Settings.AuthRequired="فعال کردن احراز هویت"
+ OBSWebSocket.Settings.Password="رمز سرور"
+--- a/data/locale/fi-FI.ini
++++ b/data/locale/fi-FI.ini
+@@ -1,10 +1,10 @@
+-OBSWebSocket.Plugin.Description="OBS Studion etähallinta WebSocketin kautta"
++OBSWebSocket.Plugin.Description="Penguin Studio Studion etähallinta WebSocketin kautta"
+ OBSWebSocket.Settings.DialogTitle="WebSocket-palvelimen asetukset"
+ OBSWebSocket.Settings.PluginSettingsTitle="Liitännäisen asetukset"
+ OBSWebSocket.Settings.ServerEnable="Ota WebSocket-palvelin käyttöön"
+ OBSWebSocket.Settings.AlertsEnable="Ota ilmoitusalueen ilmoitukset käyttöön"
+ OBSWebSocket.Settings.DebugEnable="Ota vianjäljityslokitus käyttöön"
+-OBSWebSocket.Settings.DebugEnableHoverText="Ottaa käyttöön OBS:n virheenkorjauksen lokin. Ei kuormituksen aikana.\nKäytä --websocket_debug ottaaksesi latauksen käyttöön."
++OBSWebSocket.Settings.DebugEnableHoverText="Ottaa käyttöön Penguin Studio:n virheenkorjauksen lokin. Ei kuormituksen aikana.\nKäytä --websocket_debug ottaaksesi latauksen käyttöön."
+ OBSWebSocket.Settings.ServerSettingsTitle="Palvelimen asetukset"
+ OBSWebSocket.Settings.AuthRequired="Ota tunnistautuminen käyttöön"
+ OBSWebSocket.Settings.Password="Palvelimen salasana"
+--- a/data/locale/fil-PH.ini
++++ b/data/locale/fil-PH.ini
+@@ -1,10 +1,10 @@
+-OBSWebSocket.Plugin.Description="Remote-control ng OBS Studio sa pamamagitan ng WebSocket"
++OBSWebSocket.Plugin.Description="Remote-control ng Penguin Studio sa pamamagitan ng WebSocket"
+ OBSWebSocket.Settings.DialogTitle="Mga Setting Ng WebSocket Server"
+ OBSWebSocket.Settings.PluginSettingsTitle="Mga Setting ng Plugin"
+ OBSWebSocket.Settings.ServerEnable="Paganahin ang WebSocket server"
+ OBSWebSocket.Settings.AlertsEnable="Paganahin ang System Tray Alerto"
+ OBSWebSocket.Settings.DebugEnable="Paganahin ang Debug Log"
+-OBSWebSocket.Settings.DebugEnableHoverText="Paganahin ang debug log para sa kasalukuyang instance ng OBS. Hindi nagpapatuloy sa pag-load.\nGumamit ng --websocket_debug upang paganahin ang pag-load."
++OBSWebSocket.Settings.DebugEnableHoverText="Paganahin ang debug log para sa kasalukuyang instance ng Penguin Studio. Hindi nagpapatuloy sa pag-load.\nGumamit ng --websocket_debug upang paganahin ang pag-load."
+ OBSWebSocket.Settings.ServerSettingsTitle="Mga setting ng Server"
+ OBSWebSocket.Settings.AuthRequired="Paggamit ng Pagpapatunay"
+ OBSWebSocket.Settings.Password="Password ng server"
+--- a/data/locale/fr-FR.ini
++++ b/data/locale/fr-FR.ini
+@@ -1,10 +1,10 @@
+-OBSWebSocket.Plugin.Description="Contrôle à distance d'OBS Studio via WebSocket"
++OBSWebSocket.Plugin.Description="Contrôle à distance d'Penguin Studio via WebSocket"
+ OBSWebSocket.Settings.DialogTitle="Paramètres du serveur WebSocket"
+ OBSWebSocket.Settings.PluginSettingsTitle="Paramètres du plugin"
+ OBSWebSocket.Settings.ServerEnable="Activer le serveur WebSocket"
+ OBSWebSocket.Settings.AlertsEnable="Activer les alertes de la zone de notification"
+ OBSWebSocket.Settings.DebugEnable="Activer les journaux de débogage"
+-OBSWebSocket.Settings.DebugEnableHoverText="Active la journalisation du débogage pour l'instance actuelle d'OBS. Ne persiste pas au chargement.\nUtilisez --websocket_debug pour l'activer lors du chargement."
++OBSWebSocket.Settings.DebugEnableHoverText="Active la journalisation du débogage pour l'instance actuelle d'Penguin Studio. Ne persiste pas au chargement.\nUtilisez --websocket_debug pour l'activer lors du chargement."
+ OBSWebSocket.Settings.ServerSettingsTitle="Paramètres du serveur"
+ OBSWebSocket.Settings.AuthRequired="Utiliser l'authentification"
+ OBSWebSocket.Settings.Password="Mot de passe du serveur"
+--- a/data/locale/gl-ES.ini
++++ b/data/locale/gl-ES.ini
+@@ -1,10 +1,10 @@
+-OBSWebSocket.Plugin.Description="Control remoto de OBS Studio a través de WebSocket"
++OBSWebSocket.Plugin.Description="Control remoto de Penguin Studio a través de WebSocket"
+ OBSWebSocket.Settings.DialogTitle="Configuración do servidor WebSocket"
+ OBSWebSocket.Settings.PluginSettingsTitle="Configuración do complemento"
+ OBSWebSocket.Settings.ServerEnable="Activar servidor WebSocket"
+ OBSWebSocket.Settings.AlertsEnable="Activar alertas na bandexa do sistema"
+ OBSWebSocket.Settings.DebugEnable="Activar rexistro de depuración"
+-OBSWebSocket.Settings.DebugEnableHoverText="Activa o rexistro de depuración para a instancia actual de OBS. Non se mantén ao cargar. Usa --websocket_debug para activar ao cargar."
++OBSWebSocket.Settings.DebugEnableHoverText="Activa o rexistro de depuración para a instancia actual de Penguin Studio. Non se mantén ao cargar. Usa --websocket_debug para activar ao cargar."
+ OBSWebSocket.Settings.ServerSettingsTitle="Configuración do servidor"
+ OBSWebSocket.Settings.AuthRequired="Activar autenticación"
+ OBSWebSocket.Settings.Password="Contrasinal do servidor"
+--- a/data/locale/he-IL.ini
++++ b/data/locale/he-IL.ini
+@@ -1,10 +1,10 @@
+-OBSWebSocket.Plugin.Description="שליטה מרחוק על OBS Studio באמצעות WebSocket"
++OBSWebSocket.Plugin.Description="שליטה מרחוק על Penguin Studio באמצעות WebSocket"
+ OBSWebSocket.Settings.DialogTitle="הגדרות שרת WebSocket"
+ OBSWebSocket.Settings.PluginSettingsTitle="הגדרות תוסף"
+ OBSWebSocket.Settings.ServerEnable="הפעלת שרת WebSocket"
+ OBSWebSocket.Settings.AlertsEnable="הפעלת התראות במגש המערכת"
+ OBSWebSocket.Settings.DebugEnable="הפעלת לוג איתור באגים"
+-OBSWebSocket.Settings.DebugEnableHoverText="מאפשר לוג איתור באגים עבור ההפעלה הנוכחית של OBS. לא ממשיך לפעול בעת הפעלה.\nיש להשתמש ב --websocket_debug בכדי לאפשר בעת ההפעלה."
++OBSWebSocket.Settings.DebugEnableHoverText="מאפשר לוג איתור באגים עבור ההפעלה הנוכחית של Penguin Studio. לא ממשיך לפעול בעת הפעלה.\nיש להשתמש ב --websocket_debug בכדי לאפשר בעת ההפעלה."
+ OBSWebSocket.Settings.ServerSettingsTitle="הגדרות שרת"
+ OBSWebSocket.Settings.AuthRequired="שימוש באימות"
+ OBSWebSocket.Settings.Password="סיסמת שרת"
+--- a/data/locale/hi-IN.ini
++++ b/data/locale/hi-IN.ini
+@@ -1,10 +1,10 @@
+-OBSWebSocket.Plugin.Description="WebSocket के माध्यम से OBS स्टूडियो का रिमोट-कंट्रोल"
++OBSWebSocket.Plugin.Description="WebSocket के माध्यम से Penguin Studio स्टूडियो का रिमोट-कंट्रोल"
+ OBSWebSocket.Settings.DialogTitle="वेबसॉकेट सर्वर सेटिंग्स"
+ OBSWebSocket.Settings.PluginSettingsTitle="प्लगइन सेटिंग्स"
+ OBSWebSocket.Settings.ServerEnable="WebSocket सर्वर सक्षम करें"
+ OBSWebSocket.Settings.AlertsEnable="सिस्टम ट्रे अलर्ट सक्षम करें"
+ OBSWebSocket.Settings.DebugEnable="डिबग लॉगिंग सक्रिय करें"
+-OBSWebSocket.Settings.DebugEnableHoverText="OBS के वर्तमान इंसटैन्स के लिए डीबग लॉगिंग सक्षम करता है. लोड होने पर कायम नहीं रहता है.\n लोड होने पर सक्षम करने के लिए --websocket_debug का उपयोग करें."
++OBSWebSocket.Settings.DebugEnableHoverText="Penguin Studio के वर्तमान इंसटैन्स के लिए डीबग लॉगिंग सक्षम करता है. लोड होने पर कायम नहीं रहता है.\n लोड होने पर सक्षम करने के लिए --websocket_debug का उपयोग करें."
+ OBSWebSocket.Settings.ServerSettingsTitle="सर्वर सेटिंग"
+ OBSWebSocket.Settings.AuthRequired="प्रमाणीकरण सक्षम करें"
+ OBSWebSocket.Settings.Password="सर्वर का पासवर्ड"
+--- a/data/locale/hr-HR.ini
++++ b/data/locale/hr-HR.ini
+@@ -1,10 +1,10 @@
+-OBSWebSocket.Plugin.Description="Daljinsko upravljanje OBS Studijem putem WebSocketa"
++OBSWebSocket.Plugin.Description="Daljinsko upravljanje Penguin Studio Studijem putem WebSocketa"
+ OBSWebSocket.Settings.DialogTitle="Postavke servera WebSocket"
+ OBSWebSocket.Settings.PluginSettingsTitle="Podešavanje dodatka"
+ OBSWebSocket.Settings.ServerEnable="Omogući WebSocket poslužitelj"
+ OBSWebSocket.Settings.AlertsEnable="Omogući upozorenja u sistemskoj traci"
+ OBSWebSocket.Settings.DebugEnable="Omogući zapisivanje pogrešaka"
+-OBSWebSocket.Settings.DebugEnableHoverText="Omogućuje zapisivanje ispravljanja pogrešaka za trenutnu instancu OBS-a. Ne ostaje pri učitavanju.\nKoristite --websocket_debug za omogućavanje pri učitavanju."
++OBSWebSocket.Settings.DebugEnableHoverText="Omogućuje zapisivanje ispravljanja pogrešaka za trenutnu instancu Penguin Studio-a. Ne ostaje pri učitavanju.\nKoristite --websocket_debug za omogućavanje pri učitavanju."
+ OBSWebSocket.Settings.ServerSettingsTitle="Postavke poslužitelja"
+ OBSWebSocket.Settings.AuthRequired="Omogući autentifikaciju"
+ OBSWebSocket.Settings.Password="Lozinka poslužitelja"
+--- a/data/locale/hu-HU.ini
++++ b/data/locale/hu-HU.ini
+@@ -1,10 +1,10 @@
+-OBSWebSocket.Plugin.Description="Az OBS Studio távvezérlése WebSocketen keresztül"
++OBSWebSocket.Plugin.Description="Az Penguin Studio távvezérlése WebSocketen keresztül"
+ OBSWebSocket.Settings.DialogTitle="WebSocket-kiszolgáló beállításai"
+ OBSWebSocket.Settings.PluginSettingsTitle="Bővítménybeállítások"
+ OBSWebSocket.Settings.ServerEnable="WebSocket-kiszolgáló engedélyezése"
+ OBSWebSocket.Settings.AlertsEnable="Rendszertálca-riasztások bekapcsolása"
+ OBSWebSocket.Settings.DebugEnable="Hibakeresési naplózás bekapcsolása"
+-OBSWebSocket.Settings.DebugEnableHoverText="Bekapcsolja a hibakeresési naplózást a jelenlegi OBS-példánynál. Betöltéskor nem marad meg.\nA betöltéskor történő bekapcsoláshoz használja a --websocket_debug kapcsolót."
++OBSWebSocket.Settings.DebugEnableHoverText="Bekapcsolja a hibakeresési naplózást a jelenlegi Penguin Studio-példánynál. Betöltéskor nem marad meg.\nA betöltéskor történő bekapcsoláshoz használja a --websocket_debug kapcsolót."
+ OBSWebSocket.Settings.ServerSettingsTitle="Kiszolgálóbeállítások"
+ OBSWebSocket.Settings.AuthRequired="Hitelesítés bekapcsolása"
+ OBSWebSocket.Settings.Password="Kiszolgáló jelszava"
+--- a/data/locale/hy-AM.ini
++++ b/data/locale/hy-AM.ini
+@@ -1,10 +1,10 @@
+-OBSWebSocket.Plugin.Description="OBS Studio-ի հեռակառավարումը WebSocket-ի միջոցով"
++OBSWebSocket.Plugin.Description="Penguin Studio-ի հեռակառավարումը WebSocket-ի միջոցով"
+ OBSWebSocket.Settings.DialogTitle="WebSocket Սպասարկչի Կարգավորումները"
+ OBSWebSocket.Settings.PluginSettingsTitle="Միացնիչի կարգավորումներ"
+ OBSWebSocket.Settings.ServerEnable="Միացնել WebSocket սերվերը"
+ OBSWebSocket.Settings.AlertsEnable="Միացնել սկուտեղի ծանուցումները"
+ OBSWebSocket.Settings.DebugEnable="Միացնել վրիպազերծման գրանցումը"
+-OBSWebSocket.Settings.DebugEnableHoverText="Միացնում է վրիպազերծման գրանցումը ընթացիկ OBS օրինակի համար: Չի պահպանվում գործարկման ժամանակ:\nՕգտագործեք --websocket_debug՝ գործարկման ժամանակ միացնելու համար:"
++OBSWebSocket.Settings.DebugEnableHoverText="Միացնում է վրիպազերծման գրանցումը ընթացիկ Penguin Studio օրինակի համար: Չի պահպանվում գործարկման ժամանակ:\nՕգտագործեք --websocket_debug՝ գործարկման ժամանակ միացնելու համար:"
+ OBSWebSocket.Settings.ServerSettingsTitle="Սերվերի կարգավորումներ"
+ OBSWebSocket.Settings.AuthRequired="Միացնել նույնականացումը"
+ OBSWebSocket.Settings.Password="Սերվերի գաղտնաբառը"
+--- a/data/locale/id-ID.ini
++++ b/data/locale/id-ID.ini
+@@ -1,10 +1,10 @@
+-OBSWebSocket.Plugin.Description="Kendali jarak jauh OBS Studio melalui WebSocket"
++OBSWebSocket.Plugin.Description="Kendali jarak jauh Penguin Studio melalui WebSocket"
+ OBSWebSocket.Settings.DialogTitle="Pengaturan Server WebSocket"
+ OBSWebSocket.Settings.PluginSettingsTitle="Pengaturan Plugin"
+ OBSWebSocket.Settings.ServerEnable="Aktifkan server WebSocket"
+ OBSWebSocket.Settings.AlertsEnable="Aktifkan Peringatan Baki Sistem"
+ OBSWebSocket.Settings.DebugEnable="Aktifkan Pencatatan Awakutu"
+-OBSWebSocket.Settings.DebugEnableHoverText="Aktifkan pencatatan awakutu untuk permintaan OBS saat ini. Tidak terus aktif saat memuat.\nGunakan --websocket_debug agar diaktifkan saat memuat."
++OBSWebSocket.Settings.DebugEnableHoverText="Aktifkan pencatatan awakutu untuk permintaan Penguin Studio saat ini. Tidak terus aktif saat memuat.\nGunakan --websocket_debug agar diaktifkan saat memuat."
+ OBSWebSocket.Settings.ServerSettingsTitle="Pengaturan Server"
+ OBSWebSocket.Settings.AuthRequired="Aktifkan Autentikasi"
+ OBSWebSocket.Settings.Password="Kata Sandi Server"
+--- a/data/locale/it-IT.ini
++++ b/data/locale/it-IT.ini
+@@ -1,10 +1,10 @@
+-OBSWebSocket.Plugin.Description="Controllo remoto di OBS Studio tramite WebSocket"
++OBSWebSocket.Plugin.Description="Controllo remoto di Penguin Studio tramite WebSocket"
+ OBSWebSocket.Settings.DialogTitle="Impostazioni server WebSocket"
+ OBSWebSocket.Settings.PluginSettingsTitle="Impostazioni del plugin"
+ OBSWebSocket.Settings.ServerEnable="Abilita il server WebSocket"
+ OBSWebSocket.Settings.AlertsEnable="Abilita avvisi sulla barra delle applicazioni"
+ OBSWebSocket.Settings.DebugEnable="Abilita registrazione debug"
+-OBSWebSocket.Settings.DebugEnableHoverText="Abilita la registrazione debug per l'istanza attuale di OBS.\nNon rimane attiva per il prossimo caricamento.\nUsa --websocket_debug per abilitarla al caricamento."
++OBSWebSocket.Settings.DebugEnableHoverText="Abilita la registrazione debug per l'istanza attuale di Penguin Studio.\nNon rimane attiva per il prossimo caricamento.\nUsa --websocket_debug per abilitarla al caricamento."
+ OBSWebSocket.Settings.ServerSettingsTitle="Impostazioni server"
+ OBSWebSocket.Settings.AuthRequired="Abilita autenticazione"
+ OBSWebSocket.Settings.Password="Password server"
+--- a/data/locale/ja-JP.ini
++++ b/data/locale/ja-JP.ini
+@@ -1,10 +1,10 @@
+-OBSWebSocket.Plugin.Description="WebSocketを介したOBS Studioのリモートコントロール"
++OBSWebSocket.Plugin.Description="WebSocketを介したPenguin Studioのリモートコントロール"
+ OBSWebSocket.Settings.DialogTitle="WebSocket サーバー設定"
+ OBSWebSocket.Settings.PluginSettingsTitle="プラグイン設定"
+ OBSWebSocket.Settings.ServerEnable="WebSocketサーバーを有効にする"
+ OBSWebSocket.Settings.AlertsEnable="システムトレイアラートを有効にする"
+ OBSWebSocket.Settings.DebugEnable="デバッグログを有効にする"
+-OBSWebSocket.Settings.DebugEnableHoverText="現在のOBSインスタンスに対してデバッグログを有効にします。ロード時には持続しません。\nロード時に有効にするには --websocket_debug を使用します。"
++OBSWebSocket.Settings.DebugEnableHoverText="現在のPenguin Studioインスタンスに対してデバッグログを有効にします。ロード時には持続しません。\nロード時に有効にするには --websocket_debug を使用します。"
+ OBSWebSocket.Settings.ServerSettingsTitle="サーバー設定"
+ OBSWebSocket.Settings.AuthRequired="認証を有効にする"
+ OBSWebSocket.Settings.Password="サーバーパスワード"
+--- a/data/locale/ka-GE.ini
++++ b/data/locale/ka-GE.ini
+@@ -1,10 +1,10 @@
+-OBSWebSocket.Plugin.Description="OBS Studio დაშორებული მართვით WebSocket-ის მეშვეობით"
++OBSWebSocket.Plugin.Description="Penguin Studio დაშორებული მართვით WebSocket-ის მეშვეობით"
+ OBSWebSocket.Settings.DialogTitle="WebSocket-სერვერის პარამეტრები"
+ OBSWebSocket.Settings.PluginSettingsTitle="დანამატის პარამეტრები"
+ OBSWebSocket.Settings.ServerEnable="WebSocket-სერვერის ჩართვა"
+ OBSWebSocket.Settings.AlertsEnable="სისტემური არეში ცნობების ჩართვა"
+ OBSWebSocket.Settings.DebugEnable="გამართვის აღრიცხვის ჩართვა"
+-OBSWebSocket.Settings.DebugEnableHoverText="აღირიცხება ამ გაშვებული OBS-ის ჩანაწერები გაუმართაობის მოსაგვარებლად. გაშვებისას არ ნარჩუნდება.\nგამოიყენეთ --websocket_debug გაშვებისას ჩასართავად."
++OBSWebSocket.Settings.DebugEnableHoverText="აღირიცხება ამ გაშვებული Penguin Studio-ის ჩანაწერები გაუმართაობის მოსაგვარებლად. გაშვებისას არ ნარჩუნდება.\nგამოიყენეთ --websocket_debug გაშვებისას ჩასართავად."
+ OBSWebSocket.Settings.ServerSettingsTitle="სერვერის პარამეტრები"
+ OBSWebSocket.Settings.AuthRequired="ანგარიშზე შესვლით"
+ OBSWebSocket.Settings.Password="სერვერის პაროლი"
+--- a/data/locale/kab-KAB.ini
++++ b/data/locale/kab-KAB.ini
+@@ -1,4 +1,4 @@
+-OBSWebSocket.Plugin.Description="Asenqed anmeggag n Ustudyu n OBS deg WebSocket"
++OBSWebSocket.Plugin.Description="Asenqed anmeggag n Ustudyu n Penguin Studio deg WebSocket"
+ OBSWebSocket.Settings.DialogTitle="Iɣewwaṛen n uqeddac n WebSocket"
+ OBSWebSocket.Settings.PluginSettingsTitle="Iɣewwaren n usiɣzaf"
+ OBSWebSocket.Settings.ServerEnable="Rmed aqeddac WebSocket"
+--- a/data/locale/kmr-TR.ini
++++ b/data/locale/kmr-TR.ini
+@@ -1,10 +1,10 @@
+-OBSWebSocket.Plugin.Description="Rêveberina ji dûr ve ya OBS Studio bi riya WebSocket"
++OBSWebSocket.Plugin.Description="Rêveberina ji dûr ve ya Penguin Studio bi riya WebSocket"
+ OBSWebSocket.Settings.DialogTitle="Sazkariyên rajekar a WebSocket"
+ OBSWebSocket.Settings.PluginSettingsTitle="Sazkariyên pêvekê"
+ OBSWebSocket.Settings.ServerEnable="Rajekarê WebSocket çalak bike"
+ OBSWebSocket.Settings.AlertsEnable="Hişyariyên darika pergalê çalak bike"
+ OBSWebSocket.Settings.DebugEnable="Têketinê serrastkirinê çalak bike"
+-OBSWebSocket.Settings.DebugEnableHoverText="Têketinê serrastkirinê çalak bike ji bo danişîna heyî ya OBS. Li ser barkirinê nadomîne.\nBikaranîna --websocket_debug rê dide bo çalakkirina barkirinê."
++OBSWebSocket.Settings.DebugEnableHoverText="Têketinê serrastkirinê çalak bike ji bo danişîna heyî ya Penguin Studio. Li ser barkirinê nadomîne.\nBikaranîna --websocket_debug rê dide bo çalakkirina barkirinê."
+ OBSWebSocket.Settings.ServerSettingsTitle="Sazkariyên rajekar"
+ OBSWebSocket.Settings.AuthRequired="Rastandinê çalak bike"
+ OBSWebSocket.Settings.Password="Borînpeyva rajekar"
+--- a/data/locale/ko-KR.ini
++++ b/data/locale/ko-KR.ini
+@@ -1,10 +1,10 @@
+-OBSWebSocket.Plugin.Description="WebSocket으로 OBS Studio를 원격 제어"
++OBSWebSocket.Plugin.Description="WebSocket으로 Penguin Studio를 원격 제어"
+ OBSWebSocket.Settings.DialogTitle="WebSocket 서버 설정"
+ OBSWebSocket.Settings.PluginSettingsTitle="플러그인 설정"
+ OBSWebSocket.Settings.ServerEnable="WebSocket 서버 사용"
+ OBSWebSocket.Settings.AlertsEnable="시스템 트레이 알림 사용"
+ OBSWebSocket.Settings.DebugEnable="디버그 기록 사용"
+-OBSWebSocket.Settings.DebugEnableHoverText="OBS의 현재 인스턴스에 대해 디버그 기록을 활성화합니다. 불러오는 중에는 기록이 중단됩니다.\n불러오는 중에도 활성화하려면 --websocket_debug 인자를 이용하십시오."
++OBSWebSocket.Settings.DebugEnableHoverText="Penguin Studio의 현재 인스턴스에 대해 디버그 기록을 활성화합니다. 불러오는 중에는 기록이 중단됩니다.\n불러오는 중에도 활성화하려면 --websocket_debug 인자를 이용하십시오."
+ OBSWebSocket.Settings.ServerSettingsTitle="서버 설정"
+ OBSWebSocket.Settings.AuthRequired="인증 기능 사용"
+ OBSWebSocket.Settings.Password="서버 비밀번호"
+--- a/data/locale/lo-LA.ini
++++ b/data/locale/lo-LA.ini
+@@ -1,10 +1,10 @@
+-OBSWebSocket.Plugin.Description="ຄວບຄຸມ OBS Studio ໄລຍະໄກຜ່ານ WebSocket"
++OBSWebSocket.Plugin.Description="ຄວບຄຸມ Penguin Studio ໄລຍະໄກຜ່ານ WebSocket"
+ OBSWebSocket.Settings.DialogTitle="ການຕັ້ງຄ່າເຊີບເວີ WebSocket"
+ OBSWebSocket.Settings.PluginSettingsTitle="ການຕັ້ງຄ່າປັກອິນ"
+ OBSWebSocket.Settings.ServerEnable="ເປີດໃຊ້ງານເຊີບເວີ WebSocket"
+ OBSWebSocket.Settings.AlertsEnable="ເປີດໃຊ້ງານການແຈ້ງເຕືອນໃນຖາດລະບົບ"
+ OBSWebSocket.Settings.DebugEnable="ເປີດໃຊ້ງານການບັນທຶກດີບັກ"
+-OBSWebSocket.Settings.DebugEnableHoverText="ເປີດໃຊ້ການບັນທຶກດີບັກສຳລັບການເຮັດວຽກຂອງ OBS ໃນຕອນນີ້. ຈະບໍ່ຖືກຈົດຈຳໄວ້ເມື່ອໂຫຼດໃໝ່.\nໃຊ້ --websocket_debug ເພື່ອເປີດໃຊ້ງານຕອນໂຫຼດ."
++OBSWebSocket.Settings.DebugEnableHoverText="ເປີດໃຊ້ການບັນທຶກດີບັກສຳລັບການເຮັດວຽກຂອງ Penguin Studio ໃນຕອນນີ້. ຈະບໍ່ຖືກຈົດຈຳໄວ້ເມື່ອໂຫຼດໃໝ່.\nໃຊ້ --websocket_debug ເພື່ອເປີດໃຊ້ງານຕອນໂຫຼດ."
+ OBSWebSocket.Settings.ServerSettingsTitle="ການຕັ້ງຄ່າເຊີບເວີ"
+ OBSWebSocket.Settings.AuthRequired="ເປີດໃຊ້ງານການຢືນຢັນຕົວຕົນ"
+ OBSWebSocket.Settings.Password="ລະຫັດຜ່ານເຊີບເວີ"
+--- a/data/locale/ms-MY.ini
++++ b/data/locale/ms-MY.ini
+@@ -1,10 +1,10 @@
+-OBSWebSocket.Plugin.Description="Kawalan-jauh OBS Studio melalui WebSocket"
++OBSWebSocket.Plugin.Description="Kawalan-jauh Penguin Studio melalui WebSocket"
+ OBSWebSocket.Settings.DialogTitle="Tetapan Pelayan WebSocket"
+ OBSWebSocket.Settings.PluginSettingsTitle="Tetapan Pemalam"
+ OBSWebSocket.Settings.ServerEnable="Benarkan pelayan WebSocket"
+ OBSWebSocket.Settings.AlertsEnable="Benarkan Amaran Talam Sistem"
+ OBSWebSocket.Settings.DebugEnable="Benarkan Pegelogan Nyahpepijat"
+-OBSWebSocket.Settings.DebugEnableHoverText="Membenarkan pengelogan nyahpepijat bagi kejadian OBS semasa. Tidak ditetapkan ketika muat.\nGuna --websocket_debug untuk didayakan ketika muat."
++OBSWebSocket.Settings.DebugEnableHoverText="Membenarkan pengelogan nyahpepijat bagi kejadian Penguin Studio semasa. Tidak ditetapkan ketika muat.\nGuna --websocket_debug untuk didayakan ketika muat."
+ OBSWebSocket.Settings.ServerSettingsTitle="Tetapan Pelayan"
+ OBSWebSocket.Settings.AuthRequired="Benarkan Pengesahihan"
+ OBSWebSocket.Settings.Password="Kata Laluan Pelayan"
+--- a/data/locale/nl-NL.ini
++++ b/data/locale/nl-NL.ini
+@@ -1,10 +1,10 @@
+-OBSWebSocket.Plugin.Description="Op afstand bediening van OBS Studio via WebSocket"
++OBSWebSocket.Plugin.Description="Op afstand bediening van Penguin Studio via WebSocket"
+ OBSWebSocket.Settings.DialogTitle="WebSocket Server Instellingen"
+ OBSWebSocket.Settings.PluginSettingsTitle="Plugin instellingen"
+ OBSWebSocket.Settings.ServerEnable="WebSocket server inschakelen"
+ OBSWebSocket.Settings.AlertsEnable="Systeemtray meldingen inschakelen"
+ OBSWebSocket.Settings.DebugEnable="Activeer debug logging"
+-OBSWebSocket.Settings.DebugEnableHoverText="Schakelt debug logboekregistratie in voor de huidige instantie van OBS. Blijft niet meer te laden.\nGebruik --websocket_debug om bij laden in te schakelen."
++OBSWebSocket.Settings.DebugEnableHoverText="Schakelt debug logboekregistratie in voor de huidige instantie van Penguin Studio. Blijft niet meer te laden.\nGebruik --websocket_debug om bij laden in te schakelen."
+ OBSWebSocket.Settings.ServerSettingsTitle="Serverinstellingen"
+ OBSWebSocket.Settings.AuthRequired="Authenticatie inschakelen"
+ OBSWebSocket.Settings.Password="Server wachtwoord"
+--- a/data/locale/pl-PL.ini
++++ b/data/locale/pl-PL.ini
+@@ -1,10 +1,10 @@
+-OBSWebSocket.Plugin.Description="Zdalna kontrola OBS Studio przez WebSocket"
++OBSWebSocket.Plugin.Description="Zdalna kontrola Penguin Studio przez WebSocket"
+ OBSWebSocket.Settings.DialogTitle="Ustawienia serwera WebSocket"
+ OBSWebSocket.Settings.PluginSettingsTitle="Ustawienia wtyczki"
+ OBSWebSocket.Settings.ServerEnable="Włącz serwer WebSocket"
+ OBSWebSocket.Settings.AlertsEnable="Włącz powiadomienia w zasobniku systemowym"
+ OBSWebSocket.Settings.DebugEnable="Włącz logowanie debugowania"
+-OBSWebSocket.Settings.DebugEnableHoverText="Włącza logowanie debugowania dla bieżącej instancji OBS. Opcja nie jest włączana przy ładowaniu aplikacji.\nUżyj --websocket_debug, aby włączyć logowanie debugowania przy ładowaniu aplikacji."
++OBSWebSocket.Settings.DebugEnableHoverText="Włącza logowanie debugowania dla bieżącej instancji Penguin Studio. Opcja nie jest włączana przy ładowaniu aplikacji.\nUżyj --websocket_debug, aby włączyć logowanie debugowania przy ładowaniu aplikacji."
+ OBSWebSocket.Settings.ServerSettingsTitle="Ustawienia serwera"
+ OBSWebSocket.Settings.AuthRequired="Włącz uwierzytelnianie"
+ OBSWebSocket.Settings.Password="Hasło serwera"
+--- a/data/locale/pt-BR.ini
++++ b/data/locale/pt-BR.ini
+@@ -1,10 +1,10 @@
+-OBSWebSocket.Plugin.Description="Controle remoto do OBS Studio através de WebSocket"
++OBSWebSocket.Plugin.Description="Controle remoto do Penguin Studio através de WebSocket"
+ OBSWebSocket.Settings.DialogTitle="Configurações do servidor WebSocket"
+ OBSWebSocket.Settings.PluginSettingsTitle="Configurações do plugin"
+ OBSWebSocket.Settings.ServerEnable="Ativar servidor WebSocket"
+ OBSWebSocket.Settings.AlertsEnable="Ativar alertas da bandeja do sistema"
+ OBSWebSocket.Settings.DebugEnable="Habilitar registro de depuração"
+-OBSWebSocket.Settings.DebugEnableHoverText="Ativa o registro de depuração para a instância atual do OBS. Não persiste na inicialização.\nUse --websocket_debug para ativar na inicialização."
++OBSWebSocket.Settings.DebugEnableHoverText="Ativa o registro de depuração para a instância atual do Penguin Studio. Não persiste na inicialização.\nUse --websocket_debug para ativar na inicialização."
+ OBSWebSocket.Settings.ServerSettingsTitle="Configurações do servidor"
+ OBSWebSocket.Settings.AuthRequired="Habilitar autenticação"
+ OBSWebSocket.Settings.Password="Senha do servidor"
+--- a/data/locale/pt-PT.ini
++++ b/data/locale/pt-PT.ini
+@@ -1,10 +1,10 @@
+-OBSWebSocket.Plugin.Description="Controlo remoto do OBS Studio através de WebSocket"
++OBSWebSocket.Plugin.Description="Controlo remoto do Penguin Studio através de WebSocket"
+ OBSWebSocket.Settings.DialogTitle="Definições do servidor WebSocket"
+ OBSWebSocket.Settings.PluginSettingsTitle="Configurações do plugin"
+ OBSWebSocket.Settings.ServerEnable="Ativar servidor WebSocket"
+ OBSWebSocket.Settings.AlertsEnable="Ativar alertas da bandeja do sistema"
+ OBSWebSocket.Settings.DebugEnable="Ativar registo de depuração"
+-OBSWebSocket.Settings.DebugEnableHoverText="Ativa o registro de depuração para a instância atual do OBS. Não persiste no arranque.\nUse --websocket_debug para ativar no arranque."
++OBSWebSocket.Settings.DebugEnableHoverText="Ativa o registro de depuração para a instância atual do Penguin Studio. Não persiste no arranque.\nUse --websocket_debug para ativar no arranque."
+ OBSWebSocket.Settings.ServerSettingsTitle="Configurações do servidor"
+ OBSWebSocket.Settings.AuthRequired="Ativar autenticação"
+ OBSWebSocket.Settings.Password="Senha do servidor"
+--- a/data/locale/ro-RO.ini
++++ b/data/locale/ro-RO.ini
+@@ -1,10 +1,10 @@
+-OBSWebSocket.Plugin.Description="Control de la distanță pentru OBS Studio prin WebSocket"
++OBSWebSocket.Plugin.Description="Control de la distanță pentru Penguin Studio prin WebSocket"
+ OBSWebSocket.Settings.DialogTitle="Setări pentru server WebSocket"
+ OBSWebSocket.Settings.PluginSettingsTitle="Setări pentru plugin"
+ OBSWebSocket.Settings.ServerEnable="Activează serverul WebSocket"
+ OBSWebSocket.Settings.AlertsEnable="Activează alertele din bara de sistem"
+ OBSWebSocket.Settings.DebugEnable="Activează jurnalizarea pentru depanare"
+-OBSWebSocket.Settings.DebugEnableHoverText="Activează jurnalizarea pentru depanare în cazul instanței actuale de OBS. Nu persistă la încărcare.\nFolosește --websocket_debug pentru a activa la încărcare."
++OBSWebSocket.Settings.DebugEnableHoverText="Activează jurnalizarea pentru depanare în cazul instanței actuale de Penguin Studio. Nu persistă la încărcare.\nFolosește --websocket_debug pentru a activa la încărcare."
+ OBSWebSocket.Settings.ServerSettingsTitle="Setări pentru server"
+ OBSWebSocket.Settings.AuthRequired="Activează autentificarea"
+ OBSWebSocket.Settings.Password="Parola serverului"
+--- a/data/locale/ru-RU.ini
++++ b/data/locale/ru-RU.ini
+@@ -1,10 +1,10 @@
+-OBSWebSocket.Plugin.Description="Удалённое управление OBS Studio по WebSocket"
++OBSWebSocket.Plugin.Description="Удалённое управление Penguin Studio по WebSocket"
+ OBSWebSocket.Settings.DialogTitle="Настройки сервера WebSocket"
+ OBSWebSocket.Settings.PluginSettingsTitle="Настройки плагина"
+ OBSWebSocket.Settings.ServerEnable="Включить сервер WebSocket"
+ OBSWebSocket.Settings.AlertsEnable="Включить оповещения в трее"
+ OBSWebSocket.Settings.DebugEnable="Включить отладочный журнал"
+-OBSWebSocket.Settings.DebugEnableHoverText="Включает ведение журнала отладки для текущего экземпляра OBS. Не сохраняется при запуске.\nИспользуйте --websocket_debug для включения при запуске."
++OBSWebSocket.Settings.DebugEnableHoverText="Включает ведение журнала отладки для текущего экземпляра Penguin Studio. Не сохраняется при запуске.\nИспользуйте --websocket_debug для включения при запуске."
+ OBSWebSocket.Settings.ServerSettingsTitle="Настройки сервера"
+ OBSWebSocket.Settings.AuthRequired="Включить вход в аккаунт"
+ OBSWebSocket.Settings.Password="Пароль сервера"
+--- a/data/locale/sk-SK.ini
++++ b/data/locale/sk-SK.ini
+@@ -1,10 +1,10 @@
+-OBSWebSocket.Plugin.Description="Vzdialené ovládanie OBS Štúdia cez WebSocket"
++OBSWebSocket.Plugin.Description="Vzdialené ovládanie Penguin Studio Štúdia cez WebSocket"
+ OBSWebSocket.Settings.DialogTitle="Serverové nastavenia WebSocket"
+ OBSWebSocket.Settings.PluginSettingsTitle="Nastavenia pluginu"
+ OBSWebSocket.Settings.ServerEnable="Zapnúť WebSocket server"
+ OBSWebSocket.Settings.AlertsEnable="Zapnúť notifikácie zo systémovej lišty"
+ OBSWebSocket.Settings.DebugEnable="Zapnúť debug logovanie"
+-OBSWebSocket.Settings.DebugEnableHoverText="Zapne debug logovanie pre momentálnu inštanciu OBS. Nezotrvá po načítaní.\nPoužite --websocket_debug pre zapnutie pri načítaní."
++OBSWebSocket.Settings.DebugEnableHoverText="Zapne debug logovanie pre momentálnu inštanciu Penguin Studio. Nezotrvá po načítaní.\nPoužite --websocket_debug pre zapnutie pri načítaní."
+ OBSWebSocket.Settings.ServerSettingsTitle="Nastavenia servera"
+ OBSWebSocket.Settings.AuthRequired="Zapnúť autentifikáciu"
+ OBSWebSocket.Settings.Password="Serverové heslo"
+--- a/data/locale/sl-SI.ini
++++ b/data/locale/sl-SI.ini
+@@ -1,10 +1,10 @@
+-OBSWebSocket.Plugin.Description="Oddaljeni nadzor OBS Studia prek WebSocketa"
++OBSWebSocket.Plugin.Description="Oddaljeni nadzor Penguin Studio Studia prek WebSocketa"
+ OBSWebSocket.Settings.DialogTitle="Nastavitve strežnika WebSocket"
+ OBSWebSocket.Settings.PluginSettingsTitle="Nastavitve vtičnika"
+ OBSWebSocket.Settings.ServerEnable="Omogoči strežnik WebSocket"
+ OBSWebSocket.Settings.AlertsEnable="Omogoči opozorila v sistemskem pladnju"
+ OBSWebSocket.Settings.DebugEnable="Omogoči beleženje napak"
+-OBSWebSocket.Settings.DebugEnableHoverText="Omogoči beleženje dogodkov za potrebe razhroščevanja v trenutno zagnani inačici OBS. Ne vztraja ob nalaganju.\nUporabbite --websocket_debug, da to možnost omogočite ob nalaganju."
++OBSWebSocket.Settings.DebugEnableHoverText="Omogoči beleženje dogodkov za potrebe razhroščevanja v trenutno zagnani inačici Penguin Studio. Ne vztraja ob nalaganju.\nUporabbite --websocket_debug, da to možnost omogočite ob nalaganju."
+ OBSWebSocket.Settings.ServerSettingsTitle="Nastavitve strežnika"
+ OBSWebSocket.Settings.AuthRequired="Omogoči overjanje"
+ OBSWebSocket.Settings.Password="Geslo strežnika"
+--- a/data/locale/sr-SP.ini
++++ b/data/locale/sr-SP.ini
+@@ -1,10 +1,10 @@
+-OBSWebSocket.Plugin.Description="Даљинско управљање OBS Studio-ом путем WebSocket-а"
++OBSWebSocket.Plugin.Description="Даљинско управљање Penguin Studio-ом путем WebSocket-а"
+ OBSWebSocket.Settings.DialogTitle="Подешавања WebSocket сервера"
+ OBSWebSocket.Settings.PluginSettingsTitle="Подешавање додатка"
+ OBSWebSocket.Settings.ServerEnable="Омогући WebSocket сервер"
+ OBSWebSocket.Settings.AlertsEnable="Омогући упозорења у системској палети"
+ OBSWebSocket.Settings.DebugEnable="Омогући евидентирање грешака"
+-OBSWebSocket.Settings.DebugEnableHoverText="Омогућава евидентирање дебаговања за тренутну инстанцу OBS-а. Не задржава се при учитавању.\nКористите --websocket_debug да бисте омогућили при учитавању."
++OBSWebSocket.Settings.DebugEnableHoverText="Омогућава евидентирање дебаговања за тренутну инстанцу Penguin Studio-а. Не задржава се при учитавању.\nКористите --websocket_debug да бисте омогућили при учитавању."
+ OBSWebSocket.Settings.ServerSettingsTitle="Подешавање послуживача"
+ OBSWebSocket.Settings.AuthRequired="Омогући аутентификацију"
+ OBSWebSocket.Settings.Password="Лозинка послуживача"
+--- a/data/locale/sv-SE.ini
++++ b/data/locale/sv-SE.ini
+@@ -1,10 +1,10 @@
+-OBSWebSocket.Plugin.Description="Fjärrstyrning av OBS Studio via WebSocket"
++OBSWebSocket.Plugin.Description="Fjärrstyrning av Penguin Studio via WebSocket"
+ OBSWebSocket.Settings.DialogTitle="WebSocket-serverinställningar"
+ OBSWebSocket.Settings.PluginSettingsTitle="Insticksprogramsinställningar"
+ OBSWebSocket.Settings.ServerEnable="Aktivera WebSocket-server"
+ OBSWebSocket.Settings.AlertsEnable="Aktivera systemfältsmeddelanden"
+ OBSWebSocket.Settings.DebugEnable="Aktivera felsökningsloggning"
+-OBSWebSocket.Settings.DebugEnableHoverText="Aktiverar felsökningsloggning för den aktuella instansen av OBS. Stannar inte igång vid inläsning.\nAnvänd --websocket_debug för att aktivera vid inläsning."
++OBSWebSocket.Settings.DebugEnableHoverText="Aktiverar felsökningsloggning för den aktuella instansen av Penguin Studio. Stannar inte igång vid inläsning.\nAnvänd --websocket_debug för att aktivera vid inläsning."
+ OBSWebSocket.Settings.ServerSettingsTitle="Serverinställningar"
+ OBSWebSocket.Settings.AuthRequired="Aktivera autentisering"
+ OBSWebSocket.Settings.Password="Serverlösenord"
+--- a/data/locale/th-TH.ini
++++ b/data/locale/th-TH.ini
+@@ -1,10 +1,10 @@
+-OBSWebSocket.Plugin.Description="การควบคุม OBS Studio จากระยะไกลผ่าน WebSocket"
++OBSWebSocket.Plugin.Description="การควบคุม Penguin Studio จากระยะไกลผ่าน WebSocket"
+ OBSWebSocket.Settings.DialogTitle="การตั้งค่าเซิร์ฟเวอร์ WebSocket"
+ OBSWebSocket.Settings.PluginSettingsTitle="การตั้งค่าปลั๊กอิน"
+ OBSWebSocket.Settings.ServerEnable="เปิดใช้งานเซิร์ฟเวอร์ WebSocket"
+ OBSWebSocket.Settings.AlertsEnable="เปิดใช้งานการแจ้งเตือนถาดระบบ"
+ OBSWebSocket.Settings.DebugEnable="เปิดใช้งานการบันทึกการดีบั๊ก"
+-OBSWebSocket.Settings.DebugEnableHoverText="เปิดใช้งานการบันทึกการดีบั๊กสำหรับ OBS ตัวปัจจุบัน แต่จะไม่เปิดระหว่างการโหลด\nใช้ --websocket_debug เพื่อเปิดใช้งานระหว่างการโหลด"
++OBSWebSocket.Settings.DebugEnableHoverText="เปิดใช้งานการบันทึกการดีบั๊กสำหรับ Penguin Studio ตัวปัจจุบัน แต่จะไม่เปิดระหว่างการโหลด\nใช้ --websocket_debug เพื่อเปิดใช้งานระหว่างการโหลด"
+ OBSWebSocket.Settings.ServerSettingsTitle="การตั้งค่าเซิร์ฟเวอร์"
+ OBSWebSocket.Settings.AuthRequired="เปิดใช้งานการยืนยันตัวตน"
+ OBSWebSocket.Settings.Password="รหัสผ่านเซิร์ฟเวอร์"
+--- a/data/locale/tr-TR.ini
++++ b/data/locale/tr-TR.ini
+@@ -1,10 +1,10 @@
+-OBSWebSocket.Plugin.Description="WebSocket aracılığıyla uzaktan OBS Studio"
++OBSWebSocket.Plugin.Description="WebSocket aracılığıyla uzaktan Penguin Studio"
+ OBSWebSocket.Settings.DialogTitle="WebSocket Suncusu Ayarları"
+ OBSWebSocket.Settings.PluginSettingsTitle="Eklenti Ayarları"
+ OBSWebSocket.Settings.ServerEnable="WebSocket sunucuyu etkinleştir"
+ OBSWebSocket.Settings.AlertsEnable="Sistem Tepsi Uyarılarını Etkinleştir"
+ OBSWebSocket.Settings.DebugEnable="Hata Ayıklama Günlüğünü Etkinleştir"
+-OBSWebSocket.Settings.DebugEnableHoverText="OBS'in geçerli örneği için hata ayıklama günlüğünü etkinleştirir. Yüklemede kalıcı değildir.\nYüklemede etkinleştirmek için -- websocket_debug kullanın."
++OBSWebSocket.Settings.DebugEnableHoverText="Penguin Studio'in geçerli örneği için hata ayıklama günlüğünü etkinleştirir. Yüklemede kalıcı değildir.\nYüklemede etkinleştirmek için -- websocket_debug kullanın."
+ OBSWebSocket.Settings.ServerSettingsTitle="Sunucu Ayarları"
+ OBSWebSocket.Settings.AuthRequired="Kimlik Doğrulamasını Etkinleştir"
+ OBSWebSocket.Settings.Password="Sunucu Parolası"
+--- a/data/locale/ug-CN.ini
++++ b/data/locale/ug-CN.ini
+@@ -1,10 +1,10 @@
+-OBSWebSocket.Plugin.Description="WebSocket ئارقىلىق OBS Studio نى يىراقتىن تىزگىنلەش"
++OBSWebSocket.Plugin.Description="WebSocket ئارقىلىق Penguin Studio نى يىراقتىن تىزگىنلەش"
+ OBSWebSocket.Settings.DialogTitle="WebSocket مۇلازىمېتىر تەڭشىكى"
+ OBSWebSocket.Settings.PluginSettingsTitle="قىستۇرما تەڭشىكى"
+ OBSWebSocket.Settings.ServerEnable="WebSocket مۇلازىمېتىرنى قوزغىتىدۇ"
+ OBSWebSocket.Settings.AlertsEnable="سىستېما قورال تاختا ئاگاھلاندۇرۇشىنى قوزغىتىدۇ"
+ OBSWebSocket.Settings.DebugEnable="سازلاش خاتىرىسىنى قوزغىتىدۇ"
+-OBSWebSocket.Settings.DebugEnableHoverText="نۆۋەتتىكى OBS ئەمەلىي مىسالىنىڭ سازلاش خاتىرىسىنى قوزغىتىدۇ. كېيىنكى قېتىم يۈكلىگەندە قايتا تەڭشەش كېرەك.\n --websocket_debug ئىشلىتىلسە OBS نى يۈكلىگەندە كۈندىلىك خاتىرىنى قوزغىتىدۇ."
++OBSWebSocket.Settings.DebugEnableHoverText="نۆۋەتتىكى Penguin Studio ئەمەلىي مىسالىنىڭ سازلاش خاتىرىسىنى قوزغىتىدۇ. كېيىنكى قېتىم يۈكلىگەندە قايتا تەڭشەش كېرەك.\n --websocket_debug ئىشلىتىلسە Penguin Studio نى يۈكلىگەندە كۈندىلىك خاتىرىنى قوزغىتىدۇ."
+ OBSWebSocket.Settings.ServerSettingsTitle="مۇلازىمېتىر تەڭشىكى"
+ OBSWebSocket.Settings.AuthRequired="كىملىك دەلىللەشنى قوزغىتىدۇ"
+ OBSWebSocket.Settings.Password="مۇلازىمېتىر ئىم"
+--- a/data/locale/uk-UA.ini
++++ b/data/locale/uk-UA.ini
+@@ -1,10 +1,10 @@
+-OBSWebSocket.Plugin.Description="Віддалене керування OBS Studio через WebSocket"
++OBSWebSocket.Plugin.Description="Віддалене керування Penguin Studio через WebSocket"
+ OBSWebSocket.Settings.DialogTitle="Налаштування WebSocket сервера"
+ OBSWebSocket.Settings.PluginSettingsTitle="Налаштування плагіна"
+ OBSWebSocket.Settings.ServerEnable="Увімкнути сервер WebSocket"
+ OBSWebSocket.Settings.AlertsEnable="Увімкнути сповіщення у системному лотку"
+ OBSWebSocket.Settings.DebugEnable="Увімкнути журнал налагодження"
+-OBSWebSocket.Settings.DebugEnableHoverText="Вмикає журналювання налагодження для поточного екземпляра OBS. Не зберігається під час завантаження.\nВикористовуйте --websocket_debug для увімкнення під час завантаження."
++OBSWebSocket.Settings.DebugEnableHoverText="Вмикає журналювання налагодження для поточного екземпляра Penguin Studio. Не зберігається під час завантаження.\nВикористовуйте --websocket_debug для увімкнення під час завантаження."
+ OBSWebSocket.Settings.ServerSettingsTitle="Налаштування сервера"
+ OBSWebSocket.Settings.AuthRequired="Увімкнути автентифікацію"
+ OBSWebSocket.Settings.Password="Пароль сервера"
+--- a/data/locale/vi-VN.ini
++++ b/data/locale/vi-VN.ini
+@@ -1,10 +1,10 @@
+-OBSWebSocket.Plugin.Description="Điều khiển từ xa OBS Studio thông qua WebSocket"
++OBSWebSocket.Plugin.Description="Điều khiển từ xa Penguin Studio thông qua WebSocket"
+ OBSWebSocket.Settings.DialogTitle="Cài đặt máy chủ WebSocket"
+ OBSWebSocket.Settings.PluginSettingsTitle="Thiết đặt trình cắm"
+ OBSWebSocket.Settings.ServerEnable="Bật máy chủ WebSocket"
+ OBSWebSocket.Settings.AlertsEnable="Bật cảnh báo khay hệ thống"
+ OBSWebSocket.Settings.DebugEnable="Bật ghi nhật ký gỡ lỗi"
+-OBSWebSocket.Settings.DebugEnableHoverText="Cho phép ghi nhật ký gỡ lỗi cho phiên bản OBS hiện tại. Không tồn tại khi tải.\nUde --websocket gỡ lỗi để bật khi tải."
++OBSWebSocket.Settings.DebugEnableHoverText="Cho phép ghi nhật ký gỡ lỗi cho phiên bản Penguin Studio hiện tại. Không tồn tại khi tải.\nUde --websocket gỡ lỗi để bật khi tải."
+ OBSWebSocket.Settings.ServerSettingsTitle="Thiết đặt máy chủ"
+ OBSWebSocket.Settings.AuthRequired="Bật xác thực"
+ OBSWebSocket.Settings.Password="Mật khẩu máy chủ"
+--- a/data/locale/zh-CN.ini
++++ b/data/locale/zh-CN.ini
+@@ -1,10 +1,10 @@
+-OBSWebSocket.Plugin.Description="通过 WebSocket 远程控制 OBS Studio"
++OBSWebSocket.Plugin.Description="通过 WebSocket 远程控制 Penguin Studio"
+ OBSWebSocket.Settings.DialogTitle="WebSocket 服务器设置"
+ OBSWebSocket.Settings.PluginSettingsTitle="插件设置"
+ OBSWebSocket.Settings.ServerEnable="开启 WebSocket 服务器"
+ OBSWebSocket.Settings.AlertsEnable="开启系统托盘提醒"
+ OBSWebSocket.Settings.DebugEnable="开启调试日志"
+-OBSWebSocket.Settings.DebugEnableHoverText="开启当前 OBS 实例的调试日志。下次启动时需重新设置。\n使用 --websocket_debug 在启动 OBS 时开启日志。"
++OBSWebSocket.Settings.DebugEnableHoverText="开启当前 Penguin Studio 实例的调试日志。下次启动时需重新设置。\n使用 --websocket_debug 在启动 Penguin Studio 时开启日志。"
+ OBSWebSocket.Settings.ServerSettingsTitle="服务器设置"
+ OBSWebSocket.Settings.AuthRequired="开启身份认证"
+ OBSWebSocket.Settings.Password="服务器密码"
+--- a/data/locale/zh-TW.ini
++++ b/data/locale/zh-TW.ini
+@@ -1,10 +1,10 @@
+-OBSWebSocket.Plugin.Description="透過 WebSocket 遠端控制 OBS Studio"
++OBSWebSocket.Plugin.Description="透過 WebSocket 遠端控制 Penguin Studio"
+ OBSWebSocket.Settings.DialogTitle="WebSocket 伺服器設定"
+ OBSWebSocket.Settings.PluginSettingsTitle="外掛程式設定"
+ OBSWebSocket.Settings.ServerEnable="啟用 WebSocket 伺服器"
+ OBSWebSocket.Settings.AlertsEnable="啟用系統匣通知"
+ OBSWebSocket.Settings.DebugEnable="啟用除錯記錄"
+-OBSWebSocket.Settings.DebugEnableHoverText="啟用目前 OBS 實體的除錯記錄。下次啟動時需重新設定。\n使用 --websocket_debug 在啟動 OBS 時啟用記錄。"
++OBSWebSocket.Settings.DebugEnableHoverText="啟用目前 Penguin Studio 實體的除錯記錄。下次啟動時需重新設定。\n使用 --websocket_debug 在啟動 Penguin Studio 時啟用記錄。"
+ OBSWebSocket.Settings.ServerSettingsTitle="伺服器設定"
+ OBSWebSocket.Settings.AuthRequired="啟用認證"
+ OBSWebSocket.Settings.Password="伺服器密碼"
