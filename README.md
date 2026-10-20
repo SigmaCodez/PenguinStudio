@@ -59,10 +59,9 @@ Penguin Studio has its own version numbers and release schedule. Our GitHub Acti
 
 ## Updates
 
-The next release adds **Help → Check for updates**, automatic release notifications
+Version 0.3.0 adds **Help → Check for updates**, automatic release notifications
 and verified package installation for supported Ubuntu, Fedora and Flatpak
-installations. These features are currently on `main`; the published 0.2.1
-package does not yet include them. See [in-app updates](docs/UPDATES.md) for package
+installations. See [in-app updates](docs/UPDATES.md) for package
 support and the Snap limitation. Downloads always come from
 [Penguin Studio releases](https://github.com/SigmaCodez/PenguinStudio/releases).
 

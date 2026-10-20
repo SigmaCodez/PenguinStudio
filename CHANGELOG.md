@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.3.0 — 2026-10-20
 
 - Add automatic Penguin release notifications and verified in-app Linux package updates.
 - Add a native Wayland-compatible Twitch chat dock and bundled public-app login, with stream-details loading.
