@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 """Regression checks for release triggers and incomplete/wrong-version artifacts."""
 import importlib.util
+import json
+import os
 from pathlib import Path
 import tempfile
 import unittest
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -44,6 +47,42 @@ class Releases(unittest.TestCase):
         ]:
             with self.subTest(args=args), self.assertRaises(ValueError):
                 version.release_requested(*args)
+
+    def test_upload_failure_keeps_release_unpublished(self):
+        for fail_upload in (False, True):
+            with self.subTest(fail_upload=fail_upload), tempfile.TemporaryDirectory() as directory:
+                previous = Path.cwd()
+                os.chdir(directory)
+                try:
+                    Path('packaging').mkdir()
+                    Path('packaging/version.txt').write_text('0.2.0\n')
+                    package = Path('fixture.deb')
+                    package.write_bytes(b'fixture')
+                    calls = []
+
+                    def fake_gh(*args):
+                        calls.append(args)
+                        if args[:2] == ('release', 'upload') and fail_upload:
+                            raise RuntimeError('simulated upload failure')
+                        return '[]' if args[0] == 'api' else ''
+
+                    environment = dict(RELEASE_VERSION='0.2.0', GITHUB_REPOSITORY='test/test',
+                                       GITHUB_SHA='a' * 40, GITHUB_RUN_ID='1')
+                    with patch.object(publish, 'gh', fake_gh), \
+                         patch.object(publish, 'collect_packages', return_value={'fixture': package}), \
+                         patch.dict(os.environ, environment), patch('sys.argv', ['publish', '.']):
+                        if fail_upload:
+                            with self.assertRaises(RuntimeError):
+                                publish.main()
+                        else:
+                            publish.main()
+                    edited = any(call[:2] == ('release', 'edit') for call in calls)
+                    self.assertEqual(edited, not fail_upload)
+                    manifest = json.loads(Path('release-assets/build-manifest.json').read_text())
+                    self.assertEqual(manifest['source_commit'], 'a' * 40)
+                    self.assertEqual(manifest['packages'][0]['bytes'], len(b'fixture'))
+                finally:
+                    os.chdir(previous)
 
     def test_complete_package_set(self):
         names = ['penguin-studio_0.2.0-6+ubuntu24.04_amd64.deb',

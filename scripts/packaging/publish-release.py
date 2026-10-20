@@ -49,7 +49,8 @@ def main():
     assets = []
     for target, path in selected.items():
         shutil.copyfile(path, output / path.name)
-        digest = hashlib.file_digest(path.open('rb'), 'sha256').hexdigest()
+        with path.open('rb') as stream:
+            digest = hashlib.file_digest(stream, 'sha256').hexdigest()
         assets.append(dict(target=target, file=path.name, sha256=digest, bytes=path.stat().st_size))
     (output / 'SHA256SUMS').write_text(''.join(f"{a['sha256']}  {a['file']}\n" for a in assets))
     manifest = dict(version=version, source_commit=sha,
