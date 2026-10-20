@@ -2,6 +2,53 @@
 
 This is a development preview based on OBS Studio 32.2.2. The new Penguin code must not be described as fully production-tested until the checks below have real recorded results.
 
+## Startup diagnostics — 2026-10-20
+
+Installed Ubuntu package `0.2.0-6+ubuntu26.04`, built from
+`6ea4a2994fff010d3cdef93a6007a9435023b674`, was tested on GNOME Wayland,
+Qt 6.10.2 and an AMD Radeon RX 9070 XT. All **eleven runs** exited with code 0,
+zero startup errors, zero shutdown warnings/errors, zero late frontend callback
+removals, no remaining crash sentinels, and zero reported OBS memory leaks.
+
+The nine regular scenarios cover normal exit, multiple instances, initial setup,
+connection-wizard cancellation and focused input, auto-configuration cancellation,
+Statistics, reopening the same profile, and SIGTERM. Two additional runs verify
+legacy scene migration with the collection name preserved, and German application
+text under `de_CH.UTF-8`. The initial migration fixture had stale absolute paths
+to an older isolated test profile; correcting those paths resolved its assertion.
+No personal profile or streaming account was used.
+
+**Startup is not warning-free:** nine runs each retained one non-null Qt Wayland
+text-input focus warning (QTBUG-141475). Reopening the profile and the migrated
+legacy profile had none. The report therefore explicitly records
+`startup_clean: false` and `shutdown_clean: true`. No additional warning filter or
+input-method override was shipped. NVIDIA and DeckLink hardware were unavailable
+on this host, so their hardware paths remain unverified.
+
+Evidence: [installed startup and shutdown report](validation/ubuntu-26.04-startup.json)
+and [successful native build](https://github.com/SigmaCodez/PenguinStudio/actions/runs/39333338354).
+
+The startup audit of the installed Ubuntu 26.04 revision 5 package found a
+nonexistent legacy scene file being migrated on fresh profiles, missing DeckLink
+UI locale resources, and optional Linux runtimes being reported as load errors.
+Revision 6 checks that the legacy file exists, includes the small DeckLink UI
+catalogues (English fallback where untranslated), and distinguishes an absent
+optional runtime from an installed but broken library. NVENC unload now checks
+whether its encoder resources were initialized. An unavailable v4l2loopback
+capability is informational; camera runtime failures retain their severity.
+Application identity is assigned before icon and portal-related initialization.
+
+`test-optional-library.sh` exercises absence, successful loading, invalid ELF and
+missing dependent libraries. The tests also cover German Germany and German Switzerland locales. Only absence
+of the exact requested SONAME becomes informational, using the localized ENOENT
+suffix rather than an English-only loader message. Other loader failures remain errors. The existing Qt diagnostic
+boundary remains unchanged: QTBUG-141475 affects real text-input focus handling,
+so its non-null mismatch warning must not be hidden as a shutdown false positive.
+
+The native shutdown report now includes every startup warning and error, plus a
+`startup_clean` flag. Passing shutdown checks alone does not prove a clean start.
+The installed results below retain this distinction; no warning-free startup claim is made.
+
 ## Qt Wayland teardown diagnostics — 2026-10-19
 
 Installed Ubuntu package `0.2.0-5+ubuntu26.04`, built from
@@ -226,26 +273,3 @@ editable portrait scenes and a Meld-identical editor are not implemented.
 - Inspect all source/license contents, package metadata and artifact checksums. Test on at least one AMD/Intel and one NVIDIA system before publishing compatibility claims.
 
 Account approval, streaming service availability, GPU drivers and compositor behavior cannot be certified by static checks. No live broadcast should be started by automated repository validation.
-
-## Startup diagnostics — revision 6 work
-
-The startup audit of the installed Ubuntu 26.04 revision 5 package found a
-nonexistent legacy scene file being migrated on fresh profiles, missing DeckLink
-UI locale resources, and optional Linux runtimes being reported as load errors.
-Revision 6 checks that the legacy file exists, includes the small DeckLink UI
-catalogues (English fallback where untranslated), and distinguishes an absent
-optional runtime from an installed but broken library. NVENC unload now checks
-whether its encoder resources were initialized. An unavailable v4l2loopback
-capability is informational; camera runtime failures retain their severity.
-Application identity is assigned before icon and portal-related initialization.
-
-`test-optional-library.sh` exercises absence, successful loading, invalid ELF and
-missing dependent libraries. The tests also cover German Germany and German Switzerland locales. Only absence
-of the exact requested SONAME becomes informational, using the localized ENOENT
-suffix rather than an English-only loader message. Other loader failures remain errors. The existing Qt diagnostic
-boundary remains unchanged: QTBUG-141475 affects real text-input focus handling,
-so its non-null mismatch warning must not be hidden as a shutdown false positive.
-
-The native shutdown report now includes every startup warning and error, plus a
-`startup_clean` flag. Passing shutdown checks alone does not prove a clean start.
-Installed revision 6 results are pending; no warning-free startup claim is made.

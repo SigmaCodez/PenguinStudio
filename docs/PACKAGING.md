@@ -33,14 +33,14 @@ PackageKit reports `dependencyResolutionFailed`. Waiting or retrying that DEB
 will not resolve the incompatibility.
 
 New native builds include the distribution release in the Debian revision,
-for example `penguin-studio_0.2.0-5+ubuntu26.04_amd64.deb`. Ubuntu 26.04.1 uses
+for example `penguin-studio_0.2.0-6+ubuntu26.04_amd64.deb`. Ubuntu 26.04.1 uses
 the Ubuntu 26.04 package. Do not mix 24.04 repositories into 26.04, remove
 package dependencies, or create compatibility library symlinks to force an
 older binary to load.
 
-The corrected [Ubuntu 26.04 DEB artifact](https://github.com/SigmaCodez/PenguinStudio/actions/runs/39327708709/artifacts/12224181186)
-was built from `ff9f3334b7d97b71c02bc03b3a0bded4113e5a5c`. The
-[verification run](https://github.com/SigmaCodez/PenguinStudio/actions/runs/39327708709)
+The corrected [Ubuntu 26.04 DEB artifact](https://github.com/SigmaCodez/PenguinStudio/actions/runs/39333338354/artifacts/12225468993)
+was built from `6ea4a2994fff010d3cdef93a6007a9435023b674`. The
+[verification run](https://github.com/SigmaCodez/PenguinStudio/actions/runs/39333338354)
 passed compilation, output-safety/platform-flow/wizard tests, package installation
 and `penguin-studio --version` on Ubuntu 26.04. The downloaded archive and DEB
 checksums were verified, and APT dependency resolution passed on Ubuntu 26.04.1
@@ -50,17 +50,18 @@ Revision 3 additionally fixes crash-sentinel and frontend callback cleanup; all 
 installed Wayland shutdown cases pass in [the shutdown report](validation/ubuntu-26.04-shutdown.json).
 Revision 4 adds the modern workspace, responsive dialogs and their installed Wayland GUI, recording and shutdown checks in [the redesign report](validation/workspace-modern.json).
 Revision 5 corrects the severity of two known Qt 6.10.2 Wayland teardown diagnostics and passes all nine installed shutdown scenarios without shutdown warnings or errors; see [the focused report](validation/ubuntu-26.04-qt-focus.json).
+Revision 6 fixes fresh-profile migration, DeckLink UI locale resources, optional-runtime diagnostics (including German system locales), and early portal registration. The remaining non-null Qt 6.10.2 focus warning is still open; see [the startup report](validation/ubuntu-26.04-startup.json).
 These checks do not replace live streaming or hardware-specific validation.
 
-The local package is `dist/penguin-studio_0.2.0-5+ubuntu26.04_amd64.deb`.
-Its SHA-256 is `affbdac4c3bf83bfcf90d8500e04ad61cb6b6e4690019fe80bef592102cd407c`.
+The local package is `dist/penguin-studio_0.2.0-6+ubuntu26.04_amd64.deb`.
+Its SHA-256 is `bb95491596cdc0bf27bc85edbe0e4aa230bd7df1dc7e1e01bc26970b29bfbdd3`.
 
 After downloading the matching DEB, the repository's installer checks the
 release, architecture and APT dependency resolution before installation:
 
 ```sh
-bash scripts/packaging/install-deb.sh --check /path/to/penguin-studio_0.2.0-5+ubuntu26.04_amd64.deb
-bash scripts/packaging/install-deb.sh /path/to/penguin-studio_0.2.0-5+ubuntu26.04_amd64.deb
+bash scripts/packaging/install-deb.sh --check /path/to/penguin-studio_0.2.0-6+ubuntu26.04_amd64.deb
+bash scripts/packaging/install-deb.sh /path/to/penguin-studio_0.2.0-6+ubuntu26.04_amd64.deb
 ```
 
 The first command makes no system changes. The second uses the normal Ubuntu
@@ -166,7 +167,7 @@ supported target distribution:
 
 ```sh
 # Ubuntu 26.04 / 26.04.1, after downloading the matching build:
-sudo apt install --no-remove ./penguin-studio_0.2.0-5+ubuntu26.04_amd64.deb
+sudo apt install --no-remove ./penguin-studio_0.2.0-6+ubuntu26.04_amd64.deb
 # Use a package built for your Ubuntu release.
 # Fedora 44:
 sudo dnf install ./penguin-studio-0.2.0-1.x86_64.rpm

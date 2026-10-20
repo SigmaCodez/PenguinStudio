@@ -1,0 +1,423 @@
+{
+  "source_commit": "6ea4a2994fff010d3cdef93a6007a9435023b674",
+  "run_id": 39333338354,
+  "run_url": "https://github.com/SigmaCodez/PenguinStudio/actions/runs/39333338354",
+  "artifact_id": 12225468993,
+  "archive_sha256": "d73bbf767bf1b457854e395842bbbd584e9f936c2c73ab50d5faf44b1e825976",
+  "package": "penguin-studio_0.2.0-6+ubuntu26.04_amd64.deb",
+  "package_sha256": "bb95491596cdc0bf27bc85edbe0e4aa230bd7df1dc7e1e01bc26970b29bfbdd3",
+  "package_version": "0.2.0-6+ubuntu26.04",
+  "dependencies": "qt6-wayland, libasound2t64 (>= 1.0.17), libatk-bridge2.0-0t64 (>= 2.5.3), libatk1.0-0t64 (>= 2.2.0), libatspi2.0-0t64 (>= 2.9.90), libavcodec62 (>= 7:8.0.1), libavdevice62 (>= 7:8.0.1), libavformat62 (>= 7:8.0.1), libavutil60 (>= 7:8.0.1), libc6 (>= 2.43), libcups2t64 (>= 1.7.0), libcurl4t64 (>= 7.16.2), libdbus-1-3 (>= 1.10), libdrm2 (>= 2.4.99), libegl1, libexpat1 (>= 2.1~beta3), libfontconfig1 (>= 2.12.6), libfreetype6 (>= 2.2.1), libgbm1 (>= 17.1.0~rc2), libgcc-s1 (>= 3.0), libglib2.0-0t64 (>= 2.40.0), libglx0, libjansson4 (>= 2.14), libluajit-5.1-2 (>= 2.0.4) | libluajit-5.1-2 (>= 2.1.0+openresty), libmbedcrypto16 (>= 3.6.0), libmbedtls21 (>= 3.6.0), libmbedx509-7 (>= 3.6.0), libnspr4 (>= 2:4.9-2~), libnss3 (>= 2:3.31), libopengl0, libpci3 (>= 1:3.13.0), libpipewire-0.3-0t64 (>= 0.3.6), libpulse0 (>= 0.99.1), libpython3.14 (>= 3.14.1), libqrcodegencpp1 (>= 1.2.1), libqt6core6t64 (>= 6.10.2), libqt6dbus6 (>= 6.3.0), libqt6gui6 (>= 6.9.1), libqt6network6 (>= 6.7.2), libqt6svg6 (>= 6.6.0), libqt6widgets6 (>= 6.10.2), libqt6xml6 (>= 6.6.0), librist4 (>= 0.2.6+dfsg), libspeexdsp1 (>= 1.2.1), libsrt1.5-openssl (>= 1.5.4), libstdc++6 (>= 14), libswresample6 (>= 7:8.0.1), libswscale9 (>= 7:8.0.1), libudev1 (>= 183), libuuid1 (>= 2.16), libv4l-0t64 (>= 0.5.0), libva-drm2 (>= 1.1.0), libva2 (>= 2.2.0), libvpl2 (>= 1:2.16.0), libwayland-client0 (>= 1.20.0), libwayland-egl1 (>= 1.15.0), libx11-6 (>= 2:1.4.99.1), libx11-xcb1, libx264-165 (>= 2:0.165.3222+gitb35605ac), libxcb-composite0, libxcb-randr0 (>= 1.12), libxcb-shm0, libxcb-xfixes0, libxcb-xinerama0, libxcb1 (>= 1.9.2), libxcomposite1 (>= 1:0.4.6), libxdamage1 (>= 1:1.1), libxext6, libxfixes3, libxkbcommon0 (>= 0.5.0), libxrandr2, zlib1g (>= 1:1.1.4)",
+  "package_size_bytes": 135626830,
+  "archive_digest_verified": true,
+  "package_digest_verified": true,
+  "ci_installation_and_cli_start": "passed",
+  "installed_version": "0.2.0-6+ubuntu26.04",
+  "environment": {
+    "os": "Ubuntu 26.04.1",
+    "session": "GNOME Wayland",
+    "qt": "6.10.2",
+    "gpu": "AMD Radeon RX 9070 XT"
+  },
+  "scenarios": {
+    "normal": {
+      "apiInitialized": true,
+      "apiDestroyed": true,
+      "unregisterCalls": 4,
+      "lateUnregisterCalls": 0,
+      "closeRequested": true,
+      "sentinelObserved": true,
+      "wizardVisibleAtClose": false,
+      "statsOpened": false,
+      "connectionWizardOpened": false,
+      "autoConfigOpened": false,
+      "wizardInputFocused": false,
+      "wizardInputFocusedAtClose": false,
+      "wizardCancelRequested": false,
+      "wizardClosedBeforeShutdown": false,
+      "startup_warnings": [
+        "warning: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Try to disable surface 0x62b9aaf52be0 with focusing surface 0x62b9ab1f6980"
+      ],
+      "startup_errors": [],
+      "startup_clean": false,
+      "platform": "wayland",
+      "exit_code": 0,
+      "shutdown_errors": [],
+      "shutdown_warnings": [],
+      "qt_focus_warnings": [
+        "warning: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Try to disable surface 0x62b9aaf52be0 with focusing surface 0x62b9ab1f6980"
+      ],
+      "qt_teardown_focus_warnings": [],
+      "startup_qt_focus_warnings": [
+        "warning: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Try to disable surface 0x62b9aaf52be0 with focusing surface 0x62b9ab1f6980"
+      ],
+      "qt_teardown_focus_debug_messages": [],
+      "sentinel_files_after_exit": 0,
+      "obs_memory_leaks": 0
+    },
+    "multi": {
+      "apiInitialized": true,
+      "apiDestroyed": true,
+      "unregisterCalls": 4,
+      "lateUnregisterCalls": 0,
+      "closeRequested": true,
+      "sentinelObserved": false,
+      "wizardVisibleAtClose": false,
+      "statsOpened": false,
+      "connectionWizardOpened": false,
+      "autoConfigOpened": false,
+      "wizardInputFocused": false,
+      "wizardInputFocusedAtClose": false,
+      "wizardCancelRequested": false,
+      "wizardClosedBeforeShutdown": false,
+      "startup_warnings": [
+        "warning: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Try to disable surface 0x5bf5aa90bf90 with focusing surface 0x5bf5aa0e6920"
+      ],
+      "startup_errors": [],
+      "startup_clean": false,
+      "platform": "wayland",
+      "exit_code": 0,
+      "shutdown_errors": [],
+      "shutdown_warnings": [],
+      "qt_focus_warnings": [
+        "warning: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Try to disable surface 0x5bf5aa90bf90 with focusing surface 0x5bf5aa0e6920"
+      ],
+      "qt_teardown_focus_warnings": [],
+      "startup_qt_focus_warnings": [
+        "warning: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Try to disable surface 0x5bf5aa90bf90 with focusing surface 0x5bf5aa0e6920"
+      ],
+      "qt_teardown_focus_debug_messages": [],
+      "sentinel_files_after_exit": 0,
+      "obs_memory_leaks": 0
+    },
+    "wizard": {
+      "apiInitialized": true,
+      "apiDestroyed": true,
+      "unregisterCalls": 4,
+      "lateUnregisterCalls": 0,
+      "closeRequested": true,
+      "sentinelObserved": false,
+      "wizardVisibleAtClose": true,
+      "statsOpened": false,
+      "connectionWizardOpened": false,
+      "autoConfigOpened": false,
+      "wizardInputFocused": false,
+      "wizardInputFocusedAtClose": false,
+      "wizardCancelRequested": false,
+      "wizardClosedBeforeShutdown": false,
+      "startup_warnings": [
+        "warning: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Try to disable surface 0x644e486697f0 with focusing surface 0x644e47e298a0"
+      ],
+      "startup_errors": [],
+      "startup_clean": false,
+      "platform": "wayland",
+      "exit_code": 0,
+      "shutdown_errors": [],
+      "shutdown_warnings": [],
+      "qt_focus_warnings": [
+        "warning: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Try to disable surface 0x644e486697f0 with focusing surface 0x644e47e298a0"
+      ],
+      "qt_teardown_focus_warnings": [],
+      "startup_qt_focus_warnings": [
+        "warning: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Try to disable surface 0x644e486697f0 with focusing surface 0x644e47e298a0"
+      ],
+      "qt_teardown_focus_debug_messages": [
+        "debug: virtual void QtWaylandClient::QWaylandTextInputv3::zwp_text_input_v3_leave(wl_surface*) Got leave event for surface 0x0 with focusing surface 0x644e486697f0",
+        "debug: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Try to disable surface 0x0 with focusing surface 0x644e486697f0"
+      ],
+      "sentinel_files_after_exit": 0,
+      "obs_memory_leaks": 0
+    },
+    "wizard-cancel": {
+      "apiInitialized": true,
+      "apiDestroyed": true,
+      "unregisterCalls": 4,
+      "lateUnregisterCalls": 0,
+      "closeRequested": true,
+      "sentinelObserved": true,
+      "wizardVisibleAtClose": false,
+      "statsOpened": false,
+      "connectionWizardOpened": true,
+      "autoConfigOpened": false,
+      "wizardInputFocused": true,
+      "wizardInputFocusedAtClose": false,
+      "wizardCancelRequested": true,
+      "wizardClosedBeforeShutdown": true,
+      "startup_warnings": [
+        "warning: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Try to disable surface 0x5c656678f760 with focusing surface 0x5c65663323a0"
+      ],
+      "startup_errors": [],
+      "startup_clean": false,
+      "platform": "wayland",
+      "exit_code": 0,
+      "shutdown_errors": [],
+      "shutdown_warnings": [],
+      "qt_focus_warnings": [
+        "warning: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Try to disable surface 0x5c656678f760 with focusing surface 0x5c65663323a0"
+      ],
+      "qt_teardown_focus_warnings": [],
+      "startup_qt_focus_warnings": [
+        "warning: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Try to disable surface 0x5c656678f760 with focusing surface 0x5c65663323a0"
+      ],
+      "qt_teardown_focus_debug_messages": [],
+      "sentinel_files_after_exit": 0,
+      "obs_memory_leaks": 0
+    },
+    "wizard-input": {
+      "apiInitialized": true,
+      "apiDestroyed": true,
+      "unregisterCalls": 4,
+      "lateUnregisterCalls": 0,
+      "closeRequested": true,
+      "sentinelObserved": true,
+      "wizardVisibleAtClose": true,
+      "statsOpened": false,
+      "connectionWizardOpened": true,
+      "autoConfigOpened": false,
+      "wizardInputFocused": true,
+      "wizardInputFocusedAtClose": true,
+      "wizardCancelRequested": false,
+      "wizardClosedBeforeShutdown": false,
+      "startup_warnings": [
+        "warning: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Try to disable surface 0x5a2b5b3ebb10 with focusing surface 0x5a2b5f6263b0"
+      ],
+      "startup_errors": [],
+      "startup_clean": false,
+      "platform": "wayland",
+      "exit_code": 0,
+      "shutdown_errors": [],
+      "shutdown_warnings": [],
+      "qt_focus_warnings": [
+        "warning: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Try to disable surface 0x5a2b5b3ebb10 with focusing surface 0x5a2b5f6263b0"
+      ],
+      "qt_teardown_focus_warnings": [],
+      "startup_qt_focus_warnings": [
+        "warning: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Try to disable surface 0x5a2b5b3ebb10 with focusing surface 0x5a2b5f6263b0"
+      ],
+      "qt_teardown_focus_debug_messages": [
+        "debug: virtual void QtWaylandClient::QWaylandTextInputv3::zwp_text_input_v3_leave(wl_surface*) Got leave event for surface 0x0 with focusing surface 0x5a2b5b3ebb10",
+        "debug: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Try to disable surface 0x0 with focusing surface 0x5a2b5b3ebb10"
+      ],
+      "sentinel_files_after_exit": 0,
+      "obs_memory_leaks": 0
+    },
+    "auto-config": {
+      "apiInitialized": true,
+      "apiDestroyed": true,
+      "unregisterCalls": 4,
+      "lateUnregisterCalls": 0,
+      "closeRequested": true,
+      "sentinelObserved": true,
+      "wizardVisibleAtClose": false,
+      "statsOpened": false,
+      "connectionWizardOpened": false,
+      "autoConfigOpened": true,
+      "wizardInputFocused": false,
+      "wizardInputFocusedAtClose": false,
+      "wizardCancelRequested": true,
+      "wizardClosedBeforeShutdown": true,
+      "startup_warnings": [
+        "warning: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Try to disable surface 0x5c4a13120920 with focusing surface 0x5c4a129c4100"
+      ],
+      "startup_errors": [],
+      "startup_clean": false,
+      "platform": "wayland",
+      "exit_code": 0,
+      "shutdown_errors": [],
+      "shutdown_warnings": [],
+      "qt_focus_warnings": [
+        "warning: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Try to disable surface 0x5c4a13120920 with focusing surface 0x5c4a129c4100"
+      ],
+      "qt_teardown_focus_warnings": [],
+      "startup_qt_focus_warnings": [
+        "warning: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Try to disable surface 0x5c4a13120920 with focusing surface 0x5c4a129c4100"
+      ],
+      "qt_teardown_focus_debug_messages": [],
+      "sentinel_files_after_exit": 0,
+      "obs_memory_leaks": 0
+    },
+    "stats": {
+      "apiInitialized": true,
+      "apiDestroyed": true,
+      "unregisterCalls": 5,
+      "lateUnregisterCalls": 0,
+      "closeRequested": true,
+      "sentinelObserved": true,
+      "wizardVisibleAtClose": false,
+      "statsOpened": true,
+      "connectionWizardOpened": false,
+      "autoConfigOpened": false,
+      "wizardInputFocused": false,
+      "wizardInputFocusedAtClose": false,
+      "wizardCancelRequested": false,
+      "wizardClosedBeforeShutdown": false,
+      "startup_warnings": [
+        "warning: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Try to disable surface 0x6052ffbeeb80 with focusing surface 0x6052ff3cd850"
+      ],
+      "startup_errors": [],
+      "startup_clean": false,
+      "platform": "wayland",
+      "exit_code": 0,
+      "shutdown_errors": [],
+      "shutdown_warnings": [],
+      "qt_focus_warnings": [
+        "warning: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Try to disable surface 0x6052ffbeeb80 with focusing surface 0x6052ff3cd850"
+      ],
+      "qt_teardown_focus_warnings": [],
+      "startup_qt_focus_warnings": [
+        "warning: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Try to disable surface 0x6052ffbeeb80 with focusing surface 0x6052ff3cd850"
+      ],
+      "qt_teardown_focus_debug_messages": [],
+      "sentinel_files_after_exit": 0,
+      "obs_memory_leaks": 0
+    },
+    "restart": {
+      "apiInitialized": true,
+      "apiDestroyed": true,
+      "unregisterCalls": 4,
+      "lateUnregisterCalls": 0,
+      "closeRequested": true,
+      "sentinelObserved": true,
+      "wizardVisibleAtClose": false,
+      "statsOpened": false,
+      "connectionWizardOpened": false,
+      "autoConfigOpened": false,
+      "wizardInputFocused": false,
+      "wizardInputFocusedAtClose": false,
+      "wizardCancelRequested": false,
+      "wizardClosedBeforeShutdown": false,
+      "startup_warnings": [],
+      "startup_errors": [],
+      "startup_clean": true,
+      "platform": "wayland",
+      "exit_code": 0,
+      "shutdown_errors": [],
+      "shutdown_warnings": [],
+      "qt_focus_warnings": [],
+      "qt_teardown_focus_warnings": [],
+      "startup_qt_focus_warnings": [],
+      "qt_teardown_focus_debug_messages": [],
+      "sentinel_files_after_exit": 0,
+      "obs_memory_leaks": 0
+    },
+    "signal": {
+      "apiInitialized": true,
+      "apiDestroyed": true,
+      "unregisterCalls": 4,
+      "lateUnregisterCalls": 0,
+      "closeRequested": true,
+      "sentinelObserved": true,
+      "wizardVisibleAtClose": false,
+      "statsOpened": false,
+      "connectionWizardOpened": false,
+      "autoConfigOpened": false,
+      "wizardInputFocused": false,
+      "wizardInputFocusedAtClose": false,
+      "wizardCancelRequested": false,
+      "wizardClosedBeforeShutdown": false,
+      "startup_warnings": [
+        "warning: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Try to disable surface 0x6341766f14e0 with focusing surface 0x63417aa0f2a0"
+      ],
+      "startup_errors": [],
+      "startup_clean": false,
+      "platform": "wayland",
+      "exit_code": 0,
+      "shutdown_errors": [],
+      "shutdown_warnings": [],
+      "qt_focus_warnings": [
+        "warning: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Try to disable surface 0x6341766f14e0 with focusing surface 0x63417aa0f2a0"
+      ],
+      "qt_teardown_focus_warnings": [],
+      "startup_qt_focus_warnings": [
+        "warning: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Try to disable surface 0x6341766f14e0 with focusing surface 0x63417aa0f2a0"
+      ],
+      "qt_teardown_focus_debug_messages": [],
+      "sentinel_files_after_exit": 0,
+      "obs_memory_leaks": 0
+    }
+  },
+  "startup_clean": false,
+  "shutdown_clean": true,
+  "remaining_startup_warning_count": 9,
+  "optional_runtime_tests": {
+    "locales": [
+      "C",
+      "de_DE.UTF-8",
+      "de_CH.UTF-8"
+    ],
+    "cases": [
+      "absent library",
+      "valid library",
+      "invalid ELF",
+      "missing dependency"
+    ],
+    "passed": true
+  },
+  "limitations": [
+    "NVIDIA and DeckLink hardware paths were not available on this AMD host.",
+    "Non-null Qt 6.10.2 focus mismatches retain warning severity; QTBUG-141475 is not patched in the system runtime."
+  ],
+  "additional_scenarios": {
+    "legacy": {
+      "apiInitialized": true,
+      "apiDestroyed": true,
+      "unregisterCalls": 4,
+      "lateUnregisterCalls": 0,
+      "closeRequested": true,
+      "sentinelObserved": true,
+      "wizardVisibleAtClose": false,
+      "statsOpened": false,
+      "connectionWizardOpened": false,
+      "autoConfigOpened": false,
+      "wizardInputFocused": false,
+      "wizardInputFocusedAtClose": false,
+      "wizardCancelRequested": false,
+      "wizardClosedBeforeShutdown": false,
+      "platform": "wayland",
+      "exit_code": 0,
+      "startup_warnings": [],
+      "startup_clean": true,
+      "shutdown_clean": true,
+      "legacy_source_migrated": true,
+      "collection_name_preserved": true,
+      "startup_errors": [],
+      "shutdown_errors": [],
+      "shutdown_warnings": [],
+      "obs_memory_leaks": 0,
+      "sentinel_files_after_exit": 0
+    },
+    "german": {
+      "apiInitialized": true,
+      "apiDestroyed": true,
+      "unregisterCalls": 4,
+      "lateUnregisterCalls": 0,
+      "closeRequested": true,
+      "sentinelObserved": true,
+      "wizardVisibleAtClose": false,
+      "statsOpened": false,
+      "connectionWizardOpened": false,
+      "autoConfigOpened": false,
+      "wizardInputFocused": false,
+      "wizardInputFocusedAtClose": false,
+      "wizardCancelRequested": false,
+      "wizardClosedBeforeShutdown": false,
+      "platform": "wayland",
+      "exit_code": 0,
+      "startup_warnings": [
+        "warning: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Try to disable surface 0x607c3dd791a0 with focusing surface 0x607c3d5e70c0"
+      ],
+      "startup_clean": false,
+      "shutdown_clean": true,
+      "system_locale": "de_CH.UTF-8",
+      "application_locale": "de-DE",
+      "startup_errors": [],
+      "shutdown_errors": [],
+      "shutdown_warnings": [],
+      "obs_memory_leaks": 0,
+      "sentinel_files_after_exit": 0
+    }
+  },
+  "test_notes": [
+    "The first legacy fixture retained absolute paths to a previous isolated test profile; its migration assertion failed. The fixture paths were corrected and the test repeated successfully. No personal profile was used."
+  ]
+}
