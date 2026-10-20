@@ -4,7 +4,7 @@
 
 **Your studio, every screen.** An independent Linux broadcasting application by SigmaCodez, built on OBS Studio.
 
-Penguin Studio brings a redesigned production workspace, native multi-destination output controls, portrait output and platform connections to the OBS production engine. It is based on **OBS Studio 32.2.2**, commit `ba2f32bdf791005443988a4955e963663e16b1ed`.
+Penguin Studio brings a redesigned production workspace, native multi-destination output controls, portrait output and platform connections to the OBS production engine. See the [architecture documentation](docs/ARCHITECTURE.md) for the engine baseline and technical details.
 
 ![Penguin Studio modern workspace with searchable layers and scenes, audio channel strips and an integrated inspector](docs/validation/workspace-modern-en.png)
 
@@ -30,10 +30,9 @@ The workspace takes inspiration from modern broadcasting tools such as Meld Stud
 **[Download Linux packages](https://github.com/SigmaCodez/PenguinStudio/releases)** — Ubuntu DEB, Fedora RPM, Flatpak and Snap, with SHA-256 checksums.
 
 **Ubuntu 26.04 / 26.04.1:** use a DEB built specifically for Ubuntu 26.04 or the
-Flatpak bundle. The original unlabelled 0.2.0 DEB targets Ubuntu 24.04 and cannot
-be installed on 26.04. See [installation and troubleshooting](docs/PACKAGING.md#ubuntu-2604--26041-installation).
+Flatpak bundle. Choose the package matching your distribution release. See [installation and troubleshooting](docs/PACKAGING.md#ubuntu-2604--26041-installation).
 
-1. Build or install a verified Penguin Studio package following [PACKAGING.md](docs/PACKAGING.md).
+1. Install the Penguin Studio package for your system following the [installation guide](docs/PACKAGING.md).
 2. Launch `penguin-studio`. Finish the OBS hardware configuration assistant and Penguin's destination assistant.
 3. Choose a platform, copy its RTMP(S) server and stream key from its creator dashboard, and choose landscape or portrait output.
 4. Use **Destinations** to add further destinations. **Go live** starts all configured Penguin destinations; **End stream** stops them. The live button's menu also exposes OBS's separate primary stream action.
@@ -41,6 +40,12 @@ be installed on 26.04. See [installation and troubleshooting](docs/PACKAGING.md#
 6. Make a private test stream before a public broadcast. Check picture framing, sound, reconnects, CPU/GPU load, dropped frames and total upload bandwidth.
 
 In the new **Broadcast destinations** and **Stream details** docks, stream keys, OAuth access/refresh tokens and client secrets remain in memory for the current session. They must be entered again after restart. Destination names, nonsecret server URLs, encoder choices and public application IDs are saved locally. Never put a stream key into a saved server URL. The inherited OBS **Settings → Stream** workflow has separate storage behavior and can persist stream credentials in the local profile.
+
+## Penguin Studio updates
+
+New Penguin Studio versions are published on our [GitHub Releases page](https://github.com/SigmaCodez/PenguinStudio/releases), with release notes, Linux packages and SHA-256 checksums. To update, close Penguin Studio and install the newer package for the same distribution release and package format. See the [package guide](docs/PACKAGING.md) for format-specific instructions. Direct downloads do not require a source checkout.
+
+Penguin Studio has its own version numbers and release schedule. Our GitHub Actions workflow builds and publishes the Linux packages when a new project version is released. These downloads are development previews; check the release notes and [verification status](docs/VERIFICATION.md) before updating a production setup.
 
 ## Scope and current limits
 
@@ -52,27 +57,9 @@ In the new **Broadcast destinations** and **Stream details** docks, stream keys,
 - Flatpak is the primary cross-distribution target. Native DEB/RPM builds target the distribution used to build them. Retained libobs paths mean native packages conflict with an existing native OBS installation.
 - All existing OBS languages remain selectable. New Penguin dialogs have their own translations and English fallback; see [localization](docs/LOCALIZATION.md).
 
-## Development
+## Contributing
 
-Penguin Studio is maintained in its own standalone GitHub repository on the `main` branch. Its history starts from an independent source snapshot; OBS source, author attribution and license notices are retained. See [source provenance and history](docs/HISTORY.md). Keep the OBS C/C++ API names and plugin ABI intact when updating branding.
-
-The repository includes the OBS source and submodules. Clone with:
-
-```sh
-git clone --recurse-submodules --branch main https://github.com/SigmaCodez/PenguinStudio.git
-cd PenguinStudio
-```
-
-In a new checkout, add OBS as a separate source of future updates:
-
-```sh
-git remote add upstream https://github.com/obsproject/obs-studio.git
-git fetch --no-tags upstream
-```
-
-The new history has no shared merge base with OBS. Review upstream changes against the pinned baseline and import selected patches deliberately, preserving their attribution and licenses. Test those changes before integrating them into `main`.
-
-See [architecture](docs/ARCHITECTURE.md), [platform setup](docs/PLATFORMS.md), [release checks](docs/VERIFICATION.md) and [brand assets](docs/branding/README.md). Build on a filesystem supporting Unix permissions and symbolic links; staging outside an exFAT/NTFS checkout may be required.
+For source checkout, builds and maintenance, see the [developer guide](CONTRIBUTING.md).
 
 ## Attribution and license
 

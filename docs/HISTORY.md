@@ -32,8 +32,11 @@ revision and verification results.
 
 ## Future upstream changes
 
-Clone Penguin Studio recursively from `main`. Add OBS as a separate read-only
-source of updates when needed:
+This optional workflow is for maintainers importing OBS changes into Penguin
+Studio. It is not required to install or update Penguin Studio packages.
+
+Follow the [developer checkout instructions](../CONTRIBUTING.md#source-checkout-and-builds),
+then add OBS as a separate read-only source of updates when needed:
 
 ```sh
 git remote add upstream https://github.com/obsproject/obs-studio.git

@@ -4,6 +4,28 @@ Penguin Studio is an independent project maintained by SigmaCodez. Open changes
 against the `main` branch of this repository. Questions or changes specific
 to Penguin Studio belong here; the OBS Project does not support this application.
 
+## Source checkout and builds
+
+The repository includes the application source and pinned submodules. Clone the
+`main` branch recursively:
+
+```sh
+git clone --recurse-submodules --branch main https://github.com/SigmaCodez/PenguinStudio.git
+cd PenguinStudio
+```
+
+Follow the [build and package guide](docs/PACKAGING.md). Build on a filesystem
+supporting Unix permissions and symbolic links; staging outside an exFAT/NTFS
+checkout may be required. See [architecture](docs/ARCHITECTURE.md),
+[platform setup](docs/PLATFORMS.md), [release checks](docs/VERIFICATION.md) and
+[brand assets](docs/branding/README.md) for implementation details.
+
+Importing OBS changes is an optional maintainer task. The
+[upstream update instructions](docs/HISTORY.md#future-upstream-changes) explain
+how to add the source remote, review patches against the pinned baseline and
+preserve attribution. Users installing or updating Penguin Studio packages do
+not need an OBS remote or a source checkout.
+
 ## Before changing code
 
 - Use American English for code, comments, documentation and default UI text.
