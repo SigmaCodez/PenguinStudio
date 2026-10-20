@@ -100,7 +100,20 @@ int main(int argc, char **argv)
 		dock->Event(OBS_FRONTEND_EVENT_FINISHED_LOADING);
 		QElapsedTimer clock;
 		clock.start();
-		while (!dock->findChild<QWizard *>() && clock.elapsed() < 2000)
+		while (clock.elapsed() < 1200)
+			QCoreApplication::processEvents(QEventLoop::AllEvents, 10);
+		Require(!dock->findChild<QWizard *>(), "hidden window must not open the first-run assistant");
+		dock->setProperty("penguinStartupDialogPending", true);
+		dock->show();
+		dock->activateWindow();
+		clock.restart();
+		while (clock.elapsed() < 1200)
+			QCoreApplication::processEvents(QEventLoop::AllEvents, 10);
+		Require(dock->isActiveWindow(), "first-run test window did not become active");
+		Require(!dock->findChild<QWizard *>(), "pending startup dialog must defer the first-run assistant");
+		dock->setProperty("penguinStartupDialogPending", false);
+		clock.restart();
+		while (!dock->findChild<QWizard *>() && clock.elapsed() < 3000)
 			QCoreApplication::processEvents(QEventLoop::AllEvents, 10);
 		QPointer<QWizard> wizard = dock->findChild<QWizard *>();
 		Require(wizard && wizard->pageIds().size() == 2, "first-run assistant did not open");
