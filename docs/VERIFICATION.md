@@ -2,6 +2,27 @@
 
 This is a development preview based on OBS Studio 32.2.2. The new Penguin code must not be described as fully production-tested until the checks below have real recorded results.
 
+## Automated Linux release — 2026-10-20
+
+[Penguin Studio 0.2.0](https://github.com/SigmaCodez/PenguinStudio/releases/tag/penguin-v0.2.0)
+is published as a development prerelease with five packages: Ubuntu 24.04 and
+26.04 DEB, Fedora 44 RPM, Flatpak x86_64 and Snap core24 amd64. All package jobs
+and the publication job passed in [the release run](https://github.com/SigmaCodez/PenguinStudio/actions/runs/39394971754).
+Native packages passed their regression executables, installation and CLI checks;
+Snap passed installation and confined CLI startup; Flatpak passed build, export
+and bundle generation. This release run did not repeat GUI or live-stream tests.
+
+All seven uploaded assets (five packages, `SHA256SUMS`, `build-manifest.json`)
+were verified after publication. Package sizes and GitHub-computed SHA-256
+values match the manifest and checksum list. The two metadata files were also
+downloaded and hashed. See [release verification](validation/linux-release-0.2.0.json).
+
+The workflow was checked with actionlint. Release regression tests cover version
+changes, ordinary pushes, pull requests, matching/mismatched tags, restricted
+manual publication, version rollback, incomplete/duplicate/wrong-version/empty
+package sets, and upload failure leaving a release unpublished. Future version
+increases in `packaging/version.txt` on `main` automatically run the same pipeline.
+
 ## Startup diagnostics — 2026-10-20
 
 Installed Ubuntu package `0.2.0-6+ubuntu26.04`, built from

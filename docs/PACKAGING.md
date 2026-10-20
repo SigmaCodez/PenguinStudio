@@ -25,6 +25,13 @@ recipes deliberately target x86_64 only.
 
 ## Automatic versioned downloads
 
+**[Download Penguin Studio 0.2.0](https://github.com/SigmaCodez/PenguinStudio/releases/tag/penguin-v0.2.0)**
+(published 2026-10-20). All five package jobs and the release job passed in
+[run 39394971754](https://github.com/SigmaCodez/PenguinStudio/actions/runs/39394971754),
+built from `3a229e46eac6b48a50b829e676d361107d9671df`. The uploaded package sizes
+and GitHub SHA-256 digests match the downloaded build manifest and checksum file;
+see [release verification](validation/linux-release-0.2.0.json).
+
 [GitHub Releases](https://github.com/SigmaCodez/PenguinStudio/releases) provides
 permanent downloads of Ubuntu 24.04 and 26.04 DEBs, Fedora 44 RPM, Flatpak and
 Snap, plus `SHA256SUMS` and `build-manifest.json`. Releases are marked as
@@ -62,7 +69,7 @@ the Ubuntu 26.04 package. Do not mix 24.04 repositories into 26.04, remove
 package dependencies, or create compatibility library symlinks to force an
 older binary to load.
 
-The corrected [Ubuntu 26.04 DEB artifact](https://github.com/SigmaCodez/PenguinStudio/actions/runs/39333338354/artifacts/12225468993)
+The earlier locally verified [Ubuntu 26.04 DEB artifact](https://github.com/SigmaCodez/PenguinStudio/actions/runs/39333338354/artifacts/12225468993)
 was built from `6ea4a2994fff010d3cdef93a6007a9435023b674`. The
 [verification run](https://github.com/SigmaCodez/PenguinStudio/actions/runs/39333338354)
 passed compilation, output-safety/platform-flow/wizard tests, package installation
@@ -132,7 +139,7 @@ and [the baseline Flatpak manifest](validation/flatpak-build-manifest.json).
 
 ## Flatpak
 
-The current local development bundle is `dist/penguin-studio-0.2.0-x86_64.flatpak`
+The earlier local development bundle is `dist/penguin-studio-0.2.0-x86_64.flatpak`
 (142,757,376 bytes). Its SHA-256 is
 `bcfaa6fecf3f3e9e3b1135ccbbf1d8277989ddabff10994137bc3a1cc261c968`.
 It contains application source matching commit
