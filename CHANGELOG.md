@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.4.0 — 2026-10-20
 
 - Add searchable Twitch game/category suggestions and filterable YouTube video categories.
 - Restore Twitch and YouTube sign-ins from the system keyring after restart; disconnect removes the saved credentials without a plaintext fallback.
