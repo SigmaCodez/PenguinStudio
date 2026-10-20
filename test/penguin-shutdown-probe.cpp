@@ -30,6 +30,7 @@ bool sentinelObserved = false;
 bool statsOpened = false;
 bool connectionWizardOpened = false;
 bool autoConfigOpened = false;
+bool startupAutoConfigObserved = false;
 bool wizardInputFocused = false;
 bool wizardInputFocusedAtClose = false;
 bool wizardCancelRequested = false;
@@ -117,6 +118,7 @@ void Tick()
 			mainWindow = qobject_cast<QMainWindow *>(widget);
 		if (ticks < 12) {
 			if (auto *dialog = qobject_cast<QDialog *>(widget); dialog && dialog->isVisible()) {
+				startupAutoConfigObserved |= QByteArray(dialog->metaObject()->className()) == "AutoConfig";
 				if (!wizardMode || !qobject_cast<QWizard *>(dialog))
 					dialog->reject();
 			}
@@ -182,13 +184,14 @@ __attribute__((destructor)) void SaveReport()
 			"\"lateUnregisterCalls\":%d,\"closeRequested\":%s,\"sentinelObserved\":%s,"
 			"\"wizardVisibleAtClose\":%s,\"statsOpened\":%s,\"connectionWizardOpened\":%s,"
 			"\"autoConfigOpened\":%s,\"wizardInputFocused\":%s,\"wizardInputFocusedAtClose\":%s,"
-			"\"wizardCancelRequested\":%s,\"wizardClosedBeforeShutdown\":%s}\n",
+			"\"wizardCancelRequested\":%s,\"wizardClosedBeforeShutdown\":%s,\"startupAutoConfigObserved\":%s}\n",
 			apiInitialized ? "true" : "false", apiDestroyed ? "true" : "false", unregisterCalls,
 			lateUnregisterCalls, closeRequested ? "true" : "false", sentinelObserved ? "true" : "false",
 			wizardVisibleAtClose ? "true" : "false", statsOpened ? "true" : "false",
 			connectionWizardOpened ? "true" : "false", autoConfigOpened ? "true" : "false",
 			wizardInputFocused ? "true" : "false", wizardInputFocusedAtClose ? "true" : "false",
-			wizardCancelRequested ? "true" : "false", wizardClosedBeforeShutdown ? "true" : "false");
+			wizardCancelRequested ? "true" : "false", wizardClosedBeforeShutdown ? "true" : "false",
+			startupAutoConfigObserved ? "true" : "false");
 		std::fclose(file);
 	}
 }

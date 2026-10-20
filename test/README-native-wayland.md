@@ -198,3 +198,10 @@ complete multiline caption fits, its accessible name retains the original text,
 and enabling, toggling and restoring the checkbox still work. Inspect the separate
 `stream-delay-checkbox.png` capture for its full caption. These images are Qt widget
 renders, so independently rendered video previews must be verified with the workspace recording checks.
+
+As of 0.2.1, the native runner also rejects **all startup warnings and errors**
+and confirms the hardware wizard was visible on each fresh-profile run. Set
+`PENGUIN_EXECUTABLE` to test an extracted package's launcher; use its matching
+libraries and resources. The observer must be rebuilt from the same checkout.
+`penguin-startup-dialog.cpp` separately checks activation, one-shot dispatch and
+parent destruction with Qt's offscreen platform.

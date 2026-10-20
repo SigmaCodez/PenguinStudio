@@ -58,3 +58,21 @@ warning and passed wizard focus/cancellation checks, but introduced
 construction, reproduced in a minimal native Qt application. This workaround was
 not shipped. Both direct IBus and its portal path reproduced that warning. The
 application continues to honor the user's existing input-method settings.
+
+## Startup sequencing correction (0.2.1)
+
+The remaining startup warning was traced to the initial hardware wizard opening
+while Qt still processed main-window activation. The focus object belonged to
+the main window, but Wayland text-input v3 had already entered the wizard surface.
+`StartupDialog` now waits for the visible main widget, its active native window,
+and `QGuiApplication::focusWindow()` to agree before queueing the initial wizard.
+The callback runs once, is cancelled with its parent, and uses no fixed delay.
+The connection assistant also waits for pending hardware setup and main-window
+activation. The wizard remains enabled; no additional warning classification or
+input-method override is applied. Qt's upstream issue can still affect other
+applications or unrelated focus transitions.
+
+The offscreen regression checks activation, repeated activation, and parent
+destruction. Native validation additionally requires every startup warning and
+error to be absent and records that the first-run hardware wizard actually
+appeared. See `docs/VERIFICATION.md` for package-level evidence.

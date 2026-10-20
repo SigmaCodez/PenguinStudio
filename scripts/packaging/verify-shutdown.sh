@@ -5,6 +5,7 @@ if (( $# != 2 )); then
   echo "Usage: $0 SHUTDOWN_PROBE_SO NEW_RESULTS_DIRECTORY" >&2
   exit 2
 fi
+executable=${PENGUIN_EXECUTABLE:-penguin-studio}
 probe=$(realpath "$1")
 results=$(realpath -m "$2")
 if [[ -e "$results" ]]; then
@@ -31,7 +32,7 @@ for scenario in normal multi wizard wizard-cancel wizard-input auto-config stats
   env QT_QPA_PLATFORM=wayland XDG_CONFIG_HOME="$results/$profile/config" \
     XDG_CACHE_HOME="$results/$profile/cache" LD_PRELOAD="$probe" \
     PENGUIN_SHUTDOWN_MODE="$mode" PENGUIN_SHUTDOWN_REPORT="$results/$scenario/report.json" \
-    timeout --kill-after=5s 40s penguin-studio "${args[@]}" > "$results/$scenario/application.log" 2>&1
+    timeout --kill-after=5s 40s "$executable" "${args[@]}" > "$results/$scenario/application.log" 2>&1
   python3 - "$results" "$scenario" "$profile" <<'PY'
 from pathlib import Path
 import json
@@ -48,6 +49,7 @@ assert '[obs-websocket] [obs_module_load] Module loaded.' in log
 assert '[obs-websocket] [obs_module_unload] Finished shutting down.' in log
 assert report['unregisterCalls'] >= 4 and report['lateUnregisterCalls'] == 0, report
 assert report['sentinelObserved'] == (scenario not in ('multi', 'wizard')), report
+assert report['startupAutoConfigObserved'] == (scenario != 'restart'), report
 assert not list((root / profile / 'config/PenguinStudio/.sentinel').glob('run_*'))
 if scenario == 'wizard':
     assert report['wizardVisibleAtClose'], report
@@ -90,7 +92,9 @@ report.update(startup_warnings=startup_warnings, startup_errors=startup_errors,
               qt_teardown_focus_debug_messages=[line for line in focus_debug if re.search(null_surface, line)],
               sentinel_files_after_exit=0, obs_memory_leaks=0)
 (case / 'verified.json').write_text(json.dumps(report, indent=2) + '\n')
-print(f'STARTUP: {scenario}: {len(startup_warnings)} warnings, {len(startup_errors)} errors')
+assert not startup_errors, startup_errors
+assert not startup_warnings, startup_warnings
+print(f'STARTUP: {scenario}: no warnings or errors')
 print(f'PASS: {scenario}: zero late unregisters, zero shutdown warnings/errors, zero Qt teardown focus warnings, zero OBS memory leaks')
 PY
 done

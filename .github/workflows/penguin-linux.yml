@@ -71,6 +71,10 @@ jobs:
         run: |
           c++ -std=c++17 -Wall -Wextra -Werror -fPIC -I. test/penguin-qt-wayland-diagnostics.cpp $(pkg-config --cflags --libs Qt6Core) -o /tmp/penguin-qt-wayland-diagnostics-test
           /tmp/penguin-qt-wayland-diagnostics-test
+      - name: Compile and run startup activation checks
+        run: |
+          c++ -std=c++17 -Wall -Wextra -Werror -fPIC -I. test/penguin-startup-dialog.cpp $(pkg-config --cflags --libs Qt6Widgets) -o /tmp/penguin-startup-dialog-test
+          QT_QPA_PLATFORM=offscreen /tmp/penguin-startup-dialog-test
   flatpak:
     needs: [version, checks]
     name: Flatpak (x86_64)

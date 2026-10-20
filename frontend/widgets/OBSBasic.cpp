@@ -42,6 +42,7 @@
 #include <settings/OBSBasicSettings.hpp>
 #include <utility/QuickTransition.hpp>
 #include <utility/SceneRenameDelegate.hpp>
+#include <utility/StartupDialog.hpp>
 #if defined(_WIN32) || defined(WHATSNEW_ENABLED)
 #include <utility/WhatsNewInfoThread.hpp>
 #endif
@@ -1297,7 +1298,12 @@ void OBSBasic::OBSInit()
 	}
 
 	if (!first_run && !has_last_version && !Active()) {
-		QMetaObject::invokeMethod(this, "on_autoConfigure_triggered", Qt::QueuedConnection);
+		if (isWayland)
+			new StartupDialog(this, [this]() {
+				QMetaObject::invokeMethod(this, "on_autoConfigure_triggered", Qt::QueuedConnection);
+			});
+		else
+			QMetaObject::invokeMethod(this, "on_autoConfigure_triggered", Qt::QueuedConnection);
 	}
 
 #if (defined(_WIN32) || defined(__APPLE__)) && (OBS_RELEASE_CANDIDATE > 0 || OBS_BETA > 0)

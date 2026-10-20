@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.1 — 2026-10-20
+
+- Wait for confirmed native main-window focus before scheduling the first-run hardware wizard on Wayland, avoiding the Qt 6.10.2 text-input surface race at startup.
+- Keep the connection assistant behind pending hardware setup and avoid opening it over an inactive main window.
+- Add activation, one-shot and shutdown lifetime regression checks; native verification now requires warning-free startup and confirms the hardware wizard still appears.
+- Publish versioned Ubuntu DEB, Fedora RPM, Flatpak and Snap downloads with checksums and source provenance.
+
 ## 0.2.0 — 2026-10-19
 
 - Rebuilt the native workspace around scenes/layers, a central canvas, vertical audio channels and a right-hand source inspector.

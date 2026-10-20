@@ -681,8 +681,10 @@ class OutputDock final : public QWidget {
 	{
 		if (setupShown || shuttingDown)
 			return;
-		// OBS may first show its hardware auto-configuration wizard or a plugin warning.
-		if (QApplication::activeModalWidget()) {
+		// Wait for main-window activation and any pending hardware setup before
+		// opening another modal surface. Background/tray starts must not steal focus.
+		if (window()->property("penguinStartupDialogPending").toBool() || !window()->isActiveWindow() ||
+		    QApplication::activeModalWidget()) {
 			QTimer::singleShot(1000, this, [this]() { MaybeShowSetup(); });
 			return;
 		}
