@@ -28,6 +28,7 @@ apps:
       - camera
       - browser-support
       - home
+      - password-manager-service
       - network
       - network-bind
       - opengl
@@ -108,6 +109,7 @@ parts:
       - uthash-dev
       - libsimde-dev
       - qt6-base-dev
+      - qtkeychain-qt6-dev
       - qt6-websockets-dev
       - qt6-base-private-dev
       - qt6-svg-dev
@@ -140,6 +142,7 @@ parts:
       - libpython3.12t64
       - libqt6widgets6t64
       - libqt6network6t64
+      - libqt6keychain1
       - libqt6websockets6
       - libqt6xml6t64
       - libqt6dbus6t64

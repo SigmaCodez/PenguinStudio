@@ -1,0 +1,41 @@
+{
+  "date": "2026-10-20",
+  "scope": "Unreleased development plugins over installed 0.3.1; isolated configuration",
+  "firstSession": {
+    "accountConnected": true,
+    "chatConnected": true,
+    "chatDock": true,
+    "detailsDock": true,
+    "keyringSaved": true,
+    "wayland": true
+  },
+  "restart": {
+    "accountConnected": true,
+    "chatConnected": true,
+    "chatDock": true,
+    "detailsDock": true,
+    "keyringSaved": true,
+    "liveSearchReturnedGame": true,
+    "searchResultCount": 20,
+    "wayland": true
+  },
+  "wizard": {
+    "accountControlsVisible": true,
+    "accountDialogOpened": true,
+    "bothTabsRestored": true,
+    "optionalButton": true,
+    "twitchCategoryPicker": true,
+    "wayland": true,
+    "wizardOpened": true,
+    "youtubeCategoryPicker": true
+  },
+  "newAuthorizationOnRestart": false,
+  "testCredentialRemoved": true,
+  "exitCodes": [
+    0,
+    0
+  ],
+  "liveYouTubeTest": false,
+  "streamMetadataModified": false,
+  "chatMessagesSent": false
+}

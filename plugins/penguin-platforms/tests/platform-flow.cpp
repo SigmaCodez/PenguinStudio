@@ -14,6 +14,32 @@
 
 namespace {
 QString configuration;
+class MemoryStore final : public CredentialStore {
+public:
+	QByteArray value;
+	bool failWrite = false, holdRead = false;
+	Done pending;
+	void Read(Done done) override
+	{
+		if (holdRead) {
+			pending = std::move(done);
+		} else {
+			done(true, value);
+		}
+	}
+	void Write(const QByteArray &data, Done done) override
+	{
+		if (!failWrite) {
+			value = data;
+		}
+		done(!failWrite, {});
+	}
+	void Remove(Done done) override
+	{
+		value.clear();
+		done(true, {});
+	}
+};
 
 void Require(bool condition, const char *message)
 {
@@ -242,7 +268,8 @@ int main(int argc, char **argv)
 				{{"data", QJsonArray{QJsonObject{{"title", "Remote title"}, {"game_id", "509658"}}}}});
 		Require(Line(*pane, "Title")->text() == "Local edit while loading",
 			"Loading overwrote an unsaved title");
-		Require(Line(*pane, "Twitch.Category")->text() == "509658", "Channel category was not loaded");
+		Require(static_cast<CategoryPicker *>(pane->findChild<QComboBox *>("twitchCategory"))->Id() == "509658",
+			"Channel category was not loaded");
 		Button(*pane, "Twitch.Load")->click();
 		network.Respond(10, 200,
 				{{"data", QJsonArray{QJsonObject{{"title", "Remote title"}, {"game_id", "509658"}}}}});
@@ -282,21 +309,25 @@ int main(int argc, char **argv)
 			"PKCE challenge does not match verifier");
 		network.Respond(0, 200, Tokens("google-access", "google-refresh"));
 		network.Respond(1, 200,
+				{{"items", QJsonArray{QJsonObject{{"id", "20"},
+								  {"snippet", QJsonObject{{"title", "Gaming"},
+											  {"assignable", true}}}}}}});
+		network.Respond(2, 200,
 				{{"items", QJsonArray{Broadcast("first", "First title")}},
 				 {"nextPageToken", "next+page"}});
-		Require(QUrlQuery(network.calls[2].request.url()).queryItemValue("pageToken", QUrl::FullyDecoded) ==
+		Require(QUrlQuery(network.calls[3].request.url()).queryItemValue("pageToken", QUrl::FullyDecoded) ==
 				"next+page",
 			"pagination token was not encoded correctly");
-		network.Respond(2, 200, {{"items", QJsonArray{Broadcast("second", "Second title")}}});
+		network.Respond(3, 200, {{"items", QJsonArray{Broadcast("second", "Second title")}}});
 		auto *broadcasts = pane.findChild<QComboBox *>();
 		Require(broadcasts && broadcasts->count() == 2, "all broadcast pages must be loaded");
 		broadcasts->setCurrentIndex(1);
 		Line(pane, "Title")->setText("A new title");
 		Button(pane, "Update")->click();
 		Tick(pane, 3540 * 1000);
-		network.Respond(4, 200, Tokens("refreshed-google-access"));
+		network.Respond(5, 200, Tokens("refreshed-google-access"));
 		Require(!Button(pane, "Update")->isEnabled(), "Google refresh must not unlock an in-flight update");
-		network.Respond(5, 200,
+		network.Respond(6, 200,
 				{{"items",
 				  QJsonArray{Broadcast("first", "First title"), Broadcast("second", "Second title")}}});
 		Require(broadcasts->currentData().toString() == "second" &&
@@ -306,10 +337,10 @@ int main(int argc, char **argv)
 					   {"description", "Keep description"}, {"tags", QJsonArray{"one", "two"}},
 					   {"defaultLanguage", "en"},           {"defaultAudioLanguage", "en"},
 					   {"channelId", "read-only"},          {"publishedAt", "read-only"}};
-		network.Respond(3, 200, {{"items", QJsonArray{QJsonObject{{"snippet", original}}}}});
-		Require(network.calls[6].request.attribute(QNetworkRequest::CustomVerbAttribute).toByteArray() == "PUT",
+		network.Respond(4, 200, {{"items", QJsonArray{QJsonObject{{"snippet", original}}}}});
+		Require(network.calls[7].request.attribute(QNetworkRequest::CustomVerbAttribute).toByteArray() == "PUT",
 			"YouTube videos.update must use PUT");
-		const auto update = QJsonDocument::fromJson(network.calls[6].body).object();
+		const auto update = QJsonDocument::fromJson(network.calls[7].body).object();
 		auto expected = original;
 		expected["title"] = "A new title";
 		expected.remove("channelId");
@@ -317,25 +348,28 @@ int main(int argc, char **argv)
 		Require(update.value("id").toString() == "second" && update.value("snippet").toObject() == expected,
 			"title update must preserve mutable snippet fields and omit read-only fields");
 		Line(pane, "Title")->setText("A later unsaved edit");
-		network.Respond(6, 200);
+		network.Respond(7, 200);
 		Require(Line(pane, "Title")->text() == "A later unsaved edit", "completion must not erase later edits");
 		broadcasts->setCurrentIndex(0);
 		broadcasts->setCurrentIndex(1);
 		Require(Line(pane, "Title")->text() == "A new title",
 			"successful update must refresh cached broadcast title");
 		Button(pane, "YouTube.Refresh")->click();
-		network.Respond(7, 200, {{"items", QJsonArray{}}, {"nextPageToken", "repeating-page"}});
 		network.Respond(8, 200, {{"items", QJsonArray{}}, {"nextPageToken", "repeating-page"}});
-		Require(network.calls.size() == 9 && Button(pane, "YouTube.Refresh")->isEnabled() &&
+		network.Respond(9, 200, {{"items", QJsonArray{}}, {"nextPageToken", "repeating-page"}});
+		Require(network.calls.size() == 10 && Button(pane, "YouTube.Refresh")->isEnabled() &&
 				broadcasts->count() == 2,
 			"a pagination cycle must stop without replacing the last complete broadcast list");
 		Button(pane, "Update")->click();
-		network.Respond(9, 401);
+		network.Respond(10, 401);
 		Require(!Button(pane, "Update")->isEnabled() && Button(pane, "Connect")->isEnabled() &&
 				broadcasts->count() == 0,
 			"revoked Google token must disconnect and clear stale broadcasts");
 		QSettings saved(configuration, QSettings::IniFormat);
-		Require(saved.allKeys().size() == 2, "only the two public client IDs may be saved");
+		for (const auto &key : saved.allKeys()) {
+			Require(key.endsWith("/clientId") || key.endsWith("/sessionEnabled"),
+				"credentials leaked to settings");
+		}
 	}
 	{
 		Transport network;
@@ -350,6 +384,117 @@ int main(int argc, char **argv)
 		pane.reset();
 		Until([&]() { return partial.state() == QAbstractSocket::UnconnectedState; });
 		Require(network.calls.isEmpty(), "partial callback must never exchange a token during shutdown");
+	}
+
+	{
+		QSettings settings(configuration, QSettings::IniFormat);
+		settings.clear();
+		MemoryStore store;
+		store.value =
+			QJsonDocument(QJsonObject{{"client", "test-client"}, {"refresh", "saved-refresh"}}).toJson();
+		Transport network;
+		auto pane = std::make_unique<TwitchPane>(nullptr, &network, nullptr, &store);
+		Line(*pane, "AppID")->setText("test-client");
+		Until([&]() { return network.calls.size() == 1; });
+		Require(network.calls[0].body.contains("refresh_token=saved-refresh"),
+			"saved Twitch session did not refresh on startup");
+		network.Respond(0, 200, Tokens("access", "rotated-persistent-refresh"));
+		network.Respond(1, 200, Validation());
+		Require(QJsonDocument::fromJson(store.value).object().value("refresh") == "rotated-persistent-refresh",
+			"rotated token not saved");
+		auto *picker = static_cast<CategoryPicker *>(pane->findChild<QComboBox *>("twitchCategory"));
+		const auto type = [&](const QString &query) {
+			picker->lineEdit()->setText(query);
+			QMetaObject::invokeMethod(picker->lineEdit(), "textEdited", Q_ARG(QString, query));
+			Tick(*pane, 300);
+		};
+		type("Old");
+		type("New");
+		network.Respond(3, 200, {{"data", QJsonArray{QJsonObject{{"name", "New game"}, {"id", "42"}}}}});
+		network.Respond(2, 200, {{"data", QJsonArray{QJsonObject{{"name", "Old game"}, {"id", "41"}}}}});
+		Require(picker->count() == 1 && picker->itemText(0) == "New game",
+			"stale category search replaced new results");
+		picker->setCurrentIndex(0);
+		Require(picker->Id() == "42", "category display name did not resolve to ID");
+		picker->setEditText("unselected category");
+		Line(*pane, "Title")->setText("Test");
+		Button(*pane, "Update")->click();
+		Require(network.calls.size() == 4, "unselected category sent an invalid metadata update");
+		pane.reset();
+		Require(!store.value.isEmpty(), "shutdown erased stored sign-in");
+		Transport restarted;
+		auto restored = std::make_unique<TwitchPane>(nullptr, &restarted, nullptr, &store);
+		Line(*restored, "AppID")->setText("test-client");
+		Until([&]() { return restarted.calls.size() == 1; });
+		Require(restarted.calls[0].body.contains("rotated-persistent-refresh"),
+			"restart reused an obsolete refresh token");
+		Button(*restored, "Disconnect")->click();
+		Require(store.value.isEmpty(), "disconnect did not erase saved sign-in");
+	}
+	{
+		QSettings settings(configuration, QSettings::IniFormat);
+		settings.clear();
+		MemoryStore store;
+		store.holdRead = true;
+		Transport network;
+		TwitchPane pane(nullptr, &network, nullptr, &store);
+		Line(pane, "AppID")->setText("test-client");
+		Until([&]() { return bool(store.pending); });
+		Button(pane, "Disconnect")->click();
+		store.pending(
+			true,
+			QJsonDocument(QJsonObject{{"client", "test-client"}, {"refresh", "late-refresh"}}).toJson());
+		QCoreApplication::processEvents();
+		Require(network.calls.isEmpty(), "late keyring read resurrected a disconnected account");
+	}
+
+	{
+		QSettings settings(configuration, QSettings::IniFormat);
+		settings.clear();
+		MemoryStore store;
+		store.value = QJsonDocument(QJsonObject{{"client", "google-client"},
+							{"refresh", "google-saved"},
+							{"secret", "saved-desktop-secret"}})
+				      .toJson();
+		Transport network;
+		YoutubePane pane(nullptr, &network, &store);
+		Line(pane, "AppID")->setText("google-client");
+		Until([&]() { return network.calls.size() == 1; });
+		Require(network.calls[0].body.contains("refresh_token=google-saved") &&
+				network.calls[0].body.contains("client_secret=saved-desktop-secret"),
+			"Google saved credentials did not restore");
+		store.failWrite = true;
+		network.Respond(0, 200, Tokens("google-access", "new-refresh"));
+		Require(pane.findChild<QLabel *>("penguinCredentialStatus")->text() == "Session.Unavailable",
+			"keyring save failure was hidden");
+		Require(Button(pane, "Update")->isEnabled(), "keyring failure unnecessarily disconnected live account");
+		network.Respond(
+			1, 200,
+			{{"items",
+			  QJsonArray{
+				  QJsonObject{{"id", "20"},
+					      {"snippet", QJsonObject{{"title", "Gaming"}, {"assignable", true}}}},
+				  QJsonObject{{"id", "27"},
+					      {"snippet", QJsonObject{{"title", "Education"}, {"assignable", true}}}},
+				  QJsonObject{{"id", "99"},
+					      {"snippet", QJsonObject{{"title", "Hidden"}, {"assignable", false}}}}}}});
+		network.Respond(2, 200, {{"items", QJsonArray{Broadcast("selected-video", "Original title")}}});
+		auto *category = static_cast<CategoryPicker *>(pane.findChild<QComboBox *>("youtubeCategory"));
+		Require(category->count() == 2, "unassignable YouTube categories were offered");
+		category->Select("27", "Education");
+		Button(pane, "Update")->click();
+		network.Respond(3, 200,
+				{{"items", QJsonArray{QJsonObject{
+						   {"snippet", QJsonObject{{"title", "Original title"},
+									   {"categoryId", "20"},
+									   {"description", "Preserve this"}}}}}}});
+		const auto snippet =
+			QJsonDocument::fromJson(network.calls[4].body).object().value("snippet").toObject();
+		Require(snippet.value("categoryId") == "27" && snippet.value("description") == "Preserve this",
+			"YouTube category update lost existing metadata");
+		network.Respond(4, 200);
+		Button(pane, "Disconnect")->click();
+		Require(store.value.isEmpty(), "Google saved account was not removed");
 	}
 	QDesktopServices::unsetUrlHandler("https");
 	std::cout

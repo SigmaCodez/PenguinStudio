@@ -17,7 +17,10 @@
         "--talk-name=org.freedesktop.Flatpak",
         "--talk-name=org.freedesktop.Notifications",
         "--talk-name=org.a11y.Bus",
-        "--env=VST_PATH=/app/extensions/Plugins/vst"
+        "--env=VST_PATH=/app/extensions/Plugins/vst",
+        "--talk-name=org.freedesktop.secrets",
+        "--talk-name=org.kde.kwalletd5",
+        "--talk-name=org.kde.kwalletd6"
     ],
     "add-extensions": {
         "org.freedesktop.LinuxAudio.Plugins": {
@@ -140,6 +143,25 @@
                     "url": "https://cdn-fastly.obsproject.com/downloads/cef_binary_6533_linux_x86_64_v6.tar.xz",
                     "sha256": "7963335519a19ccdc5233f7334c5ab023026e2f3e9a0cc417007c09d86608146"
                 }
+            ]
+        },
+        {
+            "name": "qtkeychain",
+            "buildsystem": "cmake-ninja",
+            "config-opts": [
+                "-DBUILD_WITH_QT6=ON",
+                "-DBUILD_TEST_APPLICATION=OFF",
+                "-DBUILD_TRANSLATIONS=OFF"
+            ],
+            "sources": [
+                {
+                    "type": "archive",
+                    "url": "https://github.com/frankosterfeld/qtkeychain/archive/refs/tags/0.15.0.tar.gz",
+                    "sha256": "f4254dc8f0933b06d90672d683eab08ef770acd8336e44dfa030ce041dc2ca22"
+                }
+            ],
+            "post-install": [
+                "install -Dm644 COPYING /app/share/licenses/qtkeychain/COPYING"
             ]
         },
         {

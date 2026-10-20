@@ -2,6 +2,13 @@
 // Native metadata controls: no embedded browser or X11 dependency.
 #include "oauth-helpers.hpp"
 #include "twitch-chat.hpp"
+#include "category-picker.hpp"
+#include "credential-store.hpp"
+#include <QLocale>
+#include <QAction>
+#include <QApplication>
+#include <QDialog>
+#include <QDialogButtonBox>
 
 #include <obs-module.h>
 #include <obs-frontend-api.h>
@@ -70,6 +77,84 @@ protected:
 	quint64 generation = 0;
 	QString provider;
 	QString configPath;
+	CredentialStore *credentials = nullptr;
+	QLabel *credentialStatus = new QLabel(this);
+	virtual QString SessionSecret() const { return {}; }
+	virtual void RestoreSecret(const QString &) {}
+	void SaveSession()
+	{
+		if (!credentials || refreshToken.isEmpty()) {
+			return;
+		}
+		const auto attempt = generation;
+		const auto value = QJsonDocument(QJsonObject{{"client", activeClient},
+							     {"refresh", refreshToken},
+							     {"secret", SessionSecret()}})
+					   .toJson(QJsonDocument::Compact);
+		QPointer<PlatformPane> self(this);
+		credentials->Write(value, [self, attempt](bool ok, const QByteArray &) {
+			if (!self || self->generation != attempt) {
+				return;
+			}
+			self->credentialStatus->setText(Text(ok ? "Session.Saved" : "Session.Unavailable"));
+			if (ok) {
+				QSettings settings(self->configPath, QSettings::IniFormat);
+				settings.setValue(self->provider + "/sessionEnabled", true);
+			}
+		});
+	}
+	void RestoreSession()
+	{
+		if (!credentials) {
+			return;
+		}
+		QSettings settings(configPath, QSettings::IniFormat);
+		if (!settings.value(provider + "/sessionEnabled", true).toBool()) {
+			return;
+		}
+		const auto attempt = generation;
+		QPointer<PlatformPane> self(this);
+		credentials->Read([self, attempt](bool ok, const QByteArray &value) {
+			if (!self || self->generation != attempt) {
+				return;
+			}
+			if (!ok) {
+				self->credentialStatus->setText(Text("Session.Unavailable"));
+				return;
+			}
+			if (value.isEmpty()) {
+				return;
+			}
+			const auto data = QJsonDocument::fromJson(value).object();
+			if (data.value("client").toString() != self->client->text().trimmed() ||
+			    data.value("refresh").toString().isEmpty()) {
+				return;
+			}
+			self->activeClient = data.value("client").toString();
+			self->refreshToken = data.value("refresh").toString();
+			self->RestoreSecret(data.value("secret").toString());
+			self->client->setEnabled(false);
+			self->connectButton->setEnabled(false);
+			self->status->setText(Text("Session.Restoring"));
+			self->refreshTimer.start(1);
+		});
+	}
+	void ForgetSession()
+	{
+		QSettings settings(configPath, QSettings::IniFormat);
+		settings.setValue(provider + "/sessionEnabled", false);
+		Reset();
+		if (!credentials) {
+			return;
+		}
+		const auto attempt = generation;
+		QPointer<PlatformPane> self(this);
+		credentials->Remove([self, attempt](bool ok, const QByteArray &) {
+			if (self && self->generation == attempt) {
+				self->credentialStatus->setText(Text(ok ? "Session.Removed" : "Session.RemoveFailed"));
+			}
+		});
+	}
 
 	using Completion = std::function<void(int, const QJsonObject &)>;
 
@@ -194,6 +279,9 @@ protected:
 		status->setTextFormat(Qt::PlainText);
 		status->setTextInteractionFlags(Qt::TextSelectableByMouse);
 		form->addRow(status);
+		credentialStatus->setWordWrap(true);
+		credentialStatus->setObjectName("penguinCredentialStatus");
+		form->addRow(credentialStatus);
 		for (int row = 0; row < form->rowCount(); ++row) {
 			auto *item = form->itemAt(row, QFormLayout::LabelRole);
 			if (auto *label = item ? qobject_cast<QLabel *>(item->widget()) : nullptr) {
@@ -205,7 +293,8 @@ protected:
 
 public:
 	// The optional transport is borrowed, and must outlive this pane (used by offline controller tests).
-	PlatformPane(QString name, QWidget *parent, QNetworkAccessManager *transport = nullptr)
+	PlatformPane(QString name, QWidget *parent, QNetworkAccessManager *transport = nullptr,
+		     CredentialStore *store = nullptr)
 		: QWidget(parent),
 		  network(transport ? *transport : ownedNetwork),
 		  provider(std::move(name))
@@ -216,19 +305,30 @@ public:
 		form->setRowWrapPolicy(QFormLayout::WrapAllRows);
 		form->setFieldGrowthPolicy(QFormLayout::AllNonFixedFieldsGrow);
 		form->setFormAlignment(Qt::AlignTop);
+		connectButton->setObjectName(provider + "ConnectAccount");
 		connectButton->setProperty("penguinPrimary", true);
 		updateButton->setProperty("penguinPrimary", true);
 		char *path = obs_module_config_path("platforms.ini");
 		configPath = QString::fromUtf8(path);
 		bfree(path);
 		QDir().mkpath(QFileInfo(configPath).absolutePath());
+		credentials = store;
+		if (!credentials && !transport) {
+			credentials = new KeychainStore(
+				provider + "/" +
+					QString::fromLatin1(QCryptographicHash::hash(
+								    QFileInfo(configPath).absoluteFilePath().toUtf8(),
+								    QCryptographicHash::Sha256)
+								    .toHex()),
+				this);
+		}
 		QSettings settings(configPath, QSettings::IniFormat);
 		client->setText(settings.value(provider + "/clientId").toString());
 		form->addRow(Text("AppID"), client);
 		form->addRow(connectButton);
 		form->addRow(disconnectButton);
 		refreshTimer.setSingleShot(true);
-		connect(disconnectButton, &QPushButton::clicked, this, [this]() { Reset(); });
+		connect(disconnectButton, &QPushButton::clicked, this, [this]() { ForgetSession(); });
 	}
 
 	~PlatformPane() override
@@ -248,7 +348,9 @@ class TwitchPane final : public PlatformPane {
 	QString broadcaster;
 	qint64 deadline = 0;
 	int pollInterval = 5000;
-	QLineEdit *category = new QLineEdit(this);
+	CategoryPicker *category = new CategoryPicker(this);
+	QTimer categorySearch{this};
+	quint64 categoryRevision = 0;
 	QPointer<TwitchChat> chat;
 	QPushButton *loadDetails = nullptr;
 	static constexpr const char *scopes = "channel:manage:broadcast user:read:chat user:write:chat";
@@ -261,6 +363,10 @@ class TwitchPane final : public PlatformPane {
 		if (chat) {
 			chat->Stop();
 		}
+		categorySearch.stop();
+		++categoryRevision;
+		category->clear();
+		category->setEnabled(false);
 		pollTimer.stop();
 		validateTimer.stop();
 		deviceCode.clear();
@@ -283,6 +389,8 @@ class TwitchPane final : public PlatformPane {
 				}
 				broadcaster = data.value("user_id").toString();
 				SetConnected(true);
+				category->setEnabled(true);
+				SaveSession();
 				if (loadDetails) {
 					loadDetails->setEnabled(true);
 				}
@@ -325,8 +433,9 @@ class TwitchPane final : public PlatformPane {
 	}
 
 public:
-	explicit TwitchPane(QWidget *parent, QNetworkAccessManager *transport = nullptr, TwitchChat *chatPane = nullptr)
-		: PlatformPane("twitch", parent, transport),
+	explicit TwitchPane(QWidget *parent, QNetworkAccessManager *transport = nullptr, TwitchChat *chatPane = nullptr,
+			    CredentialStore *store = nullptr)
+		: PlatformPane("twitch", parent, transport, store),
 		  chat(chatPane)
 	{
 		client->setText(QStringLiteral("wx372widbw00vu69va6dhedawepy9x"));
@@ -336,6 +445,43 @@ public:
 		}
 		connectButton->setText(Text("Twitch.Connect"));
 		form->addRow(Text("Twitch.Category"), category);
+		category->setObjectName("twitchCategory");
+		category->setEnabled(false);
+		category->lineEdit()->setPlaceholderText(Text("Category.Search"));
+		categorySearch.setSingleShot(true);
+		categorySearch.setInterval(300);
+		connect(category->lineEdit(), &QLineEdit::textEdited, this, [this]() {
+			++categoryRevision;
+			categorySearch.start();
+		});
+		connect(&categorySearch, &QTimer::timeout, this, [this]() {
+			const auto query = category->currentText().trimmed();
+			const auto revision = categoryRevision;
+			if (query.isEmpty() || accessToken.isEmpty()) {
+				return;
+			}
+			Request("https://api.twitch.tv/helix/search/categories?first=20&query=" +
+					QString::fromLatin1(QUrl::toPercentEncoding(query)),
+				"GET", {}, {}, true, [this, query, revision](int code, const QJsonObject &data) {
+					if (revision != categoryRevision ||
+					    query != category->currentText().trimmed()) {
+						return;
+					}
+					if (code != 200) {
+						status->setText(Text("Category.Failed"));
+						return;
+					}
+					QList<QPair<QString, QString>> choices;
+					for (const auto &entry : data.value("data").toArray()) {
+						const auto item = entry.toObject();
+						if (!item.value("id").toString().isEmpty()) {
+							choices.append({item.value("name").toString(),
+									item.value("id").toString()});
+						}
+					}
+					category->Choices(choices, true);
+				});
+		});
 		FinishForm();
 		auto *load = new QPushButton(Text("Twitch.Load"), this);
 		loadDetails = load;
@@ -347,7 +493,7 @@ public:
 			}
 			load->setEnabled(false);
 			const auto oldTitle = title->text();
-			const auto oldCategory = category->text();
+			const auto oldCategory = category->currentText();
 			Request("https://api.twitch.tv/helix/channels?broadcaster_id=" + broadcaster, "GET", {}, {},
 				true, [this, load, oldTitle, oldCategory](int code, const QJsonObject &data) {
 					load->setEnabled(true);
@@ -361,8 +507,9 @@ public:
 					if (title->text() == oldTitle) {
 						title->setText(info.value("title").toString());
 					}
-					if (category->text() == oldCategory) {
-						category->setText(info.value("game_id").toString());
+					if (category->currentText() == oldCategory) {
+						category->Select(info.value("game_id").toString(),
+								 info.value("game_name").toString());
 					}
 				});
 		});
@@ -420,8 +567,12 @@ public:
 				return;
 			}
 			QJsonObject body{{"title", value}};
-			if (!category->text().trimmed().isEmpty()) {
-				body.insert("game_id", category->text().trimmed());
+			if (!category->Valid()) {
+				status->setText(Text("Category.Select"));
+				return;
+			}
+			if (!category->Id().isEmpty()) {
+				body.insert("game_id", category->Id());
 			}
 			BeginUpdate();
 			Request("https://api.twitch.tv/helix/channels?broadcaster_id=" + broadcaster, "PATCH",
@@ -435,6 +586,7 @@ public:
 					status->setText(Text(code == 204 ? "Updated" : "Failed"));
 				});
 		});
+		QTimer::singleShot(0, this, [this]() { RestoreSession(); });
 	}
 };
 
@@ -449,11 +601,46 @@ class YoutubePane final : public PlatformPane {
 	QString redirect;
 	QString activeSecret;
 	quint64 broadcastLoad = 0;
+	CategoryPicker *category = new CategoryPicker(this);
+	QString SessionSecret() const override { return activeSecret; }
+	void RestoreSecret(const QString &value) override
+	{
+		activeSecret = value;
+		secret->setText(value);
+		secret->setEnabled(false);
+	}
+	void LoadCategories()
+	{
+		auto region = QLocale().name().section('_', 1, 1);
+		if (region.size() != 2) {
+			region = "US";
+		}
+		Request("https://www.googleapis.com/youtube/v3/videoCategories?part=snippet&regionCode=" + region,
+			"GET", {}, {}, true, [this](int code, const QJsonObject &data) {
+				if (code != 200) {
+					status->setText(Text("Category.Failed"));
+					return;
+				}
+				QList<QPair<QString, QString>> choices;
+				for (const auto &entry : data.value("items").toArray()) {
+					const auto item = entry.toObject();
+					const auto snippet = item.value("snippet").toObject();
+					if (snippet.value("assignable").toBool()) {
+						choices.append({snippet.value("title").toString(),
+								item.value("id").toString()});
+					}
+				}
+				category->Choices(choices, false);
+				category->setEnabled(true);
+			});
+	}
 	QList<QPair<QString, QString>> pendingBroadcasts;
 	QSet<QString> pageTokens;
 
 	void Reset() override
 	{
+		category->clear();
+		category->setEnabled(false);
 		++broadcastLoad;
 		pendingBroadcasts.clear();
 		pageTokens.clear();
@@ -486,6 +673,10 @@ class YoutubePane final : public PlatformPane {
 				return;
 			}
 			SetConnected(true);
+			SaveSession();
+			if (category->count() == 0) {
+				LoadCategories();
+			}
 			loadButton->setEnabled(true);
 			LoadBroadcasts();
 		});
@@ -609,13 +800,21 @@ class YoutubePane final : public PlatformPane {
 	}
 
 public:
-	explicit YoutubePane(QWidget *parent, QNetworkAccessManager *transport = nullptr)
-		: PlatformPane("youtube", parent, transport)
+	explicit YoutubePane(QWidget *parent, QNetworkAccessManager *transport = nullptr,
+			     CredentialStore *store = nullptr)
+		: PlatformPane("youtube", parent, transport, store)
 	{
 		secret->setEchoMode(QLineEdit::Password);
 		form->addRow(Text("ClientSecret"), secret);
 		form->addRow(Text("YouTube.Broadcast"), broadcasts);
 		form->addRow(loadButton);
+		category->setObjectName("youtubeCategory");
+		category->setEnabled(false);
+		category->lineEdit()->setPlaceholderText(Text("Category.Search"));
+		form->addRow(Text("YouTube.Category"), category);
+		auto *categoryNote = new QLabel(Text("YouTube.CategoryNote"), this);
+		categoryNote->setWordWrap(true);
+		form->addRow(categoryNote);
 		loadButton->setEnabled(false);
 		FinishForm();
 		authorizationTimeout.setSingleShot(true);
@@ -668,6 +867,11 @@ public:
 				status->setText(Text(value.isEmpty() ? "TitleRequired" : "YouTube.TitleLength"));
 				return;
 			}
+			if (!category->Valid()) {
+				status->setText(Text("Category.Select"));
+				return;
+			}
+			const auto categoryId = category->Id();
 			const auto id = broadcasts->currentData().toString();
 			if (id.isEmpty()) {
 				status->setText(Text("YouTube.NoBroadcast"));
@@ -676,7 +880,7 @@ public:
 			BeginUpdate();
 			Request("https://www.googleapis.com/youtube/v3/videos?part=snippet&id=" +
 					QString::fromLatin1(QUrl::toPercentEncoding(id)),
-				"GET", {}, {}, true, [this, id, value](int code, const QJsonObject &data) {
+				"GET", {}, {}, true, [this, id, value, categoryId](int code, const QJsonObject &data) {
 					if (code == 401) {
 						Fail("Expired");
 						return;
@@ -695,6 +899,9 @@ public:
 						if (original.contains(key)) {
 							snippet.insert(key, original.value(key));
 						}
+					}
+					if (!categoryId.isEmpty()) {
+						snippet.insert("categoryId", categoryId);
 					}
 					if (!snippet.contains("categoryId")) {
 						FinishUpdate();
@@ -722,6 +929,7 @@ public:
 						});
 				});
 		});
+		QTimer::singleShot(0, this, [this]() { RestoreSession(); });
 	}
 };
 
@@ -782,6 +990,46 @@ void CreateDock()
 	addPlatform(new TwitchPane(tabs, nullptr, chatDock), QStringLiteral("Twitch"));
 	addPlatform(new YoutubePane(tabs), QStringLiteral("YouTube"));
 	layout->addWidget(tabs, 1);
+	auto *accountAction = new QAction(parent);
+	accountAction->setObjectName("penguinConnectAccountAction");
+	QObject::connect(accountAction, &QAction::triggered, dock, [tabs, accountAction, parent]() {
+		const QString provider = accountAction->data().toString();
+		const int index = provider == "twitch" ? 0 : provider == "youtube" ? 1 : -1;
+		if (index < 0 || tabs->count() != 2) {
+			return;
+		}
+		QPointer<QTabWidget> original = tabs;
+		QPointer<QWidget> page = tabs->widget(index);
+		const auto label = tabs->tabText(index);
+		tabs->removeTab(index);
+		auto *owner = QApplication::activeModalWidget();
+		auto *dialog = new QDialog(owner ? owner : parent);
+		dialog->setAttribute(Qt::WA_DeleteOnClose);
+		dialog->setWindowTitle(label);
+		dialog->resize(500, 620);
+		auto *box = new QVBoxLayout(dialog);
+		box->addWidget(page);
+		page->show();
+		auto *buttons = new QDialogButtonBox(QDialogButtonBox::Close, dialog);
+		box->addWidget(buttons);
+		QObject::connect(buttons, &QDialogButtonBox::rejected, dialog, &QDialog::reject);
+		const auto restore = [original, page, index, label]() {
+			if (original && page && original->indexOf(page) < 0) {
+				original->insertTab(index, page, label);
+				original->setCurrentIndex(index);
+			}
+		};
+		QObject::connect(dialog, &QDialog::finished, parent, restore);
+		QObject::connect(dialog, &QObject::destroyed, parent, restore);
+		dialog->setWindowModality(Qt::WindowModal);
+		dialog->show();
+		if (provider == "twitch") {
+			if (auto *button = page->findChild<QPushButton *>("twitchConnectAccount");
+			    button && button->isEnabled()) {
+				button->click();
+			}
+		}
+	});
 	auto *note = new QLabel(Text("SessionNoteShort"), dock);
 	note->setProperty("penguinHint", true);
 	note->setToolTip(Text("SessionNote"));

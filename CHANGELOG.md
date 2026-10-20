@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Add searchable Twitch game/category suggestions and filterable YouTube video categories.
+- Restore Twitch and YouTube sign-ins from the system keyring after restart; disconnect removes the saved credentials without a plaintext fallback.
+- Offer optional provider sign-in in the first-start and destination assistants.
+
 ## 0.3.1 — 2026-10-20
 
 - Publish a maintenance build to validate the complete in-app upgrade path from 0.3.0 on Ubuntu 26.04.1.

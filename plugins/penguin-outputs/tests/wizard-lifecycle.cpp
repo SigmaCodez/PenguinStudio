@@ -22,9 +22,11 @@ void Require(bool condition, const char *message)
 
 QPushButton *Add(OutputDock &dock)
 {
-	for (auto *button : dock.findChildren<QPushButton *>())
-		if (button->text() == "Penguin.Add")
+	for (auto *button : dock.findChildren<QPushButton *>()) {
+		if (button->text() == "Penguin.Add") {
 			return button;
+		}
+	}
 	Require(false, "add destination button missing");
 	return nullptr;
 }
@@ -46,8 +48,14 @@ char *obs_module_get_config_path(obs_module_t *, const char *)
 {
 	return bstrdup(configuration.toUtf8().constData());
 }
-bool obs_enum_encoder_types(size_t, const char **) { return false; }
-void obs_frontend_remove_event_callback(obs_frontend_event_cb, void *) { ++callbackRemovals; }
+bool obs_enum_encoder_types(size_t, const char **)
+{
+	return false;
+}
+void obs_frontend_remove_event_callback(obs_frontend_event_cb, void *)
+{
+	++callbackRemovals;
+}
 }
 
 int main(int argc, char **argv)
@@ -57,6 +65,17 @@ int main(int argc, char **argv)
 	QTemporaryDir directory;
 	Require(directory.isValid(), "temporary config directory missing");
 	configuration = directory.filePath("destinations.json");
+	{
+		ConnectionWizard welcome(nullptr, true);
+		bool twitch = false, youtube = false;
+		for (auto *b : welcome.findChildren<QPushButton *>()) {
+			twitch |= b->text() == "Penguin.Account.Twitch";
+			youtube |= b->text() == "Penguin.Account.YouTube";
+		}
+		Require(twitch && youtube, "first-start wizard must offer both optional account providers");
+		Require(welcome.pageIds().size() == 2,
+			"optional account sign-in must not require an extra blocking page");
+	}
 	{
 		QPointer<OutputDock> dock = new OutputDock(nullptr);
 		// With the old stack/exec implementation, this deletes a stack wizard
@@ -91,7 +110,8 @@ int main(int argc, char **argv)
 		Require(dock->findChildren<QWizard *>().size() == 1, "duplicate wizard opened");
 		dock->Event(OBS_FRONTEND_EVENT_SCRIPTING_SHUTDOWN);
 		DrainDeletes();
-		Require(!wizard && !QFile::exists(configuration), "shutdown must cancel the wizard without saving changes");
+		Require(!wizard && !QFile::exists(configuration),
+			"shutdown must cancel the wizard without saving changes");
 		Add(*dock)->click();
 		Require(dock->findChildren<QWizard *>().isEmpty(), "shutdown must prevent reopening a wizard");
 	}
@@ -100,21 +120,24 @@ int main(int argc, char **argv)
 		dock->Event(OBS_FRONTEND_EVENT_FINISHED_LOADING);
 		QElapsedTimer clock;
 		clock.start();
-		while (clock.elapsed() < 1200)
+		while (clock.elapsed() < 1200) {
 			QCoreApplication::processEvents(QEventLoop::AllEvents, 10);
+		}
 		Require(!dock->findChild<QWizard *>(), "hidden window must not open the first-run assistant");
 		dock->setProperty("penguinStartupDialogPending", true);
 		dock->show();
 		dock->activateWindow();
 		clock.restart();
-		while (clock.elapsed() < 1200)
+		while (clock.elapsed() < 1200) {
 			QCoreApplication::processEvents(QEventLoop::AllEvents, 10);
+		}
 		Require(dock->isActiveWindow(), "first-run test window did not become active");
 		Require(!dock->findChild<QWizard *>(), "pending startup dialog must defer the first-run assistant");
 		dock->setProperty("penguinStartupDialogPending", false);
 		clock.restart();
-		while (!dock->findChild<QWizard *>() && clock.elapsed() < 3000)
+		while (!dock->findChild<QWizard *>() && clock.elapsed() < 3000) {
 			QCoreApplication::processEvents(QEventLoop::AllEvents, 10);
+		}
 		QPointer<QWizard> wizard = dock->findChild<QWizard *>();
 		Require(wizard && wizard->pageIds().size() == 2, "first-run assistant did not open");
 		wizard->reject();
@@ -129,5 +152,5 @@ int main(int argc, char **argv)
 	obs_module_unload();
 	Require(callbackRemovals == 0, "module unload must not call the destroyed frontend after EXIT");
 	std::cout << "PASS: asynchronous wizard/warnings, parent destruction, shutdown cancellation, duplicate guard, "
-		"first-run dismissal and frontend unload\n";
+		     "first-run dismissal and frontend unload\n";
 }

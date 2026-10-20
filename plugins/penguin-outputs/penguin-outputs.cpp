@@ -33,6 +33,7 @@
 #include <QUuid>
 #include <QVBoxLayout>
 #include <QWizard>
+#include <QAction>
 
 #include <algorithm>
 #include <atomic>
@@ -72,7 +73,8 @@ struct Preset {
 
 // Account-specific endpoints must be copied from the provider dashboard.
 const Preset Presets[] = {
-	{"Twitch", "rtmps://ingest.global-contribute.live-video.net/app", "https://dashboard.twitch.tv/settings/stream"},
+	{"Twitch", "rtmps://ingest.global-contribute.live-video.net/app",
+	 "https://dashboard.twitch.tv/settings/stream"},
 	{"YouTube", "rtmps://a.rtmps.youtube.com:443/live2", "https://studio.youtube.com"},
 	{"Kick", "", "https://dashboard.kick.com"},
 	{"Facebook Live", "rtmps://rtmp-api.facebook.com:443/rtmp/", "https://www.facebook.com/live/producer"},
@@ -108,25 +110,30 @@ bool HasEncoder(const QString &id, const char *codec)
 	const QByteArray bytes = id.toUtf8();
 	const char *candidate = nullptr;
 	for (size_t i = 0; obs_enum_encoder_types(i, &candidate); ++i) {
-		if (bytes == candidate && strcmp(obs_get_encoder_codec(candidate), codec) == 0)
+		if (bytes == candidate && strcmp(obs_get_encoder_codec(candidate), codec) == 0) {
 			return true;
+		}
 	}
 	return false;
 }
 
 QString Validate(const Destination &destination, bool requireKey)
 {
-	if (destination.name.trimmed().isEmpty())
+	if (destination.name.trimmed().isEmpty()) {
 		return Text("Penguin.InvalidName");
+	}
 	const QUrl url(destination.server, QUrl::StrictMode);
 	if (!url.isValid() || url.host().isEmpty() ||
 	    (url.scheme() != QStringLiteral("rtmp") && url.scheme() != QStringLiteral("rtmps")) ||
-	    !url.userInfo().isEmpty() || url.hasQuery() || url.hasFragment())
+	    !url.userInfo().isEmpty() || url.hasQuery() || url.hasFragment()) {
 		return Text("Penguin.InvalidServer");
-	if (requireKey && destination.key.trimmed().isEmpty())
+	}
+	if (requireKey && destination.key.trimmed().isEmpty()) {
 		return Text("Penguin.InvalidKey");
-	if (!HasEncoder(destination.encoder, "h264"))
+	}
+	if (!HasEncoder(destination.encoder, "h264")) {
 		return Text("Penguin.MissingEncoder");
+	}
 	return {};
 }
 
@@ -148,13 +155,16 @@ class ConnectionWizard final : public QWizard {
 	QSpinBox *bitrate;
 
 public:
-	explicit ConnectionWizard(QWidget *parent, bool welcome, const Destination *existing = nullptr) : QWizard(parent)
+	explicit ConnectionWizard(QWidget *parent, bool welcome, const Destination *existing = nullptr)
+		: QWizard(parent)
 	{
 		setWindowTitle(Text(welcome ? "Penguin.Wizard" : "Penguin.Add"));
 		setWizardStyle(QWizard::ModernStyle);
 		const QPixmap logo(QStringLiteral(":/res/images/penguin-studio.png"));
-		if (!logo.isNull())
-			setPixmap(QWizard::LogoPixmap, logo.scaled(64, 64, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+		if (!logo.isNull()) {
+			setPixmap(QWizard::LogoPixmap,
+				  logo.scaled(64, 64, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+		}
 		resize(660, 540);
 		if (welcome) {
 			auto *intro = new QWizardPage;
@@ -164,6 +174,25 @@ public:
 				auto *label = new QLabel(Text(text));
 				label->setWordWrap(true);
 				introLayout->addWidget(label);
+			}
+			auto *accountNote = new QLabel(Text("Penguin.Account.Optional"), intro);
+			accountNote->setWordWrap(true);
+			introLayout->addWidget(accountNote);
+			for (const auto &provider : {QStringLiteral("twitch"), QStringLiteral("youtube")}) {
+				auto *button = new QPushButton(Text(provider == "twitch" ? "Penguin.Account.Twitch"
+											 : "Penguin.Account.YouTube"),
+							       intro);
+				introLayout->addWidget(button);
+				connect(button, &QPushButton::clicked, this, [provider]() {
+					auto *main = static_cast<QWidget *>(obs_frontend_get_main_window());
+					if (main) {
+						if (auto *action =
+							    main->findChild<QAction *>("penguinConnectAccountAction")) {
+							action->setData(provider);
+							action->trigger();
+						}
+					}
+				});
 			}
 			addPage(intro);
 		}
@@ -175,20 +204,25 @@ public:
 		form->addRow(connectionNote);
 		name = new QLineEdit;
 		platform = new QComboBox;
-		for (const auto &preset : Presets)
+		for (const auto &preset : Presets) {
 			platform->addItem(QString::fromUtf8(preset.name));
+		}
 		server = new QLineEdit;
 		server->setPlaceholderText(QStringLiteral("rtmps://server.example/app"));
 		key = new QLineEdit;
 		key->setEchoMode(QLineEdit::Password);
 		layout = new QComboBox;
-		layout->addItems({Text("Penguin.Landscape"), Text("Penguin.PortraitCrop"), Text("Penguin.PortraitFit")});
+		layout->addItems(
+			{Text("Penguin.Landscape"), Text("Penguin.PortraitCrop"), Text("Penguin.PortraitFit")});
 		encoder = new QComboBox;
 		const char *id = nullptr;
 		for (size_t i = 0; obs_enum_encoder_types(i, &id); ++i) {
-			if (obs_get_encoder_type(id) == OBS_ENCODER_VIDEO && strcmp(obs_get_encoder_codec(id), "h264") == 0 &&
-			    !(obs_get_encoder_caps(id) & OBS_ENCODER_CAP_DEPRECATED))
-				encoder->addItem(QString::fromUtf8(obs_encoder_get_display_name(id)), QString::fromUtf8(id));
+			if (obs_get_encoder_type(id) == OBS_ENCODER_VIDEO &&
+			    strcmp(obs_get_encoder_codec(id), "h264") == 0 &&
+			    !(obs_get_encoder_caps(id) & OBS_ENCODER_CAP_DEPRECATED)) {
+				encoder->addItem(QString::fromUtf8(obs_encoder_get_display_name(id)),
+						 QString::fromUtf8(id));
+			}
 		}
 		bitrate = new QSpinBox;
 		bitrate->setRange(500, 50000);
@@ -197,6 +231,23 @@ public:
 		bitrate->setValue(6000);
 		form->addRow(Text("Penguin.Name"), name);
 		form->addRow(Text("Penguin.Platform"), platform);
+		auto *account = new QPushButton(Text("Penguin.Account.Connect"), page);
+		form->addRow(account);
+		const auto enableAccount = [this, account]() {
+			account->setEnabled(platform->currentText() == "Twitch" ||
+					    platform->currentText() == "YouTube");
+		};
+		connect(platform, &QComboBox::currentIndexChanged, this, enableAccount);
+		connect(account, &QPushButton::clicked, this, [this]() {
+			auto *main = static_cast<QWidget *>(obs_frontend_get_main_window());
+			if (main) {
+				if (auto *a = main->findChild<QAction *>("penguinConnectAccountAction")) {
+					a->setData(platform->currentText().toLower());
+					a->trigger();
+				}
+			}
+		});
+		enableAccount();
 		form->addRow(Text("Penguin.Server"), server);
 		form->addRow(Text("Penguin.Key"), key);
 		form->addRow(Text("Penguin.Orientation"), layout);
@@ -232,14 +283,20 @@ public:
 
 	Destination Value() const
 	{
-		return {name->text().trimmed(), platform->currentText(), server->text().trimmed(), key->text().trimmed(),
-			encoder->currentData().toString(), static_cast<Layout>(layout->currentIndex()), bitrate->value()};
+		return {name->text().trimmed(),
+			platform->currentText(),
+			server->text().trimmed(),
+			key->text().trimmed(),
+			encoder->currentData().toString(),
+			static_cast<Layout>(layout->currentIndex()),
+			bitrate->value()};
 	}
 
 	bool validateCurrentPage() override
 	{
 		if (currentPage()->isFinalPage()) {
-			const QString problem = encoder->count() ? Validate(Value(), false) : Text("Penguin.InvalidEncoder");
+			const QString problem = encoder->count() ? Validate(Value(), false)
+								 : Text("Penguin.InvalidEncoder");
 			if (!problem.isEmpty()) {
 				ShowMessage(this, QMessageBox::Warning, Text("Penguin.Invalid"), problem);
 				return false;
@@ -265,10 +322,7 @@ struct RunningOutput {
 	bool startRequested = false;
 	Layout layout = Layout::Landscape;
 
-	static void Started(void *data, calldata_t *)
-	{
-		static_cast<RunningOutput *>(data)->started.store(true);
-	}
+	static void Started(void *data, calldata_t *) { static_cast<RunningOutput *>(data)->started.store(true); }
 	static void Stopped(void *data, calldata_t *parameters)
 	{
 		auto *self = static_cast<RunningOutput *>(data);
@@ -301,40 +355,46 @@ struct RunningOutput {
 			signal_handler_disconnect(handler, "stop", Stopped, this);
 			signal_handler_disconnect(handler, "reconnect", Reconnecting, this);
 			signal_handler_disconnect(handler, "reconnect_success", Reconnected, this);
-			if (startRequested && !stopped.load())
+			if (startRequested && !stopped.load()) {
 				obs_output_force_stop(output);
+			}
 			// libobs destruction joins the output's capture/network threads. Video must outlive it.
 			obs_output_release(output);
 		}
 		obs_encoder_release(video);
 		obs_encoder_release(audio);
 		obs_service_release(service);
-		if (canvas)
+		if (canvas) {
 			obs_canvas_set_channel(canvas, 0, nullptr);
+		}
 		obs_scene_release(scene);
 		obs_canvas_release(canvas);
 	}
 
 	bool UpdateProgram()
 	{
-		if (!canvas)
+		if (!canvas) {
 			return true;
+		}
 		OBSSourceAutoRelease source = obs_get_output_source(0);
-		if (!source)
+		if (!source) {
 			return false;
+		}
 		if (programItem && obs_sceneitem_get_source(programItem) != source) {
 			obs_sceneitem_remove(programItem);
 			programItem = nullptr;
 		}
-		if (!programItem)
+		if (!programItem) {
 			programItem = obs_scene_add(scene, source);
-		if (!programItem)
+		}
+		if (!programItem) {
 			return false;
+		}
 		obs_sceneitem_defer_update_begin(programItem);
 		obs_sceneitem_set_alignment(programItem, OBS_ALIGN_CENTER);
 		obs_sceneitem_set_bounds_alignment(programItem, OBS_ALIGN_CENTER);
-		obs_sceneitem_set_bounds_type(programItem,
-					      layout == Layout::PortraitFit ? OBS_BOUNDS_SCALE_INNER : OBS_BOUNDS_SCALE_OUTER);
+		obs_sceneitem_set_bounds_type(programItem, layout == Layout::PortraitFit ? OBS_BOUNDS_SCALE_INNER
+											 : OBS_BOUNDS_SCALE_OUTER);
 		const vec2 bounds{1080.0f, 1920.0f};
 		const vec2 position{540.0f, 960.0f};
 		obs_sceneitem_set_bounds(programItem, &bounds);
@@ -346,10 +406,12 @@ struct RunningOutput {
 	QString Initialize(const Destination &destination)
 	{
 		obs_video_info info{};
-		if (!obs_get_video_info(&info))
+		if (!obs_get_video_info(&info)) {
 			return Text("Penguin.VideoUnavailable");
-		if (info.colorspace == VIDEO_CS_2100_PQ || info.colorspace == VIDEO_CS_2100_HLG)
+		}
+		if (info.colorspace == VIDEO_CS_2100_PQ || info.colorspace == VIDEO_CS_2100_HLG) {
 			return Text("Penguin.SdrRequired");
+		}
 		layout = destination.layout;
 		video_t *videoOutput = obs_get_video();
 		const QByteArray id = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
@@ -359,22 +421,26 @@ struct RunningOutput {
 			info.base_height = info.output_height = 1920;
 			info.output_format = VIDEO_FORMAT_NV12;
 			canvas = obs_canvas_create_private(name.constData(), &info, DEVICE);
-			if (!canvas || !(videoOutput = obs_canvas_get_video(canvas)))
+			if (!canvas || !(videoOutput = obs_canvas_get_video(canvas))) {
 				return Text("Penguin.CanvasFailed");
+			}
 			scene = obs_canvas_scene_create(canvas, name.constData());
-			if (!scene || !UpdateProgram())
+			if (!scene || !UpdateProgram()) {
 				return Text("Penguin.NoProgram");
+			}
 			obs_canvas_set_channel(canvas, 0, obs_scene_get_source(scene));
 		}
 		OBSDataAutoRelease serviceSettings = obs_data_create();
 		obs_data_set_string(serviceSettings, "server", destination.server.toUtf8().constData());
 		obs_data_set_string(serviceSettings, "key", destination.key.toUtf8().constData());
 		service = obs_service_create("rtmp_custom", name.constData(), serviceSettings, nullptr);
-		if (!service)
+		if (!service) {
 			return Text("Penguin.Failed");
+		}
 		OBSDataAutoRelease videoSettings = obs_encoder_defaults(destination.encoder.toUtf8().constData());
-		if (!videoSettings)
+		if (!videoSettings) {
 			return Text("Penguin.MissingEncoder");
+		}
 		obs_data_set_string(videoSettings, "rate_control", "CBR");
 		obs_data_set_int(videoSettings, "bitrate", destination.bitrate);
 		obs_data_set_int(videoSettings, "keyint_sec", 2);
@@ -382,10 +448,11 @@ struct RunningOutput {
 			obs_data_set_string(videoSettings, "preset", "veryfast");
 			obs_data_set_string(videoSettings, "profile", "high");
 		}
-		video = obs_video_encoder_create(destination.encoder.toUtf8().constData(), name.constData(), videoSettings,
-						 nullptr);
-		if (!video)
+		video = obs_video_encoder_create(destination.encoder.toUtf8().constData(), name.constData(),
+						 videoSettings, nullptr);
+		if (!video) {
 			return Text("Penguin.MissingEncoder");
+		}
 		obs_encoder_set_video(video, videoOutput);
 		obs_encoder_set_preferred_video_format(video, VIDEO_FORMAT_NV12);
 		OBSDataAutoRelease audioSettings = obs_data_create();
@@ -397,15 +464,18 @@ struct RunningOutput {
 				break;
 			}
 		}
-		if (!audioId)
+		if (!audioId) {
 			return Text("Penguin.AudioFailed");
+		}
 		audio = obs_audio_encoder_create(audioId, name.constData(), audioSettings, 0, nullptr);
-		if (!audio)
+		if (!audio) {
 			return Text("Penguin.AudioFailed");
+		}
 		obs_encoder_set_audio(audio, obs_get_audio());
 		output = obs_output_create("rtmp_output", name.constData(), nullptr, nullptr);
-		if (!output)
+		if (!output) {
 			return Text("Penguin.Failed");
+		}
 		obs_output_set_video_encoder(output, video);
 		obs_output_set_audio_encoder(output, audio, 0);
 		obs_output_set_service(output, service);
@@ -449,14 +519,18 @@ public:
 		painter->setFont(nameFont);
 		painter->setPen(option.palette.color(color));
 		painter->drawText(QRect(content.x(), content.y(), content.width(), lineHeight), Qt::AlignVCenter,
-				  QFontMetrics(nameFont).elidedText(index.data().toString(), Qt::ElideRight, content.width()));
+				  QFontMetrics(nameFont).elidedText(index.data().toString(), Qt::ElideRight,
+								    content.width()));
 		painter->setFont(option.font);
 		for (int column = 1; column <= 2; ++column) {
-			painter->setPen(option.palette.color(selected ? QPalette::HighlightedText :
-								       column == 1 ? QPalette::PlaceholderText : QPalette::Text));
+			painter->setPen(option.palette.color(selected      ? QPalette::HighlightedText
+							     : column == 1 ? QPalette::PlaceholderText
+									   : QPalette::Text));
 			const QString text = index.siblingAtColumn(column).data().toString();
-			painter->drawText(QRect(content.x(), content.y() + column * (lineHeight + 2), content.width(), lineHeight),
-					  Qt::AlignVCenter, option.fontMetrics.elidedText(text, Qt::ElideRight, content.width()));
+			painter->drawText(QRect(content.x(), content.y() + column * (lineHeight + 2), content.width(),
+						lineHeight),
+					  Qt::AlignVCenter,
+					  option.fontMetrics.elidedText(text, Qt::ElideRight, content.width()));
 		}
 		if (option.state & QStyle::State_HasFocus) {
 			painter->setBrush(Qt::NoBrush);
@@ -491,13 +565,15 @@ class OutputDock final : public QWidget {
 	void Load()
 	{
 		QFile file(ConfigPath());
-		if (!file.open(QIODevice::ReadOnly) || file.size() > 1024 * 1024)
+		if (!file.open(QIODevice::ReadOnly) || file.size() > 1024 * 1024) {
 			return;
+		}
 		const QJsonObject config = QJsonDocument::fromJson(file.readAll()).object();
 		setupShown = config.value(QStringLiteral("setupShown")).toBool();
 		for (const auto &value : config.value(QStringLiteral("destinations")).toArray()) {
-			if (entries.size() == MaxDestinations)
+			if (entries.size() == MaxDestinations) {
 				break;
+			}
 			const QJsonObject object = value.toObject();
 			auto entry = std::make_unique<Entry>();
 			auto &d = entry->destination;
@@ -505,7 +581,8 @@ class OutputDock final : public QWidget {
 			d.platform = object.value(QStringLiteral("platform")).toString();
 			d.server = object.value(QStringLiteral("server")).toString();
 			d.encoder = object.value(QStringLiteral("encoder")).toString(QStringLiteral("obs_x264"));
-			d.layout = static_cast<Layout>(std::clamp(object.value(QStringLiteral("layout")).toInt(), 0, 2));
+			d.layout =
+				static_cast<Layout>(std::clamp(object.value(QStringLiteral("layout")).toInt(), 0, 2));
 			d.bitrate = std::clamp(object.value(QStringLiteral("bitrate")).toInt(6000), 500, 50000);
 			entry->status = Text("Penguin.NeedsKey");
 			entries.push_back(std::move(entry));
@@ -521,13 +598,14 @@ class OutputDock final : public QWidget {
 		const QString path = ConfigPath();
 		QSaveFile file(path);
 		const QByteArray bytes = QJsonDocument(QJsonObject{{QStringLiteral("version"), 1},
-							       {QStringLiteral("setupShown"), setupShown},
-							       {QStringLiteral("destinations"), saved}})
+								   {QStringLiteral("setupShown"), setupShown},
+								   {QStringLiteral("destinations"), saved}})
 						 .toJson();
-		if (path.isEmpty() || !QDir().mkpath(QFileInfo(path).absolutePath()) || !file.open(QIODevice::WriteOnly) ||
-		    !file.setPermissions(QFile::ReadOwner | QFile::WriteOwner) || file.write(bytes) != bytes.size() ||
-		    !file.commit())
+		if (path.isEmpty() || !QDir().mkpath(QFileInfo(path).absolutePath()) ||
+		    !file.open(QIODevice::WriteOnly) || !file.setPermissions(QFile::ReadOwner | QFile::WriteOwner) ||
+		    file.write(bytes) != bytes.size() || !file.commit()) {
 			ShowMessage(this, QMessageBox::Warning, Text("Penguin.Outputs"), Text("Penguin.ConfigError"));
+		}
 	}
 
 	void Refresh()
@@ -538,18 +616,19 @@ class OutputDock final : public QWidget {
 			const auto &d = entry->destination;
 			const char *format = d.layout == Layout::Landscape      ? "Penguin.Landscape"
 					     : d.layout == Layout::PortraitCrop ? "Penguin.PortraitCrop"
-									    : "Penguin.PortraitFit";
+										: "Penguin.PortraitFit";
 			auto *item = new QTreeWidgetItem(destinations, {d.name, Text(format), entry->status});
-			const QString description = QStringLiteral("%1\n%2 · %3\n%4")
-						    .arg(d.name, d.platform, Text(format), entry->status);
+			const QString description =
+				QStringLiteral("%1\n%2 · %3\n%4").arg(d.name, d.platform, Text(format), entry->status);
 			item->setToolTip(0, description);
 			item->setData(0, Qt::AccessibleTextRole, description);
 		}
 		destinations->setVisible(!entries.empty());
 		emptyState->setVisible(entries.empty());
 		destinationCount->setText(QStringLiteral("%1 / %2").arg(entries.size()).arg(MaxDestinations));
-		if (selected >= 0 && selected < destinations->topLevelItemCount())
+		if (selected >= 0 && selected < destinations->topLevelItemCount()) {
 			destinations->setCurrentItem(destinations->topLevelItem(selected));
+		}
 		UpdateButtons();
 	}
 
@@ -557,8 +636,9 @@ class OutputDock final : public QWidget {
 	{
 		setProperty("penguinDestinationCount", static_cast<int>(entries.size()));
 		int active = 0;
-		for (const auto &candidate : entries)
+		for (const auto &candidate : entries) {
 			active += candidate->running ? 1 : 0;
+		}
 		setProperty("penguinActiveCount", active);
 		const Entry *entry = SelectedEntry();
 		edit->setEnabled(entry && !entry->running);
@@ -569,8 +649,9 @@ class OutputDock final : public QWidget {
 
 	void Configure(bool welcome, Entry *existing = nullptr)
 	{
-		if (shuttingDown || (existing && existing->running))
+		if (shuttingDown || (existing && existing->running)) {
 			return;
+		}
 		if (activeWizard) {
 			activeWizard->raise();
 			activeWizard->activateWindow();
@@ -584,24 +665,29 @@ class OutputDock final : public QWidget {
 		activeWizard = wizard;
 		wizard->setAttribute(Qt::WA_DeleteOnClose);
 		wizard->setWindowModality(Qt::ApplicationModal);
-		if (welcome)
+		if (welcome) {
 			setupShown = true;
+		}
 		// A nested exec() could let main-window shutdown delete a stack-owned child.
 		// The parent's lifetime now owns the wizard and automatically cancels this callback.
 		connect(wizard, &QDialog::finished, this, [this, wizard, welcome, existing](int result) mutable {
 			activeWizard = nullptr;
-			if (shuttingDown)
+			if (shuttingDown) {
 				return;
+			}
 			if (result == QDialog::Accepted) {
-				if (existing && std::none_of(entries.begin(), entries.end(),
-							    [existing](const auto &entry) { return entry.get() == existing; }))
+				if (existing &&
+				    std::none_of(entries.begin(), entries.end(),
+						 [existing](const auto &entry) { return entry.get() == existing; })) {
 					return;
+				}
 				if (!existing) {
 					entries.push_back(std::make_unique<Entry>());
 					existing = entries.back().get();
 				}
 				existing->destination = wizard->Value();
-				existing->status = Text(existing->destination.key.isEmpty() ? "Penguin.NeedsKey" : "Penguin.Idle");
+				existing->status =
+					Text(existing->destination.key.isEmpty() ? "Penguin.NeedsKey" : "Penguin.Idle");
 			}
 			Save();
 			Refresh();
@@ -616,16 +702,19 @@ class OutputDock final : public QWidget {
 
 	void Start(Entry &entry)
 	{
-		if (entry.running || shuttingDown)
+		if (entry.running || shuttingDown) {
 			return;
+		}
 		QString error = Validate(entry.destination, true);
 		auto running = std::make_unique<RunningOutput>();
-		if (error.isEmpty())
+		if (error.isEmpty()) {
 			error = running->Initialize(entry.destination);
+		}
 		if (error.isEmpty()) {
 			running->startRequested = obs_output_start(running->output);
-			if (!running->startRequested)
+			if (!running->startRequested) {
 				error = Text("Penguin.Failed");
+			}
 		}
 		if (!error.isEmpty()) {
 			entry.status = error;
@@ -639,14 +728,16 @@ class OutputDock final : public QWidget {
 
 	void Stop(Entry &entry)
 	{
-		if (!entry.running || entry.running->stopping)
+		if (!entry.running || entry.running->stopping) {
 			return;
+		}
 		entry.running->stopping = true;
 		// A connecting output is not active yet; the ordinary stop call ignores it.
-		if (!entry.running->started.load() || entry.running->reconnecting.load())
+		if (!entry.running->started.load() || entry.running->reconnecting.load()) {
 			obs_output_force_stop(entry.running->output);
-		else
+		} else {
 			obs_output_stop(entry.running->output);
+		}
 		entry.status = Text("Penguin.Stopping");
 		Refresh();
 	}
@@ -655,13 +746,15 @@ class OutputDock final : public QWidget {
 	{
 		bool changed = false;
 		for (auto &entry : entries) {
-			if (!entry->running)
+			if (!entry->running) {
 				continue;
+			}
 			auto &running = *entry->running;
 			QString state;
 			if (running.stopped.load()) {
 				const int code = running.stopCode.load();
-				state = code == OBS_OUTPUT_SUCCESS ? Text("Penguin.Stopped") : Text("Penguin.Error").arg(code);
+				state = code == OBS_OUTPUT_SUCCESS ? Text("Penguin.Stopped")
+								   : Text("Penguin.Error").arg(code);
 				entry->running.reset();
 			} else if (running.stopping) {
 				state = Text("Penguin.Stopping");
@@ -673,14 +766,16 @@ class OutputDock final : public QWidget {
 			changed |= entry->status != state;
 			entry->status = state;
 		}
-		if (changed)
+		if (changed) {
 			Refresh();
+		}
 	}
 
 	void MaybeShowSetup()
 	{
-		if (setupShown || shuttingDown)
+		if (setupShown || shuttingDown) {
 			return;
+		}
 		// Wait for main-window activation and any pending hardware setup before
 		// opening another modal surface. Background/tray starts must not steal focus.
 		if (window()->property("penguinStartupDialogPending").toBool() || !window()->isActiveWindow() ||
@@ -714,7 +809,8 @@ public:
 		destinations = new QTreeWidget;
 		destinations->setObjectName(QStringLiteral("penguinDestinationList"));
 		destinations->setRootIsDecorated(false);
-		destinations->setHeaderLabels({Text("Penguin.Destination"), Text("Penguin.Format"), Text("Penguin.Status")});
+		destinations->setHeaderLabels(
+			{Text("Penguin.Destination"), Text("Penguin.Format"), Text("Penguin.Status")});
 		destinations->setHeaderHidden(true);
 		destinations->setColumnHidden(1, true);
 		destinations->setColumnHidden(2, true);
@@ -749,8 +845,9 @@ public:
 		edit = new QPushButton(Text("Penguin.EditShort"));
 		edit->setToolTip(Text("Penguin.Edit"));
 		remove = new QPushButton(Text("Penguin.Remove"));
-		for (auto *button : {edit, remove})
+		for (auto *button : {edit, remove}) {
 			actions->addWidget(button);
+		}
 		box->addLayout(actions);
 		auto *outputs = new QGridLayout;
 		start = new QPushButton(Text("Penguin.StartShort"));
@@ -775,8 +872,9 @@ public:
 		box->addWidget(note);
 		connect(add, &QPushButton::clicked, this, [this]() { Configure(false); });
 		connect(edit, &QPushButton::clicked, this, [this]() {
-			if (auto *entry = SelectedEntry())
+			if (auto *entry = SelectedEntry()) {
 				Configure(false, entry);
+			}
 		});
 		connect(remove, &QPushButton::clicked, this, [this]() {
 			if (auto *entry = SelectedEntry(); entry && !entry->running) {
@@ -786,12 +884,14 @@ public:
 			}
 		});
 		connect(start, &QPushButton::clicked, this, [this]() {
-			if (auto *entry = SelectedEntry())
+			if (auto *entry = SelectedEntry()) {
 				Start(*entry);
+			}
 		});
 		connect(stop, &QPushButton::clicked, this, [this]() {
-			if (auto *entry = SelectedEntry())
+			if (auto *entry = SelectedEntry()) {
 				Stop(*entry);
+			}
 		});
 		connect(startAll, &QPushButton::clicked, this, [this]() {
 			for (const auto &entry : entries) {
@@ -803,12 +903,14 @@ public:
 					}
 				}
 			}
-			for (auto &entry : entries)
+			for (auto &entry : entries) {
 				Start(*entry);
+			}
 		});
 		connect(stopAll, &QPushButton::clicked, this, [this]() {
-			for (auto &entry : entries)
+			for (auto &entry : entries) {
 				Stop(*entry);
+			}
 		});
 		connect(destinations, &QTreeWidget::itemSelectionChanged, this, [this]() { UpdateButtons(); });
 		connect(&timer, &QTimer::timeout, this, [this]() { Tick(); });
@@ -838,14 +940,17 @@ public:
 			StopImmediately();
 		} else if (event == OBS_FRONTEND_EVENT_EXIT || event == OBS_FRONTEND_EVENT_SCRIPTING_SHUTDOWN) {
 			shuttingDown = true;
-			if (activeWizard)
+			if (activeWizard) {
 				activeWizard->reject();
+			}
 			timer.stop();
 			StopImmediately();
-		} else if (event == OBS_FRONTEND_EVENT_SCENE_CHANGED || event == OBS_FRONTEND_EVENT_TRANSITION_CHANGED) {
+		} else if (event == OBS_FRONTEND_EVENT_SCENE_CHANGED ||
+			   event == OBS_FRONTEND_EVENT_TRANSITION_CHANGED) {
 			for (auto &entry : entries) {
-				if (entry->running && !entry->running->UpdateProgram())
+				if (entry->running && !entry->running->UpdateProgram()) {
 					Stop(*entry);
+				}
 			}
 		}
 	}
@@ -856,10 +961,12 @@ bool frontendShutdown = false;
 
 void FrontendEvent(obs_frontend_event event, void *)
 {
-	if (dock)
+	if (dock) {
 		dock->Event(event);
-	if (event == OBS_FRONTEND_EVENT_EXIT)
+	}
+	if (event == OBS_FRONTEND_EVENT_EXIT) {
 		frontendShutdown = true;
+	}
 }
 } // namespace
 
@@ -872,8 +979,9 @@ bool obs_module_load(void)
 void obs_module_post_load(void)
 {
 	auto *parent = static_cast<QWidget *>(obs_frontend_get_main_window());
-	if (!parent)
+	if (!parent) {
 		return;
+	}
 	dock = new OutputDock(parent);
 	if (!obs_frontend_add_dock_by_id(DockId, obs_module_text("Penguin.Outputs"), dock.data())) {
 		delete dock.data();
@@ -885,8 +993,9 @@ void obs_module_post_load(void)
 void obs_module_unload(void)
 {
 	// OBS destroys its frontend callbacks immediately after the EXIT event.
-	if (frontendShutdown)
+	if (frontendShutdown) {
 		return;
+	}
 	obs_frontend_remove_event_callback(FrontendEvent, nullptr);
 	if (dock) {
 		dock->StopImmediately();

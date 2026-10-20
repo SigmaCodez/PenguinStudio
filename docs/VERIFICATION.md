@@ -2,6 +2,34 @@
 
 This is a development preview based on OBS Studio 32.2.2. The new Penguin code must not be described as fully production-tested until the checks below have real recorded results.
 
+## Searchable categories and saved accounts — 2026-10-20 (unreleased)
+
+On Ubuntu 26.04.1 / GNOME Wayland, development builds of both Penguin plugins
+were overlaid onto the installed 0.3.1 application using an isolated configuration.
+The system installation and the user's normal account configuration were not changed.
+
+- Real Twitch device authorization succeeded after user approval. Twitch chat connected,
+  and the refresh credential was saved in the OS keyring.
+- After closing and restarting the application, Twitch and chat reconnected without
+  opening another authorization page. Typing `Minecraft` returned 20 category suggestions,
+  including named games with IDs. No chat message or metadata update was sent.
+- Both application runs exited with status 0, no logged warnings/errors and zero
+  OBS-reported memory leaks. The isolated test credential was removed afterward.
+- The optional wizard account dialog was inspected under Wayland. A hidden reparented
+  page was fixed; fields now render and both provider tabs return when the dialog closes.
+- Automated Qt tests cover stale search responses, selection validation, refresh-token
+  rotation and restoration, disconnect versus pending reads, keyring failure reporting,
+  YouTube assignable categories and metadata preservation. Wizard tests cover optional
+  sign-in on the welcome page, cancellation, parent destruction and shutdown.
+- Real Secret Service write/read/delete passed with plaintext fallback disabled.
+  Native chat and update-policy regressions passed as well.
+
+YouTube authorization was tested with simulated provider responses, not a real Google
+account. YouTube's API exposes video categories, not individual Gaming title search.
+New strings are localized in English and German; the other six Penguin translations
+currently use English fallback text for these additions. Sandboxed keyring access and
+new package dependencies still need clean-package runtime coverage.
+
 ## Real in-app upgrade 0.3.0 → 0.3.1 — 2026-10-20
 
 The installed Ubuntu 26.04.1 application completed a genuine in-app upgrade.

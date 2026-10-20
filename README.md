@@ -51,7 +51,7 @@ Penguin Studio has its own version numbers and release schedule. Our GitHub Acti
 
 - Portrait currently crops or fits the program scene. Independently editable portrait scenes and a dual-preview editor remain future work.
 - Encoders are selected per destination; hardware availability and simultaneous encoding limits depend on the GPU and drivers. Encoder sharing is not implemented.
-- Twitch and YouTube metadata connections require their respective developer registrations and enabled API access. No OBS Project application credentials are bundled.
+- Twitch uses Penguin Studio’s bundled public application ID. YouTube requires your own desktop client registration and enabled API access. No OBS Project application credentials are bundled.
 - Kick, Facebook, TikTok and other RTMP(S) platforms use server/key setup. Native account login and title editing are not implemented for every provider; platform eligibility restrictions still apply.
 - PipeWire capture and a working desktop portal are needed for Wayland screen sharing. Browser sources still depend on upstream CEF support and must be tested on the target compositor.
 - Flatpak is the primary cross-distribution target. Native DEB/RPM builds target the distribution used to build them. Retained libobs paths mean native packages conflict with an existing native OBS installation.
