@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 #include "PenguinLinuxUpdater.hpp"
 #include "PenguinUpdatePolicy.hpp"
-#include <OBSApp.hpp>
-#include <qt-wrappers.hpp>
+#include <util/config-file.h>
+#include <QApplication>
 #include <ui-config.h>
 #include <obs-frontend-api.h>
 #include <QCheckBox>
@@ -33,7 +33,7 @@
 namespace {
 QString Text(const char *key)
 {
-	return QTStr(key);
+	return QString::fromUtf8(obs_frontend_get_locale_string(key));
 }
 bool OutputsActive()
 {
@@ -79,12 +79,16 @@ QString Target()
 }
 QString UpdateDirectory()
 {
+	if (!QFile::exists("/.flatpak-info")) {
+		return QDir::tempPath() + "/penguin-update-XXXXXX";
+	}
 	const auto cache = QStandardPaths::writableLocation(QStandardPaths::CacheLocation);
 	QDir().mkpath(cache);
 	return cache + "/update-XXXXXX";
 }
 class Updater final : public QDialog {
-	QNetworkAccessManager network{this};
+	QNetworkAccessManager ownedNetwork{this};
+	QNetworkAccessManager &network;
 	QPointer<QNetworkReply> reply;
 	QProcess installer{this};
 	QTimer notification{this};
@@ -98,9 +102,20 @@ class Updater final : public QDialog {
 	QPushButton *notes = new QPushButton(this);
 	QDialogButtonBox *buttons = new QDialogButtonBox(QDialogButtonBox::Close, this);
 	PenguinUpdates::Release release;
-	QString target = Target();
+	QString target;
 	bool downloading = false, installing = false;
 	qint64 received = 0;
+
+	void SetStatus(const QString &message)
+	{
+		status->setText(message);
+		status->ensurePolished();
+		// Qt can retain the short initial label's height when an asynchronous
+		// response adds wrapped paragraphs. Reserve the minimum-width text height.
+		status->setMinimumHeight(std::max(status->fontMetrics().height() * 2, status->heightForWidth(380)));
+		layout()->activate();
+		adjustSize();
+	}
 
 	void Show()
 	{
@@ -111,13 +126,14 @@ class Updater final : public QDialog {
 	{
 		downloading = false;
 		installing = false;
+		buttons->setEnabled(true);
 		setWindowModality(Qt::NonModal);
 		progress->hide();
 		package.close();
 		package.remove();
 		check->setEnabled(true);
 		install->setEnabled(!release.name.isEmpty());
-		status->setText(Text(key));
+		SetStatus(Text(key));
 	}
 	void Download()
 	{
@@ -125,7 +141,7 @@ class Updater final : public QDialog {
 			return;
 		}
 		if (OutputsActive()) {
-			status->setText(Text("Penguin.Update.StopOutputs"));
+			SetStatus(Text("Penguin.Update.StopOutputs"));
 			return;
 		}
 		if (!directory.isValid()) {
@@ -150,13 +166,14 @@ class Updater final : public QDialog {
 		progress->setRange(0, 100);
 		progress->setValue(0);
 		progress->show();
-		status->setText(Text("Penguin.Update.Downloading"));
+		SetStatus(Text("Penguin.Update.Downloading"));
 		QNetworkRequest request(release.url);
 		request.setTransferTimeout(60000);
 		request.setAttribute(QNetworkRequest::RedirectPolicyAttribute,
 				     QNetworkRequest::NoLessSafeRedirectPolicy);
 		reply = network.get(request);
 		auto *download = reply.data();
+		download->setReadBufferSize(1024 * 1024);
 		connect(download, &QNetworkReply::readyRead, this, [this, download]() {
 			const auto chunk = download->readAll();
 			received += chunk.size();
@@ -168,10 +185,11 @@ class Updater final : public QDialog {
 			progress->setValue(int(100 * received / release.size));
 		});
 		connect(download, &QNetworkReply::finished, this, [this, download]() {
-			const bool valid =
-				download->error() == QNetworkReply::NoError &&
-				download->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() == 200 &&
-				received == release.size && hash.result().toHex() == release.digest.toLatin1();
+			const bool valid = download->error() == QNetworkReply::NoError &&
+					   download->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() ==
+						   200 &&
+					   received == release.size &&
+					   hash.result().toHex() == release.digest.toLatin1() && package.flush();
 			download->deleteLater();
 			reply = nullptr;
 			package.close();
@@ -195,9 +213,10 @@ class Updater final : public QDialog {
 			return;
 		}
 		installing = true;
+		buttons->setEnabled(false);
 		setWindowModality(Qt::ApplicationModal);
 		Show();
-		status->setText(Text("Penguin.Update.Installing"));
+		SetStatus(Text("Penguin.Update.Installing"));
 		progress->setRange(0, 0);
 		// No shell, downloaded executable or privileged app process. The distro manager
 		// resolves dependencies; apt is explicitly forbidden from removing packages.
@@ -240,20 +259,25 @@ protected:
 	}
 
 public:
-	explicit Updater(QWidget *parent) : QDialog(parent)
+	explicit Updater(QWidget *parent, QNetworkAccessManager *transport = nullptr,
+			 QString installationTarget = Target())
+		: QDialog(parent),
+		  network(transport ? *transport : ownedNetwork),
+		  target(std::move(installationTarget))
 	{
 		setObjectName("penguinLinuxUpdater");
 		setWindowTitle(Text("Penguin.Update.Title"));
 		setMinimumWidth(420);
 		auto *layout = new QVBoxLayout(this);
 		status->setWordWrap(true);
+		status->setAlignment(Qt::AlignLeft | Qt::AlignTop);
 		status->setTextFormat(Qt::PlainText);
 		layout->addWidget(status);
 		layout->addWidget(progress);
 		progress->hide();
 		auto *automatic = new QCheckBox(Text("Penguin.Update.Automatic"), this);
 		auto *preview = new QCheckBox(Text("Penguin.Update.Preview"), this);
-		auto *config = App()->GetAppConfig();
+		auto *config = obs_frontend_get_app_config();
 		automatic->setChecked(config_get_bool(config, "General", "EnableAutoUpdates"));
 		// Penguin currently ships development previews; users can opt out explicitly.
 		config_set_default_bool(config, "PenguinUpdates", "Preview", true);
@@ -262,9 +286,14 @@ public:
 			config_set_bool(config, "General", "EnableAutoUpdates", value);
 			config_save_safe(config, "tmp", nullptr);
 		});
-		connect(preview, &QCheckBox::toggled, this, [config](bool value) {
+		connect(preview, &QCheckBox::toggled, this, [this, config](bool value) {
 			config_set_bool(config, "PenguinUpdates", "Preview", value);
 			config_save_safe(config, "tmp", nullptr);
+			if (!downloading && !installing) {
+				release = {};
+				install->setEnabled(false);
+				Check(true);
+			}
 		});
 		layout->addWidget(automatic);
 		layout->addWidget(preview);
@@ -272,6 +301,10 @@ public:
 		install->setText(Text("Penguin.Update.Install"));
 		notes->setText(Text("Penguin.Update.Releases"));
 		install->setEnabled(false);
+		install->setProperty("penguinPrimary", true);
+		for (auto *button : {check, install, notes}) {
+			button->setAutoDefault(false);
+		}
 		layout->addWidget(check);
 		layout->addWidget(install);
 		layout->addWidget(notes);
@@ -296,6 +329,7 @@ public:
 		connect(&installer, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this,
 			[this](int code, QProcess::ExitStatus exit) {
 				installing = false;
+				buttons->setEnabled(true);
 				setWindowModality(Qt::NonModal);
 				if (code != 0 || exit != QProcess::NormalExit) {
 					Failed("Penguin.Update.InstallFailed");
@@ -304,7 +338,7 @@ public:
 				progress->hide();
 				install->setEnabled(false);
 				check->setEnabled(false);
-				status->setText(Text("Penguin.Update.Installed"));
+				SetStatus(Text("Penguin.Update.Installed"));
 				package.remove();
 			});
 		notification.setInterval(15000);
@@ -328,7 +362,7 @@ public:
 		}
 		check->setEnabled(false);
 		install->setEnabled(false);
-		status->setText(Text("Penguin.Update.Checking"));
+		SetStatus(Text("Penguin.Update.Checking"));
 		QNetworkRequest request(
 			QUrl("https://api.github.com/repos/SigmaCodez/PenguinStudio/releases?per_page=30"));
 		request.setRawHeader("Accept", "application/vnd.github+json");
@@ -352,21 +386,20 @@ public:
 			reply = nullptr;
 			check->setEnabled(true);
 			if (!valid) {
-				status->setText(Text("Penguin.Update.CheckFailed"));
+				SetStatus(Text("Penguin.Update.CheckFailed"));
 				return;
 			}
-			auto *config = App()->GetAppConfig();
+			auto *config = obs_frontend_get_app_config();
 			config_set_int(config, "PenguinUpdates", "LastCheck", QDateTime::currentSecsSinceEpoch());
 			config_save_safe(config, "tmp", nullptr);
 			release = PenguinUpdates::Select(document.array(), PENGUIN_VERSION, target,
 							 config_get_bool(config, "PenguinUpdates", "Preview"));
 			if (release.version.isEmpty()) {
-				status->setText(Text("Penguin.Update.Current"));
+				SetStatus(Text("Penguin.Update.Current"));
 				return;
 			}
-			status->setText(
-				Text("Penguin.Update.Available").arg(release.version) + "\n\n" +
-				Text(release.name.isEmpty() ? "Penguin.Update.External" : "Penguin.Update.Confirm"));
+			SetStatus(Text("Penguin.Update.Available").arg(release.version) + "\n\n" +
+				  Text(release.name.isEmpty() ? "Penguin.Update.External" : "Penguin.Update.Confirm"));
 			install->setEnabled(!release.name.isEmpty());
 			// Never steal focus during a broadcast, recording or startup wizard.
 			if (manual ||
@@ -384,8 +417,8 @@ QPointer<Updater> updater;
 void CheckPenguinLinuxUpdates(QWidget *parent, bool manual)
 {
 	if (!manual) {
-		auto *config = App()->GetAppConfig();
-		if (!config_get_bool(config, "General", "EnableAutoUpdates") || App()->IsUpdaterDisabled()) {
+		auto *config = obs_frontend_get_app_config();
+		if (!config_get_bool(config, "General", "EnableAutoUpdates")) {
 			return;
 		}
 		const auto elapsed =

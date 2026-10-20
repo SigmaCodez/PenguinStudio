@@ -23,6 +23,12 @@ int main()
 		 "https://github.com/SigmaCodez/PenguinStudio/releases/download/penguin-v0.3.0/" + name}};
 	const QJsonObject release{{"tag_name", "penguin-v0.3.0"}, {"prerelease", true}, {"assets", QJsonArray{asset}}};
 	Require(Select({release}, "0.2.1", "ubuntu26.04", true).name == name, "compatible preview not selected");
+	auto encodedAsset = asset;
+	encodedAsset["browser_download_url"] = asset.value("browser_download_url").toString().replace("+", "%2B");
+	auto encodedRelease = release;
+	encodedRelease["assets"] = QJsonArray{encodedAsset};
+	Require(Select({encodedRelease}, "0.2.1", "ubuntu26.04", true).name == name,
+		"GitHub's percent-encoded package URL rejected");
 	Require(Select({release}, "0.2.1", "ubuntu24.04", true).name.isEmpty(), "wrong distro accepted");
 	Require(Select({release}, "0.2.1", "", true).name.isEmpty(), "unknown installation offered native update");
 	Require(Select({release}, "0.2.1", "ubuntu26.04", false).version.isEmpty(),

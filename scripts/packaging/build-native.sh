@@ -28,6 +28,7 @@ cmake -S "$project_root" -B "$build_dir" -G Ninja \
   -DENABLE_WEBRTC=OFF -DENABLE_LIBFDK=OFF -DPENGUIN_BUILD_TESTS=ON \
   -DOBS_COMPILE_DEPRECATION_AS_WARNING=ON "${package_options[@]}"
 cmake --build "$build_dir" --parallel "${CMAKE_BUILD_PARALLEL_LEVEL:-2}"
+QT_QPA_PLATFORM=offscreen "$build_dir/frontend/penguin-update-flow"
 "$build_dir/plugins/penguin-outputs/penguin-output-safety"
 QT_QPA_PLATFORM=offscreen "$build_dir/plugins/penguin-platforms/penguin-platform-flow"
 QT_QPA_PLATFORM=offscreen "$build_dir/plugins/penguin-outputs/penguin-wizard-lifecycle"

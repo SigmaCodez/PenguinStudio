@@ -10,6 +10,8 @@
 #include <QNetworkReply>
 #include <QPlainTextEdit>
 #include <QPointer>
+#include <QSet>
+#include <QQueue>
 #include <QPushButton>
 #include <QTimer>
 #include <QVBoxLayout>
@@ -31,6 +33,8 @@ class TwitchChat final : public QWidget {
 	QPushButton *send = new QPushButton(this);
 	QLabel *status = new QLabel(this);
 	QList<Message> messages;
+	QSet<QString> delivered;
+	QQueue<QString> deliveryOrder;
 	QString token, client, user, session;
 	quint64 generation = 0;
 	int backoff = 1000, keepalive = 30;
@@ -130,21 +134,28 @@ class TwitchChat final : public QWidget {
 			Retry();
 			return;
 		}
+		if (!migration) {
+			session.clear();
+			heartbeat.stop();
+			ready = false;
+			send->setEnabled(false);
+			for (auto *previous : findChildren<QWebSocket *>()) {
+				disconnect(previous, nullptr, this, nullptr);
+				previous->abort();
+				previous->deleteLater();
+			}
+		}
 		auto *next = new QWebSocket(QString(), QWebSocketProtocol::VersionLatest, this);
 		next->setMaxAllowedIncomingFrameSize(256 * 1024);
 		next->setMaxAllowedIncomingMessageSize(256 * 1024);
 		const auto epoch = generation;
-		if (!migration && socket) {
-			disconnect(socket, nullptr, this, nullptr);
-			socket->abort();
-			socket->deleteLater();
-		}
 		if (!migration) {
 			socket = next;
 		}
-		QTimer::singleShot(15000, next, [next]() {
-			if (!next->property("welcomed").toBool()) {
+		QTimer::singleShot(15000, next, [this, next, epoch]() {
+			if (!next->property("welcomed").toBool() && epoch == generation) {
 				next->abort();
+				Retry();
 			}
 		});
 		connect(next, &QWebSocket::disconnected, this, [this, next, epoch]() {
@@ -194,6 +205,16 @@ class TwitchChat final : public QWidget {
 					Open(QUrl(payload.value("session").toObject().value("reconnect_url").toString()),
 					     true);
 				} else if (type == "notification") {
+					const auto id =
+						root.value("metadata").toObject().value("message_id").toString();
+					if (id.isEmpty() || delivered.contains(id)) {
+						return;
+					}
+					delivered.insert(id);
+					deliveryOrder.enqueue(id);
+					if (deliveryOrder.size() > 2048) {
+						delivered.remove(deliveryOrder.dequeue());
+					}
 					ApplyEvent(payload.value("subscription").toObject().value("type").toString(),
 						   payload.value("event").toObject());
 				} else if (type == "revocation") {
@@ -224,7 +245,7 @@ public:
 		history->setObjectName("penguinChatHistory");
 		history->document()->setMaximumBlockCount(500);
 		input->setPlaceholderText(text("Chat.Message"));
-		input->setMaxLength(1000);
+		input->setMaxLength(500);
 		send->setText(text("Chat.Send"));
 		status->setWordWrap(true);
 		status->setTextFormat(Qt::PlainText);
@@ -294,9 +315,12 @@ public:
 		user.clear();
 		session.clear();
 		messages.clear();
+		delivered.clear();
+		deliveryOrder.clear();
 		history->clear();
 		input->clear();
 		ready = sending = false;
+		backoff = 1000;
 		send->setEnabled(false);
 		status->setText(text("Chat.Disconnected"));
 	}

@@ -20,7 +20,8 @@ The application never collects an administrator password. APT is forbidden from
 removing packages. Flatpak uses its existing host-service permission to invoke
 `flatpak install --or-update` for the detected user/system installation. Custom
 Flatpak installation roots are not automatically selected. Update packages are
-staged in the app cache, not written into the installation directly. The update
+staged in a temporary directory (the app cache for Flatpak), not written into
+the installation directly. The update
 dialog prevents ordinary window closure while the package manager is running.
 After success, close and reopen Penguin Studio to load the updated application.
 

@@ -83,3 +83,9 @@ if(ENABLE_BROWSER AND EXISTS "${CEF_ROOT_DIR}/LICENSE.txt")
     DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/licenses/penguin-studio/cef"
   )
 endif()
+
+if(PENGUIN_BUILD_TESTS)
+  add_executable(penguin-update-flow "${CMAKE_SOURCE_DIR}/test/penguin-update-flow.cpp")
+  target_include_directories(penguin-update-flow PRIVATE "${CMAKE_CURRENT_BINARY_DIR}" "${CMAKE_SOURCE_DIR}/frontend/api")
+  target_link_libraries(penguin-update-flow PRIVATE OBS::libobs Qt::Widgets Qt::Network)
+endif()

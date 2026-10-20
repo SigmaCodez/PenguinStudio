@@ -36,7 +36,7 @@ Flatpak bundle. Choose the package matching your distribution release. See [inst
 2. Launch `penguin-studio`. Finish the OBS hardware configuration assistant and Penguin's destination assistant.
 3. Choose a platform, copy its RTMP(S) server and stream key from its creator dashboard, and choose landscape or portrait output.
 4. Use **Destinations** to add further destinations. **Go live** starts all configured Penguin destinations; **End stream** stops them. The live button's menu also exposes OBS's separate primary stream action.
-5. Open the arrow menu beside **Go live**, then choose **Stream details** to connect Twitch or YouTube for title updates. Development builds require your own registered application client IDs; see [platform setup](docs/PLATFORMS.md).
+5. Open the arrow menu beside **Go live**, then choose **Stream details** to connect Twitch or YouTube for title updates. Current `main` builds bundle the Penguin Twitch application ID and add **Docks → Twitch chat**. YouTube still requires your own registered application; see [platform setup](docs/PLATFORMS.md).
 6. Make a private test stream before a public broadcast. Check picture framing, sound, reconnects, CPU/GPU load, dropped frames and total upload bandwidth.
 
 In the new **Broadcast destinations** and **Stream details** docks, stream keys, OAuth access/refresh tokens and client secrets remain in memory for the current session. They must be entered again after restart. Destination names, nonsecret server URLs, encoder choices and public application IDs are saved locally. Never put a stream key into a saved server URL. The inherited OBS **Settings → Stream** workflow has separate storage behavior and can persist stream credentials in the local profile.
@@ -56,6 +56,15 @@ Penguin Studio has its own version numbers and release schedule. Our GitHub Acti
 - PipeWire capture and a working desktop portal are needed for Wayland screen sharing. Browser sources still depend on upstream CEF support and must be tested on the target compositor.
 - Flatpak is the primary cross-distribution target. Native DEB/RPM builds target the distribution used to build them. Retained libobs paths mean native packages conflict with an existing native OBS installation.
 - All existing OBS languages remain selectable. New Penguin dialogs have their own translations and English fallback; see [localization](docs/LOCALIZATION.md).
+
+## Updates
+
+The next release adds **Help → Check for updates**, automatic release notifications
+and verified package installation for supported Ubuntu, Fedora and Flatpak
+installations. These features are currently on `main`; the published 0.2.1
+package does not yet include them. See [in-app updates](docs/UPDATES.md) for package
+support and the Snap limitation. Downloads always come from
+[Penguin Studio releases](https://github.com/SigmaCodez/PenguinStudio/releases).
 
 ## Contributing
 

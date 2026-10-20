@@ -61,7 +61,9 @@ inline Release Select(const QJsonArray &releases, const QString &current, const 
 			const QUrl expected("https://github.com/SigmaCodez/PenguinStudio/releases/download/penguin-v" +
 					    version + "/" + expectedName);
 			if (!hash.match(digest).hasMatch() || size <= 0 || size > 1024.0 * 1024 * 1024 ||
-			    url != expected) {
+			    url.scheme() != "https" || url.host() != "github.com" || !url.userInfo().isEmpty() ||
+			    (url.port() != -1 && url.port() != 443) || url.hasQuery() || url.hasFragment() ||
+			    url.path(QUrl::FullyDecoded) != expected.path(QUrl::FullyDecoded)) {
 				continue;
 			}
 			candidate.name = expectedName;
