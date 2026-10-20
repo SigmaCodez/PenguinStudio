@@ -29,6 +29,20 @@ not an installation test or a new release. Other package formats need their own
 GUI and installation validation. Strict Snap in-app installation remains limited
 by its package manager; see [update support](UPDATES.md).
 
+The final implementation (`31e1ae7898cbed51aef1b822e38d5e6efaf30791`) passed
+[all five package jobs](https://github.com/SigmaCodez/PenguinStudio/actions/runs/39463554436):
+Ubuntu 24.04/26.04 DEB, Fedora 44 RPM, Flatpak and Snap. Native and Snap jobs also
+passed their CI installation and launcher checks. Release publication was skipped
+because the version remains unchanged; these are development artifacts.
+
+The verified Ubuntu 26.04 CI package then passed a native Wayland GUI run without
+application implementation overlays. Both native docks were present and the actual
+Help update action opened the updater, correctly reporting the current version
+with installation disabled. Startup and shutdown produced no logged warnings/errors,
+exit code was 0, and reported OBS memory leaks were 0. This used an extracted
+package, its additional QtWebSockets dependency, a Qt observer and an isolated
+profile; it did not modify the installed application or test a package upgrade.
+
 Evidence: [sanitized test report](validation/updates-twitch-wayland.json),
 [German update dialog](validation/update-dialog-de.png),
 [native chat dock before sign-in](validation/twitch-chat-native.png).
