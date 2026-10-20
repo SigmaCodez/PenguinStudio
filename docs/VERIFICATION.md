@@ -2,6 +2,35 @@
 
 This is a development preview based on OBS Studio 32.2.2. The new Penguin code must not be described as fully production-tested until the checks below have real recorded results.
 
+## Real in-app upgrade 0.3.0 → 0.3.1 — 2026-10-20
+
+The installed Ubuntu 26.04.1 application completed a genuine in-app upgrade.
+Its Help updater offered published version 0.3.1, downloaded the matching Ubuntu
+26.04 DEB, passed its production size and SHA-256 validation, and invoked
+`pkexec /usr/bin/apt-get install -y --no-remove` itself. The observer clicked the
+real installation button; no separate installer command or replacement updater
+implementation was used. The package manager exited normally with code 0 and
+the updater displayed its installation-success message.
+
+The system package log confirms `0.3.0-1+ubuntu26.04` → `0.3.1-1+ubuntu26.04`.
+Installed-file verification passed. After closing the old process and reopening
+the app with the same isolated test profile, the launcher and application log
+reported 0.3.1. Both native docks were present, and a new update lookup reported
+the current version with installation disabled. Both application runs exited
+with code 0, no logged warnings/errors, and zero reported OBS memory leaks.
+The success and post-restart dialogs were visually inspected. No updater defect
+was found in this run. The restart was performed explicitly after the app's
+instruction; automatic restart is not implemented.
+
+The maintenance release retains 0.3.0 functionality and supplies all five Linux
+packages. This test establishes the Ubuntu upgrade path, not live upgrades on
+other package formats. Twitch authentication was not repeated here; see the
+installed 0.3.0 test below. Personal profiles were unchanged.
+
+Evidence: [upgrade results](validation/in-app-upgrade-0.3.1.json),
+[success dialog](validation/in-app-upgrade-installed.png),
+[release package manifest](validation/linux-release-0.3.1.json).
+
 ## Installed 0.3.0 validation — 2026-10-20
 
 [Version 0.3.0](https://github.com/SigmaCodez/PenguinStudio/releases/tag/penguin-v0.3.0)

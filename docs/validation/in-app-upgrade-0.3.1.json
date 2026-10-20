@@ -1,0 +1,63 @@
+{
+  "date": "2026-10-20",
+  "system": "Ubuntu 26.04.1 GNOME Wayland",
+  "from_version": "0.3.0-1+ubuntu26.04",
+  "to_version": "0.3.1-1+ubuntu26.04",
+  "release_url": "https://github.com/SigmaCodez/PenguinStudio/releases/tag/penguin-v0.3.1",
+  "source_commit": "2e131b9843c5ee11edcd752beaf5a50996056eab",
+  "updater": {
+    "dialogVisible": true,
+    "installClicked": true,
+    "installEnabled": false,
+    "installerArguments": [
+      "/usr/bin/apt-get",
+      "install",
+      "-y",
+      "--no-remove",
+      "penguin-studio_0.3.1-1+ubuntu26.04_amd64.deb"
+    ],
+    "installerExitCode": 0,
+    "installerNormalExit": true,
+    "installerProgram": "/usr/bin/pkexec",
+    "installerRunning": false,
+    "labels": [
+      "Update installed. Close Penguin Studio and start it again to use the new version."
+    ],
+    "manualCheckTriggered": true,
+    "wayland": true
+  },
+  "restarted": {
+    "chatDock": true,
+    "detailsPanel": true,
+    "dialogVisible": true,
+    "installEnabled": false,
+    "releaseMessage": "You are using the latest available version for the selected channel.",
+    "wayland": true
+  },
+  "runs": {
+    "upgrade": {
+      "application_version": "0.3.0",
+      "exit_code": 0,
+      "application_warnings_or_errors": [],
+      "reported_obs_memory_leaks": 0
+    },
+    "restart": {
+      "application_version": "0.3.1",
+      "exit_code": 0,
+      "application_warnings_or_errors": [],
+      "reported_obs_memory_leaks": 0
+    }
+  },
+  "package_verification": {
+    "dpkg_verify_passed": true,
+    "dpkg_upgrade_from_to_confirmed": true,
+    "launcher_version": "Penguin Studio 0.3.1 (OBS 32.2.2)"
+  },
+  "method": "The system-installed 0.3.0 application opened its real Help updater. A temporary Qt observer/controller clicked Download and install update after confirming the 0.3.1 offer. The application downloaded and verified the published Ubuntu package and invoked pkexec/apt-get itself; no external installer command or replacement updater was used. The old application was closed after success, then the installed 0.3.1 application was restarted using the same isolated profile and performed a fresh update lookup. Personal application profiles were not modified.",
+  "scope": [
+    "Manual in-app update from 0.3.0 to 0.3.1 on Ubuntu 26.04.1.",
+    "Actual download, production size/SHA-256 gate, package-manager success, installed-file verification, restart and current-version UI.",
+    "Both native docks remained present after restart; live Twitch authentication was not repeated in this upgrade-only test.",
+    "Does not establish live upgrade behavior for Fedora, Flatpak or Snap."
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "release_url": "https://github.com/SigmaCodez/PenguinStudio/releases/tag/penguin-v0.3.1",
+  "source_commit": "2e131b9843c5ee11edcd752beaf5a50996056eab",
+  "workflow_url": "https://github.com/SigmaCodez/PenguinStudio/actions/runs/39479174947",
+  "version": "0.3.1",
+  "published": true,
+  "prerelease": true,
+  "asset_count": 7,
+  "uploaded_sizes_and_github_sha256_verified": true,
+  "packages": [
+    {
+      "target": "Ubuntu 24.04 (amd64)",
+      "file": "penguin-studio_0.3.1-1+ubuntu24.04_amd64.deb",
+      "sha256": "92eb30c6c5186f7ac39fa18d432ac4eea28e68bf9c1b33976d611817124b49e2",
+      "bytes": 135554718
+    },
+    {
+      "target": "Ubuntu 26.04 / 26.04.1 (amd64)",
+      "file": "penguin-studio_0.3.1-1+ubuntu26.04_amd64.deb",
+      "sha256": "5d8bfbea0e9e4e7905f104b6133273a66d4638990a68fe94e6034b36bba131f4",
+      "bytes": 135684534
+    },
+    {
+      "target": "Fedora 44 (x86_64)",
+      "file": "penguin-studio-0.3.1-1.x86_64.rpm",
+      "sha256": "807cfa96f18b7f3fc53a6363489ca46eaf1b9fcdbf71837f517618ecffb06573",
+      "bytes": 119346869
+    },
+    {
+      "target": "Flatpak (x86_64)",
+      "file": "penguin-studio-0.3.1-x86_64.flatpak",
+      "sha256": "7087bf4de5471cb0c37f09276834bb01e701ed7777dbd221cceff28af777e0a0",
+      "bytes": 142678784
+    },
+    {
+      "target": "Snap core24 (amd64)",
+      "file": "penguin-studio_0.3.1_amd64.snap",
+      "sha256": "e3f7277e53ab122ff6c708f95d0740695014bcff61d363ea7d6ce27412e22c38",
+      "bytes": 499195904
+    }
+  ]
+}
