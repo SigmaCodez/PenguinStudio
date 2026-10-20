@@ -1,0 +1,46 @@
+{
+  "version": "0.3.0",
+  "date": "2026-10-20",
+  "system": "Ubuntu 26.04.1 GNOME Wayland",
+  "installed_package": "0.3.0-1+ubuntu26.04",
+  "release_url": "https://github.com/SigmaCodez/PenguinStudio/releases/tag/penguin-v0.3.0",
+  "source_commit": "1888829758d9249dfdd42f2d38fd0c3b864b0a7b",
+  "installation": {
+    "method": "System apt-get via pkexec after user confirmation",
+    "exit_code": 0,
+    "upgraded": [
+      "penguin-studio"
+    ],
+    "added": [
+      "libqt6websockets6"
+    ],
+    "removed": [],
+    "release_package_sha256_verified": true,
+    "dpkg_verify_passed": true
+  },
+  "native_gui": {
+    "accountConnected": true,
+    "chatConnected": true,
+    "chatDock": true,
+    "detailsDock": true,
+    "metadataRequested": true,
+    "metadataTitleLoaded": true,
+    "updateDialogVisible": true,
+    "updateInstallDisabled": true,
+    "updateReportsCurrent": true,
+    "wayland": true
+  },
+  "shutdown": {
+    "exit_code": 0,
+    "application_warnings_or_errors": [],
+    "reported_obs_memory_leaks": 0
+  },
+  "method": "System-installed application and dependencies with an isolated test profile. A temporary Qt observer/controller exercised the actual docks and Help update action; no replacement application modules or update implementations were used. User authorized Twitch in the normal browser.",
+  "limits": [
+    "No chat messages were sent and no stream metadata was changed.",
+    "Update lookup and current-version handling were tested; no subsequent version was available to test an in-app package upgrade.",
+    "Firefox/Snap emitted mount-namespace and browser diagnostics to inherited stderr; these were separate from Penguin Studio logs.",
+    "Live GUI tests cover Ubuntu GNOME Wayland, not every supported distribution or compositor.",
+    "The test application was closed after verification; Twitch tokens are session-only."
+  ]
+}

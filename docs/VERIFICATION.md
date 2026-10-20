@@ -2,6 +2,35 @@
 
 This is a development preview based on OBS Studio 32.2.2. The new Penguin code must not be described as fully production-tested until the checks below have real recorded results.
 
+## Installed 0.3.0 validation — 2026-10-20
+
+[Version 0.3.0](https://github.com/SigmaCodez/PenguinStudio/releases/tag/penguin-v0.3.0)
+is published as a development preview with all five Linux packages. All package
+jobs and release publication passed. Uploaded sizes and SHA-256 digests match
+the release manifest. The Ubuntu 26.04 DEB was downloaded, hashed and installed
+on Ubuntu 26.04.1 after system administrator confirmation. APT upgraded only
+Penguin Studio and added `libqt6websockets6`, removed nothing, and exited with
+code 0. Installed-file verification passed; the launcher reports version 0.3.0.
+
+The installed application passed a native GNOME Wayland test with an isolated
+profile and a temporary Qt observer/controller. The user completed real Twitch
+authorization in the system browser. Account and native chat connections
+succeeded, both docks were present, and loading stream details populated the
+current title. The actual Help update action reported the installed version as
+current and disabled installation appropriately. No chat message was sent and
+no stream metadata was changed.
+
+Closing the connected application exited with code 0, no Penguin warnings or
+errors, and zero reported OBS memory leaks. Firefox/Snap emitted separate browser
+and mount-namespace diagnostics to inherited stderr. No application implementation
+overlays were used. This verifies installation via the system package manager
+and update lookup; a subsequent in-app version upgrade was not exercised.
+Other distributions/compositors still require live GUI validation. The test
+instance was closed; Twitch authorization remains session-only.
+
+Evidence: [release assets](validation/linux-release-0.3.0.json),
+[installed Wayland results](validation/installed-0.3.0-wayland.json).
+
 ## Native Twitch chat and Linux updates — unreleased, 2026-10-20
 
 The development module connected to a real Twitch account after the user
