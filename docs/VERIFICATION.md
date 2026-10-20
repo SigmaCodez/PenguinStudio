@@ -2,7 +2,41 @@
 
 This is a development preview based on OBS Studio 32.2.2. The new Penguin code must not be described as fully production-tested until the checks below have real recorded results.
 
-## Searchable categories and saved accounts — 2026-10-20 (unreleased)
+## Released and installed 0.4.0 — 2026-10-20
+
+[Release 0.4.0](https://github.com/SigmaCodez/PenguinStudio/releases/tag/penguin-v0.4.0)
+contains Ubuntu 24.04 and 26.04 DEBs, Fedora RPM, Flatpak and Snap, plus SHA-256
+checksums and the exact source manifest. All five package jobs and the publication
+job passed at commit `bb3ff5120e9d75cd66f0d090f728fc7accdbcb21`.
+Two Flatpak configuration failures were fixed: disable QtKeychain's optional
+upstream tests (the packaged Qt has no Qt6Test), and build the library explicitly
+as Release so Penguin Studio can resolve its imported CMake target.
+
+The published Ubuntu 26.04 package was checked against the release manifest and
+installed on Ubuntu 26.04.1, upgrading 0.3.1 to 0.4.0. Only `libqt6keychain1` was
+added; no packages were removed. Package-file verification passed.
+
+The installed application, without development-plugin overlays, was tested on
+GNOME Wayland with an isolated profile. Real Twitch browser authorization and
+chat connection succeeded. Sign-in was saved in the system keyring and restored
+on two subsequent starts without another authorization. Game search returned
+20 suggestions including Minecraft. A synthetic popup attempt lacked a Wayland
+input serial and logged a grabbing-popup warning; the test was repeated using
+real user input. The user confirmed the visible suggestions, and the popup was
+visually inspected. The initial login and real-input runs exited with code 0,
+no logged warnings/errors, and zero OBS-reported memory leaks. The synthetic
+attempt also exited normally; no application warning filter was introduced.
+
+No chat messages or stream metadata changes were sent. The isolated account was
+disconnected and its keyring entry removed after testing. Normal user settings
+were unchanged. Real YouTube authorization remains untested; the automated
+provider tests cover its category and credential-restoration flows.
+
+Evidence: [package build results and manifest](validation/linux-release-0.4.0.json),
+[installed Wayland checks](validation/accounts-installed-0.4.0.json), and
+[visible game suggestions](validation/accounts-search-0.4.0.png).
+
+## Searchable categories and saved accounts — 2026-10-20 (pre-release checks)
 
 On Ubuntu 26.04.1 / GNOME Wayland, development builds of both Penguin plugins
 were overlaid onto the installed 0.3.1 application using an isolated configuration.

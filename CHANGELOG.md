@@ -5,6 +5,7 @@
 - Add searchable Twitch game/category suggestions and filterable YouTube video categories.
 - Restore Twitch and YouTube sign-ins from the system keyring after restart; disconnect removes the saved credentials without a plaintext fallback.
 - Offer optional provider sign-in in the first-start and destination assistants.
+- Fix Flatpak QtKeychain test dependencies and imported build configuration.
 
 ## 0.3.1 — 2026-10-20
 

@@ -1,0 +1,60 @@
+{
+  "version": "0.4.0",
+  "installedPackage": "0.4.0-1+ubuntu26.04",
+  "system": "Ubuntu 26.04.1 / GNOME Wayland",
+  "profile": "isolated test configuration; normal user configuration unchanged",
+  "installation": {
+    "exitCode": 0,
+    "packageFilesVerified": true,
+    "releaseDigestVerified": true,
+    "packagesRemoved": 0,
+    "newDependency": "libqt6keychain1 0.15.0-2"
+  },
+  "firstSession": {
+    "accountConnected": true,
+    "chatConnected": true,
+    "chatDock": true,
+    "detailsDock": true,
+    "keyringSaved": true,
+    "wayland": true
+  },
+  "automaticRestore": {
+    "accountConnected": true,
+    "chatConnected": true,
+    "chatDock": true,
+    "detailsDock": true,
+    "keyringSaved": true,
+    "liveSearchReturnedGame": true,
+    "searchResultCount": 20,
+    "suggestionsVisible": false,
+    "wayland": true
+  },
+  "manualSearch": {
+    "accountConnected": true,
+    "chatConnected": true,
+    "chatDock": true,
+    "detailsDock": true,
+    "keyringSaved": true,
+    "liveSearchReturnedGame": true,
+    "searchResultCount": 20,
+    "suggestionsVisible": false,
+    "wayland": true
+  },
+  "visibleSuggestionsConfirmedByUser": true,
+  "visibleSuggestionsScreenshot": "accounts-search-0.4.0.png",
+  "exitCodes": [
+    0,
+    0,
+    0
+  ],
+  "normalRunsLoggedWarningsOrErrors": false,
+  "normalRunsReportedMemoryLeaks": [
+    0,
+    0
+  ],
+  "syntheticInputLimitation": "The programmatic search attempt had no Wayland input serial and produced a grabbing-popup warning. Repeating with real user input displayed suggestions without warnings. No warning suppression was added.",
+  "testKeyringEntryRemoved": true,
+  "liveYouTubeTest": false,
+  "chatMessagesSent": false,
+  "streamMetadataModified": false
+}

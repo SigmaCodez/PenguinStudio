@@ -1,0 +1,77 @@
+{
+  "version": "0.4.0",
+  "sourceCommit": "bb3ff5120e9d75cd66f0d090f728fc7accdbcb21",
+  "workflow": "https://github.com/SigmaCodez/PenguinStudio/actions/runs/39492631568",
+  "result": "success",
+  "jobs": [
+    {
+      "name": "Validate version and release intent",
+      "result": "success"
+    },
+    {
+      "name": "Branding, translations, configuration, and OAuth",
+      "result": "success"
+    },
+    {
+      "name": "Ubuntu 26.04 DEB (amd64)",
+      "result": "success"
+    },
+    {
+      "name": "Snap core24 (amd64, development)",
+      "result": "success"
+    },
+    {
+      "name": "Ubuntu 24.04 DEB (amd64)",
+      "result": "success"
+    },
+    {
+      "name": "Flatpak (x86_64)",
+      "result": "success"
+    },
+    {
+      "name": "Fedora 44 RPM (x86_64)",
+      "result": "success"
+    },
+    {
+      "name": "Publish complete Linux download set",
+      "result": "success"
+    }
+  ],
+  "releaseManifest": {
+    "version": "0.4.0",
+    "source_commit": "bb3ff5120e9d75cd66f0d090f728fc7accdbcb21",
+    "workflow_url": "https://github.com/SigmaCodez/PenguinStudio/actions/runs/39492631568",
+    "packages": [
+      {
+        "target": "Ubuntu 24.04 (amd64)",
+        "file": "penguin-studio_0.4.0-1+ubuntu24.04_amd64.deb",
+        "sha256": "89388da57376b14efb1a67859dba847d64631b8ebf8a5cdd418b6e62f241d84b",
+        "bytes": 135575330
+      },
+      {
+        "target": "Ubuntu 26.04 / 26.04.1 (amd64)",
+        "file": "penguin-studio_0.4.0-1+ubuntu26.04_amd64.deb",
+        "sha256": "f9a7b056af2d71ed16abdfdce211656d216db4378ec4e31fe4d072fe389f0fd8",
+        "bytes": 135707520
+      },
+      {
+        "target": "Fedora 44 (x86_64)",
+        "file": "penguin-studio-0.4.0-1.x86_64.rpm",
+        "sha256": "2c6764f9fc31b99f68093983a33e345c3fbe1c4c4abb46e3c84a7111cd61216c",
+        "bytes": 119365911
+      },
+      {
+        "target": "Flatpak (x86_64)",
+        "file": "penguin-studio-0.4.0-x86_64.flatpak",
+        "sha256": "9fb84d16aee0d9056c6001d8ada56bb5df2098df42b2a59319487325d33814bf",
+        "bytes": 142734672
+      },
+      {
+        "target": "Snap core24 (amd64)",
+        "file": "penguin-studio_0.4.0_amd64.snap",
+        "sha256": "df0d0a33a484720ef8c7bd21699fa0a24e574eadcf6267c780a4d70da9471ec3",
+        "bytes": 499277824
+      }
+    ]
+  }
+}
