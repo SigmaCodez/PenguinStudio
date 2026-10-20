@@ -2,6 +2,37 @@
 
 This is a development preview based on OBS Studio 32.2.2. The new Penguin code must not be described as fully production-tested until the checks below have real recorded results.
 
+## Native Twitch chat and Linux updates — unreleased, 2026-10-20
+
+The development module connected to a real Twitch account after the user
+completed device authorization in Firefox. Both account validation and all four
+native chat EventSub subscriptions succeeded under GNOME Wayland. No chat message
+was sent and no live stream title/category was changed. Closing this connected
+test instance exited successfully, without logged warnings/errors or reported
+OBS memory leaks. The test profile and tokens were isolated from personal app
+configuration; tokens remained in memory only.
+
+The actual updater dialog was exercised against GitHub releases using a simulated
+older compiled version (`0.2.0`) to offer the real `0.2.1` Ubuntu 26.04 asset.
+English and German runs displayed the update and enabled installation; no package
+manager was executed. A real-data regression fixed GitHub's `%2B` encoding of the
+plus sign in Ubuntu package names. A visual check also found and fixed clipping
+of asynchronously loaded, wrapped update text. Both corrected language runs
+closed with no logged warnings/errors and zero reported OBS memory leaks.
+
+Offline tests exercise the production updater's failed downloads, size limits,
+checksum rejection and active-output exclusion. Additional tests cover Twitch
+polling/refresh/revocation, loading metadata without overwriting user edits,
+chat moderation events, history bounds and reconnect URL validation. Native
+GUI checks used development overlays over the verified 0.2.1 package; they are
+not an installation test or a new release. Other package formats need their own
+GUI and installation validation. Strict Snap in-app installation remains limited
+by its package manager; see [update support](UPDATES.md).
+
+Evidence: [sanitized test report](validation/updates-twitch-wayland.json),
+[German update dialog](validation/update-dialog-de.png),
+[native chat dock before sign-in](validation/twitch-chat-native.png).
+
 ## UI branding audit — unreleased source, 2026-10-20
 
 Source `d05aaf0f9863bbf477d8129a131ce9ddee5d0c0f` passed the Ubuntu 26.04

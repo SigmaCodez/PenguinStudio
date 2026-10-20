@@ -234,10 +234,23 @@ int main(int argc, char **argv)
 			"refresh token form encoding incorrect");
 		network.Respond(7, 200, Tokens("new-access", "rotated-refresh"));
 		network.Respond(8, 200, Validation());
+		Button(*pane, "Twitch.Load")->click();
+		Require(network.calls[9].request.url().path() == "/helix/channels",
+			"Channel information request missing");
+		Line(*pane, "Title")->setText("Local edit while loading");
+		network.Respond(9, 200,
+				{{"data", QJsonArray{QJsonObject{{"title", "Remote title"}, {"game_id", "509658"}}}}});
+		Require(Line(*pane, "Title")->text() == "Local edit while loading",
+			"Loading overwrote an unsaved title");
+		Require(Line(*pane, "Twitch.Category")->text() == "509658", "Channel category was not loaded");
+		Button(*pane, "Twitch.Load")->click();
+		network.Respond(10, 200,
+				{{"data", QJsonArray{QJsonObject{{"title", "Remote title"}, {"game_id", "509658"}}}}});
+		Require(Line(*pane, "Title")->text() == "Remote title", "Current channel title was not loaded");
 		Tick(*pane, 3540 * 1000);
-		Require(network.calls[9].body.contains("refresh_token=rotated-refresh"),
+		Require(network.calls[11].body.contains("refresh_token=rotated-refresh"),
 			"one-use refresh token was reused");
-		const auto pending = network.calls[9].reply;
+		const auto pending = network.calls[11].reply;
 		Button(*pane, "Disconnect")->click();
 		Require(pending && pending->aborted && !Button(*pane, "Update")->isEnabled(),
 			"disconnect must cancel pending requests");

@@ -1,0 +1,65 @@
+{
+  "date": "2026-10-20",
+  "environment": {
+    "os": "Ubuntu 26.04.1",
+    "desktop": "GNOME Wayland",
+    "qt": "6.10.2"
+  },
+  "method": "Isolated profiles and private filesystem view of the verified 0.2.1 package, with development module/Qt observer overlays. Browser authorization was relayed to the normal host browser because the read-only test filesystem prevents Firefox Snap startup. No system installation was changed.",
+  "twitch": {
+    "accountConnected": true,
+    "chatConnected": true,
+    "chatDock": true,
+    "detailsDock": true,
+    "wayland": true
+  },
+  "updater": {
+    "fixture_current_version": "0.2.0",
+    "real_release_version": "0.2.1",
+    "install_button_exercised": false,
+    "english": {
+      "dialogVisible": true,
+      "installEnabled": true,
+      "releaseMessage": "Penguin Studio 0.2.1 is available.\n\nThe package will be verified before installation. Linux may ask for administrator approval. Restart Penguin Studio after the update."
+    },
+    "german": {
+      "dialogVisible": true,
+      "installEnabled": true,
+      "releaseMessage": "Penguin Studio 0.2.1 ist verfügbar.\n\nDas Paket wird vor der Installation geprüft. Linux kann eine Administratorbestätigung anfordern. Starte Penguin Studio nach dem Update neu."
+    }
+  },
+  "runs": {
+    "twitch-connected": {
+      "exit_code": 0,
+      "warnings_or_errors": [],
+      "reported_obs_memory_leaks": 0
+    },
+    "updater-en": {
+      "exit_code": 0,
+      "warnings_or_errors": [],
+      "reported_obs_memory_leaks": 0
+    },
+    "updater-de": {
+      "exit_code": 0,
+      "warnings_or_errors": [],
+      "reported_obs_memory_leaks": 0
+    }
+  },
+  "offline_checks": [
+    "Device authorization polling/backoff and rotating refresh tokens",
+    "Scope validation, disconnect cancellation and shutdown callbacks",
+    "Channel metadata loading and preservation of an in-flight user edit",
+    "Chat plain-text rendering, duplicate messages, deletion, clearing and bounded history",
+    "Twitch reconnect endpoint validation",
+    "Release channel, version, architecture/distribution and digest selection",
+    "Real GitHub percent-encoded Ubuntu asset URL regression",
+    "Production updater rejects malformed metadata, incorrect SHA-256 and oversized downloads",
+    "Production updater refuses download/install while outputs are active"
+  ],
+  "limitations": [
+    "No live chat message was sent and no Twitch stream metadata was changed.",
+    "No real package-manager installation or automatic restart was performed.",
+    "Native graphical tests cover Ubuntu GNOME Wayland; Fedora, Flatpak and Snap GUI behavior is not covered by these runs.",
+    "The live OAuth check used a development module during implementation; final input-length/reset refinements were subsequently compiled and covered by offline tests."
+  ]
+}
