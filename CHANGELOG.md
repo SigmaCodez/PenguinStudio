@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.1 — 2026-10-20
+
+- Publish a maintenance build to validate the complete in-app upgrade path from 0.3.0 on Ubuntu 26.04.1.
+- Retain the 0.3.0 application behavior; verification results are recorded separately in the release validation documentation.
+
 ## 0.3.0 — 2026-10-20
 
 - Add automatic Penguin release notifications and verified in-app Linux package updates.
