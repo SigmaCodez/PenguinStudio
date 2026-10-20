@@ -1,15 +1,14 @@
-Code of Conduct
-===============
+Penguin Studio Code of Conduct
+==============================
 
 Preamble
 --------
 
-OBS is made up of many people from all over the world, with different
+Penguin Studio welcomes people from all over the world, with different
 backgrounds and experiences that they bring to the project. In order to
 continue letting the community grow, feel safe, and to encourage good
-communication, we are adopting the following Code of Conduct. This
-document—or any subsequent version—will be enforced from July 31st, 2021
-onwards.
+communication, we are adopting the following Code of Conduct. This document
+adapts the inherited OBS Code of Conduct for the Penguin Studio repository; see Attribution and Version History below.
 
 Scope
 -----
@@ -23,14 +22,12 @@ intend to speak for the project or not.
 A person is considered to be representing the project if they’re
 speaking as a code contributor, support volunteer, member involved with
 the project, or if they have some kind of visible role in an official
-channel for OBS. This does not include roles for Sponsors or Patrons.
+channel for Penguin Studio. This does not include roles for Sponsors or Patrons.
 
-Official channels for OBS include the Discord server, the forum, any
-GitHub repositories within the OBS Project organization, any social
-media accounts for OBS Project, any public events where OBS Project has
-a presence, any presentations given on behalf of OBS Project, or any
-other situation that can be reasonably interpreted as being hosted,
-attended or communicated by the OBS Project.
+The official project channel is the
+`SigmaCodez/PenguinStudio repository <https://github.com/SigmaCodez/PenguinStudio>`__,
+including its issues, pull requests and discussions where enabled. OBS Project
+channels are operated independently and do not provide Penguin Studio support.
 
 This Code of Conduct is subject to change, and any changes will have a 2
 week notice period before taking immediate effect. Changes will not be
@@ -82,10 +79,10 @@ Support Volunteers
 
 -  There are many users of differing skill levels or abilities. This is
    never a reason to refuse support for someone, as long as it’s within
-   the scope of OBS support, and the user is willing to cooperate.
+   the scope of Penguin Studio support, and the user is willing to cooperate.
 -  Just because something seems obvious to you, doesn’t mean it’s
    actually obvious. If someone is having difficulty understanding how
-   to use OBS, it should never be treated as their fault.
+   to use Penguin Studio, it should never be treated as their fault.
 -  Bad advice is often worse than no advice. If you don’t know how to
    address someone’s issue, then get ahold of someone who’ll be able to
    provide them help. We can only expect so much patience from a user
@@ -114,31 +111,31 @@ within our community:
 Enforcement
 -----------
 
-Instances of unacceptable behavior may be reported by contacting an
-enforcement team member at one of the following addresses:
-coc@obsproject.com. All complaints will be reviewed and investigated,
-and will result in a response that is deemed necessary and appropriate
-to the circumstances. The project team is obligated to maintain
-confidentiality with regard to the reporter of an incident. Further
-details of specific enforcement policies may be posted separately.
+The Penguin Studio maintainer moderates participation in this repository.
+For abusive content, use GitHub's reporting controls on the relevant content
+or account. Do not post personal information or sensitive incident details in
+public issues. No dedicated Penguin Studio conduct-reporting email address is
+currently published; OBS contact addresses are not a reporting channel for this
+project. Security vulnerabilities have a separate process in
+`SECURITY.md <SECURITY.md>`__.
 
-In other cases where behavior is against the general guidelines set out
-in this Code of Conduct, this may be brought up with a moderator through
-either a Discord DM, or through an email to an enforcement member. In
-these cases, it is always assumed in the first instance that a person
-means well, and action will only be taken in the case of repeated
-failure to follow the guidelines.
+Moderation may include requesting changes, removing inappropriate content or
+restricting participation, according to the circumstances and available GitHub
+controls.
 
 Feedback
 --------
 
-Suggestions for changes can be made by submitting a pull request on the
-`obsproject/obs-studio <https://github.com/obsproject/obs-studio>`__
-repo, or if you wish to privately discuss your concerns, you can instead
-email coc@obsproject.com.
+Suggestions for this document can be submitted as a pull request in the
+`Penguin Studio repository <https://github.com/SigmaCodez/PenguinStudio>`__.
+Keep public feedback free of private incident details.
 
 Attribution
 -----------
+
+This Penguin Studio adaptation retains the OBS Project Code of Conduct as its
+source. The original policy is available in the
+`pinned OBS source <https://github.com/obsproject/obs-studio/blob/ba2f32bdf791005443988a4955e963663e16b1ed/COC.rst>`__.
 
 This Code of Conduct is adapted in part from the Contributor Covenant,
 version 1.4, in part from the Citizen Code of Conduct (used under
@@ -150,4 +147,7 @@ Attribution-ShareAlike 3.0 License.
 Version History
 ---------------
 
-V1.0 - First Iteration - July 31st, 2021
+OBS V1.0 - First Iteration - July 31st, 2021
+
+Penguin Studio adaptation - October 20th, 2026: project scope, reporting and
+feedback channels updated; inherited attribution and license retained.

@@ -5,10 +5,15 @@
 
 .. _contents:
 
-Welcome to OBS Studio's documentation!
-======================================
+Penguin Studio: inherited OBS API reference
+==========================================
 
-* **Setting up an OBS development environment?** :wiki:`Use the Wiki <Install-Instructions>`
+This reference documents the inherited OBS engine and plugin interfaces. API
+names, upstream examples and attribution are retained for compatibility.
+For Penguin Studio setup and releases, use the project guides below.
+
+* **Building Penguin Studio?** `Use the developer guide <https://github.com/SigmaCodez/PenguinStudio/blob/main/CONTRIBUTING.md>`_
+* **Installing Penguin Studio?** `Download a Penguin Studio release <https://github.com/SigmaCodez/PenguinStudio/releases>`_
 * **Developing your first OBS plugin?** `Use the obs-plugintemplate <https://github.com/obsproject/obs-plugintemplate#obs-plugin-template>`_
 
 .. toctree::
@@ -39,5 +44,5 @@ Welcome to OBS Studio's documentation!
    :maxdepth: 1
    :hidden:
 
-   Build Instructions <https://obsproject.com/wiki/Install-Instructions>
+   Penguin Studio Builds <https://github.com/SigmaCodez/PenguinStudio/blob/main/docs/PACKAGING.md>
    Plugin Template <https://github.com/obsproject/obs-plugintemplate#obs-plugin-template>

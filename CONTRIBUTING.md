@@ -58,7 +58,8 @@ integration test when a suitable graphics session is available. Package changes
 must build on their declared target distribution; do not describe untested distro
 or hardware combinations as supported.
 
-Use a respectful, constructive tone in discussions. Security-sensitive reports
+Follow the [Penguin Studio Code of Conduct](COC.rst) and use a respectful,
+constructive tone in discussions. Security-sensitive reports
 must not expose another person's credentials or personal data in public issues.
 
 ## Upstream and licensing

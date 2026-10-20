@@ -1,3 +1,9 @@
+.. note::
+
+   This is the preserved upstream OBS Studio README, including its original
+   project links and attribution. For Penguin Studio installation, support and
+   releases, use `README.md <README.md>`_. The links below refer to OBS itself.
+
 OBS Studio <https://obsproject.com>
 ===================================
 

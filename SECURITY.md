@@ -19,8 +19,10 @@ Use test accounts and synthetic data; redact credentials and personal informatio
 
 Penguin Studio is currently a development preview. Security fixes target the
 latest source on `main` and subsequent builds. Older preview packages do not
-have a separate security maintenance branch. Check the source revision recorded
-for your package when reporting a problem.
+have a separate security maintenance branch. Download fixes from
+[Penguin Studio releases](https://github.com/SigmaCodez/PenguinStudio/releases);
+OBS releases are not Penguin Studio updates. Include the package version and
+source revision from `build-manifest.json` when reporting a problem.
 
 ## Coordinated disclosure
 

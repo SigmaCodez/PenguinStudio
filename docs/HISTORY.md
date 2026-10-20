@@ -16,8 +16,9 @@ Git entries retain the upstream submodules and their separate histories.
 
 ## Existing verification and packages
 
-The 0.1 and 0.2 records in `docs/validation/` describe work performed before the
-reset. Their original commit hashes, branch names, run IDs and package checksums
+The original 0.1 and early 0.2 records in `docs/validation/` describe work performed
+before the reset. Later 0.2.0 revisions and 0.2.1 reports record post-reset work;
+check each report's source commit and date. Their original commit hashes, branch names, run IDs and package checksums
 remain unchanged. In particular, the 0.2 workspace tests used
 `6ed8300525b17e1fd0597389a2b139956228240d`; the final 0.2 application packages
 used `8c1d5113a19fa90a5c604e79d81e6e0c60208dbc`. The repository-state record

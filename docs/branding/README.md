@@ -26,12 +26,13 @@ notices and are not claimed as Penguin Studio artwork.
 
 ## Native appearance
 
-`frontend/data/themes/Penguin.ovt` extends OBS's Yami theme rather than replacing
-working controls. Charcoal surfaces, mint action buttons, generous dock titles,
-and six-pixel control corners provide a distinct studio identity. The inherited
-layout places scenes and sources on the left, the preview in the center, and
-audio, transitions, and output controls below. Users retain movable docks and
-the original appearance settings, including accessibility options.
+`frontend/data/themes/Penguin.ovt` extends the inherited Yami theme. The current
+workspace uses charcoal surfaces, indigo selection and focus accents, and a mint
+Go live action. Searchable layers and scenes sit on the left, the canvas in the
+center, vertical audio channels below, and Inspector/Outputs/Details on the right.
+The top toolbar provides production controls. Docks remain movable, and the
+appearance settings retain font scaling and accessibility options. See the
+[workspace visual guide](workspace.md) and [user guide](../WORKSPACE.md).
 
 This is an original visual interpretation of a modern streaming workspace,
 not a reproduction of Meld Studio's assets or proprietary functionality.

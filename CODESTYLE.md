@@ -1,5 +1,9 @@
-OBS Studio Code Style Guidelines
-================================
+Penguin Studio Code Style Guidelines
+===================================
+
+Adapted from the OBS Studio code style guidelines retained with the source.
+These conventions apply to Penguin Studio contributions; upstream attribution
+and source license notices remain intact.
 
 The project requires all contributions to have their source code formatted using appropriate formatting tools to reduce the potential impact of stylistic changes to a structured “diff” view of code.
 
@@ -132,7 +136,7 @@ And the more such “naive” code (mainly in the form of hacks and workarounds)
 
 ## Language Specific Guidance
 
-OBS Studio currently contains code written in the following languages:
+Penguin Studio currently contains code written in the following languages:
 
 * C
 * C++
@@ -166,16 +170,16 @@ The project treats C++ as its own language and not just as “C with classes”.
 Additions and changes (in the order the associated topics appear in the Google document):
 
 * **Header Files**
-    * OBS Studio uses the “cpp” suffix for C++ source code files rather than “cc” and “hpp” for C++-specific header files
+    * Penguin Studio uses the “cpp” suffix for C++ source code files rather than “cc” and “hpp” for C++-specific header files
     * Header guards are permitted, but not required - a simple `#pragma once` is sufficient
     * Use of forward declarations is permitted for class or struct types, but be mindful of the caveats mentioned in the Style Guide. **Avoid “Structuring code to enable forward declarations”.**
-    * OBS Studio uses a different header include order, documented in a separate section below
+    * Penguin Studio uses a different header include order, documented in a separate section below
 * **Classes**
     * If any constructor or assignment operator is defined, all 5 types need to be either defined, defaulted, or deleted, including the destructor (**“Rule of Five”**)
     * Ensure that move constructor and move assignment operator are marked “noexcept” (and implemented accordingly) to avoid possible pessimization when using user-defined types with standard library containers like `std::vector`.
     * Use multiple-inheritance only for the interface/protocol pattern ("implements an interface as defined by" relationship), avoid the diamond pattern and virtual base classes.
 * **Google-Specific Magic**
-    * OBS Studio does not use `cpplint`
+    * Penguin Studio does not use `cpplint`
 * **Other C++ Features**
     * Exceptions can (but don't have to) be used, particularly when no good "sentinel value" can be provided and also to avoid littering the code with correctness checks after every function call. It is preferred to keep the “scope” of exceptions within the same module (i.e., the same executable or library).
     * Be aware that in C++ <u>any</u> function that is not a destructor and is not explicitly marked as noexcept can potentially throw an exception as part of normal error handling rather than signaling an actual critical failure.
@@ -188,7 +192,7 @@ Additions and changes (in the order the associated topics appear in the Google d
     * Use the class name (following type name rules) for the file name of its interface header and implementation file.
     * Use `camelCase` for instance methods, functions, as well as variables. This also aligns with Qt’s code style.
     * Existing constants in code are permitted to be kept with `UPPERCASE` names, but new constants should follow the new convention of `kCamelCase`.
-    * Namespaces need to follow type name rules, though the project only uses the “`OBS`” namespace for refactoring of application code for the time being.
+    * Namespaces need to follow type name rules, preserve existing OBS namespaces and use the established `PenguinStudio` namespace for Penguin helpers.
     * Do not use underscore prefixes for any names, as these are reserved for the standard library implementation. Use a trailing underscore for private member variables.
 * **Comments**
     * Only C++ comment style is permitted for C++ source code, mixing of different styles is not allowed.
