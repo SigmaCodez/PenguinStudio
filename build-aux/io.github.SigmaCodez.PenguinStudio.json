@@ -102,6 +102,22 @@
             ]
         },
         {
+            "name": "qtwebsockets",
+            "buildsystem": "cmake-ninja",
+            "config-opts": [
+                "-DBUILD_WITH_PCH=OFF",
+                "-DQT_BUILD_EXAMPLES=OFF",
+                "-DQT_BUILD_TESTS=OFF"
+            ],
+            "sources": [
+                {
+                    "type": "archive",
+                    "url": "https://download.qt.io/official_releases/qt/6.11/6.11.1/submodules/qtwebsockets-everywhere-src-6.11.1.tar.xz",
+                    "sha256": "243e3aa11924c8c5c1645e892f62d013caa3766c57512ca926d5b58146646fbf"
+                }
+            ]
+        },
+        {
             "name": "cef",
             "build-options": {
                 "no-debuginfo": true

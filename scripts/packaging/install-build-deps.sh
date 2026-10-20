@@ -17,7 +17,7 @@ case "$ID" in
       libatk1.0-dev libatk-bridge2.0-dev swig libcmocka-dev libxss-dev \
       libglvnd-dev libgles2-mesa-dev libwayland-dev librist-dev libsrt-openssl-dev \
       libpci-dev libpipewire-0.3-dev libqrcodegencpp-dev uthash-dev libsimde-dev \
-      qt6-base-dev qt6-base-private-dev qt6-svg-dev qt6-wayland \
+      qt6-websockets-dev qt6-base-dev qt6-base-private-dev qt6-svg-dev qt6-wayland \
       libasound2-dev libfontconfig-dev libfreetype-dev libjack-jackd2-dev \
       libpulse-dev libsndio-dev libspeexdsp-dev libudev-dev libv4l-dev \
       libva-dev libvlc-dev libvpl-dev libdrm-dev \
@@ -34,7 +34,7 @@ case "$ID" in
       at-spi2-atk-devel swig libcmocka-devel libglvnd-devel wayland-devel \
       librist-devel srt-devel pciutils-devel pipewire-devel qrencode-devel \
       libqrcodegencpp-devel uthash-devel simde-devel \
-      qt6-qtbase-devel qt6-qtbase-private-devel qt6-qtsvg-devel qt6-qtwayland-devel \
+      qt6-qtwebsockets-devel qt6-qtbase-devel qt6-qtbase-private-devel qt6-qtsvg-devel qt6-qtwayland-devel \
       alsa-lib-devel fontconfig-devel freetype-devel jack-audio-connection-kit-devel \
       pulseaudio-libs-devel speexdsp-devel systemd-devel libv4l-devel \
       libva-devel vlc-devel libvpl-devel libdrm-devel json-devel websocketpp-devel \

@@ -2,12 +2,16 @@
 
 ## Twitch
 
-1. Register an application in the [Twitch developer console](https://dev.twitch.tv/console/apps) owned by the Penguin Studio maintainer. Choose the **Public** client type for the device authorization grant.
-2. Open **Docks → Stream details → Twitch** and enter its public client ID.
-3. Select **Connect account**. Penguin opens Twitch in your system browser and displays the device code. Complete the requested `channel:manage:broadcast` authorization there.
-4. Enter a title and optionally a Twitch game/category ID, then select **Update stream details**.
+1. Open **Docks → Stream details → Twitch** and select **Connect with Twitch**.
+2. Penguin opens the official Twitch activation page in your system browser. Enter the displayed device code and authorize the application. No Twitch password is entered into Penguin Studio.
+3. Use **Load current stream details** to retrieve the current title and category ID, or enter a title and optional category ID, then select **Update stream details**.
+4. Open **Docks → Twitch chat**. The native dock reads and sends messages in the connected account's channel on Wayland as well as X11. It follows chat deletion/clear events and reconnects after connection loss. The current implementation displays plain text, including emote names; it does not embed Twitch's web dashboard or render third-party emote extensions.
 
-The module validates the token after connection and periodically while connected, and refreshes it before expiration. Disconnect clears the local session; revoking the application itself is done in your Twitch account settings. The official [device grant documentation](https://dev.twitch.tv/docs/authentication/getting-tokens-oauth/#device-code-grant-flow) and [channel update API](https://dev.twitch.tv/docs/api/reference/#modify-channel-information) define the required registration and permissions.
+The maintainer's public Twitch application ID is bundled with Penguin Studio. The application must remain registered with client type **Public**; no client secret is embedded. Device authorization requests `channel:manage:broadcast`, `user:read:chat` and `user:write:chat`. The module validates tokens after connection and periodically while connected, and refreshes them before expiration. Account tokens and chat history remain in memory for the session. Disconnect clears both. Revoking the application itself is done in Twitch account settings.
+
+The chat uses Twitch EventSub WebSockets and the Send Chat Message API, with bounded history and authenticated HTTPS requests that do not follow redirects. An API failure is shown in the dock; it never falls back to sending unauthenticated messages. This login manages chat and metadata; broadcast destinations and their stream keys remain a separate setup step.
+
+References: [device grant](https://dev.twitch.tv/docs/authentication/getting-tokens-oauth/#device-code-grant-flow), [channel update API](https://dev.twitch.tv/docs/api/reference/#modify-channel-information), [chat authentication](https://dev.twitch.tv/docs/chat/authenticating), [WebSocket lifecycle](https://dev.twitch.tv/docs/eventsub/handling-websocket-events/).
 
 ## YouTube
 
@@ -24,7 +28,7 @@ The first-launch wizard includes Twitch, YouTube, Kick, Facebook Live, TikTok LI
 
 ## Wayland
 
-Platform metadata controls use Qt Network and the external browser, so they do not rely on the embedded Twitch browser panel that OBS disables under Wayland. Screen capture continues to use OBS's PipeWire source and the desktop's screen-sharing portal. Install a portal backend appropriate to the desktop (for example GNOME, KDE or wlroots). Test the actual compositor, graphics driver and sandbox package being shipped.
+Platform metadata controls and the native Twitch chat use Qt Network/WebSockets and system-browser authorization, so they do not rely on the embedded Twitch browser panel that OBS disables under Wayland. Screen capture continues to use OBS's PipeWire source and the desktop's screen-sharing portal. Install a portal backend appropriate to the desktop (for example GNOME, KDE or wlroots). Test the actual compositor, graphics driver and sandbox package being shipped.
 
 ## Secret handling
 

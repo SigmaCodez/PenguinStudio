@@ -1298,12 +1298,13 @@ void OBSBasic::OBSInit()
 	}
 
 	if (!first_run && !has_last_version && !Active()) {
-		if (isWayland)
+		if (isWayland) {
 			new StartupDialog(this, [this]() {
 				QMetaObject::invokeMethod(this, "on_autoConfigure_triggered", Qt::QueuedConnection);
 			});
-		else
+		} else {
 			QMetaObject::invokeMethod(this, "on_autoConfigure_triggered", Qt::QueuedConnection);
+		}
 	}
 
 #if (defined(_WIN32) || defined(__APPLE__)) && (OBS_RELEASE_CANDIDATE > 0 || OBS_BETA > 0)
@@ -1341,11 +1342,15 @@ void OBSBasic::OBSInit()
 	delete ui->actionShowCrashLogs;
 	delete ui->actionUploadLastCrashLog;
 	delete ui->menuCrashLogs;
+#if !defined(__linux__)
 	delete ui->actionCheckForUpdates;
+#endif
 	ui->actionShowCrashLogs = nullptr;
 	ui->actionUploadLastCrashLog = nullptr;
 	ui->menuCrashLogs = nullptr;
+#if !defined(__linux__)
 	ui->actionCheckForUpdates = nullptr;
+#endif
 #endif
 #endif
 
@@ -1359,7 +1364,7 @@ void OBSBasic::OBSInit()
 	ui->actionShowMacPermissions = nullptr;
 #endif
 
-#if defined(_WIN32) || defined(__APPLE__)
+#if defined(_WIN32) || defined(__APPLE__) || defined(__linux__)
 	if (App()->IsUpdaterDisabled()) {
 		ui->actionCheckForUpdates->setEnabled(false);
 #if defined(_WIN32)

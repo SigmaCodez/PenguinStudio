@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 // Native metadata controls: no embedded browser or X11 dependency.
 #include "oauth-helpers.hpp"
+#include "twitch-chat.hpp"
 
 #include <obs-module.h>
 #include <obs-frontend-api.h>
@@ -79,27 +80,31 @@ protected:
 		request.setTransferTimeout(20000);
 		// Credentials must never be forwarded to a redirect destination.
 		request.setAttribute(QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::ManualRedirectPolicy);
-		if (!contentType.isEmpty())
+		if (!contentType.isEmpty()) {
 			request.setHeader(QNetworkRequest::ContentTypeHeader, contentType);
+		}
 		if (authenticated) {
 			request.setRawHeader("Authorization", "Bearer " + accessToken.toUtf8());
-			if (provider == "twitch")
+			if (provider == "twitch") {
 				request.setRawHeader("Client-Id", activeClient.toUtf8());
+			}
 		}
 		auto *reply = network.sendCustomRequest(request, method, body);
 		reply->setReadBufferSize(2 * 1024 * 1024);
 		const auto requestGeneration = generation;
 		connect(reply, &QNetworkReply::readyRead, this, [reply]() {
-			if (reply->bytesAvailable() > 1024 * 1024)
+			if (reply->bytesAvailable() > 1024 * 1024) {
 				reply->abort();
+			}
 		});
 		connect(reply, &QNetworkReply::finished, this, [this, reply, requestGeneration, done]() {
 			const int code = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
 			const auto data = QJsonDocument::fromJson(reply->readAll()).object();
 			const bool transportError = reply->error() != QNetworkReply::NoError && code < 400;
 			reply->deleteLater();
-			if (generation == requestGeneration)
+			if (generation == requestGeneration) {
 				done(transportError ? 0 : code, data);
+			}
 		});
 	}
 
@@ -136,8 +141,9 @@ protected:
 		refreshToken.clear();
 		activeClient.clear();
 		updatePending = false;
-		for (auto *reply : network.findChildren<QNetworkReply *>())
+		for (auto *reply : network.findChildren<QNetworkReply *>()) {
 			reply->abort();
+		}
 		SetConnected(false);
 	}
 
@@ -172,8 +178,9 @@ protected:
 			return false;
 		}
 		accessToken = token;
-		if (!data.value("refresh_token").toString().isEmpty())
+		if (!data.value("refresh_token").toString().isEmpty()) {
 			refreshToken = data.value("refresh_token").toString();
+		}
 		refreshTimer.start(std::clamp(lifetime - 60, 1, 86400) * 1000);
 		return true;
 	}
@@ -189,8 +196,9 @@ protected:
 		form->addRow(status);
 		for (int row = 0; row < form->rowCount(); ++row) {
 			auto *item = form->itemAt(row, QFormLayout::LabelRole);
-			if (auto *label = item ? qobject_cast<QLabel *>(item->widget()) : nullptr)
+			if (auto *label = item ? qobject_cast<QLabel *>(item->widget()) : nullptr) {
 				label->setWordWrap(true);
+			}
 		}
 		SetConnected(false);
 	}
@@ -198,7 +206,9 @@ protected:
 public:
 	// The optional transport is borrowed, and must outlive this pane (used by offline controller tests).
 	PlatformPane(QString name, QWidget *parent, QNetworkAccessManager *transport = nullptr)
-		: QWidget(parent), network(transport ? *transport : ownedNetwork), provider(std::move(name))
+		: QWidget(parent),
+		  network(transport ? *transport : ownedNetwork),
+		  provider(std::move(name))
 	{
 		setObjectName(QStringLiteral("penguinPlatformPane"));
 		form->setContentsMargins(12, 14, 12, 14);
@@ -239,9 +249,18 @@ class TwitchPane final : public PlatformPane {
 	qint64 deadline = 0;
 	int pollInterval = 5000;
 	QLineEdit *category = new QLineEdit(this);
+	QPointer<TwitchChat> chat;
+	QPushButton *loadDetails = nullptr;
+	static constexpr const char *scopes = "channel:manage:broadcast user:read:chat user:write:chat";
 
 	void Reset() override
 	{
+		if (loadDetails) {
+			loadDetails->setEnabled(false);
+		}
+		if (chat) {
+			chat->Stop();
+		}
 		pollTimer.stop();
 		validateTimer.stop();
 		deviceCode.clear();
@@ -256,12 +275,20 @@ class TwitchPane final : public PlatformPane {
 			[this](int code, const QJsonObject &data) {
 				if (code != 200 || data.value("client_id").toString() != activeClient ||
 				    data.value("user_id").toString().isEmpty() ||
-				    !data.value("scopes").toArray().contains("channel:manage:broadcast")) {
+				    !data.value("scopes").toArray().contains("channel:manage:broadcast") ||
+				    !data.value("scopes").toArray().contains("user:read:chat") ||
+				    !data.value("scopes").toArray().contains("user:write:chat")) {
 					Fail();
 					return;
 				}
 				broadcaster = data.value("user_id").toString();
 				SetConnected(true);
+				if (loadDetails) {
+					loadDetails->setEnabled(true);
+				}
+				if (chat) {
+					chat->SetSession(activeClient, accessToken, broadcaster);
+				}
 				validateTimer.start(55 * 60 * 1000);
 			});
 	}
@@ -274,40 +301,80 @@ class TwitchPane final : public PlatformPane {
 		}
 		PostForm("https://id.twitch.tv/oauth2/token",
 			 {{"client_id", activeClient},
-			  {"scopes", "channel:manage:broadcast"},
+			  {"scopes", scopes},
 			  {"device_code", deviceCode},
 			  {"grant_type", "urn:ietf:params:oauth:grant-type:device_code"}},
 			 [this](int code, const QJsonObject &data) {
 				 if (code == 200) {
 					 deviceCode.clear();
-					 if (AcceptTokens(data))
+					 if (AcceptTokens(data)) {
 						 Validate();
+					 }
 					 return;
 				 }
 				 const QString error = data.value("error").toString(data.value("message").toString());
-				 if (error == "slow_down")
+				 if (error == "slow_down") {
 					 pollInterval += 5000;
-				 if (error == "authorization_pending" || error == "slow_down")
+				 }
+				 if (error == "authorization_pending" || error == "slow_down") {
 					 pollTimer.start(pollInterval);
-				 else
+				 } else {
 					 Fail("Expired");
+				 }
 			 });
 	}
 
 public:
-	explicit TwitchPane(QWidget *parent, QNetworkAccessManager *transport = nullptr)
-		: PlatformPane("twitch", parent, transport)
+	explicit TwitchPane(QWidget *parent, QNetworkAccessManager *transport = nullptr, TwitchChat *chatPane = nullptr)
+		: PlatformPane("twitch", parent, transport),
+		  chat(chatPane)
 	{
+		client->setText(QStringLiteral("wx372widbw00vu69va6dhedawepy9x"));
+		client->setVisible(false);
+		if (auto *label = form->labelForField(client)) {
+			label->hide();
+		}
+		connectButton->setText(Text("Twitch.Connect"));
 		form->addRow(Text("Twitch.Category"), category);
 		FinishForm();
+		auto *load = new QPushButton(Text("Twitch.Load"), this);
+		loadDetails = load;
+		load->setEnabled(false);
+		form->insertRow(form->rowCount() - 1, load);
+		connect(load, &QPushButton::clicked, this, [this, load]() {
+			if (broadcaster.isEmpty() || accessToken.isEmpty() || updatePending) {
+				return;
+			}
+			load->setEnabled(false);
+			const auto oldTitle = title->text();
+			const auto oldCategory = category->text();
+			Request("https://api.twitch.tv/helix/channels?broadcaster_id=" + broadcaster, "GET", {}, {},
+				true, [this, load, oldTitle, oldCategory](int code, const QJsonObject &data) {
+					load->setEnabled(true);
+					const auto items = data.value("data").toArray();
+					if (code != 200 || items.isEmpty()) {
+						status->setText(Text("Failed"));
+						return;
+					}
+					const auto info = items.first().toObject();
+					// Do not replace text the user edited while the request was in flight.
+					if (title->text() == oldTitle) {
+						title->setText(info.value("title").toString());
+					}
+					if (category->text() == oldCategory) {
+						category->setText(info.value("game_id").toString());
+					}
+				});
+		});
 		pollTimer.setSingleShot(true);
 		connect(&pollTimer, &QTimer::timeout, this, [this]() { Poll(); });
 		connect(&validateTimer, &QTimer::timeout, this, [this]() { Validate(); });
 		connect(connectButton, &QPushButton::clicked, this, [this]() {
-			if (!Begin())
+			if (!Begin()) {
 				return;
+			}
 			PostForm("https://id.twitch.tv/oauth2/device",
-				 {{"client_id", activeClient}, {"scopes", "channel:manage:broadcast"}},
+				 {{"client_id", activeClient}, {"scopes", scopes}},
 				 [this](int code, const QJsonObject &data) {
 					 const QUrl verification(data.value("verification_uri").toString());
 					 if (code != 200 || verification.scheme() != "https" ||
@@ -335,12 +402,15 @@ public:
 				return;
 			}
 			PostForm("https://id.twitch.tv/oauth2/token",
-				 {{"client_id", activeClient}, {"refresh_token", refreshToken}, {"grant_type", "refresh_token"}},
+				 {{"client_id", activeClient},
+				  {"refresh_token", refreshToken},
+				  {"grant_type", "refresh_token"}},
 				 [this](int code, const QJsonObject &data) {
-					 if (code == 200 && AcceptTokens(data))
+					 if (code == 200 && AcceptTokens(data)) {
 						 Validate();
-					 else
+					 } else {
 						 Fail("Expired");
+					 }
 				 });
 		});
 		connect(updateButton, &QPushButton::clicked, this, [this]() {
@@ -350,8 +420,9 @@ public:
 				return;
 			}
 			QJsonObject body{{"title", value}};
-			if (!category->text().trimmed().isEmpty())
+			if (!category->text().trimmed().isEmpty()) {
 				body.insert("game_id", category->text().trimmed());
+			}
 			BeginUpdate();
 			Request("https://api.twitch.tv/helix/channels?broadcaster_id=" + broadcaster, "PATCH",
 				QJsonDocument(body).toJson(QJsonDocument::Compact), "application/json", true,
@@ -406,8 +477,9 @@ class YoutubePane final : public PlatformPane {
 	{
 		auto values = parameters;
 		values.append({"client_id", activeClient});
-		if (!activeSecret.isEmpty())
+		if (!activeSecret.isEmpty()) {
 			values.append({"client_secret", activeSecret});
+		}
 		PostForm("https://oauth2.googleapis.com/token", values, [this](int code, const QJsonObject &data) {
 			if (code != 200 || !AcceptTokens(data)) {
 				Fail("Expired");
@@ -421,56 +493,61 @@ class YoutubePane final : public PlatformPane {
 
 	void LoadBroadcastPage(const QString &pageToken, quint64 load, const QString &editedTitle)
 	{
-		QString url = "https://www.googleapis.com/youtube/v3/liveBroadcasts?part=id,snippet&mine=true&broadcastType=all&maxResults=50";
-		if (!pageToken.isEmpty())
+		QString url =
+			"https://www.googleapis.com/youtube/v3/liveBroadcasts?part=id,snippet&mine=true&broadcastType=all&maxResults=50";
+		if (!pageToken.isEmpty()) {
 			url += "&pageToken=" + QString::fromLatin1(QUrl::toPercentEncoding(pageToken));
-		Request(url, "GET", {}, {}, true,
-			[this, load, editedTitle](int code, const QJsonObject &data) {
-				if (load != broadcastLoad)
-					return;
-				if (code != 200) {
-					loadButton->setEnabled(true);
-					if (code == 401)
-						Fail("Expired");
-					else
-						status->setText(Text("Failed"));
-					return;
-				}
-				for (const auto &entry : data.value("items").toArray()) {
-					const auto item = entry.toObject();
-					pendingBroadcasts.append({item.value("snippet").toObject().value("title").toString(),
-								  item.value("id").toString()});
-				}
-				const auto next = data.value("nextPageToken").toString();
-				if (!next.isEmpty()) {
-					if (pageTokens.contains(next)) {
-						loadButton->setEnabled(true);
-						status->setText(Text("Failed"));
-						return;
-					}
-					pageTokens.insert(next);
-					LoadBroadcastPage(next, load, editedTitle);
-					return;
-				}
-				// Avoid resetting the selected broadcast or an edited title on token refresh.
-				const auto selectedId = broadcasts->currentData().toString();
-				QSignalBlocker block(broadcasts);
-				broadcasts->clear();
-				for (const auto &item : pendingBroadcasts)
-					broadcasts->addItem(item.first, item.second);
-				const int previous = broadcasts->findData(selectedId);
-				if (previous >= 0) {
-					broadcasts->setCurrentIndex(previous);
-					// Preserve edits made while the request was in flight as well.
-				} else if (title->text() == editedTitle) {
-					title->setText(broadcasts->currentText());
-				}
-				pendingBroadcasts.clear();
-				pageTokens.clear();
+		}
+		Request(url, "GET", {}, {}, true, [this, load, editedTitle](int code, const QJsonObject &data) {
+			if (load != broadcastLoad) {
+				return;
+			}
+			if (code != 200) {
 				loadButton->setEnabled(true);
-				if (!broadcasts->count())
-					status->setText(Text("YouTube.NoBroadcast"));
-			});
+				if (code == 401) {
+					Fail("Expired");
+				} else {
+					status->setText(Text("Failed"));
+				}
+				return;
+			}
+			for (const auto &entry : data.value("items").toArray()) {
+				const auto item = entry.toObject();
+				pendingBroadcasts.append({item.value("snippet").toObject().value("title").toString(),
+							  item.value("id").toString()});
+			}
+			const auto next = data.value("nextPageToken").toString();
+			if (!next.isEmpty()) {
+				if (pageTokens.contains(next)) {
+					loadButton->setEnabled(true);
+					status->setText(Text("Failed"));
+					return;
+				}
+				pageTokens.insert(next);
+				LoadBroadcastPage(next, load, editedTitle);
+				return;
+			}
+			// Avoid resetting the selected broadcast or an edited title on token refresh.
+			const auto selectedId = broadcasts->currentData().toString();
+			QSignalBlocker block(broadcasts);
+			broadcasts->clear();
+			for (const auto &item : pendingBroadcasts) {
+				broadcasts->addItem(item.first, item.second);
+			}
+			const int previous = broadcasts->findData(selectedId);
+			if (previous >= 0) {
+				broadcasts->setCurrentIndex(previous);
+				// Preserve edits made while the request was in flight as well.
+			} else if (title->text() == editedTitle) {
+				title->setText(broadcasts->currentText());
+			}
+			pendingBroadcasts.clear();
+			pageTokens.clear();
+			loadButton->setEnabled(true);
+			if (!broadcasts->count()) {
+				status->setText(Text("YouTube.NoBroadcast"));
+			}
+		});
 	}
 
 	void LoadBroadcasts()
@@ -485,8 +562,9 @@ class YoutubePane final : public PlatformPane {
 	{
 		while (listener.hasPendingConnections()) {
 			auto *socket = listener.nextPendingConnection();
-			if (!socket)
+			if (!socket) {
 				continue;
+			}
 			socket->setReadBufferSize(8192);
 			const auto attempt = generation;
 			connect(socket, &QTcpSocket::disconnected, socket, &QObject::deleteLater);
@@ -497,19 +575,22 @@ class YoutubePane final : public PlatformPane {
 					return;
 				}
 				if (!socket->canReadLine()) {
-					if (socket->bytesAvailable() >= 8192)
+					if (socket->bytesAvailable() >= 8192) {
 						socket->abort();
+					}
 					return;
 				}
 				const auto callback = PenguinOAuth::ParseCallback(socket->readLine(8192), state);
 				if (callback.status == PenguinOAuth::CallbackStatus::Invalid) {
-					socket->write("HTTP/1.1 400 Bad Request\r\nContent-Length: 0\r\nConnection: close\r\n\r\n");
+					socket->write(
+						"HTTP/1.1 400 Bad Request\r\nContent-Length: 0\r\nConnection: close\r\n\r\n");
 					socket->disconnectFromHost();
 					return;
 				}
 				const QByteArray body = Text("YouTube.Return").toUtf8();
-				socket->write("HTTP/1.1 200 OK\r\nContent-Type: text/plain; charset=utf-8\r\nCache-Control: no-store\r\nConnection: close\r\nContent-Length: " +
-					      QByteArray::number(body.size()) + "\r\n\r\n" + body);
+				socket->write(
+					"HTTP/1.1 200 OK\r\nContent-Type: text/plain; charset=utf-8\r\nCache-Control: no-store\r\nConnection: close\r\nContent-Length: " +
+					QByteArray::number(body.size()) + "\r\n\r\n" + body);
 				socket->disconnectFromHost();
 				listener.close();
 				authorizationTimeout.stop();
@@ -518,7 +599,9 @@ class YoutubePane final : public PlatformPane {
 					Fail("Expired");
 					return;
 				}
-				Token({{"code", callback.code}, {"code_verifier", verifier}, {"redirect_uri", redirect},
+				Token({{"code", callback.code},
+				       {"code_verifier", verifier},
+				       {"redirect_uri", redirect},
 				       {"grant_type", "authorization_code"}});
 				verifier.clear();
 			});
@@ -541,8 +624,9 @@ public:
 		connect(loadButton, &QPushButton::clicked, this, [this]() { LoadBroadcasts(); });
 		connect(broadcasts, &QComboBox::currentTextChanged, title, &QLineEdit::setText);
 		connect(connectButton, &QPushButton::clicked, this, [this]() {
-			if (!Begin())
+			if (!Begin()) {
 				return;
+			}
 			if (!listener.listen(QHostAddress::LocalHost, 0)) {
 				Fail("YouTube.Callback");
 				return;
@@ -572,10 +656,11 @@ public:
 			authorizationTimeout.start(5 * 60 * 1000);
 		});
 		connect(&refreshTimer, &QTimer::timeout, this, [this]() {
-			if (refreshToken.isEmpty())
+			if (refreshToken.isEmpty()) {
 				Fail("Expired");
-			else
+			} else {
 				Token({{"refresh_token", refreshToken}, {"grant_type", "refresh_token"}});
+			}
 		});
 		connect(updateButton, &QPushButton::clicked, this, [this]() {
 			const QString value = title->text().trimmed();
@@ -605,17 +690,22 @@ public:
 					const auto original = items[0].toObject().value("snippet").toObject();
 					// videos.update replaces mutable snippet fields; preserve all of them.
 					QJsonObject snippet{{"title", value}};
-					for (const auto *key : {"categoryId", "description", "tags", "defaultLanguage", "defaultAudioLanguage"})
-						if (original.contains(key))
+					for (const auto *key : {"categoryId", "description", "tags", "defaultLanguage",
+								"defaultAudioLanguage"}) {
+						if (original.contains(key)) {
 							snippet.insert(key, original.value(key));
+						}
+					}
 					if (!snippet.contains("categoryId")) {
 						FinishUpdate();
 						status->setText(Text("Failed"));
 						return;
 					}
 					Request("https://www.googleapis.com/youtube/v3/videos?part=snippet", "PUT",
-						QJsonDocument(QJsonObject{{"id", id}, {"snippet", snippet}}).toJson(QJsonDocument::Compact),
-						"application/json", true, [this, id, value](int result, const QJsonObject &) {
+						QJsonDocument(QJsonObject{{"id", id}, {"snippet", snippet}})
+							.toJson(QJsonDocument::Compact),
+						"application/json", true,
+						[this, id, value](int result, const QJsonObject &) {
 							if (result == 401) {
 								Fail("Expired");
 								return;
@@ -637,23 +727,32 @@ public:
 
 constexpr char DockId[] = "penguin-stream-details";
 QPointer<QWidget> dock;
+QPointer<TwitchChat> chatDock;
+constexpr const char *ChatDockId = "penguinTwitchChat";
 bool frontendShutdown = false;
 
 void FrontendEvent(enum obs_frontend_event event, void *)
 {
-	if (event != OBS_FRONTEND_EVENT_EXIT)
+	if (event != OBS_FRONTEND_EVENT_EXIT) {
 		return;
+	}
 	// Dock state has already been saved. Dispose callbacks while the API still exists.
 	frontendShutdown = true;
-	if (dock)
+	if (chatDock) {
+		chatDock->Stop();
+		obs_frontend_remove_dock(ChatDockId);
+	}
+	if (dock) {
 		obs_frontend_remove_dock(DockId);
+	}
 }
 
 void CreateDock()
 {
 	auto *parent = static_cast<QWidget *>(obs_frontend_get_main_window());
-	if (!parent || dock)
+	if (!parent || dock) {
 		return;
+	}
 	dock = new QWidget(parent);
 	dock->setObjectName(QStringLiteral("penguinPlatformPanel"));
 	auto *layout = new QVBoxLayout(dock);
@@ -675,7 +774,12 @@ void CreateDock()
 		scroll->setWidget(pane);
 		tabs->addTab(scroll, name);
 	};
-	addPlatform(new TwitchPane(tabs), QStringLiteral("Twitch"));
+	chatDock = new TwitchChat(parent, Text);
+	if (!obs_frontend_add_dock_by_id(ChatDockId, obs_module_text("Chat.Title"), chatDock.data())) {
+		delete chatDock.data();
+		chatDock = nullptr;
+	}
+	addPlatform(new TwitchPane(tabs, nullptr, chatDock), QStringLiteral("Twitch"));
 	addPlatform(new YoutubePane(tabs), QStringLiteral("YouTube"));
 	layout->addWidget(tabs, 1);
 	auto *note = new QLabel(Text("SessionNoteShort"), dock);
@@ -701,18 +805,25 @@ void obs_module_post_load(void)
 {
 	// Register before OBS restores saved QMainWindow dock positions.
 	CreateDock();
-	if (dock)
+	if (dock) {
 		obs_frontend_add_event_callback(FrontendEvent, nullptr);
+	}
 }
 
 void obs_module_unload(void)
 {
 	// OBS destroys the frontend API immediately after its EXIT event.
-	if (frontendShutdown)
+	if (frontendShutdown) {
 		return;
+	}
 	obs_frontend_remove_event_callback(FrontendEvent, nullptr);
-	if (dock)
+	if (chatDock) {
+		chatDock->Stop();
+		obs_frontend_remove_dock(ChatDockId);
+	}
+	if (dock) {
 		obs_frontend_remove_dock(DockId);
+	}
 }
 
 MODULE_EXPORT const char *obs_module_description(void)

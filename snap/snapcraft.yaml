@@ -108,6 +108,7 @@ parts:
       - uthash-dev
       - libsimde-dev
       - qt6-base-dev
+      - qt6-websockets-dev
       - qt6-base-private-dev
       - qt6-svg-dev
       - libasound2-dev
@@ -139,6 +140,7 @@ parts:
       - libpython3.12t64
       - libqt6widgets6t64
       - libqt6network6t64
+      - libqt6websockets6
       - libqt6xml6t64
       - libqt6dbus6t64
       - libqt6svg6

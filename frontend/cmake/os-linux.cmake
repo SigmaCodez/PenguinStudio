@@ -1,6 +1,9 @@
 target_sources(
   obs-studio
   PRIVATE
+    utility/PenguinLinuxUpdater.cpp
+    utility/PenguinLinuxUpdater.hpp
+    utility/PenguinUpdatePolicy.hpp
     utility/CrashHandler_Linux.cpp
     utility/NativeEventFilter.cpp
     utility/platform-x11.cpp

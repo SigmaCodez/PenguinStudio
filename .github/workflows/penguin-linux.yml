@@ -60,9 +60,15 @@ jobs:
       - name: Compile and run OAuth callback checks
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends qt6-base-dev
+          sudo apt-get install -y --no-install-recommends qt6-base-dev qt6-websockets-dev
           c++ -std=c++17 -Wall -Wextra -Werror -fPIC -I. test/penguin-oauth.cpp $(pkg-config --cflags --libs Qt6Core) -o /tmp/penguin-oauth-test
           /tmp/penguin-oauth-test
+      - name: Check update selection and native Twitch chat
+        run: |
+          c++ -std=c++17 -Wall -Wextra -Werror -fPIC -I. test/penguin-update-policy.cpp $(pkg-config --cflags --libs Qt6Core) -o /tmp/penguin-update-test
+          /tmp/penguin-update-test
+          c++ -std=c++17 -Wall -Wextra -Werror -fPIC -I. test/penguin-twitch-chat.cpp $(pkg-config --cflags --libs Qt6Widgets Qt6Network Qt6WebSockets) -o /tmp/penguin-chat-test
+          QT_QPA_PLATFORM=offscreen /tmp/penguin-chat-test
       - name: Compile and run Qt button translation checks
         run: |
           c++ -std=c++17 -Wall -Wextra -Werror -fPIC -I. test/penguin-qt-translation.cpp $(pkg-config --cflags --libs Qt6Core) -o /tmp/penguin-qt-translation-test

@@ -20,6 +20,9 @@
 #include "OBSBasic.hpp"
 
 #include <dialogs/OBSWhatsNew.hpp>
+#ifdef __linux__
+#include <utility/PenguinLinuxUpdater.hpp>
+#endif
 
 #ifdef _WIN32
 #include <utility/AutoUpdateThread.hpp>
@@ -180,7 +183,13 @@ void OBSBasic::TimedCheckForUpdates()
 		return;
 	}
 
-#if defined(ENABLE_SPARKLE_UPDATER)
+#if defined(__linux__)
+	QTimer::singleShot(30000, this, [this]() {
+		if (!isClosing()) {
+			CheckPenguinLinuxUpdates(this, false);
+		}
+	});
+#elif defined(ENABLE_SPARKLE_UPDATER)
 	CheckForUpdates(false);
 #elif _WIN32
 	long long lastUpdate = config_get_int(App()->GetAppConfig(), "General", "LastUpdateCheck");
@@ -202,7 +211,9 @@ void OBSBasic::TimedCheckForUpdates()
 
 void OBSBasic::CheckForUpdates(bool manualUpdate)
 {
-#if _WIN32
+#if defined(__linux__)
+	CheckPenguinLinuxUpdates(this, manualUpdate);
+#elif _WIN32
 	ui->actionCheckForUpdates->setEnabled(false);
 	ui->actionRepair->setEnabled(false);
 

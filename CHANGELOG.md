@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Add automatic Penguin release notifications and verified in-app Linux package updates.
+- Add a native Wayland-compatible Twitch chat dock and bundled public-app login, with stream-details loading.
+
 - Update inherited dialog and plugin product names across translations to Penguin Studio.
 - Route Help support and About contribution links to the Penguin Studio repository; brand OAuth completion pages locally.
 - Preserve OBS import formats, engine attribution, authors, licenses and third-party service disclosures.
