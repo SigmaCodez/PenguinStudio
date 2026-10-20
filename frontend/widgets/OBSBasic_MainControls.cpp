@@ -431,7 +431,7 @@ void OBSBasic::on_actionWebsite_triggered()
 
 void OBSBasic::on_actionDiscord_triggered()
 {
-	QUrl url = QUrl("https://obsproject.com/discord", QUrl::TolerantMode);
+	QUrl url = QUrl("https://github.com/SigmaCodez/PenguinStudio/issues", QUrl::TolerantMode);
 	QDesktopServices::openUrl(url);
 }
 

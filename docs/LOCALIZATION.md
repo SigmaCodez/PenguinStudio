@@ -32,3 +32,23 @@ Run `python3 scripts/check-penguin-locales.py` to verify key coverage, valid quo
 values, duplicate keys, non-empty translations, and matching placeholders.
 Contribute changes through the Penguin Studio repository; upstream OBS Crowdin
 does not manage the new Penguin modules.
+
+## Product names in inherited dialogs
+
+Visible application references in startup, restart, crash, remux, settings and
+plugin dialogs use Penguin Studio across the inherited locale catalogues.
+Locale keys, format placeholders, protocol identifiers and API names remain
+unchanged. Browser and WebSocket translations are applied as reviewed patches
+at CMake configure time, preserving the pinned submodule revisions. Patch checks
+fail if an upstream update requires review, and repeated configuration is safe.
+
+OBS remains visible where it identifies an import source, the underlying engine,
+upstream supporters, authors, licenses or the actual third-party log-upload
+service. These are not Penguin Studio service claims. The Help menu points to
+Penguin Studio issues; its support label is translated in the eight Penguin
+languages, with English fallback for other locales. The About contribution link
+uses this repository's `main` branch. OAuth completion pages use Penguin Studio
+text without loading the OBS logo from a remote server.
+
+`scripts/check-branding.py` rejects stale application names in frontend locale
+values while allowing the explicit attribution, service and importer entries.

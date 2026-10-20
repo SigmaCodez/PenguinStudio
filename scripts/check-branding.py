@@ -70,6 +70,22 @@ def main():
     assert "PenguinStudio.About" in keys
     locales = list((ROOT / "frontend/data/locale").glob("*.ini"))
     assert len(locales) >= 50, "Inherited locale catalogue is incomplete"
+    # Product text must not regress when upstream translations are imported.
+    # These entries name a real source application, upstream attribution or service.
+    upstream_entries = {
+        "About.Contribute", "Importer.HelpText", "OBSStudio", "OBSClassic",
+        "PenguinStudio.About", "CrashHandling.Labels.PrivacyNotice",
+        "LogUploadDialog.Labels.PrivacyNotice", "MacPermissions.Item.Accessibility.Details",
+    }
+    product_name = re.compile(r"(?<![A-Za-z0-9_])OBS(?:[ -]Studio)?(?![A-Za-z0-9_])")
+    for locale in locales:
+        for line in locale.read_text(encoding="utf-8").splitlines():
+            if not line or line.startswith("#") or "=" not in line:
+                continue
+            key, value = line.split("=", 1)
+            if key not in upstream_entries:
+                assert not product_name.search(value), f"Stale product name: {locale.name}: {key}"
+    assert "blob/penguin/main/" not in read("frontend/dialogs/OBSAbout.cpp")
     print(f"Branding checks passed: {width}x{height} RGBA logo, {len(locales)} locales.")
     print("Logo SHA-256:", hashlib.sha256(logo).hexdigest())
 

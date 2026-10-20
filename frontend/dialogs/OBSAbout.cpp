@@ -44,7 +44,7 @@ OBSAbout::OBSAbout(QWidget *parent) : QDialog(parent), ui(new Ui::OBSAbout)
 		ui->donate->setOpenExternalLinks(true);
 	}
 
-	ui->getInvolved->setText("&nbsp;&nbsp;<a href='https://github.com/SigmaCodez/PenguinStudio/blob/penguin/main/CONTRIBUTING.md'>" +
+	ui->getInvolved->setText("&nbsp;&nbsp;<a href='https://github.com/SigmaCodez/PenguinStudio/blob/main/CONTRIBUTING.md'>" +
 				 QTStr("About.GetInvolved") + "</a>");
 	ui->getInvolved->setTextInteractionFlags(Qt::TextBrowserInteraction);
 	ui->getInvolved->setOpenExternalLinks(true);
@@ -92,7 +92,7 @@ void OBSAbout::ShowAbout()
 	const Json::array &patrons = json.array_items();
 	QString text;
 
-	text += "<h1>Top Patreon contributors:</h1>";
+	text += "<h1>" + QTStr("About.Contribute").toHtmlEscaped() + "</h1>";
 	text += "<p style=\"font-size:16px;\">";
 	bool first = true;
 	bool top = true;
@@ -130,7 +130,7 @@ void OBSAbout::ShowAbout()
 void OBSAbout::ShowAuthors()
 {
 	std::string path;
-	QString error = QTStr("About.Error").arg("https://github.com/obsproject/obs-studio/blob/master/AUTHORS");
+	QString error = QTStr("About.Error").arg("https://github.com/SigmaCodez/PenguinStudio/blob/main/AUTHORS");
 
 #ifdef __APPLE__
 	if (!GetDataFilePath("AUTHORS", path)) {
@@ -156,7 +156,7 @@ void OBSAbout::ShowAuthors()
 void OBSAbout::ShowLicense()
 {
 	std::string path;
-	QString error = QTStr("About.Error").arg("https://github.com/obsproject/obs-studio/blob/master/COPYING");
+	QString error = QTStr("About.Error").arg("https://github.com/SigmaCodez/PenguinStudio/blob/main/COPYING");
 
 	if (!GetDataFilePath("license/gplv2.txt", path)) {
 		ui->textBrowser->setPlainText(error);

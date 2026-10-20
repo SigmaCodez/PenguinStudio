@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Update inherited dialog and plugin product names across translations to Penguin Studio.
+- Route Help support and About contribution links to the Penguin Studio repository; brand OAuth completion pages locally.
+- Preserve OBS import formats, engine attribution, authors, licenses and third-party service disclosures.
+
 ## 0.2.1 — 2026-10-20
 
 - Wait for confirmed native main-window focus before scheduling the first-run hardware wizard on Wayland, avoiding the Qt 6.10.2 text-input surface race at startup.
