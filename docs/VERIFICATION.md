@@ -2,6 +2,26 @@
 
 This is a development preview based on OBS Studio 32.2.2. The new Penguin code must not be described as fully production-tested until the checks below have real recorded results.
 
+## Installed 0.2.1 validation — 2026-10-20
+
+The published Ubuntu 26.04 package `0.2.1-1+ubuntu26.04` is now installed on
+Ubuntu 26.04.1. Its SHA-256 matches the release manifest. APT upgraded only
+Penguin Studio, removed no packages, and exited successfully.
+
+The system-installed executable passed all **ten native GNOME Wayland runs**:
+normal exit, multiple instances, open initial wizard, connection-wizard
+cancellation, focused connection input at shutdown, auto-configuration
+cancellation, Statistics, profile restart, SIGTERM, and an additional focused
+wizard with German application text under `de_CH.UTF-8`. All runs had zero
+startup warnings/errors, zero shutdown warnings/errors, zero late frontend
+callback removals, no remaining crash sentinels, and zero reported OBS memory
+leaks. Initial setup visibility and native input focus were verified. Tests used
+isolated profiles and an observer-only helper, with no filesystem overlays or
+focus shim. Personal configuration was not modified.
+
+Evidence: [installed-package report](validation/ubuntu-26.04-installed-0.2.1.json).
+The pre-publication validation below remains as historical evidence.
+
 ## Wayland startup focus correction — 0.2.1, 2026-10-20
 
 [Penguin Studio 0.2.1](https://github.com/SigmaCodez/PenguinStudio/releases/tag/penguin-v0.2.1) fixes the first-run hardware
