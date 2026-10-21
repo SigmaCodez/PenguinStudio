@@ -29,8 +29,10 @@ attempt also exited normally; no application warning filter was introduced.
 
 No chat messages or stream metadata changes were sent. The isolated account was
 disconnected and its keyring entry removed after testing. Normal user settings
-were unchanged. Real YouTube authorization remains untested; the automated
-provider tests cover its category and credential-restoration flows.
+were unchanged. A subsequent user-operated YouTube test confirmed browser authorization, categories,
+secure saving and automatic reconnection after restart. Both application logs showed
+Wayland, normal shutdown and zero reported leaks; native UI results were user-confirmed.
+See [YouTube test evidence](validation/youtube-wayland-0.4.0.json).
 
 Evidence: [package build results and manifest](validation/linux-release-0.4.0.json),
 [installed Wayland checks](validation/accounts-installed-0.4.0.json), and

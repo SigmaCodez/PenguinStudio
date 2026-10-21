@@ -1,0 +1,56 @@
+{
+  "date": "2026-10-20",
+  "application_version": "0.4.0",
+  "installed_package": "0.4.0-1+ubuntu26.04",
+  "environment": {
+    "os": "Ubuntu 26.04.1 (user reported)",
+    "session": "Wayland (verified in both application logs)"
+  },
+  "method": "User-operated native GUI with independent application-log and process checks. Native GUI automation was unavailable.",
+  "live_checks": {
+    "google_authorization": "User confirmed connected account, loaded categories and saved-sign-in message.",
+    "restart_restore": "User confirmed automatic reconnection without another Google authorization after normal exit and restart.",
+    "category_search": "User typed Gam and confirmed Gaming appeared after restart.",
+    "final_exit": "User exited normally; independent process check found no running obs or penguin-studio process."
+  },
+  "local_settings_check": {
+    "youtube_client_id_configured": true,
+    "youtube_session_enabled": true,
+    "plaintext_secret_token_password_keys_present": false,
+    "scope": "platforms.ini key names only; keyring secrets were not read"
+  },
+  "logs": [
+    {
+      "file": "2026-10-20 23-27-48.txt",
+      "wayland": true,
+      "normal_cleanup_logged": true,
+      "reported_memory_leaks": 0,
+      "warning_error_failed_crash_matches": []
+    },
+    {
+      "file": "2026-10-20 23-30-04.txt",
+      "wayland": true,
+      "normal_cleanup_logged": true,
+      "reported_memory_leaks": 0,
+      "warning_error_failed_crash_matches": []
+    }
+  ],
+  "automated_regression_checks": {
+    "result": "passed earlier in the same setup session",
+    "coverage": [
+      "PKCE loopback",
+      "token rotation",
+      "saved Google credentials restoration using a mocked store and transport",
+      "assignable categories",
+      "metadata preservation",
+      "callback shutdown"
+    ]
+  },
+  "limitations": [
+    "Native GUI results are user-confirmed, not independently visually inspected.",
+    "Log checks cover application log files, not uncaptured stderr or all system logs.",
+    "Immediate restart does not prove long-term refresh-token validity; Google External/Testing tokens for YouTube scopes normally expire after seven days.",
+    "No live broadcast, metadata update or chat message was sent."
+  ],
+  "code_changes_required": false
+}

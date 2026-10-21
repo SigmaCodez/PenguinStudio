@@ -15,12 +15,71 @@ References: [device grant](https://dev.twitch.tv/docs/authentication/getting-tok
 
 ## YouTube
 
-1. Create a Google Cloud project, enable the **YouTube Data API v3**, configure its OAuth consent screen, and register an OAuth client of type **Desktop app**. While the consent screen is in testing, add the accounts that will test Penguin Studio.
-2. Open **Docks → Stream details → YouTube** and enter the desktop client ID and its client secret if supplied by Google. The secret and refresh token are saved together in the system keyring after successful authorization. Desktop client secrets are not a substitute for server-side credential security.
-3. Select **Connect account** and complete authorization in the system browser. Penguin requests the YouTube scope required to edit video metadata. The callback binds only to `127.0.0.1` on an ephemeral port, uses random state and verifies a PKCE challenge.
-4. Create or schedule a broadcast in [YouTube Studio](https://studio.youtube.com), load your broadcasts in Penguin, select one, and update its title.
+1. Open **Docks → Stream details → YouTube** and select **Connect with YouTube**.
+2. Complete account selection and authorization in your system browser. Penguin restores saved sign-ins from the system keyring on subsequent starts.
+3. Create or schedule a broadcast in [YouTube Studio](https://studio.youtube.com), load your broadcasts in Penguin, select one, and update its title.
+
+Publisher-configured packages use Penguin Studio's Google Desktop app. Users do not
+need to register their own Google application or enter client credentials. Maintainers
+and custom builds can use **Advanced application settings**; existing locally
+configured accounts retain their client ID and saved credentials. A build without
+publisher configuration or a locally configured client displays an explanatory
+message instead of opening a broken Google authorization URL.
+
+The system-browser flow uses a loopback callback bound to `127.0.0.1` on an ephemeral
+port, random state and PKCE. Desktop client credentials and refresh tokens for saved
+accounts remain in the system keyring.
 
 The implementation updates the video's title and an optionally selected video category while preserving its description, tags and language fields. Categories are loaded from YouTube's videoCategories API for the desktop locale's region (US fallback) and filtered as you type. Only assignable categories are offered. The public Data API does not expose a writable individual game-title selector; choose specific games in YouTube Studio. Leaving the category field empty preserves the video's existing category. It does not create broadcasts, enable live streaming on an account, or bypass Google's consent/API verification process. See [Google desktop OAuth](https://developers.google.com/identity/protocols/oauth2/native-app) and [videos.update](https://developers.google.com/youtube/v3/docs/videos/update).
+
+### Maintainer setup: Google Cloud and package configuration
+
+1. Select or create a project for Penguin Studio in [Google Cloud Console](https://console.cloud.google.com/).
+2. Under **APIs & Services → Library**, enable **YouTube Data API v3** in that project.
+3. Open **Google Auth Platform**. Configure **Branding** with the application name
+   `Penguin Studio` and an owner-controlled support/contact email. Choose **External**
+   audience for accounts outside a single Google Workspace organization. For initial
+   testing, keep publishing status **Testing** and add the Google account that owns
+   the intended YouTube channel as a test user.
+4. Under **Data Access**, add `https://www.googleapis.com/auth/youtube.force-ssl`.
+   This is the scope requested by the current metadata editor; Google controls the
+   permissions described on its consent screen. The read-only validation below does
+   not send metadata changes despite requesting the editor's scope.
+5. Under **Clients**, create an OAuth client of type **Desktop app**, named
+   `Penguin Studio Desktop`. An API key, service account, or Web application client
+   is not a replacement. Penguin uses a loopback callback with an ephemeral port;
+   do not configure a fixed web callback URL for this desktop client.
+6. For a local maintainer test, open **Advanced application settings** and enter the
+   client ID and the client secret supplied by Google directly in the YouTube dock. Keep downloaded credential JSON outside the repository. Complete
+   account selection and authorization only on Google's official browser pages.
+
+For official Linux packages, configure GitHub Actions repository secrets
+`PENGUIN_YOUTUBE_CLIENT_ID` and `PENGUIN_YOUTUBE_CLIENT_SECRET` from this **Desktop app**.
+Each package job runs `scripts/packaging/configure-youtube.py` before building. A
+published release requires both values; development builds may omit them. The
+script generates an ignored header in the source tree so DEB, RPM, Flatpak and Snap
+use the same application identity. Never supply a Web application secret or user
+tokens: desktop credentials are extractable from distributed binaries, even when
+injected through CI secrets. Google production/verification requirements still
+apply before general distribution. For local packaging, run the same script with
+those environment variables set before invoking the package builder.
+
+For a read-only live check, verify that assignable video categories load, type to
+filter them, and verify the system-keyring saved-sign-in message. Close Penguin
+Studio normally, reopen it with the same configuration, and confirm that categories
+load again without another authorization. Do not click **Disconnect** between the
+two runs; that intentionally removes saved credentials. No broadcast is required
+for the category endpoint. Broadcast listing may require channel/live eligibility;
+an empty list or lack of live eligibility must be distinguished from failed OAuth.
+
+For **External / Testing**, Google normally expires refresh tokens after seven
+days when requesting YouTube scopes. Secure local storage does not override this
+policy. A successful immediate restart does not certify indefinite access. Public
+distribution may require Google's verification process and production consent
+configuration; changing publishing status alone is not evidence of approval.
+See [desktop OAuth](https://developers.google.com/identity/protocols/oauth2/native-app),
+[consent configuration](https://developers.google.com/workspace/guides/configure-oauth-consent),
+and [refresh-token expiration](https://developers.google.com/identity/protocols/oauth2#expiration).
 
 ## Other destinations
 

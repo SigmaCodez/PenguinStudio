@@ -4,6 +4,13 @@
 #include "twitch-chat.hpp"
 #include "category-picker.hpp"
 #include "credential-store.hpp"
+#if __has_include("youtube-app-config.hpp")
+#include "youtube-app-config.hpp"
+#endif
+#ifndef PENGUIN_YOUTUBE_CLIENT_ID
+#define PENGUIN_YOUTUBE_CLIENT_ID ""
+#define PENGUIN_YOUTUBE_CLIENT_SECRET ""
+#endif
 #include <QLocale>
 #include <QAction>
 #include <QApplication>
@@ -804,8 +811,27 @@ public:
 			     CredentialStore *store = nullptr)
 		: PlatformPane("youtube", parent, transport, store)
 	{
+		// Preserve the client associated with an existing saved sign-in.
+		if (client->text().trimmed().isEmpty()) {
+			client->setText(QStringLiteral(PENGUIN_YOUTUBE_CLIENT_ID));
+		}
+		if (client->text().trimmed() == QStringLiteral(PENGUIN_YOUTUBE_CLIENT_ID)) {
+			secret->setText(QStringLiteral(PENGUIN_YOUTUBE_CLIENT_SECRET));
+		}
+		connectButton->setText(Text("YouTube.Connect"));
+		connectButton->setObjectName("youtubeConnectAccount");
 		secret->setEchoMode(QLineEdit::Password);
 		form->addRow(Text("ClientSecret"), secret);
+		auto *appSettings = new QPushButton(Text("YouTube.AppSettings"), this);
+		appSettings->setObjectName("youtubeAppSettings");
+		appSettings->setCheckable(true);
+		form->addRow(appSettings);
+		const auto showAppSettings = [this](bool visible) {
+			form->setRowVisible(client, visible);
+			form->setRowVisible(secret, visible);
+		};
+		showAppSettings(false);
+		connect(appSettings, &QPushButton::toggled, this, showAppSettings);
 		form->addRow(Text("YouTube.Broadcast"), broadcasts);
 		form->addRow(loadButton);
 		category->setObjectName("youtubeCategory");
@@ -823,6 +849,10 @@ public:
 		connect(loadButton, &QPushButton::clicked, this, [this]() { LoadBroadcasts(); });
 		connect(broadcasts, &QComboBox::currentTextChanged, title, &QLineEdit::setText);
 		connect(connectButton, &QPushButton::clicked, this, [this]() {
+			if (client->text().trimmed().isEmpty()) {
+				status->setText(Text("YouTube.AppUnavailable"));
+				return;
+			}
 			if (!Begin()) {
 				return;
 			}

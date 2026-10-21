@@ -130,7 +130,8 @@ protected:
 QPushButton *Button(QWidget &pane, const QString &text)
 {
 	for (auto *button : pane.findChildren<QPushButton *>()) {
-		if (button->text() == text || (text == "Connect" && button->text() == "Twitch.Connect")) {
+		if (button->text() == text || (text == "Connect" && (button->text() == "Twitch.Connect" ||
+								     button->text() == "YouTube.Connect"))) {
 			return button;
 		}
 	}
@@ -289,6 +290,14 @@ int main(int argc, char **argv)
 	{
 		Transport network;
 		YoutubePane pane(nullptr, &network);
+		Require(Button(pane, "Connect")->text() == "YouTube.Connect",
+			"YouTube must expose the browser sign-in action");
+		Require(Line(pane, "AppID")->isHidden() && Line(pane, "ClientSecret")->isHidden(),
+			"Application credentials must not appear in the normal sign-in flow");
+		Button(pane, "YouTube.AppSettings")->click();
+		Require(!Line(pane, "AppID")->isHidden() && !Line(pane, "ClientSecret")->isHidden(),
+			"Custom application settings must remain accessible");
+		Button(pane, "YouTube.AppSettings")->click();
 		Line(pane, "AppID")->setText("google-client");
 		Line(pane, "ClientSecret")->setText("memory-only-secret");
 		Button(pane, "Connect")->click();

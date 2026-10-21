@@ -94,6 +94,17 @@ jobs:
         with:
           submodules: recursive
           fetch-depth: 0
+      - name: Configure publisher YouTube browser sign-in
+        env:
+          PENGUIN_YOUTUBE_CLIENT_ID: ${{ secrets.PENGUIN_YOUTUBE_CLIENT_ID }}
+          PENGUIN_YOUTUBE_CLIENT_SECRET: ${{ secrets.PENGUIN_YOUTUBE_CLIENT_SECRET }}
+          REQUIRE_YOUTUBE: ${{ needs.version.outputs.publish }}
+        run: |
+          if [ "$REQUIRE_YOUTUBE" = "true" ]; then
+            python3 scripts/packaging/configure-youtube.py --required
+          else
+            python3 scripts/packaging/configure-youtube.py
+          fi
       - uses: flatpak/flatpak-github-actions/flatpak-builder@401fe28a8384095fc1531b9d320b292f0ee45adb # v6.7
         with:
           manifest-path: build-aux/io.github.SigmaCodez.PenguinStudio.json
@@ -101,6 +112,8 @@ jobs:
           upload-artifact: false
           build-bundle: true
           cache-key: penguin-flatpak-${{ hashFiles('build-aux/io.github.SigmaCodez.PenguinStudio.json') }}
+      - name: Verify compiled YouTube configuration
+        run: python3 scripts/packaging/configure-youtube.py --verify .flatpak-builder
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: penguin-studio-flatpak-x86_64
@@ -122,8 +135,21 @@ jobs:
           fetch-depth: 0
       - name: Install build dependencies
         run: sudo bash scripts/packaging/install-build-deps.sh
+      - name: Configure publisher YouTube browser sign-in
+        env:
+          PENGUIN_YOUTUBE_CLIENT_ID: ${{ secrets.PENGUIN_YOUTUBE_CLIENT_ID }}
+          PENGUIN_YOUTUBE_CLIENT_SECRET: ${{ secrets.PENGUIN_YOUTUBE_CLIENT_SECRET }}
+          REQUIRE_YOUTUBE: ${{ needs.version.outputs.publish }}
+        run: |
+          if [ "$REQUIRE_YOUTUBE" = "true" ]; then
+            python3 scripts/packaging/configure-youtube.py --required
+          else
+            python3 scripts/packaging/configure-youtube.py
+          fi
       - name: Compile and package
         run: bash scripts/packaging/build-native.sh DEB
+      - name: Verify compiled YouTube configuration
+        run: python3 scripts/packaging/configure-youtube.py --verify build_penguin_deb
       - name: Validate DEB preflight
         run: |
           python3 test/penguin-deb-install.py
@@ -154,8 +180,21 @@ jobs:
           fetch-depth: 0
       - name: Install build dependencies
         run: bash scripts/packaging/install-build-deps.sh
+      - name: Configure publisher YouTube browser sign-in
+        env:
+          PENGUIN_YOUTUBE_CLIENT_ID: ${{ secrets.PENGUIN_YOUTUBE_CLIENT_ID }}
+          PENGUIN_YOUTUBE_CLIENT_SECRET: ${{ secrets.PENGUIN_YOUTUBE_CLIENT_SECRET }}
+          REQUIRE_YOUTUBE: ${{ needs.version.outputs.publish }}
+        run: |
+          if [ "$REQUIRE_YOUTUBE" = "true" ]; then
+            python3 scripts/packaging/configure-youtube.py --required
+          else
+            python3 scripts/packaging/configure-youtube.py
+          fi
       - name: Compile and package
         run: bash scripts/packaging/build-native.sh RPM
+      - name: Verify compiled YouTube configuration
+        run: python3 scripts/packaging/configure-youtube.py --verify build_penguin_rpm
       - name: Inspect package metadata
         run: rpm -qp --info build_penguin_rpm/*.rpm
       - name: Install RPM and verify launcher
@@ -177,10 +216,23 @@ jobs:
         with:
           submodules: recursive
           fetch-depth: 0
+      - name: Configure publisher YouTube browser sign-in
+        env:
+          PENGUIN_YOUTUBE_CLIENT_ID: ${{ secrets.PENGUIN_YOUTUBE_CLIENT_ID }}
+          PENGUIN_YOUTUBE_CLIENT_SECRET: ${{ secrets.PENGUIN_YOUTUBE_CLIENT_SECRET }}
+          REQUIRE_YOUTUBE: ${{ needs.version.outputs.publish }}
+        run: |
+          if [ "$REQUIRE_YOUTUBE" = "true" ]; then
+            python3 scripts/packaging/configure-youtube.py --required
+          else
+            python3 scripts/packaging/configure-youtube.py
+          fi
       - name: Install Snapcraft
         run: sudo snap install snapcraft --classic
       - name: Build snap
         run: sudo snapcraft --destructive-mode
+      - name: Verify compiled YouTube configuration
+        run: python3 scripts/packaging/configure-youtube.py --verify prime
       - name: Install Snap and verify confined launcher
         run: |
           sudo snap install --dangerous ./penguin-studio_*.snap

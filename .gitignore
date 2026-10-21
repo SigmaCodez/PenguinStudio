@@ -57,3 +57,6 @@ build-aux/flatpak-github-action-modified-*
 
 # Exclude CMake build number cache
 /cmake/.CMakeBuildNumber
+
+# Generated publisher Desktop OAuth configuration
+/plugins/penguin-platforms/youtube-app-config.hpp
