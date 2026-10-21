@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+# Package the tested Ubuntu 24.04 binaries; run on that distribution after build-native.sh.
+set -euo pipefail
+root=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/../.." && pwd)
+deb=$(realpath "${1:?Usage: build-appimage.sh ubuntu24.04.deb [output-directory]}")
+out=$(realpath -m "${2:-$root/build_penguin_appimage}")
+version=$(cat "$root/packaging/version.txt")
+source /etc/os-release
+[[ "$ID" == ubuntu && "$VERSION_ID" == 24.04 && $(uname -m) == x86_64 ]]
+[[ $(dpkg-deb -f "$deb" Package) == penguin-studio ]]
+[[ $(dpkg-deb -f "$deb" Version) == "$version"-*+ubuntu24.04 ]]
+mkdir -p "$out/tools"
+appdir="$out/AppDir"
+[[ ! -e "$appdir" ]] || { echo 'Use a fresh AppImage output directory' >&2; exit 1; }
+dpkg-deb -x "$deb" "$appdir"
+python3 - "$root/packaging/appimage/tools.json" "$out/tools" <<'PY'
+import hashlib, json, pathlib, sys, urllib.request
+for tool in json.loads(pathlib.Path(sys.argv[1]).read_text()):
+    path = pathlib.Path(sys.argv[2]) / tool['name']
+    urllib.request.urlretrieve(tool['url'], path)
+    if hashlib.sha256(path.read_bytes()).hexdigest() != tool['sha256']:
+        raise SystemExit(f"Checksum mismatch: {tool['name']}; review the upstream release before updating the pin")
+    path.chmod(0o755)
+PY
+# linuxdeploy cannot discover dlopen-loaded OBS modules from the executable alone.
+libraries=()
+while IFS= read -r -d '' lib; do libraries+=(--library "$lib"); done \
+  < <(find "$appdir/usr/lib" -type f -name '*.so*' -print0)
+export APPIMAGE_EXTRACT_AND_RUN=1
+export QMAKE=/usr/bin/qmake6
+export EXTRA_PLATFORM_PLUGINS='libqwayland-egl.so;libqwayland-generic.so'
+export EXTRA_QT_MODULES='svg;waylandclient'
+export LD_LIBRARY_PATH="$appdir/usr/lib/x86_64-linux-gnu${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+export NO_STRIP=1
+"$out/tools/linuxdeploy-x86_64.AppImage" --appdir "$appdir" \
+  --executable "$appdir/usr/bin/obs" --executable "$appdir/usr/bin/obs-ffmpeg-mux" \
+  "${libraries[@]}" --plugin qt \
+  --desktop-file "$appdir/usr/share/applications/io.github.SigmaCodez.PenguinStudio.desktop" \
+  --icon-file "$appdir/usr/share/icons/hicolor/scalable/apps/io.github.SigmaCodez.PenguinStudio.svg"
+# Retain dependency copyright notices as well as Penguin/OBS/CEF licenses from the DEB.
+mkdir -p "$appdir/usr/share/licenses/penguin-studio/bundled-dependencies"
+for copyright in /usr/share/doc/*/copyright; do
+  [[ -f "$copyright" ]] || continue
+  package=$(basename "$(dirname "$copyright")")
+  cp -L "$copyright" "$appdir/usr/share/licenses/penguin-studio/bundled-dependencies/$package.txt"
+done
+export OUTPUT="$out/penguin-studio-$version-x86_64.AppImage"
+export ARCH=x86_64
+"$out/tools/linuxdeploy-x86_64.AppImage" --appdir "$appdir" --output appimage
+# --appimage-extract-and-run works without FUSE, including CI containers.
+"$OUTPUT" --appimage-extract-and-run --version | tee "$out/launcher-version.txt"
+grep -F "Penguin Studio $version" "$out/launcher-version.txt"
+(cd "$out" && sha256sum "$(basename "$OUTPUT")" > "$(basename "$OUTPUT").sha256")

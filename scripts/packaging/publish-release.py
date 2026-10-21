@@ -15,10 +15,12 @@ def collect_packages(root, version):
         'Ubuntu 24.04 (amd64)': rf'penguin-studio_{re.escape(version)}-\d+\+ubuntu24\.04_amd64\.deb',
         'Ubuntu 26.04 / 26.04.1 (amd64)': rf'penguin-studio_{re.escape(version)}-\d+\+ubuntu26\.04_amd64\.deb',
         'Fedora 44 (x86_64)': rf'penguin-studio-{re.escape(version)}-[^.]+(?:\.fc44)?\.x86_64\.rpm',
+        'AppImage (x86_64, glibc 2.39+)': rf'penguin-studio-{re.escape(version)}-x86_64\.AppImage',
+        'Arch Linux / AUR recipe (x86_64)': rf'penguin-studio-{re.escape(version)}-aur\.tar\.gz',
         'Flatpak (x86_64)': rf'penguin-studio-{re.escape(version)}-x86_64\.flatpak',
         'Snap core24 (amd64)': rf'penguin-studio_{re.escape(version)}_amd64\.snap',
     }
-    packages = [p for p in root.rglob('*') if p.suffix in ('.deb', '.rpm', '.flatpak', '.snap')]
+    packages = [p for p in root.rglob('*') if p.suffix in ('.deb', '.rpm', '.flatpak', '.snap', '.AppImage') or p.name.endswith('-aur.tar.gz')]
     selected = {}
     for target, pattern in patterns.items():
         matches = [p for p in packages if re.fullmatch(pattern, p.name)]
@@ -60,7 +62,7 @@ def main():
     notes = Path('release-notes.md')
     notes.write_text(f'''Penguin Studio {version} — Linux development preview
 
-Download the package matching your system from Assets below. All five builds
+Download the package matching your system from Assets below. All package builds
 and their automated checks passed before publication. Full live-provider,
 hardware and cross-desktop testing is still incomplete; see docs/VERIFICATION.md.
 
@@ -71,9 +73,15 @@ Ubuntu DEBs are release-specific; do not install the 24.04 package on 26.04.
 The RPM targets Fedora 44. Flatpak requires the Freedesktop 25.08 runtime
 from Flathub. Snap requires snapd and local installation with --dangerous;
 it is a development build, not a Snap Store publication.
+AppImage targets x86_64 hosts with glibc 2.39 or newer. Make it executable and
+launch it; `--appimage-extract-and-run` avoids a FUSE dependency. The AUR archive
+contains a checksum-pinned `penguin-studio-bin` recipe, not a claim of publication
+on aur.archlinux.org. Extract it, review PKGBUILD, then run `makepkg -si` on Arch.
+AppImage and Arch installations currently use manual/package-manager updates;
+the in-app updater offers release links instead of replacing those installations.
 
 Verify downloaded files with `sha256sum --check SHA256SUMS` after downloading
-all five packages, or compare the entry for the package you downloaded.
+all listed files, or compare the entry for the package you downloaded.
 `build-manifest.json` records the exact source commit and package hashes.
 
 Source: `{sha}`. [Build and checks]({manifest['workflow_url']}).

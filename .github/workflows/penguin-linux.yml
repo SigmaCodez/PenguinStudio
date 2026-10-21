@@ -12,7 +12,7 @@ on:
         description: Package builds to run
         type: choice
         default: all
-        options: [all, deb, deb-26.04, rpm, flatpak, snap]
+        options: [all, deb, deb-26.04, rpm, flatpak, snap, appimage, aur]
       publish:
         description: Publish all packages for the current version (main only)
         type: boolean
@@ -122,11 +122,11 @@ jobs:
   deb:
     needs: [version, checks]
     name: Ubuntu ${{ matrix.ubuntu }} DEB (amd64)
-    if: github.event_name != 'workflow_dispatch' || inputs.packages == 'all' || startsWith(inputs.packages, 'deb')
+    if: github.event_name != 'workflow_dispatch' || inputs.packages == 'all' || startsWith(inputs.packages, 'deb') || inputs.packages == 'appimage' || inputs.packages == 'aur'
     strategy:
       fail-fast: false
       matrix:
-        ubuntu: ${{ fromJSON(inputs.packages == 'deb-26.04' && '["26.04"]' || '["24.04", "26.04"]') }}
+        ubuntu: ${{ fromJSON(inputs.packages == 'deb-26.04' && '["26.04"]' || (inputs.packages == 'appimage' || inputs.packages == 'aur') && '["24.04"]' || '["24.04", "26.04"]') }}
     runs-on: ubuntu-${{ matrix.ubuntu }}
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -242,9 +242,72 @@ jobs:
           name: penguin-studio-core24-amd64
           path: '*.snap'
           if-no-files-found: error
+  appimage:
+    needs: [version, checks, deb]
+    name: AppImage (x86_64, Ubuntu 24.04 baseline)
+    if: github.event_name != 'workflow_dispatch' || inputs.packages == 'all' || inputs.packages == 'appimage' || inputs.packages == 'aur'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5
+        with:
+          name: penguin-studio-ubuntu-24.04-amd64
+          path: deb-artifact
+      - name: Install packaging dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends qt6-base-dev qt6-svg-dev qt6-wayland patchelf file desktop-file-utils
+          sudo apt-get install -y --no-remove ./deb-artifact/*.deb
+      - name: Bundle and verify AppImage
+        run: bash scripts/packaging/build-appimage.sh deb-artifact/*.deb
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: penguin-studio-appimage-x86_64
+          path: build_penguin_appimage/*.AppImage*
+          if-no-files-found: error
+  aur:
+    needs: [version, appimage]
+    name: Arch Linux binary recipe and package validation
+    if: github.event_name != 'workflow_dispatch' || inputs.packages == 'all' || inputs.packages == 'appimage' || inputs.packages == 'aur'
+    runs-on: ubuntu-24.04
+    container: archlinux:base-devel
+    steps:
+      - name: Install packaging prerequisites
+        run: pacman -Syu --noconfirm --needed git python sudo desktop-file-utils
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5
+        with:
+          name: penguin-studio-appimage-x86_64
+          path: appimage-artifact
+      - name: Generate, build and install Arch package
+        env:
+          VERSION: ${{ needs.version.outputs.version }}
+        run: |
+          python scripts/packaging/prepare-aur.py appimage-artifact/*.AppImage /tmp/aur-build
+          cp appimage-artifact/*.AppImage /tmp/aur-build/
+          useradd -m builder
+          printf 'builder ALL=(ALL) NOPASSWD: /usr/bin/pacman\n' > /etc/sudoers.d/builder
+          chmod 440 /etc/sudoers.d/builder
+          chown -R builder:builder /tmp/aur-build
+          cd /tmp/aur-build
+          sudo -u builder makepkg --printsrcinfo > .SRCINFO
+          sudo -u builder makepkg --syncdeps --noconfirm
+          pacman -U --noconfirm ./*.pkg.tar.zst
+          penguin-studio --version | tee launcher-version.txt
+          grep -F "Penguin Studio $VERSION" launcher-version.txt
+          desktop-file-validate /usr/share/applications/io.github.SigmaCodez.PenguinStudio.desktop
+          mkdir -p "$GITHUB_WORKSPACE/aur-artifact/penguin-studio-bin"
+          cp PKGBUILD .SRCINFO "$GITHUB_WORKSPACE/aur-artifact/penguin-studio-bin/"
+          cd "$GITHUB_WORKSPACE/aur-artifact"
+          tar -czf "penguin-studio-$VERSION-aur.tar.gz" penguin-studio-bin
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: penguin-studio-aur-recipe
+          path: aur-artifact/*.tar.gz
+          if-no-files-found: error
   release:
     name: Publish complete Linux download set
-    needs: [version, checks, flatpak, deb, rpm, snap]
+    needs: [version, checks, flatpak, deb, rpm, snap, appimage, aur]
     if: needs.version.outputs.publish == 'true'
     runs-on: ubuntu-24.04
     permissions:

@@ -25,7 +25,7 @@ the installation directly. The update
 dialog prevents ordinary window closure while the package manager is running.
 After success, close and reopen Penguin Studio to load the updated application.
 
-Strict Snap packages and unrecognized installation layouts show the new release
+AppImage, Arch packages, strict Snap packages and unrecognized installation layouts show the new release
 and a link to its downloads; they do not run apt/dnf or bypass sandbox rules.
 Store-managed Snaps use snapd's update mechanism. Locally installed unsigned
 Snaps still require a new bundle installed through the host's package tools.

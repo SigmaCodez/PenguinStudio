@@ -1,0 +1,40 @@
+# Maintainer: SigmaCodez (https://github.com/SigmaCodez)
+pkgname=penguin-studio-bin
+pkgver=@VERSION@
+pkgrel=1
+pkgdesc='Linux broadcasting studio with multistreaming, portrait output and platform connections'
+arch=('x86_64')
+url='https://github.com/SigmaCodez/PenguinStudio'
+license=('GPL-2.0-or-later')
+depends=('glibc' 'gcc-libs' 'zlib' 'libglvnd' 'libx11' 'libxcb' 'fontconfig' 'freetype2' 'dbus' 'alsa-lib' 'libpulse' 'libva' 'libdrm' 'pipewire' 'libxkbcommon' 'wayland' 'xdg-utils')
+optdepends=('xdg-desktop-portal: Wayland screen sharing'
+            'gnome-keyring: saved Twitch and YouTube sign-ins via Secret Service'
+            'kwallet: alternative system keyring'
+            'libva-mesa-driver: AMD hardware video encoding'
+            'nvidia-utils: NVIDIA hardware video encoding')
+provides=('penguin-studio')
+conflicts=('penguin-studio')
+options=('!strip' '!debug')
+_appimage="penguin-studio-${pkgver}-x86_64.AppImage"
+source=("${url}/releases/download/penguin-v${pkgver}/${_appimage}")
+sha256sums=('@SHA256@')
+noextract=("${_appimage}")
+
+prepare() {
+    chmod +x "${_appimage}"
+    "./${_appimage}" --appimage-extract >/dev/null
+}
+
+package() {
+    install -d "${pkgdir}/opt/${pkgname}" "${pkgdir}/usr/bin"
+    cp -a squashfs-root/. "${pkgdir}/opt/${pkgname}/"
+    # A wrapper preserves AppRun's executable location; a bare symlink may not.
+    printf '#!/bin/sh\nexec /opt/penguin-studio-bin/AppRun "$@"\n' > "${pkgdir}/usr/bin/penguin-studio"
+    chmod 755 "${pkgdir}/usr/bin/penguin-studio"
+    install -Dm644 squashfs-root/usr/share/applications/io.github.SigmaCodez.PenguinStudio.desktop \
+        "${pkgdir}/usr/share/applications/io.github.SigmaCodez.PenguinStudio.desktop"
+    install -Dm644 squashfs-root/usr/share/icons/hicolor/scalable/apps/io.github.SigmaCodez.PenguinStudio.svg \
+        "${pkgdir}/usr/share/icons/hicolor/scalable/apps/io.github.SigmaCodez.PenguinStudio.svg"
+    install -d "${pkgdir}/usr/share/licenses/${pkgname}"
+    cp -a squashfs-root/usr/share/licenses/penguin-studio/. "${pkgdir}/usr/share/licenses/${pkgname}/"
+}

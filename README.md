@@ -22,7 +22,7 @@ Actual Linux application capture with test media. See the [workspace guide](docs
 - Landscape program output and a separate 1080 × 1920 portrait canvas with center crop or fit. Each destination has its own H.264/AAC encoding pipeline.
 - Native Twitch device authorization and YouTube desktop authorization with PKCE. The **Stream details** dock can update titles through their APIs without an embedded browser, including in a Wayland session.
 - Automatic NVIDIA NVENC and Linux VA-API H.264 selection for new simple-output profiles, the setup assistant and new destinations, with capability checks and software fallback. See [hardware encoding](docs/HARDWARE-ENCODING.md).
-- Build definitions for Flatpak, Snap, DEB and RPM, with a Linux CI workflow. See [packaging](docs/PACKAGING.md).
+- Build definitions for Flatpak, Snap, DEB, RPM and AppImage, plus an Arch/AUR recipe, with a Linux CI workflow. See [AppImage and Arch installation](docs/APPIMAGE-AUR.md). See [packaging](docs/PACKAGING.md).
 
 ## Get started
 

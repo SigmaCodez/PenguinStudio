@@ -1,15 +1,19 @@
 # Linux builds and packages
 
-Penguin Studio's current source version is **0.4.2**, based on OBS Studio
+Penguin Studio's current source version is **0.4.3**, based on OBS Studio
 **32.2.2**. The application ID is `io.github.SigmaCodez.PenguinStudio` and the
 launcher is `penguin-studio`. Internal OBS libraries and plugin paths retain
 their names for compatibility. Application settings are stored separately
 from OBS Studio.
 
+See [AppImage and Arch/AUR instructions](APPIMAGE-AUR.md) for the new package formats.
+
 ## Supported build targets
 
 | Package | Build environment | Architecture | Distribution scope |
 | --- | --- | --- | --- |
+| AppImage | Ubuntu 24.04 with bundled Qt | x86_64 | glibc 2.39+ hosts; graphics drivers and portals remain host-provided |
+| Arch/AUR recipe | Arch Linux makepkg; packages the AppImage | x86_64 | Arch Linux; GitHub recipe download, AUR submission pending |
 | Flatpak | Freedesktop SDK 25.08, pinned OBS dependencies | x86_64 | Linux distributions with Flatpak and working graphics/desktop portals |
 | DEB | Ubuntu 24.04 and Ubuntu 26.04, built separately | amd64 | Install only the package matching the host Ubuntu release |
 | RPM | Fedora 44 with RPM Fusion free build dependencies | x86_64 | Fedora 44; rebuild for other RPM distributions |
@@ -40,9 +44,8 @@ prereleases while Penguin Studio remains a development preview.
 To publish a new version, increase **`packaging/version.txt`** (for example from
 `0.4.2` to `0.4.3`) and push it to `main`. This single file supplies the application,
 native package and Snap versions; the Flatpak filename uses the same value.
-The Linux workflow detects the version change, runs the checks, builds all five
-packages, creates `penguin-v<version>` at the exact build commit, uploads the
-complete download set to a draft, and only then publishes it. A failed build or
+The Linux workflow detects the version change, runs the checks, builds all six binary packages and validates the Arch recipe, creates `penguin-v<version>` at the exact build commit, uploads the
+complete download set (six binaries and one recipe archive) to a draft, and only then publishes it. A failed build or
 upload cannot publish a partial release. Existing public releases are preserved;
 use a new version for changed binaries. Re-run failed jobs on the original run to
 retry a failed release for the same commit.
