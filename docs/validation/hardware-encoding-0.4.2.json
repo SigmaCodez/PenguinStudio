@@ -1,0 +1,103 @@
+{
+  "date": "2026-10-21",
+  "source_commit": "83c1639912f09298754ed8c01513ddaa4921c7ed",
+  "gpu": "AMD Radeon RX 9070 XT",
+  "display_backend": "native Wayland/EGL",
+  "encoder_plugin": "installed Penguin Studio 0.4.1 obs-ffmpeg; unchanged in 0.4.2",
+  "capability_query": "0.4.2 PenguinVAAPIAvailable passed",
+  "test_inputs": "synthetic blank video, silent audio, no screen capture or external stream",
+  "tests": {
+    "CBR": {
+      "result": "passed",
+      "bitrate_kbps": 2500,
+      "format": "H.264 1280x720 30fps + AAC"
+    },
+    "CQP": {
+      "result": "passed",
+      "qp": 23,
+      "format": "H.264 1280x720 30fps + AAC"
+    },
+    "capability_regression": "passed",
+    "multistream_output_safety": "passed",
+    "wizard_lifecycle": "passed",
+    "wayland_hardware_multistream": {
+      "result": "passed",
+      "landscape": "1280x720 H.264/AAC",
+      "portrait": "1080x1920 H.264/AAC",
+      "encoder": "ffmpeg_vaapi_tex",
+      "checks": [
+        "simultaneous outputs",
+        "crop and fit",
+        "normal stop and restart",
+        "active-output destruction",
+        "receiver interruption and reconnect",
+        "unreachable receiver cleanup"
+      ],
+      "destination": "loopback only",
+      "test_harness": "existing local-stream test compiled with VA-API selection; FFmpeg runtime wrappers configured to share loopback and die with parent"
+    },
+    "packaged_wayland_gui": {
+      "actualEncoder": "ffmpeg_vaapi_tex",
+      "frames": 145,
+      "newDestinationEncoder": "ffmpeg_vaapi_tex",
+      "recordDefault": "vaapi",
+      "recordingActive": true,
+      "recordingStopped": true,
+      "simpleOutRecEncoder": true,
+      "simpleOutStrEncoder": true,
+      "streamDefault": "vaapi",
+      "wayland": true,
+      "wizardPrefersHardware": true,
+      "exit_code": 0,
+      "logged_warnings_or_errors": false,
+      "reported_memory_leaks": 0,
+      "isolated_profile": true,
+      "installed_system_changed": false
+    }
+  },
+  "nvidia_runtime_test": "not run: no NVIDIA GPU installed",
+  "test_log_sha256": {
+    "penguin-vaapi-live.log": "e4c3100e5cbce44ae8928d2688e5c73ab6187786002f5b5f36369ec2f9aca5e6",
+    "test.log": "1d3a3b0b1aaf5116af7941e2ff7bc2be5051e9838887d43259cd2bfba16b3d0c",
+    "application.log": "997ebdfb0c89cbf871b34fd703d42d6c3c0d5d0fb82e028fc5378130bad6558b",
+    "installed-application.log": "3ba639f1250b2a93db920b3e6112b71c38065f681c3629e6e3dc6c517870eb60",
+    "installed-restart.log": "c7c90cc27a94606165324465ab2c698f1e945953ecf69a8b45ced15e80c9a2e5"
+  },
+  "installed_ubuntu": {
+    "version": "0.4.2-1+ubuntu26.04",
+    "installation_exit_code": 0,
+    "packages_added": 0,
+    "packages_removed": 0,
+    "dpkg_verify": "passed",
+    "dependency_check": "passed",
+    "wayland_gui": {
+      "actualEncoder": "ffmpeg_vaapi_tex",
+      "frames": 145,
+      "newDestinationEncoder": "ffmpeg_vaapi_tex",
+      "recordDefault": "vaapi",
+      "recordingActive": true,
+      "recordingStopped": true,
+      "simpleOutRecEncoder": true,
+      "simpleOutStrEncoder": true,
+      "streamDefault": "vaapi",
+      "wayland": true,
+      "wizardPrefersHardware": true
+    },
+    "exit_code": 0,
+    "reported_memory_leaks": 0,
+    "logged_warnings_or_errors": false,
+    "restart": {
+      "exit_code": 0,
+      "logged_warnings_or_errors": false,
+      "reported_memory_leaks": 0
+    },
+    "test_harness_repair": "A private synthetic fixture caused a missing-source warning when reloading the first test profile. The fixture was changed to a serializable public source; a fresh installed-app run and subsequent same-profile restart passed without warnings."
+  },
+  "release": {
+    "url": "https://github.com/SigmaCodez/PenguinStudio/releases/tag/penguin-v0.4.2",
+    "workflow_url": "https://github.com/SigmaCodez/PenguinStudio/actions/runs/39642169397",
+    "package_count": 5,
+    "installed_package_matches_release": true,
+    "ubuntu26_sha256": "874635cce17c330d4ca6565c7161e1b443b317359e1bc6c2930a238f7dcfff87"
+  }
+}

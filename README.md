@@ -21,6 +21,7 @@ Actual Linux application capture with test media. See the [workspace guide](docs
 - A first-launch destination assistant, platform dashboard links and up to eight independently controlled RTMP(S) outputs.
 - Landscape program output and a separate 1080 × 1920 portrait canvas with center crop or fit. Each destination has its own H.264/AAC encoding pipeline.
 - Native Twitch device authorization and YouTube desktop authorization with PKCE. The **Stream details** dock can update titles through their APIs without an embedded browser, including in a Wayland session.
+- Automatic NVIDIA NVENC and Linux VA-API H.264 selection for new simple-output profiles, the setup assistant and new destinations, with capability checks and software fallback. See [hardware encoding](docs/HARDWARE-ENCODING.md).
 - Build definitions for Flatpak, Snap, DEB and RPM, with a Linux CI workflow. See [packaging](docs/PACKAGING.md).
 
 The workspace takes inspiration from modern broadcasting tools such as Meld Studio. It uses original branding and OBS's native Qt interface; it is not an identical Meld implementation.

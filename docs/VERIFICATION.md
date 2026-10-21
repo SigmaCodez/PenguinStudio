@@ -2,6 +2,47 @@
 
 This is a development preview based on OBS Studio 32.2.2. The new Penguin code must not be described as fully production-tested until the checks below have real recorded results.
 
+## Hardware encoding 0.4.2 — 2026-10-21
+
+The source at `83c1639912f09298754ed8c01513ddaa4921c7ed` adds Linux VA-API to
+simple-output defaults, the auto-configuration wizard, encoder menus and new
+multistream destinations. Registered NVIDIA NVENC encoders retain priority.
+Explicit user selections are preserved. VA-API capability checks require CBR
+and CQP support on the default device/profile; unsupported simple-mode selections
+fall back to software x264. All Linux package recipes explicitly enable NVENC.
+
+A checksum-verified Ubuntu 26.04 CI package was tested under native Wayland/EGL
+on a Radeon RX 9070 XT with an isolated profile. New profile defaults selected
+VA-API for streaming and recording, both simple-output menus contained and selected
+it, the auto-configuration wizard preferred hardware, and a new multistream
+destination selected `ffmpeg_vaapi_tex`. A short synthetic recording used that
+encoder and stopped normally. The application exited with code 0, no logged
+warnings/errors and zero reported memory leaks.
+
+Separate CBR/CQP hardware encoding and simultaneous landscape/portrait loopback
+streaming passed, including crop/fit, restart, reconnect and active shutdown.
+No external stream, desktop capture or live account was used. Regression tests
+cover rate-control availability, disabled entries and property callbacks; output
+safety and wizard lifecycle tests also passed. These results do not establish
+NVIDIA runtime compatibility or support for every GPU/driver combination.
+
+The same Ubuntu package was then installed successfully, upgrading only Penguin
+Studio from 0.4.1 to 0.4.2 with no additions or removals. Package-file and dependency
+checks passed. A repeat test of the installed application passed every hardware
+selection and recording check and exited cleanly, again with no logged warnings
+or errors and zero reported leaks. A subsequent restart of the same test profile also exited without warnings or
+errors and reported zero leaks. An earlier missing-source warning was traced to
+a private synthetic test fixture; making that fixture serializable resolved it
+without changing application code. Personal profile settings were unchanged.
+
+[Release 0.4.2](https://github.com/SigmaCodez/PenguinStudio/releases/tag/penguin-v0.4.2)
+contains Ubuntu 24.04 and 26.04 DEBs, Fedora RPM, Flatpak and Snap packages. All
+five CI builds and publication passed. The installed Ubuntu package matches the
+published SHA-256 checksum.
+
+See [hardware configuration](HARDWARE-ENCODING.md) and
+[test evidence](validation/hardware-encoding-0.4.2.json).
+
 ## Released 0.4.1 — 2026-10-21
 
 [Release 0.4.1](https://github.com/SigmaCodez/PenguinStudio/releases/tag/penguin-v0.4.1)

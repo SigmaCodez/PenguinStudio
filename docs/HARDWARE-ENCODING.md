@@ -38,3 +38,9 @@ Wayland/EGL: CBR at 2500 kbit/s and CQP at QP 23. Both outputs stopped normally.
 This validates the VA-API capability query and encoder settings, not all GPU models
 or a complete application GUI session. NVIDIA runtime testing requires NVIDIA
 hardware and has not been performed on this AMD machine.
+
+The production multistream controller was also tested with VA-API under Wayland:
+simultaneous 1280×720 landscape and 1080×1920 portrait H.264/AAC outputs to local
+receivers, crop/fit, stop/restart, reconnect after a receiver interruption, active
+output destruction and unreachable-server cleanup all passed. Test media was
+synthetic; no streaming account or desktop capture was used.
