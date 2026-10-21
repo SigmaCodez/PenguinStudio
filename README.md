@@ -24,8 +24,6 @@ Actual Linux application capture with test media. See the [workspace guide](docs
 - Automatic NVIDIA NVENC and Linux VA-API H.264 selection for new simple-output profiles, the setup assistant and new destinations, with capability checks and software fallback. See [hardware encoding](docs/HARDWARE-ENCODING.md).
 - Build definitions for Flatpak, Snap, DEB and RPM, with a Linux CI workflow. See [packaging](docs/PACKAGING.md).
 
-The workspace takes inspiration from modern broadcasting tools such as Meld Studio. It uses original branding and OBS's native Qt interface; it is not an identical Meld implementation.
-
 ## Get started
 
 **Current release: [Penguin Studio 0.4.2](https://github.com/SigmaCodez/PenguinStudio/releases/tag/penguin-v0.4.2)** — automatic hardware encoder selection, browser sign-in and saved accounts.
