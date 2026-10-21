@@ -306,6 +306,10 @@ jobs:
           sudo -u builder makepkg --printsrcinfo > .SRCINFO
           sudo -u builder makepkg --syncdeps --noconfirm
           pacman -U --noconfirm ./*.pkg.tar.zst
+          export LD_LIBRARY_PATH=/opt/penguin-studio-bin/usr/lib:/opt/penguin-studio-bin/usr/lib/x86_64-linux-gnu
+          find /opt/penguin-studio-bin/usr/lib -type f -name '*.so*' -exec ldd {} \; > library-check.txt 2>&1
+          if grep 'not found' library-check.txt; then exit 1; fi
+          unset LD_LIBRARY_PATH
           penguin-studio --version | tee launcher-version.txt
           grep -F "Penguin Studio $VERSION" launcher-version.txt
           desktop-file-validate /usr/share/applications/io.github.SigmaCodez.PenguinStudio.desktop

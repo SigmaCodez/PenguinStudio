@@ -36,11 +36,19 @@ export EXTRA_PLATFORM_PLUGINS='libqwayland-egl.so;libqwayland-generic.so'
 export EXTRA_QT_MODULES='svg;waylandclient'
 export LD_LIBRARY_PATH="$appdir/usr/lib/x86_64-linux-gnu${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
 export NO_STRIP=1
-"$out/tools/linuxdeploy-x86_64.AppImage" --appdir "$appdir" \
+"$out/tools/linuxdeploy-x86_64.AppImage" --appdir "$appdir" --exclude-library 'libva*.so*' \
   --executable "$appdir/usr/bin/obs" --executable "$appdir/usr/bin/obs-ffmpeg-mux" \
   "${libraries[@]}" --plugin qt \
   --desktop-file "$appdir/usr/share/applications/io.github.SigmaCodez.PenguinStudio.desktop" \
   --icon-file "$appdir/usr/share/icons/hicolor/scalable/apps/io.github.SigmaCodez.PenguinStudio.svg"
+# Qt's platform plugins also need the Wayland shell/graphics integrations.
+# The Qt deploy plugin does not currently copy these Qt 6 subdirectories.
+qt_plugins=$($QMAKE -query QT_INSTALL_PLUGINS)
+for integration in wayland-decoration-client wayland-graphics-integration-client wayland-shell-integration; do
+  cp -a "$qt_plugins/$integration" "$appdir/usr/plugins/"
+done
+test -d "$appdir/usr/plugins/wayland-shell-integration"
+test -d "$appdir/usr/plugins/wayland-graphics-integration-client"
 # Retain dependency copyright notices as well as Penguin/OBS/CEF licenses from the DEB.
 mkdir -p "$appdir/usr/share/licenses/penguin-studio/bundled-dependencies"
 for copyright in /usr/share/doc/*/copyright; do
@@ -51,7 +59,7 @@ done
 export OUTPUT="$out/penguin-studio-$version-x86_64.AppImage"
 export ARCH=x86_64
 export LDAI_RUNTIME_FILE="$out/tools/runtime-x86_64"
-"$out/tools/linuxdeploy-x86_64.AppImage" --appdir "$appdir" --output appimage
+"$out/tools/linuxdeploy-x86_64.AppImage" --appdir "$appdir" --exclude-library 'libva*.so*' --output appimage
 # --appimage-extract-and-run works without FUSE, including CI containers.
 "$OUTPUT" --appimage-extract-and-run --version | tee "$out/launcher-version.txt"
 grep -F "Penguin Studio $version" "$out/launcher-version.txt"
@@ -94,3 +102,8 @@ assert result['main_window_visible'], result
 assert result['platform'] == 'xcb', result
 print('AppImage graphical startup and normal shutdown passed')
 PYTEST
+
+if grep -E 'QMetaMethod::invoke:.*unregistered|Fatal Python error' "$out/gui.log"; then
+  echo 'Portable GUI runtime regression detected' >&2
+  exit 1
+fi

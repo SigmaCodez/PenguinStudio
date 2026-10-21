@@ -139,7 +139,9 @@ void ThumbnailManager::obsSourceRemoved(void *data, calldata_t *params)
 	}
 
 	auto *manager = static_cast<ThumbnailManager *>(data);
-	QMetaObject::invokeMethod(manager, "deleteItemById", Qt::QueuedConnection, Q_ARG(std::string, uuidPointer));
+	QMetaObject::invokeMethod(
+		manager, [manager, uuid = std::string(uuidPointer)]() { manager->deleteItemById(uuid); },
+		Qt::QueuedConnection);
 }
 
 void ThumbnailManager::updateTickInterval(int newInterval)

@@ -5,6 +5,7 @@
 - Add an x86_64 AppImage built from the Ubuntu 24.04 package, including Qt Wayland plugins and publisher-configured browser sign-in.
 - Generate a checksum-pinned `penguin-studio-bin` Arch/AUR recipe and validate it with makepkg before release. AUR submission requires a maintainer account and is not yet enabled.
 - Require both new artifacts in the complete Linux release set.
+- Fix queued thumbnail cleanup on Qt 6.4 by passing an owned UUID through a context-bound callback.
 
 ## 0.4.2 — 2026-10-21
 

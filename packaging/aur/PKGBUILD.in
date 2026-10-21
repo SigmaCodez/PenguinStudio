@@ -6,11 +6,12 @@ pkgdesc='Linux broadcasting studio with multistreaming, portrait output and plat
 arch=('x86_64')
 url='https://github.com/SigmaCodez/PenguinStudio'
 license=('GPL-2.0-or-later')
-depends=('glibc' 'gcc-libs' 'zlib' 'libglvnd' 'libx11' 'libxcb' 'fontconfig' 'freetype2' 'dbus' 'alsa-lib' 'libpulse' 'libva' 'libdrm' 'pipewire' 'libxkbcommon' 'wayland' 'xdg-utils')
+depends=('glibc' 'gcc-libs' 'zlib' 'libglvnd' 'libx11' 'libxcb' 'fontconfig' 'freetype2' 'harfbuzz' 'fribidi' 'libice' 'libsm'
+         'libusb' 'e2fsprogs' 'gmp' 'libgpg-error' 'util-linux-libs' 'expat'
+         'mesa' 'jack' 'dbus' 'alsa-lib' 'libpulse' 'libva' 'libdrm' 'pipewire' 'libxkbcommon' 'wayland' 'xdg-utils')
 optdepends=('xdg-desktop-portal: Wayland screen sharing'
             'gnome-keyring: saved Twitch and YouTube sign-ins via Secret Service'
             'kwallet: alternative system keyring'
-            'mesa: AMD hardware video encoding'
             'nvidia-utils: NVIDIA hardware video encoding')
 provides=('penguin-studio')
 conflicts=('penguin-studio')
