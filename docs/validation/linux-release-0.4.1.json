@@ -1,0 +1,53 @@
+{
+  "date": "2026-10-21",
+  "version": "0.4.1",
+  "source_commit": "43de468de1193f7c7887543e7b025d6812dcc037",
+  "release_url": "https://github.com/SigmaCodez/PenguinStudio/releases/tag/penguin-v0.4.1",
+  "workflow_url": "https://github.com/SigmaCodez/PenguinStudio/actions/runs/39594940336",
+  "workflow_result": "success",
+  "packages": [
+    {
+      "target": "Ubuntu 24.04 (amd64)",
+      "file": "penguin-studio_0.4.1-1+ubuntu24.04_amd64.deb",
+      "sha256": "7ff82a086c7cfa6c4939dc16947b1ab60bd465d24535f373621c0f638f68e338",
+      "bytes": 135576756
+    },
+    {
+      "target": "Ubuntu 26.04 / 26.04.1 (amd64)",
+      "file": "penguin-studio_0.4.1-1+ubuntu26.04_amd64.deb",
+      "sha256": "b1adf55681cb728829a590ecb72a062318cebc9fbf6db8ab9bad139d9f3c9e85",
+      "bytes": 135708474
+    },
+    {
+      "target": "Fedora 44 (x86_64)",
+      "file": "penguin-studio-0.4.1-1.x86_64.rpm",
+      "sha256": "10fdd9e8ed548bc6311a3bb1b5fe3cdf02ee49db3c08f691471c54d9d3dac5e3",
+      "bytes": 119364415
+    },
+    {
+      "target": "Flatpak (x86_64)",
+      "file": "penguin-studio-0.4.1-x86_64.flatpak",
+      "sha256": "4fd41959fc0c8daf75351c6345c636edcc434cb159e540ad9c701fceae43251a",
+      "bytes": 142763288
+    },
+    {
+      "target": "Snap core24 (amd64)",
+      "file": "penguin-studio_0.4.1_amd64.snap",
+      "sha256": "7014419263855196f33d4dcd16ffc915d9a65f124b82d96da7fd58dabb290416",
+      "bytes": 499277824
+    }
+  ],
+  "checks": {
+    "branding_locales_oauth": "passed",
+    "all_five_package_jobs": "passed",
+    "publisher_configuration_in_compiled_modules": "passed for all five packages",
+    "ubuntu_26_04_download_sha256": "passed",
+    "ubuntu_26_04_manifest_source": "passed",
+    "ubuntu_26_04_apt_preflight": "upgrade Penguin Studio only; no new packages or removals",
+    "bundled_google_client_matches_previously_live_tested_local_client": true
+  },
+  "fixed_build_issue": "Flatpak verification originally searched the cache directory. It now searches the exported flatpak_app application tree. The corrected run passed.",
+  "local_installation": "Not changed during this release task; installed version remains 0.4.0.",
+  "live_testing": "Existing YouTube account was tested under Wayland on 0.4.0. The 0.4.1 browser-button UI and OAuth flows have automated coverage; a new installed 0.4.1 GUI/live-provider test has not been performed.",
+  "google_distribution_note": "Shared Google app consent/audience restrictions still apply. Testing status restricts authorization to listed test accounts."
+}

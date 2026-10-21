@@ -2,6 +2,27 @@
 
 This is a development preview based on OBS Studio 32.2.2. The new Penguin code must not be described as fully production-tested until the checks below have real recorded results.
 
+## Released 0.4.1 — 2026-10-21
+
+[Release 0.4.1](https://github.com/SigmaCodez/PenguinStudio/releases/tag/penguin-v0.4.1)
+provides all five Linux packages with publisher-configured YouTube browser sign-in.
+The normal flow offers **Connect with YouTube**, with application credentials hidden
+under advanced settings. Existing saved accounts retain their client identity.
+Each package job verified the publisher configuration in its compiled platform
+module. The initial Flatpak check used the cache directory instead of the exported
+application directory; the corrected complete run passed at commit
+`43de468de1193f7c7887543e7b025d6812dcc037`.
+
+The downloaded Ubuntu 26.04 DEB matches the published checksum and source manifest.
+Its bundled Google client matches the previously live-tested local account. APT
+preflight upgrades Penguin Studio only, without adding or removing packages.
+The local installation was not changed in this release task. Automated tests cover
+the browser button, hidden/advanced settings and existing OAuth flows; the installed
+0.4.1 GUI has not yet received a new live-provider test. Google testing/production
+and verification restrictions still apply to the shared app.
+
+Evidence: [release and package checks](validation/linux-release-0.4.1.json).
+
 ## Released and installed 0.4.0 — 2026-10-20
 
 [Release 0.4.0](https://github.com/SigmaCodez/PenguinStudio/releases/tag/penguin-v0.4.0)
