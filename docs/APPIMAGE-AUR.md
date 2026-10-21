@@ -29,8 +29,8 @@ If FUSE is unavailable, use:
 Wayland screen capture needs PipeWire and the desktop's portal backend. Account
 persistence needs a working Secret Service or KWallet keyring. Official packages
 include the Twitch and YouTube application configuration. User accounts, stream
-keys and passwords are never included in the download. Native VLC sources and
-Python scripting may require additional host runtimes.
+keys and passwords are never included in the download. Python scripting uses the bundled Python 3.12 standard library. Third-party Python
+modules must support that version. VLC sources may require a host VLC runtime.
 
 For updates, stop outputs, close Penguin Studio and replace the AppImage with the
 new verified download. In-app notifications link to releases; this package does

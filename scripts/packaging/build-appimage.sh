@@ -22,6 +22,10 @@ for tool in json.loads(pathlib.Path(sys.argv[1]).read_text()):
         raise SystemExit(f"Checksum mismatch: {tool['name']}; review the upstream release before updating the pin")
     path.chmod(0o755)
 PY
+# OBS initializes Python at startup. Shipping libpython without its matching
+# standard library would abort on hosts with a different Python version.
+cp -aL /usr/lib/python3.12 "$appdir/usr/lib/"
+install -m755 "$root/packaging/appimage/penguin-studio" "$appdir/usr/bin/penguin-studio"
 # linuxdeploy cannot discover dlopen-loaded OBS modules from the executable alone.
 libraries=()
 while IFS= read -r -d '' lib; do libraries+=(--library "$lib"); done \
@@ -46,8 +50,47 @@ for copyright in /usr/share/doc/*/copyright; do
 done
 export OUTPUT="$out/penguin-studio-$version-x86_64.AppImage"
 export ARCH=x86_64
+export LDAI_RUNTIME_FILE="$out/tools/runtime-x86_64"
 "$out/tools/linuxdeploy-x86_64.AppImage" --appdir "$appdir" --output appimage
 # --appimage-extract-and-run works without FUSE, including CI containers.
 "$OUTPUT" --appimage-extract-and-run --version | tee "$out/launcher-version.txt"
 grep -F "Penguin Studio $version" "$out/launcher-version.txt"
 (cd "$out" && sha256sum "$(basename "$OUTPUT")" > "$(basename "$OUTPUT").sha256")
+
+# A CLI version check alone does not initialize Qt plugins, Python or OBS modules.
+c++ -std=c++17 -fPIC -shared "$root/test/penguin-portable-smoke.cpp" \
+  $(pkg-config --cflags --libs Qt6Widgets) -o "$out/gui-probe.so"
+mkdir -p "$out/gui-config/PenguinStudio/basic/profiles/Test"
+cat > "$out/gui-config/PenguinStudio/user.ini" <<'PROFILE'
+[General]
+Language=en-US
+FirstRun=true
+[Basic]
+Profile=Test
+ProfileDir=Test
+[Updates]
+AutoCheck=false
+PROFILE
+cat > "$out/gui-config/PenguinStudio/basic/profiles/Test/basic.ini" <<'PROFILE'
+[General]
+Name=Test
+[Video]
+BaseCX=1280
+BaseCY=720
+OutputCX=1280
+OutputCY=720
+FPSType=0
+FPSCommon=30
+PROFILE
+xvfb-run -a timeout --kill-after=5s 45s env -u LD_LIBRARY_PATH \
+  LD_PRELOAD="$out/gui-probe.so" XDG_CONFIG_HOME="$out/gui-config" \
+  XDG_CACHE_HOME="$out/gui-cache" QT_QPA_PLATFORM=xcb LIBGL_ALWAYS_SOFTWARE=1 \
+  PENGUIN_TEST_RESULT="$out/gui-result.json" \
+  "$OUTPUT" --appimage-extract-and-run --multi > "$out/gui.log" 2>&1
+python3 - "$out/gui-result.json" <<'PYTEST'
+import json, pathlib, sys
+result = json.loads(pathlib.Path(sys.argv[1]).read_text())
+assert result['main_window_visible'], result
+assert result['platform'] == 'xcb', result
+print('AppImage graphical startup and normal shutdown passed')
+PYTEST

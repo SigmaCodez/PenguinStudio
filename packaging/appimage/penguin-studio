@@ -1,0 +1,5 @@
+#!/bin/sh
+# AppRun points to this file; resolve the symlink before finding OBS and Python.
+bindir=$(CDPATH= cd -- "$(dirname -- "$(readlink -f -- "$0")")" && pwd)
+export PYTHONHOME="$bindir/.."
+exec "$bindir/obs" "$@"

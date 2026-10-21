@@ -10,7 +10,7 @@ depends=('glibc' 'gcc-libs' 'zlib' 'libglvnd' 'libx11' 'libxcb' 'fontconfig' 'fr
 optdepends=('xdg-desktop-portal: Wayland screen sharing'
             'gnome-keyring: saved Twitch and YouTube sign-ins via Secret Service'
             'kwallet: alternative system keyring'
-            'libva-mesa-driver: AMD hardware video encoding'
+            'mesa: AMD hardware video encoding'
             'nvidia-utils: NVIDIA hardware video encoding')
 provides=('penguin-studio')
 conflicts=('penguin-studio')

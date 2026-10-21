@@ -50,7 +50,9 @@ jobs:
           python3 scripts/check-branding.py
           python3 scripts/check-penguin-locales.py
       - name: Validate automatic releases
-        run: python3 test/penguin-release.py
+        run: |
+          python3 test/penguin-release.py
+          python3 test/penguin-portable.py
       - name: Check optional Linux runtime diagnostics
         run: bash scripts/packaging/test-optional-library.sh
       - name: Compile and run configuration isolation checks
@@ -256,10 +258,21 @@ jobs:
       - name: Install packaging dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends qt6-base-dev qt6-svg-dev qt6-wayland patchelf file desktop-file-utils
+          sudo apt-get install -y --no-install-recommends qt6-base-dev qt6-svg-dev qt6-wayland patchelf file desktop-file-utils xvfb xauth libgl1-mesa-dri
           sudo apt-get install -y --no-remove ./deb-artifact/*.deb
       - name: Bundle and verify AppImage
         run: bash scripts/packaging/build-appimage.sh deb-artifact/*.deb
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        if: failure()
+        with:
+          name: penguin-debug-appimage
+          path: |
+            build_penguin_appimage/*.AppImage
+            build_penguin_appimage/gui-probe.so
+            build_penguin_appimage/gui*.log
+            build_penguin_appimage/gui*.json
+            build_penguin_appimage/gui*.maps
+          if-no-files-found: ignore
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: penguin-studio-appimage-x86_64
