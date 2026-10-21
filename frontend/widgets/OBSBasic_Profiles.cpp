@@ -15,6 +15,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
+#include <utility/PenguinHardwareEncoder.hpp>
 #include "OBSBasic.hpp"
 
 #ifdef YOUTUBE_ENABLED
@@ -833,7 +834,13 @@ void OBSBasic::CheckForSimpleModeX264Fallback()
 	}
 
 	auto CheckEncoder = [&](const char *&name) {
-		if (strcmp(name, SIMPLE_ENCODER_QSV) == 0) {
+		if (strcmp(name, SIMPLE_ENCODER_VAAPI) == 0) {
+			if (!PenguinVAAPIAvailable()) {
+				changed = true;
+				name = SIMPLE_ENCODER_X264;
+				return false;
+			}
+		} else if (strcmp(name, SIMPLE_ENCODER_QSV) == 0) {
 			if (!qsv_supported) {
 				changed = true;
 				name = SIMPLE_ENCODER_X264;

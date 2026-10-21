@@ -47,6 +47,7 @@ parts:
       - -DCMAKE_INSTALL_LIBDIR=lib/x86_64-linux-gnu
       - -DENABLE_RELOCATABLE=ON
       - -DOBS_VERSION_OVERRIDE=32.2.2
+      - -DENABLE_NVENC=ON
       - -DENABLE_WAYLAND=ON
       - -DENABLE_BROWSER=ON
       - -DCEF_ROOT_DIR=$CRAFT_PART_SRC/.deps/cef

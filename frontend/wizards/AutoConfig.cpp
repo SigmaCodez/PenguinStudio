@@ -1,3 +1,4 @@
+#include <utility/PenguinHardwareEncoder.hpp>
 #include "AutoConfig.hpp"
 #include "AutoConfigStartPage.hpp"
 #include "AutoConfigStreamPage.hpp"
@@ -187,10 +188,10 @@ AutoConfig::AutoConfig(QWidget *parent) : QWizard(parent)
 		delete streamPage->ui->preferHardware;
 		streamPage->ui->preferHardware = nullptr;
 	} else {
-		/* Newer generations of NVENC have a high enough quality to
-		 * bitrate ratio that if NVENC is available, it makes sense to
-		 * just always prefer hardware encoding by default */
-		bool preferHardware = nvencAvailable || appleAvailable || os_get_physical_cores() <= 4;
+		/* Prefer registered hardware encoders, including Linux VA-API
+		 * devices whose simple-output rate controls were validated. */
+		bool preferHardware = nvencAvailable || vceAvailable || vaapiAvailable || appleAvailable ||
+				      os_get_physical_cores() <= 4;
 		streamPage->ui->preferHardware->setChecked(preferHardware);
 	}
 
@@ -216,6 +217,8 @@ AutoConfig::~AutoConfig()
 
 void AutoConfig::TestHardwareEncoding()
 {
+	vaapiAvailable = PenguinVAAPIAvailable();
+	hardwareEncodingAvailable = vaapiAvailable;
 	size_t idx = 0;
 	const char *id;
 	while (obs_enum_encoder_types(idx++, &id)) {
@@ -289,6 +292,8 @@ inline const char *AutoConfig::GetEncoderId(Encoder enc)
 		return SIMPLE_ENCODER_NVENC;
 	case Encoder::QSV:
 		return SIMPLE_ENCODER_QSV;
+	case Encoder::VAAPI:
+		return SIMPLE_ENCODER_VAAPI;
 	case Encoder::AMD:
 		return SIMPLE_ENCODER_AMD;
 	case Encoder::Apple:

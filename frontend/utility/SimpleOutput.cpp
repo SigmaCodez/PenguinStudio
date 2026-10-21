@@ -98,6 +98,8 @@ const char *get_simple_output_encoder(const char *encoder)
 		return "obs_qsv11_v2";
 	} else if (strcmp(encoder, SIMPLE_ENCODER_QSV_AV1) == 0) {
 		return "obs_qsv11_av1";
+	} else if (strcmp(encoder, SIMPLE_ENCODER_VAAPI) == 0) {
+		return "ffmpeg_vaapi_tex";
 	} else if (strcmp(encoder, SIMPLE_ENCODER_AMD) == 0) {
 		return "h264_texture_amf";
 #ifdef ENABLE_HEVC
@@ -329,14 +331,14 @@ void SimpleOutput::Update()
 	/* Only use preset2 for legacy/FFmpeg NVENC Encoder. */
 	if (strncmp(encoder_id, "ffmpeg_", 7) == 0 && strcmp(presetType, "NVENCPreset2") == 0) {
 		obs_data_set_string(videoSettings, "preset2", preset);
-	} else {
+	} else if (strcmp(encoder, SIMPLE_ENCODER_VAAPI) != 0) {
 		obs_data_set_string(videoSettings, "preset", preset);
 	}
 
 	obs_data_set_string(videoSettings, "rate_control", "CBR");
 	obs_data_set_int(videoSettings, "bitrate", videoBitrate);
 
-	if (advanced) {
+	if (advanced && strcmp(encoder, SIMPLE_ENCODER_VAAPI) != 0) {
 		obs_data_set_string(videoSettings, "x264opts", custom);
 	}
 
@@ -544,6 +546,12 @@ void SimpleOutput::UpdateRecordingSettings()
 
 	} else if (videoEncoder == SIMPLE_ENCODER_QSV_AV1) {
 		UpdateRecordingSettings_qsv11(crf, true);
+
+	} else if (videoEncoder == SIMPLE_ENCODER_VAAPI) {
+		OBSDataAutoRelease settings = obs_data_create();
+		obs_data_set_string(settings, "rate_control", "CQP");
+		obs_data_set_int(settings, "qp", crf);
+		obs_encoder_update(videoRecording, settings);
 
 	} else if (videoEncoder == SIMPLE_ENCODER_AMD) {
 		UpdateRecordingSettings_amd_cqp(crf);

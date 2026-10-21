@@ -172,6 +172,7 @@
             "builddir": true,
             "config-opts": [
                 "-DCMAKE_BUILD_TYPE=RelWithDebInfo",
+                "-DENABLE_NVENC=ON",
                 "-DENABLE_WAYLAND=ON",
                 "-DENABLE_BROWSER=ON",
                 "-DCEF_ROOT_DIR=/app/cef",

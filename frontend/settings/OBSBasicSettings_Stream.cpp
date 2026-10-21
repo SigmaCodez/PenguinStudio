@@ -1,3 +1,4 @@
+#include <utility/PenguinHardwareEncoder.hpp>
 #include "OBSBasicSettings.hpp"
 
 #ifdef YOUTUBE_ENABLED
@@ -1757,6 +1758,10 @@ void OBSBasicSettings::ResetEncoders(bool streamOnly)
 		ui->simpleOutStrEncoder->addItem(ENCODER_STR("Hardware.QSV.AV1"), QString(SIMPLE_ENCODER_QSV_AV1));
 	}
 #endif
+	if (service_supports_encoder(vcodecs, "ffmpeg_vaapi_tex") && PenguinVAAPIAvailable()) {
+		ui->simpleOutStrEncoder->addItem(QT_UTF8(obs_encoder_get_display_name("ffmpeg_vaapi_tex")),
+						 QString(SIMPLE_ENCODER_VAAPI));
+	}
 	if (service_supports_encoder(vcodecs, "ffmpeg_nvenc")) {
 		ui->simpleOutStrEncoder->addItem(ENCODER_STR("Hardware.NVENC.H264"), QString(SIMPLE_ENCODER_NVENC));
 	}

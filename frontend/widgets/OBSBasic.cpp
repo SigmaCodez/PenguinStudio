@@ -17,6 +17,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
+#include <utility/PenguinHardwareEncoder.hpp>
 #include "OBSBasic.hpp"
 #include "ui-config.h"
 
@@ -885,12 +886,19 @@ bool OBSBasic::InitBasicConfigDefaults()
 void OBSBasic::InitBasicConfigDefaults2()
 {
 	bool oldEncDefaults = config_get_bool(App()->GetUserConfig(), "General", "Pre23Defaults");
-	bool useNV = EncoderAvailable("ffmpeg_nvenc") && !oldEncDefaults;
+	const char *encoder = SIMPLE_ENCODER_X264;
+	if (!oldEncDefaults) {
+		if (EncoderAvailable("ffmpeg_nvenc")) {
+			encoder = SIMPLE_ENCODER_NVENC;
+		} else if (EncoderAvailable("h264_texture_amf")) {
+			encoder = SIMPLE_ENCODER_AMD;
+		} else if (PenguinVAAPIAvailable()) {
+			encoder = SIMPLE_ENCODER_VAAPI;
+		}
+	}
 
-	config_set_default_string(activeConfiguration, "SimpleOutput", "StreamEncoder",
-				  useNV ? SIMPLE_ENCODER_NVENC : SIMPLE_ENCODER_X264);
-	config_set_default_string(activeConfiguration, "SimpleOutput", "RecEncoder",
-				  useNV ? SIMPLE_ENCODER_NVENC : SIMPLE_ENCODER_X264);
+	config_set_default_string(activeConfiguration, "SimpleOutput", "StreamEncoder", encoder);
+	config_set_default_string(activeConfiguration, "SimpleOutput", "RecEncoder", encoder);
 
 	const char *aac_default = "ffmpeg_aac";
 	if (EncoderAvailable("CoreAudio_AAC")) {

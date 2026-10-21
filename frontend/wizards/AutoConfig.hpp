@@ -31,6 +31,7 @@ class AutoConfig : public QWizard {
 		NVENC,
 		QSV,
 		AMD,
+		VAAPI,
 		Apple,
 		Stream,
 	};
@@ -85,6 +86,7 @@ class AutoConfig : public QWizard {
 	bool nvencAvailable = false;
 	bool qsvAvailable = false;
 	bool vceAvailable = false;
+	bool vaapiAvailable = false;
 	bool appleAvailable = false;
 
 	int startingBitrate = 2500;

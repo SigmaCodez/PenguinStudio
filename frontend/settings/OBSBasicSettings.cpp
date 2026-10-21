@@ -16,6 +16,7 @@
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
+#include <utility/PenguinHardwareEncoder.hpp>
 #include "OBSBasicSettings.hpp"
 #include "OBSHotkeyLabel.hpp"
 #include "OBSHotkeyWidget.hpp"
@@ -3499,14 +3500,13 @@ void OBSBasicSettings::SaveOutputSettings()
 		presetType = "AMDPreset";
 	} else if (encoder == SIMPLE_ENCODER_AMD_AV1) {
 		presetType = "AMDAV1Preset";
-	} else if (encoder == SIMPLE_ENCODER_APPLE_H264
+	} else if (encoder == SIMPLE_ENCODER_VAAPI || encoder == SIMPLE_ENCODER_APPLE_H264
 #ifdef ENABLE_HEVC
 		   || encoder == SIMPLE_ENCODER_APPLE_HEVC
 #endif
 	)
-		/* The Apple encoders don't have presets like the other encoders
-         do. This only exists to make sure that the x264 preset doesn't
-         get overwritten with empty data. */
+		/* VA-API and Apple encoders have no simple-mode presets. Keep
+		 * the x264 preset from being overwritten with empty data. */
 		presetType = "ApplePreset";
 	else {
 		presetType = "Preset";
@@ -4982,6 +4982,10 @@ void OBSBasicSettings::FillSimpleRecordingValues()
 	if (EncoderAvailable("obs_qsv11_av1")) {
 		ui->simpleOutRecEncoder->addItem(ENCODER_STR("Hardware.QSV.AV1"), QString(SIMPLE_ENCODER_QSV_AV1));
 	}
+	if (PenguinVAAPIAvailable()) {
+		ui->simpleOutRecEncoder->addItem(QT_UTF8(obs_encoder_get_display_name("ffmpeg_vaapi_tex")),
+						 QString(SIMPLE_ENCODER_VAAPI));
+	}
 	if (EncoderAvailable("ffmpeg_nvenc")) {
 		ui->simpleOutRecEncoder->addItem(ENCODER_STR("Hardware.NVENC.H264"), QString(SIMPLE_ENCODER_NVENC));
 	}
@@ -5114,7 +5118,7 @@ void OBSBasicSettings::SimpleStreamingEncoderChanged()
 
 		defaultPreset = "balanced";
 		preset = curAMDPreset;
-	} else if (encoder == SIMPLE_ENCODER_APPLE_H264
+	} else if (encoder == SIMPLE_ENCODER_VAAPI || encoder == SIMPLE_ENCODER_APPLE_H264
 #ifdef ENABLE_HEVC
 		   || encoder == SIMPLE_ENCODER_APPLE_HEVC
 #endif

@@ -23,11 +23,12 @@ fi
 cmake -S "$project_root" -B "$build_dir" -G Ninja \
   -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_INSTALL_PREFIX=/usr \
   -DCMAKE_INSTALL_LIBDIR="$library_dir" -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
-  -DOBS_VERSION_OVERRIDE=32.2.2 -DENABLE_WAYLAND=ON -DENABLE_BROWSER=ON \
+  -DOBS_VERSION_OVERRIDE=32.2.2 -DENABLE_WAYLAND=ON -DENABLE_BROWSER=ON -DENABLE_NVENC=ON \
   -DCEF_ROOT_DIR="$cef_dir" -DENABLE_AJA=OFF -DENABLE_VLC=ON \
   -DENABLE_WEBRTC=OFF -DENABLE_LIBFDK=OFF -DPENGUIN_BUILD_TESTS=ON \
   -DOBS_COMPILE_DEPRECATION_AS_WARNING=ON "${package_options[@]}"
 cmake --build "$build_dir" --parallel "${CMAKE_BUILD_PARALLEL_LEVEL:-2}"
+"$build_dir/frontend/penguin-hardware-encoder"
 QT_QPA_PLATFORM=offscreen "$build_dir/frontend/penguin-update-flow"
 "$build_dir/plugins/penguin-outputs/penguin-output-safety"
 QT_QPA_PLATFORM=offscreen "$build_dir/plugins/penguin-platforms/penguin-platform-flow"

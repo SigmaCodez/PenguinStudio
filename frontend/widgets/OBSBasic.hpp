@@ -81,6 +81,7 @@ enum class ItemPasteType { Invalid, Reference, Duplicate, Both };
 #define SIMPLE_ENCODER_NVENC "nvenc"
 #define SIMPLE_ENCODER_NVENC_AV1 "nvenc_av1"
 #define SIMPLE_ENCODER_NVENC_HEVC "nvenc_hevc"
+#define SIMPLE_ENCODER_VAAPI "vaapi"
 #define SIMPLE_ENCODER_AMD "amd"
 #define SIMPLE_ENCODER_AMD_HEVC "amd_hevc"
 #define SIMPLE_ENCODER_AMD_AV1 "amd_av1"

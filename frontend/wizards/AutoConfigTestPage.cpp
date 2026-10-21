@@ -888,6 +888,8 @@ void AutoConfigTestPage::TestStreamEncoderThread()
 	if (!softwareTested) {
 		if (wiz->nvencAvailable) {
 			wiz->streamingEncoder = AutoConfig::Encoder::NVENC;
+		} else if (wiz->vaapiAvailable) {
+			wiz->streamingEncoder = AutoConfig::Encoder::VAAPI;
 		} else if (wiz->qsvAvailable) {
 			wiz->streamingEncoder = AutoConfig::Encoder::QSV;
 		} else if (wiz->appleAvailable) {
@@ -935,6 +937,8 @@ void AutoConfigTestPage::TestRecordingEncoderThread()
 	if (wiz->hardwareEncodingAvailable) {
 		if (wiz->nvencAvailable) {
 			wiz->recordingEncoder = AutoConfig::Encoder::NVENC;
+		} else if (wiz->vaapiAvailable) {
+			wiz->recordingEncoder = AutoConfig::Encoder::VAAPI;
 		} else if (wiz->qsvAvailable) {
 			wiz->recordingEncoder = AutoConfig::Encoder::QSV;
 		} else if (wiz->appleAvailable) {
@@ -1001,6 +1005,8 @@ void AutoConfigTestPage::FinalizeResults()
 			return QTStr(ENCODER_NVENC);
 		case AutoConfig::Encoder::QSV:
 			return QTStr(ENCODER_QSV);
+		case AutoConfig::Encoder::VAAPI:
+			return QT_UTF8(obs_encoder_get_display_name("ffmpeg_vaapi_tex"));
 		case AutoConfig::Encoder::AMD:
 			return QTStr(ENCODER_AMD);
 		case AutoConfig::Encoder::Apple:

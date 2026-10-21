@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
+#include "../../frontend/utility/PenguinHardwareEncoder.hpp"
 #include <obs-module.h>
 #include <obs-frontend-api.h>
 #include <obs.hpp>
@@ -268,7 +269,18 @@ public:
 			QDesktopServices::openUrl(QUrl(QString::fromUtf8(Presets[platform->currentIndex()].dashboard)));
 		});
 		addPage(page);
-		const Destination initial = existing ? *existing : Destination{};
+		Destination initial = existing ? *existing : Destination{};
+		if (!existing) {
+			if (HasEncoder(QStringLiteral("obs_nvenc_h264_tex"), "h264")) {
+				initial.encoder = QStringLiteral("obs_nvenc_h264_tex");
+			} else if (HasEncoder(QStringLiteral("ffmpeg_nvenc"), "h264")) {
+				initial.encoder = QStringLiteral("ffmpeg_nvenc");
+			} else if (HasEncoder(QStringLiteral("h264_texture_amf"), "h264")) {
+				initial.encoder = QStringLiteral("h264_texture_amf");
+			} else if (HasEncoder(QStringLiteral("ffmpeg_vaapi_tex"), "h264") && PenguinVAAPIAvailable()) {
+				initial.encoder = QStringLiteral("ffmpeg_vaapi_tex");
+			}
+		}
 		int index = platform->findText(initial.platform);
 		platform->setCurrentIndex(index < 0 ? platform->count() - 1 : index);
 		name->setText(existing ? initial.name : QStringLiteral("Twitch"));
