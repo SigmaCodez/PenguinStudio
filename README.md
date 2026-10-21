@@ -28,23 +28,25 @@ The workspace takes inspiration from modern broadcasting tools such as Meld Stud
 
 ## Get started
 
+**Current release: [Penguin Studio 0.4.2](https://github.com/SigmaCodez/PenguinStudio/releases/tag/penguin-v0.4.2)** — automatic hardware encoder selection, browser sign-in and saved accounts.
+
 **[Download Linux packages](https://github.com/SigmaCodez/PenguinStudio/releases)** — Ubuntu DEB, Fedora RPM, Flatpak and Snap, with SHA-256 checksums.
 
 **Ubuntu 26.04 / 26.04.1:** use a DEB built specifically for Ubuntu 26.04 or the
 Flatpak bundle. Choose the package matching your distribution release. See [installation and troubleshooting](docs/PACKAGING.md#ubuntu-2604--26041-installation).
 
 1. Install the Penguin Studio package for your system following the [installation guide](docs/PACKAGING.md).
-2. Launch `penguin-studio`. Finish the OBS hardware configuration assistant and Penguin's destination assistant.
+2. Launch `penguin-studio`. Finish the hardware configuration and destination assistants. Twitch and YouTube sign-in is optional during setup.
 3. Choose a platform, copy its RTMP(S) server and stream key from its creator dashboard, and choose landscape or portrait output.
 4. Use **Destinations** to add further destinations. **Go live** starts all configured Penguin destinations; **End stream** stops them. The live button's menu also exposes OBS's separate primary stream action.
-5. Open the arrow menu beside **Go live**, then choose **Stream details** to connect Twitch or YouTube for title updates. Current `main` builds bundle the Penguin Twitch application ID and add **Docks → Twitch chat**. YouTube still requires your own registered application; see [platform setup](docs/PLATFORMS.md).
+5. Open the arrow menu beside **Go live**, then choose **Stream details** to connect Twitch or YouTube for title updates. Official packages include the application configuration for browser sign-in with both providers; you do not need to enter client IDs. Use the searchable Twitch game and YouTube category lists, and **Docks → Twitch chat** for native chat. See [platform setup](docs/PLATFORMS.md).
 6. Make a private test stream before a public broadcast. Check picture framing, sound, reconnects, CPU/GPU load, dropped frames and total upload bandwidth.
 
-In the new **Broadcast destinations** and **Stream details** docks, stream keys, OAuth access/refresh tokens and client secrets remain in memory for the current session. They must be entered again after restart. Destination names, nonsecret server URLs, encoder choices and public application IDs are saved locally. Never put a stream key into a saved server URL. The inherited OBS **Settings → Stream** workflow has separate storage behavior and can persist stream credentials in the local profile.
+Twitch and YouTube sign-ins are saved in the system keyring and restored after restart when the keyring is available. **Disconnect** removes the saved account. The **Broadcast destinations** dock keeps stream keys in memory for the current session; they must be entered again after restart. Destination names, nonsecret server URLs and encoder choices are saved locally. Never put a stream key into a saved server URL. The separate **Settings → Stream** workflow can persist stream credentials in the local profile.
 
 ## Penguin Studio updates
 
-New Penguin Studio versions are published on our [GitHub Releases page](https://github.com/SigmaCodez/PenguinStudio/releases), with release notes, Linux packages and SHA-256 checksums. To update, close Penguin Studio and install the newer package for the same distribution release and package format. See the [package guide](docs/PACKAGING.md) for format-specific instructions. Direct downloads do not require a source checkout.
+New Penguin Studio versions are published on our [GitHub Releases page](https://github.com/SigmaCodez/PenguinStudio/releases), with release notes, Linux packages and SHA-256 checksums. Use **Help → Check for updates** to download and install a verified update on supported Ubuntu, Fedora and Flatpak installations. Automatic notifications announce newer versions. Stop all outputs before updating, confirm any system administrator prompt, then restart the app. Locally installed Snap bundles require a manual package update. You can also close Penguin Studio and install the newer package for the same distribution release and format. See the [package guide](docs/PACKAGING.md) for format-specific instructions. Direct downloads do not require a source checkout.
 
 Penguin Studio has its own version numbers and release schedule. Our GitHub Actions workflow builds and publishes the Linux packages when a new project version is released. These downloads are development previews; check the release notes and [verification status](docs/VERIFICATION.md) before updating a production setup.
 
@@ -52,19 +54,13 @@ Penguin Studio has its own version numbers and release schedule. Our GitHub Acti
 
 - Portrait currently crops or fits the program scene. Independently editable portrait scenes and a dual-preview editor remain future work.
 - Encoders are selected per destination; hardware availability and simultaneous encoding limits depend on the GPU and drivers. Encoder sharing is not implemented.
-- Twitch uses Penguin Studio’s bundled public application ID. YouTube requires your own desktop client registration and enabled API access. No OBS Project application credentials are bundled.
+- Twitch uses Penguin Studio’s bundled public application ID. Official YouTube packages include the publisher’s desktop application configuration. Google consent, test-user and channel eligibility restrictions still apply. No OBS Project application credentials are bundled.
 - Kick, Facebook, TikTok and other RTMP(S) platforms use server/key setup. Native account login and title editing are not implemented for every provider; platform eligibility restrictions still apply.
 - PipeWire capture and a working desktop portal are needed for Wayland screen sharing. Browser sources still depend on upstream CEF support and must be tested on the target compositor.
 - Flatpak is the primary cross-distribution target. Native DEB/RPM builds target the distribution used to build them. Retained libobs paths mean native packages conflict with an existing native OBS installation.
 - All existing OBS languages remain selectable. New Penguin dialogs have their own translations and English fallback; see [localization](docs/LOCALIZATION.md).
 
-## Updates
-
-Version 0.3.0 adds **Help → Check for updates**, automatic release notifications
-and verified package installation for supported Ubuntu, Fedora and Flatpak
-installations. See [in-app updates](docs/UPDATES.md) for package
-support and the Snap limitation. Downloads always come from
-[Penguin Studio releases](https://github.com/SigmaCodez/PenguinStudio/releases).
+See [in-app updates](docs/UPDATES.md) for supported package formats and installation behavior.
 
 ## Contributing
 

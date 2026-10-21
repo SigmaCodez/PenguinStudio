@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.4.2 — 2026-10-21
+
+- Select available NVIDIA NVENC or Linux VA-API H.264 encoders automatically for new simple-output profiles, setup and multistream destinations. Preserve explicit user choices.
+- Add VA-API streaming/recording settings with CBR/CQP capability checks and software fallback.
+- Explicitly enable NVENC in every Linux package recipe and recommend Mesa VA drivers for native Ubuntu packages.
+- Validate AMD hardware recording, landscape/portrait loopback output and clean installed-app startup/shutdown under Wayland. NVIDIA runtime testing remains pending.
+
+## 0.4.1 — 2026-10-21
+
+- Include publisher-configured YouTube desktop authorization in all official Linux packages, allowing browser sign-in without user-entered client credentials.
+- Keep custom client configuration under advanced settings and preserve existing saved-account identities.
+
 ## 0.4.0 — 2026-10-20
 
 - Add searchable Twitch game/category suggestions and filterable YouTube video categories.

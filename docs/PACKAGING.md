@@ -1,6 +1,6 @@
 # Linux builds and packages
 
-Penguin Studio's current source version is **0.2.1**, based on OBS Studio
+Penguin Studio's current source version is **0.4.2**, based on OBS Studio
 **32.2.2**. The application ID is `io.github.SigmaCodez.PenguinStudio` and the
 launcher is `penguin-studio`. Internal OBS libraries and plugin paths retain
 their names for compatibility. Application settings are stored separately
@@ -25,13 +25,12 @@ recipes deliberately target x86_64 only.
 
 ## Automatic versioned downloads
 
-**[Download Penguin Studio 0.2.1](https://github.com/SigmaCodez/PenguinStudio/releases/tag/penguin-v0.2.1)**
-(published 2026-10-20). All five package jobs passed in
-[run 39402886896](https://github.com/SigmaCodez/PenguinStudio/actions/runs/39402886896),
-built from `54c55a73b0091a3324846dcc444a7cfb10674f00`. Publication followed native
-Ubuntu 26.04 Wayland startup/shutdown validation. The uploaded package sizes
-and GitHub SHA-256 digests match the downloaded build manifest and checksum file;
-see [release verification](validation/linux-release-0.2.1.json).
+**[Download Penguin Studio 0.4.2](https://github.com/SigmaCodez/PenguinStudio/releases/tag/penguin-v0.4.2)**
+(published 2026-10-21). All five package jobs passed in
+[run 39642169397](https://github.com/SigmaCodez/PenguinStudio/actions/runs/39642169397),
+built from `83c1639912f09298754ed8c01513ddaa4921c7ed`. The Ubuntu 26.04 package was
+installed and tested under Wayland with AMD hardware encoding. See
+[release and hardware verification](validation/hardware-encoding-0.4.2.json).
 
 [GitHub Releases](https://github.com/SigmaCodez/PenguinStudio/releases) provides
 permanent downloads of Ubuntu 24.04 and 26.04 DEBs, Fedora 44 RPM, Flatpak and
@@ -39,7 +38,7 @@ Snap, plus `SHA256SUMS` and `build-manifest.json`. Releases are marked as
 prereleases while Penguin Studio remains a development preview.
 
 To publish a new version, increase **`packaging/version.txt`** (for example from
-`0.2.1` to `0.2.2`) and push it to `main`. This single file supplies the application,
+`0.4.2` to `0.4.3`) and push it to `main`. This single file supplies the application,
 native package and Snap versions; the Flatpak filename uses the same value.
 The Linux workflow detects the version change, runs the checks, builds all five
 packages, creates `penguin-v<version>` at the exact build commit, uploads the
@@ -61,21 +60,21 @@ Download the Ubuntu 26.04 DEB from [Penguin Studio releases](https://github.com/
 Ubuntu 26.04.1 uses the same package. Do not install the Ubuntu 24.04 DEB on
 26.04 or mix distribution repositories to satisfy its dependencies.
 
-Version `0.2.1-1+ubuntu26.04` was installed on Ubuntu 26.04.1 and passed ten
-native Wayland startup/shutdown scenarios, including German application text.
-See the [installed-package report](validation/ubuntu-26.04-installed-0.2.1.json).
-Earlier installation failures and package revisions are preserved in the
-[packaging history](PACKAGING-HISTORY.md#earlier-ubuntu-packages).
+Version `0.4.2-1+ubuntu26.04` was installed on Ubuntu 26.04.1. Hardware selection,
+recording, restart and clean shutdown passed under native Wayland on an AMD
+Radeon RX 9070 XT. See the [installed-package report](validation/hardware-encoding-0.4.2.json).
+Earlier installation results remain in the [verification history](VERIFICATION.md)
+and [packaging history](PACKAGING-HISTORY.md#earlier-ubuntu-packages).
 
-The local package is `dist/penguin-studio_0.2.1-1+ubuntu26.04_amd64.deb`.
-Its SHA-256 is `6c910a02b0495cabe5ee7467d78f3179e593a1a913630e636f20ec59dac9b306`.
+The download is `penguin-studio_0.4.2-1+ubuntu26.04_amd64.deb`.
+Its SHA-256 is `874635cce17c330d4ca6565c7161e1b443b317359e1bc6c2930a238f7dcfff87`.
 
 After downloading the matching DEB, the repository's installer checks the
 release, architecture and APT dependency resolution before installation:
 
 ```sh
-bash scripts/packaging/install-deb.sh --check /path/to/penguin-studio_0.2.1-1+ubuntu26.04_amd64.deb
-bash scripts/packaging/install-deb.sh /path/to/penguin-studio_0.2.1-1+ubuntu26.04_amd64.deb
+bash scripts/packaging/install-deb.sh --check /path/to/penguin-studio_0.4.2-1+ubuntu26.04_amd64.deb
+bash scripts/packaging/install-deb.sh /path/to/penguin-studio_0.4.2-1+ubuntu26.04_amd64.deb
 ```
 
 The first command makes no system changes. The second uses the normal Ubuntu
@@ -85,13 +84,13 @@ on the host's Qt, Python or FFmpeg library versions.
 
 ## Flatpak
 
-Download `penguin-studio-0.2.1-x86_64.flatpak` from the Penguin Studio release.
+Download `penguin-studio-0.4.2-x86_64.flatpak` from the Penguin Studio release.
 Only the runtime is needed to install or update the bundle:
 
 ```sh
 flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 flatpak install --user flathub org.freedesktop.Platform//25.08
-flatpak install --user --or-update ./penguin-studio-0.2.1-x86_64.flatpak
+flatpak install --user --or-update ./penguin-studio-0.4.2-x86_64.flatpak
 flatpak run io.github.SigmaCodez.PenguinStudio
 ```
 
@@ -130,10 +129,10 @@ on its supported target distribution:
 
 ```sh
 # Ubuntu 26.04 / 26.04.1, after downloading the matching build:
-sudo apt install --no-remove ./penguin-studio_0.2.1-1+ubuntu26.04_amd64.deb
+sudo apt install --no-remove ./penguin-studio_0.4.2-1+ubuntu26.04_amd64.deb
 # Use a package built for your Ubuntu release.
 # Fedora 44:
-sudo dnf install ./penguin-studio-0.2.1-1.x86_64.rpm
+sudo dnf install ./penguin-studio-0.4.2-1.x86_64.rpm
 ```
 
 To build from source, use the target distribution and start from a recursive checkout:
@@ -169,7 +168,7 @@ on a host with Snapcraft installed. To install a downloaded or locally built
 Snap on a host with snapd:
 
 ```sh
-sudo snap install --dangerous ./penguin-studio_0.2.1_amd64.snap
+sudo snap install --dangerous ./penguin-studio_0.4.2_amd64.snap
 sudo snap connect penguin-studio:audio-record
 sudo snap connect penguin-studio:camera
 # Only if media on removable drives is needed:
