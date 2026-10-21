@@ -26,9 +26,9 @@ Actual Linux application capture with test media. See the [workspace guide](docs
 
 ## Get started
 
-**Current release: [Penguin Studio 0.4.2](https://github.com/SigmaCodez/PenguinStudio/releases/tag/penguin-v0.4.2)** — automatic hardware encoder selection, browser sign-in and saved accounts.
+**Current release: [Penguin Studio 0.4.3](https://github.com/SigmaCodez/PenguinStudio/releases/tag/penguin-v0.4.3)** — AppImage and Arch packaging, hardware encoding, browser sign-in and saved accounts.
 
-**[Download Linux packages](https://github.com/SigmaCodez/PenguinStudio/releases)** — Ubuntu DEB, Fedora RPM, Flatpak and Snap, with SHA-256 checksums.
+**[Download Linux packages](https://github.com/SigmaCodez/PenguinStudio/releases)** — Ubuntu DEB, Fedora RPM, Flatpak, Snap, AppImage and an Arch/AUR recipe, with SHA-256 checksums.
 
 **Ubuntu 26.04 / 26.04.1:** use a DEB built specifically for Ubuntu 26.04 or the
 Flatpak bundle. Choose the package matching your distribution release. See [installation and troubleshooting](docs/PACKAGING.md#ubuntu-2604--26041-installation).
@@ -44,7 +44,7 @@ Twitch and YouTube sign-ins are saved in the system keyring and restored after r
 
 ## Penguin Studio updates
 
-New Penguin Studio versions are published on our [GitHub Releases page](https://github.com/SigmaCodez/PenguinStudio/releases), with release notes, Linux packages and SHA-256 checksums. Use **Help → Check for updates** to download and install a verified update on supported Ubuntu, Fedora and Flatpak installations. Automatic notifications announce newer versions. Stop all outputs before updating, confirm any system administrator prompt, then restart the app. Locally installed Snap bundles require a manual package update. You can also close Penguin Studio and install the newer package for the same distribution release and format. See the [package guide](docs/PACKAGING.md) for format-specific instructions. Direct downloads do not require a source checkout.
+New Penguin Studio versions are published on our [GitHub Releases page](https://github.com/SigmaCodez/PenguinStudio/releases), with release notes, Linux packages and SHA-256 checksums. Use **Help → Check for updates** to download and install a verified update on supported Ubuntu, Fedora and Flatpak installations. Automatic notifications announce newer versions. Stop all outputs before updating, confirm any system administrator prompt, then restart the app. Locally installed Snap bundles and AppImages require a manual package update. Arch installations use the updated recipe until an AUR listing is available. You can also close Penguin Studio and install the newer package for the same distribution release and format. See the [package guide](docs/PACKAGING.md) for format-specific instructions. Direct downloads do not require a source checkout.
 
 Penguin Studio has its own version numbers and release schedule. Our GitHub Actions workflow builds and publishes the Linux packages when a new project version is released. These downloads are development previews; check the release notes and [verification status](docs/VERIFICATION.md) before updating a production setup.
 

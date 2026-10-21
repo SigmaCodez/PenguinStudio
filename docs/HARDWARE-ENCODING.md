@@ -24,6 +24,11 @@ Debian/Ubuntu packages recommend `mesa-va-drivers`. Flatpak and Snap also requir
 working graphics access and a compatible graphics runtime/host driver. Hardware
 session limits still apply when several outputs run simultaneously.
 
+AppImage and Arch binary packages use the host VA-API runtime and graphics
+driver together. Bundling an older VA-API loader can prevent a newer Mesa driver
+from initializing. Their Qt Wayland platform, shell and graphics-integration
+plugins are bundled with the application. See [portable packages](APPIMAGE-AUR.md).
+
 H.264 is the automatic default for streaming compatibility. HEVC and AV1 remain
 explicit selections where supported by the GPU, driver and streaming service.
 

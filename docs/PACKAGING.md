@@ -29,20 +29,19 @@ recipes deliberately target x86_64 only.
 
 ## Automatic versioned downloads
 
-**[Download Penguin Studio 0.4.2](https://github.com/SigmaCodez/PenguinStudio/releases/tag/penguin-v0.4.2)**
-(published 2026-10-21). All five package jobs passed in
-[run 39642169397](https://github.com/SigmaCodez/PenguinStudio/actions/runs/39642169397),
-built from `83c1639912f09298754ed8c01513ddaa4921c7ed`. The Ubuntu 26.04 package was
-installed and tested under Wayland with AMD hardware encoding. See
-[release and hardware verification](validation/hardware-encoding-0.4.2.json).
+**[Download Penguin Studio 0.4.3](https://github.com/SigmaCodez/PenguinStudio/releases/tag/penguin-v0.4.3)**
+(published 2026-10-22). All six binary package jobs and the Arch recipe validation
+passed in [run 39684701505](https://github.com/SigmaCodez/PenguinStudio/actions/runs/39684701505),
+built from `6529d27909072ac136240a811eebbc7991f36bcf`.
 
 [GitHub Releases](https://github.com/SigmaCodez/PenguinStudio/releases) provides
-permanent downloads of Ubuntu 24.04 and 26.04 DEBs, Fedora 44 RPM, Flatpak and
-Snap, plus `SHA256SUMS` and `build-manifest.json`. Releases are marked as
-prereleases while Penguin Studio remains a development preview.
+permanent downloads of Ubuntu 24.04 and 26.04 DEBs, Fedora 44 RPM, Flatpak,
+Snap, AppImage and an Arch recipe archive, plus `SHA256SUMS` and
+`build-manifest.json`. The Arch recipe is not yet listed on aur.archlinux.org.
+Releases are marked as prereleases while Penguin Studio remains a development preview.
 
 To publish a new version, increase **`packaging/version.txt`** (for example from
-`0.4.2` to `0.4.3`) and push it to `main`. This single file supplies the application,
+`0.4.3` to `0.4.4`) and push it to `main`. This single file supplies the application,
 native package and Snap versions; the Flatpak filename uses the same value.
 The Linux workflow detects the version change, runs the checks, builds all six binary packages and validates the Arch recipe, creates `penguin-v<version>` at the exact build commit, uploads the
 complete download set (six binaries and one recipe archive) to a draft, and only then publishes it. A failed build or
@@ -63,9 +62,10 @@ Download the Ubuntu 26.04 DEB from [Penguin Studio releases](https://github.com/
 Ubuntu 26.04.1 uses the same package. Do not install the Ubuntu 24.04 DEB on
 26.04 or mix distribution repositories to satisfy its dependencies.
 
-Version `0.4.2-1+ubuntu26.04` was installed on Ubuntu 26.04.1. Hardware selection,
-recording, restart and clean shutdown passed under native Wayland on an AMD
-Radeon RX 9070 XT. See the [installed-package report](validation/hardware-encoding-0.4.2.json).
+Version `0.4.3-1+ubuntu26.04` was installed on Ubuntu 26.04.1. Native Wayland
+startup/shutdown and AMD VA-API recording passed. The recording test still emitted
+an AAC queue diagnostic; the separate startup/shutdown test was clean. See the
+[installed-package report](validation/portable-packages-0.4.3.json).
 Earlier installation results remain in the [verification history](VERIFICATION.md)
 and [packaging history](PACKAGING-HISTORY.md#earlier-ubuntu-packages).
 

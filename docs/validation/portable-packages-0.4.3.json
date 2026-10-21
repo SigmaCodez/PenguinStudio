@@ -1,0 +1,103 @@
+{
+  "version": "0.4.3",
+  "date": "2026-10-22",
+  "source_commit": "6529d27909072ac136240a811eebbc7991f36bcf",
+  "workflow_url": "https://github.com/SigmaCodez/PenguinStudio/actions/runs/39684701505",
+  "ci": "All six binary builds and Arch makepkg/build/install/library/launcher checks passed.",
+  "packages": [
+    {
+      "target": "Ubuntu 24.04 (amd64)",
+      "file": "penguin-studio_0.4.3-1+ubuntu24.04_amd64.deb",
+      "sha256": "1dfc5d80e75258c3f71cc4fe2faba0738cb541518ab889e8dc72aecbe969e27b",
+      "bytes": 135586186
+    },
+    {
+      "target": "Ubuntu 26.04 / 26.04.1 (amd64)",
+      "file": "penguin-studio_0.4.3-1+ubuntu26.04_amd64.deb",
+      "sha256": "fa681e1de5258e1dedb0712a93a30ab02e85012948a80411fd7a2d8cb06713b4",
+      "bytes": 135703250
+    },
+    {
+      "target": "Fedora 44 (x86_64)",
+      "file": "penguin-studio-0.4.3-1.x86_64.rpm",
+      "sha256": "decca75df63c548d483b6e0cd7fdaa5327cf77b52f88cbe6c0df799d5dec32a8",
+      "bytes": 119363723
+    },
+    {
+      "target": "AppImage (x86_64, glibc 2.39+)",
+      "file": "penguin-studio-0.4.3-x86_64.AppImage",
+      "sha256": "f41f3a7ef869c7a56059dc796fc152043953ac2e1f9000665ac07f181caa3733",
+      "bytes": 251038200
+    },
+    {
+      "target": "Arch Linux / AUR recipe (x86_64)",
+      "file": "penguin-studio-0.4.3-aur.tar.gz",
+      "sha256": "b9d0556112b1bb5c61590054f3eeaa5badce4b021a6d8aaec3330d24c6003e9d",
+      "bytes": 1437
+    },
+    {
+      "target": "Flatpak (x86_64)",
+      "file": "penguin-studio-0.4.3-x86_64.flatpak",
+      "sha256": "aef6a4cb99c3e8b0dd6440e258e4bdc36c4d61d4ef131f8cd0dbbc28fe8a23d9",
+      "bytes": 142798312
+    },
+    {
+      "target": "Snap core24 (amd64)",
+      "file": "penguin-studio_0.4.3_amd64.snap",
+      "sha256": "c0373f3074f1cac7dfe1a14fd231d2f58071237374a681b898d859aa4e685eb1",
+      "bytes": 499281920
+    }
+  ],
+  "installed_version": "0.4.3-1+ubuntu26.04",
+  "installation": {
+    "exit_code": 0,
+    "upgraded": 1,
+    "added": 0,
+    "removed": 0,
+    "dpkg_verify": "passed"
+  },
+  "host": "Ubuntu 26.04.1, native Wayland, AMD Radeon RX 9070 XT",
+  "native_recording": {
+    "executable": "/usr/bin/obs",
+    "main_window_visible": true,
+    "recording": {
+      "active": true,
+      "encoder": "ffmpeg_vaapi_tex",
+      "frames": 221,
+      "stopped": true
+    },
+    "wayland": true
+  },
+  "native_start_stop": {
+    "executable": "/usr/bin/obs",
+    "main_window_visible": true,
+    "platform": "wayland"
+  },
+  "appimage_recording": {
+    "executable": "/tmp/penguin-043-direct/squashfs-root/usr/bin/obs",
+    "main_window_visible": true,
+    "recording": {
+      "active": true,
+      "encoder": "ffmpeg_vaapi_tex",
+      "frames": 221,
+      "stopped": true
+    },
+    "wayland": true
+  },
+  "exit_codes": {
+    "native_recording": 0,
+    "native_start_stop": 0,
+    "appimage_recording": 0
+  },
+  "reported_memory_leaks": 0,
+  "remaining_diagnostics": [
+    "Both synthetic recording tests emitted FFmpeg AAC: 2 frames left in the queue on closing.",
+    "Native startup/shutdown without recording emitted no warnings or errors."
+  ],
+  "limitations": [
+    "AUR listing pending maintainer account; recipe available on GitHub.",
+    "No NVIDIA hardware available.",
+    "Arch GUI, Snap confinement and all distribution desktops not exhaustively tested.",
+    "No external streaming, account authorization or screen capture performed in these packaging checks."
+  ]
+}

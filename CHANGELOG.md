@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.4.3 — 2026-10-21
+## 0.4.3 — 2026-10-22
 
 - Add an x86_64 AppImage built from the Ubuntu 24.04 package, including Qt Wayland plugins and publisher-configured browser sign-in.
 - Generate a checksum-pinned `penguin-studio-bin` Arch/AUR recipe and validate it with makepkg before release. AUR submission requires a maintainer account and is not yet enabled.

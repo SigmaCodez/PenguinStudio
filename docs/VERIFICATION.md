@@ -2,6 +2,39 @@
 
 This is a development preview based on OBS Studio 32.2.2. The new Penguin code must not be described as fully production-tested until the checks below have real recorded results.
 
+## AppImage and Arch packaging 0.4.3 — 2026-10-22
+
+All six binary package builds and the Arch recipe build/install checks passed in
+[run 39684701505](https://github.com/SigmaCodez/PenguinStudio/actions/runs/39684701505).
+The complete release uses source `6529d27909072ac136240a811eebbc7991f36bcf`.
+AppImage GUI startup/close is checked in CI using Xvfb; Arch checks include shared
+library availability, launcher execution and desktop-entry validation.
+
+The released Ubuntu 26.04 DEB was hash-verified and installed on Ubuntu 26.04.1,
+upgrading only Penguin Studio from 0.4.2 to 0.4.3. Package-file verification passed.
+Native Wayland startup and normal shutdown passed with exit code 0, no warnings
+or errors and zero reported memory leaks. A separate synthetic recording selected
+AMD VA-API (`ffmpeg_vaapi_tex`), produced 221 frames and stopped normally.
+
+The hash-verified release AppImage was extracted and tested under native Wayland
+with host OBS resources/libraries hidden. Its visible main window, hardware
+recording (221 frames), normal recording stop and shutdown passed, with exit code
+0 and zero reported leaks. This validates the shipped layout, not a locally
+patched replacement. Earlier missing Wayland integration plugins, incompatible
+bundled VA-API libraries and the Qt 6.4 queued-thumbnail metatype warning were
+corrected before the final release build.
+
+Both synthetic recording tests still emitted FFmpeg's AAC diagnostic:
+`2 frames left in the queue on closing`. Therefore recording shutdown is not
+claimed to be completely diagnostic-free. The no-recording native lifecycle test
+was clean. No account authorization, external streaming or desktop capture was
+performed in these packaging checks. NVIDIA hardware and full GUI/device coverage
+on Arch and other distributions remain untested. The Arch recipe is downloadable
+on GitHub; an actual AUR listing requires a maintainer account.
+
+Machine-readable results and package hashes:
+[portable-packages-0.4.3.json](validation/portable-packages-0.4.3.json).
+
 ## Hardware encoding 0.4.2 — 2026-10-21
 
 The source at `83c1639912f09298754ed8c01513ddaa4921c7ed` adds Linux VA-API to
