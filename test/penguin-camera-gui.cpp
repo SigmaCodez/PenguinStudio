@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 // LD_PRELOAD test helper. Run only with a new, isolated configuration directory.
 #include <QApplication>
+#include <QAction>
 #include <QComboBox>
 #include <QFile>
 #include <QImage>
@@ -138,6 +139,35 @@ void Start()
 	QTimer::singleShot(4500, qApp, [] {
 		Snap("rectangle");
 		Mode(1, 0);
+	});
+	QTimer::singleShot(5000, qApp, [] {
+		if (!report["inspector_used"].toBool()) {
+			return;
+		}
+		auto *undo = mainWindow->findChild<QAction *>("actionUndo");
+		if (!undo || !undo->isEnabled()) {
+			QCoreApplication::exit(48);
+			return;
+		}
+		undo->trigger();
+		auto *settings = obs_source_get_settings(filter);
+		report["default_undo_shape"] = int(obs_data_get_int(settings, "shape"));
+		report["default_undo_radius"] = obs_data_get_double(settings, "radius");
+		obs_data_release(settings);
+	});
+	QTimer::singleShot(5250, qApp, [] {
+		if (!report["inspector_used"].toBool()) {
+			return;
+		}
+		auto *redo = mainWindow->findChild<QAction *>("actionRedo");
+		if (!redo || !redo->isEnabled()) {
+			QCoreApplication::exit(49);
+			return;
+		}
+		redo->trigger();
+		auto *settings = obs_source_get_settings(filter);
+		report["default_redo_shape"] = int(obs_data_get_int(settings, "shape"));
+		obs_data_release(settings);
 	});
 	QTimer::singleShot(5500, qApp, [] {
 		Snap("circle");

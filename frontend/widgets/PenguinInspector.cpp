@@ -114,7 +114,8 @@ void RestoreCamera(const std::string &json)
 		}
 	} else if (filter) {
 		OBSDataAutoRelease settings = obs_data_get_obj(saved, "settings");
-		obs_source_update(filter, settings);
+		// Empty snapshots mean defaults, so merging would leave later edits active.
+		obs_source_reset_settings(filter, settings);
 		obs_source_set_enabled(filter, obs_data_get_bool(saved, "enabled"));
 	} else {
 		OBSSourceAutoRelease restored = obs_load_source(saved);
