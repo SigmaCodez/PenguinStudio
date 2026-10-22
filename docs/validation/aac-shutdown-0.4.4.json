@@ -1,0 +1,82 @@
+{
+  "platform": "wayland",
+  "recordings": [
+    {
+      "active": true,
+      "audio_encoder": "ffmpeg_aac",
+      "frames": 75,
+      "stopped": true,
+      "video_encoder": "ffmpeg_vaapi_tex",
+      "media_validation": {
+        "audio": "aac",
+        "video": "h264",
+        "decode_errors": 0,
+        "audio_rms": 0.09053886514401227,
+        "end_time_difference_seconds": 0.01200000000000001
+      }
+    },
+    {
+      "active": true,
+      "audio_encoder": "ffmpeg_aac",
+      "frames": 144,
+      "stopped": true,
+      "video_encoder": "ffmpeg_vaapi_tex",
+      "media_validation": {
+        "audio": "aac",
+        "video": "h264",
+        "decode_errors": 0,
+        "audio_rms": 0.09118740389404938,
+        "end_time_difference_seconds": 0.005000000000000782
+      }
+    },
+    {
+      "active": true,
+      "audio_encoder": "ffmpeg_aac",
+      "frames": 176,
+      "stopped": true,
+      "video_encoder": "ffmpeg_vaapi_tex",
+      "media_validation": {
+        "audio": "aac",
+        "video": "h264",
+        "decode_errors": 0,
+        "audio_rms": 0.09120596409026471,
+        "end_time_difference_seconds": 0.006000000000000227
+      }
+    }
+  ],
+  "visible": true,
+  "version": "0.4.4",
+  "source_commit": "add2dd3f2202779a218cc9b1d4fa106312e02a33",
+  "test_date": "2026-10-23",
+  "host": "Ubuntu 26.04.1, native Wayland, AMD Radeon RX 9070 XT",
+  "installed_package": "0.4.4-1+ubuntu26.04",
+  "installed_package_sha256": "225ee59a2c147997765988db3a54e2e4f7a6f1aca38129431cf1832954138926",
+  "package_workflow": "https://github.com/SigmaCodez/PenguinStudio/actions/runs/39862855871",
+  "release_workflow": "https://github.com/SigmaCodez/PenguinStudio/actions/runs/39861163271",
+  "installation": {
+    "exit_code": 0,
+    "upgraded": 1,
+    "added": 0,
+    "removed": 0,
+    "dpkg_verify": "passed"
+  },
+  "regression_test": "Real AAC empty/single-frame/300-frame/pending-packet/repeated-drain and PCM cases passed with zero warnings",
+  "sanitizers": [
+    "AddressSanitizer",
+    "UndefinedBehaviorSanitizer",
+    "LeakSanitizer"
+  ],
+  "baseline_aac_warning_count": 3,
+  "fixed_aac_warning_count": 0,
+  "application_warnings": 0,
+  "application_errors": 0,
+  "reported_memory_leaks": 0,
+  "recording_session_exit_code": 0,
+  "restart_exit_code": 0,
+  "restart": {
+    "executable": "/usr/bin/obs",
+    "main_window_visible": true,
+    "platform": "wayland"
+  },
+  "scope": "Synthetic test tone and blank video, isolated profile; no desktop capture, external stream or account changes"
+}

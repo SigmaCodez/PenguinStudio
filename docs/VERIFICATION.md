@@ -2,6 +2,41 @@
 
 This is a development preview based on OBS Studio 32.2.2. The new Penguin code must not be described as fully production-tested until the checks below have real recorded results.
 
+## AAC encoder shutdown correction — 2026-10-22
+
+The FFmpeg audio encoder now enters draining mode and retrieves delayed packets
+before releasing its codec context. OBS has detached the output callbacks before
+this destructor runs, so these cleanup packets are released locally. The change
+does not extend output stop timestamps, route packets into stopped outputs or
+filter the FFmpeg log.
+
+`test/penguin-audio-drain.c` exercises real AAC contexts with no frames, a single
+frame, 300 frames and pending packets, plus repeated cleanup and PCM encoding.
+The local test passed with FFmpeg 8.0.1, including AddressSanitizer,
+UndefinedBehaviorSanitizer and LeakSanitizer. GitHub Actions also runs this test
+against its Ubuntu 24.04 FFmpeg libraries.
+
+The installed 0.4.3 baseline reproduced the warning on all three successive
+native Wayland recordings with synthetic audio. The files decoded successfully;
+their audio/video end times differed by at most 8 ms. This is a resource-lifecycle
+correction, not a claim that previously recorded files were unusable.
+
+The corrected Ubuntu 26.04 package from
+[run 39862855871](https://github.com/SigmaCodez/PenguinStudio/actions/runs/39862855871)
+was installed and tested on Ubuntu 26.04.1 on 2026-10-23. Three successive native
+Wayland recordings used AMD VA-API H.264 and FFmpeg AAC with a synthetic 440 Hz
+tone. All three stopped normally, contained audible audio and fully decoded
+without errors. Audio/video end times differed by at most 12 ms. The old AAC
+warning appeared three times in the 0.4.3 baseline and zero times in 0.4.4.
+Application shutdown and a separate restart/close test exited with code 0, no
+warnings/errors and zero reported memory leaks. Package-file verification passed;
+installation upgraded only Penguin Studio. No personal profile, account, external
+stream or desktop capture was used.
+
+The installed package is from the additional Ubuntu-only CI run of the same
+source commit; the complete release workflow is separate. Exact package hash and
+results: [aac-shutdown-0.4.4.json](validation/aac-shutdown-0.4.4.json).
+
 ## AppImage and Arch packaging 0.4.3 — 2026-10-22
 
 All six binary package builds and the Arch recipe build/install checks passed in
