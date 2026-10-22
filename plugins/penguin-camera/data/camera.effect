@@ -1,0 +1,49 @@
+uniform float4x4 ViewProj;
+uniform texture2d image;
+uniform texture2d person_mask;
+uniform float2 dimensions;
+uniform int shape;
+uniform int background;
+uniform float radius;
+uniform float similarity;
+uniform bool mask_ready;
+sampler_state linearClamp { Filter = Linear; AddressU = Clamp; AddressV = Clamp; };
+struct VertData { float4 pos : POSITION; float2 uv : TEXCOORD0; };
+VertData VSDefault(VertData v)
+{
+	v.pos = mul(float4(v.pos.xyz, 1.0), ViewProj);
+	return v;
+}
+float4 PSCamera(VertData v) : TARGET
+{
+	float4 color = image.Sample(linearClamp, v.uv);
+	float2 halfSize = dimensions * 0.5;
+	float2 point = (v.uv - 0.5) * dimensions;
+	float shortest = min(halfSize.x, halfSize.y);
+	float distance = -2.0;
+	if (shape == 1)
+		distance = length(point) - shortest;
+	else if (shape == 2)
+		distance = (length(point / halfSize) - 1.0) * shortest;
+	else if (shape == 3) {
+		float r = shortest * radius;
+		float2 q = abs(point) - halfSize + r;
+		distance = length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - r;
+	}
+	float opacity = 1.0 - smoothstep(-1.0, 1.0, distance);
+	if (background == 1 && mask_ready)
+		opacity *= smoothstep(0.25, 0.75, person_mask.Sample(linearClamp, v.uv).r);
+	if (background == 2 || background == 3) {
+		float3 rgb = color.a > 0.0 ? color.rgb / color.a : float3(0.0, 0.0, 0.0);
+		float key = background == 2 ? rgb.g : rgb.b;
+		float other = background == 2 ? max(rgb.r, rgb.b) : max(rgb.r, rgb.g);
+		float excess = key - other;
+		opacity *= 1.0 - smoothstep(similarity, similarity + 0.1, excess);
+		// Suppress green/blue spill while preserving premultiplied alpha.
+		if (background == 2) rgb.g = min(rgb.g, other);
+		else rgb.b = min(rgb.b, other);
+		color.rgb = rgb * color.a;
+	}
+	return color * opacity;
+}
+technique Draw { pass { vertex_shader = VSDefault(v); pixel_shader = PSCamera(v); } }

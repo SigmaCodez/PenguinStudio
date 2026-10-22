@@ -185,7 +185,8 @@
                 "-DENABLE_QSV11=ON",
                 "-DENABLE_DECKLINK=OFF",
                 "-DOBS_VERSION_OVERRIDE=32.2.2",
-                "-DCMAKE_COMPILE_WARNING_AS_ERROR=OFF"
+                "-DCMAKE_COMPILE_WARNING_AS_ERROR=OFF",
+                "-DFETCHCONTENT_SOURCE_DIR_PENGUIN_ORT=/run/build/penguin-studio/onnxruntime"
             ],
             "secret-opts": [
                 "-DRESTREAM_CLIENTID=$RESTREAM_CLIENTID",
@@ -205,6 +206,12 @@
                 {
                     "type": "dir",
                     "path": "../"
+                },
+                {
+                    "type": "archive",
+                    "url": "https://github.com/microsoft/onnxruntime/releases/download/v1.20.1/onnxruntime-linux-x64-1.20.1.tgz",
+                    "sha256": "67db4dc1561f1e3fd42e619575c82c601ef89849afc7ea85a003abbac1a1a105",
+                    "dest": "onnxruntime"
                 }
             ]
         }

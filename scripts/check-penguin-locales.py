@@ -27,7 +27,7 @@ def load(path, prefix=None):
 def main():
     catalogues = [
         (module, ROOT / "plugins" / module / "data" / "locale", None)
-        for module in ("penguin-outputs", "penguin-platforms")
+        for module in ("penguin-outputs", "penguin-platforms", "penguin-camera")
     ]
     catalogues.append(("workspace", ROOT / "frontend" / "data" / "locale", "Penguin."))
     for module, folder, prefix in catalogues:

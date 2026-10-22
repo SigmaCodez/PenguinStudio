@@ -12,6 +12,7 @@
 
 class OBSBasic;
 class QLabel;
+class QComboBox;
 class QDoubleSpinBox;
 class QSpinBox;
 class QToolButton;
@@ -31,6 +32,12 @@ class PenguinInspector final : public QWidget {
 	QWidget *content;
 	QWidget *transformCard;
 	QWidget *cropCard;
+	QWidget *cameraCard;
+	QComboBox *cameraShape;
+	QComboBox *cameraBackground;
+	QSpinBox *cameraRadius;
+	QSpinBox *cameraSimilarity;
+	QLabel *cameraStatus;
 	QToolButton *visible;
 	QToolButton *locked;
 	QToolButton *aspectLock;
@@ -45,6 +52,7 @@ class PenguinInspector final : public QWidget {
 	void ChangeTransform(size_t field, double value);
 	void ChangeCrop(size_t field, int value);
 	void ChangeFlag(bool visibility, bool value);
+	void ChangeCamera();
 
 public:
 	explicit PenguinInspector(OBSBasic *main, QWidget *parent = nullptr);
