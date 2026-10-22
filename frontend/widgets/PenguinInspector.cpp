@@ -75,11 +75,15 @@ constexpr const char *CameraFilterId = "penguin_camera_filter";
 OBSSourceAutoRelease CameraFilter(obs_source_t *source)
 {
 	obs_source_t *result = nullptr;
-	obs_source_enum_filters(source, [](obs_source_t *, obs_source_t *filter, void *data) {
-		auto **found = static_cast<obs_source_t **>(data);
-		if (!*found && std::strcmp(obs_source_get_id(filter), CameraFilterId) == 0)
-			*found = obs_source_get_ref(filter);
-	}, &result);
+	obs_source_enum_filters(
+		source,
+		[](obs_source_t *, obs_source_t *filter, void *data) {
+			auto **found = static_cast<obs_source_t **>(data);
+			if (!*found && std::strcmp(obs_source_get_id(filter), CameraFilterId) == 0) {
+				*found = obs_source_get_ref(filter);
+			}
+		},
+		&result);
 	return OBSSourceAutoRelease(result);
 }
 
@@ -99,21 +103,24 @@ void RestoreCamera(const std::string &json)
 {
 	OBSDataAutoRelease data = obs_data_create_from_json(json.c_str());
 	OBSSourceAutoRelease source = obs_get_source_by_uuid(obs_data_get_string(data, "source_uuid"));
-	if (!source)
+	if (!source) {
 		return;
+	}
 	auto filter = CameraFilter(source);
 	OBSDataAutoRelease saved = obs_data_get_obj(data, "filter");
 	if (!saved) {
-		if (filter)
+		if (filter) {
 			obs_source_filter_remove(source, filter);
+		}
 	} else if (filter) {
 		OBSDataAutoRelease settings = obs_data_get_obj(saved, "settings");
 		obs_source_update(filter, settings);
 		obs_source_set_enabled(filter, obs_data_get_bool(saved, "enabled"));
 	} else {
 		OBSSourceAutoRelease restored = obs_load_source(saved);
-		if (restored)
+		if (restored) {
 			obs_source_filter_add(source, restored);
+		}
 	}
 	OBSBasic::Get()->SaveProject();
 }
@@ -262,13 +269,16 @@ PenguinInspector::PenguinInspector(OBSBasic *mainWindow, QWidget *parent)
 		box->setObjectName(QString::fromUtf8(name));
 		box->setAccessibleName(QTStr(key));
 		box->setMinimumHeight(32);
-		for (const auto *choice : choices)
+		for (const auto *choice : choices) {
 			box->addItem(QTStr(choice));
+		}
 		cameraLayout->addWidget(box);
 		connect(box, &QComboBox::currentIndexChanged, this, &PenguinInspector::ChangeCamera);
 		return box;
 	};
-	cameraShape = addChoice("Penguin.Camera.Shape", "cameraShape", {"Penguin.Camera.Rectangle", "Penguin.Camera.Circle", "Penguin.Camera.Oval", "Penguin.Camera.Rounded"});
+	cameraShape = addChoice("Penguin.Camera.Shape", "cameraShape",
+				{"Penguin.Camera.Rectangle", "Penguin.Camera.Circle", "Penguin.Camera.Oval",
+				 "Penguin.Camera.Rounded"});
 	auto addSlider = [&](const char *key, const char *name, int maximum) {
 		auto *field = new QSpinBox(cameraCard);
 		field->setObjectName(QString::fromUtf8(name));
@@ -283,7 +293,9 @@ PenguinInspector::PenguinInspector(OBSBasic *mainWindow, QWidget *parent)
 		return field;
 	};
 	cameraRadius = addSlider("Penguin.Camera.Radius", "cameraRadius", 100);
-	cameraBackground = addChoice("Penguin.Camera.Background", "cameraBackground", {"Penguin.Camera.Off", "Penguin.Camera.Automatic", "Penguin.Camera.Green", "Penguin.Camera.Blue"});
+	cameraBackground = addChoice("Penguin.Camera.Background", "cameraBackground",
+				     {"Penguin.Camera.Off", "Penguin.Camera.Automatic", "Penguin.Camera.Green",
+				      "Penguin.Camera.Blue"});
 	cameraSimilarity = addSlider("Penguin.Camera.Similarity", "cameraSimilarity", 90);
 	cameraStatus = Label(QString(), cameraCard, "inspectorFieldLabel");
 	cameraStatus->setWordWrap(true);
@@ -475,27 +487,36 @@ void PenguinInspector::RefreshSelection()
 		obs_data_set_double(cameraSettings, "radius", 25);
 		obs_data_set_double(cameraSettings, "similarity", 15);
 	}
-	if (changed || !Editing(cameraShape))
+	if (changed || !Editing(cameraShape)) {
 		cameraShape->setCurrentIndex(std::clamp(int(obs_data_get_int(cameraSettings, "shape")), 0, 3));
-	if (changed || !Editing(cameraBackground))
-		cameraBackground->setCurrentIndex(std::clamp(int(obs_data_get_int(cameraSettings, "background")), 0, 3));
-	if (changed || !Editing(cameraRadius))
+	}
+	if (changed || !Editing(cameraBackground)) {
+		cameraBackground->setCurrentIndex(
+			std::clamp(int(obs_data_get_int(cameraSettings, "background")), 0, 3));
+	}
+	if (changed || !Editing(cameraRadius)) {
 		cameraRadius->setValue(int(obs_data_get_double(cameraSettings, "radius")));
-	if (changed || !Editing(cameraSimilarity))
+	}
+	if (changed || !Editing(cameraSimilarity)) {
 		cameraSimilarity->setValue(int(obs_data_get_double(cameraSettings, "similarity")));
+	}
 	cameraRadius->setVisible(cameraShape->currentIndex() == 3);
 	cameraSimilarity->setVisible(cameraBackground->currentIndex() >= 2);
 	calldata_t status;
 	calldata_init(&status);
-	if (camera)
+	if (camera) {
 		proc_handler_call(obs_source_get_proc_handler(camera), "camera_status", &status);
+	}
 	const int aiStatus = int(calldata_int(&status, "status"));
 	calldata_free(&status);
 	const char *statusKey = "Penguin.Camera.Privacy";
-	if (camera && !obs_source_enabled(camera))
+	if (camera && !obs_source_enabled(camera)) {
 		statusKey = "Penguin.Camera.Disabled";
-	else if (cameraBackground->currentIndex() == 1)
-		statusKey = aiStatus == 3 ? "Penguin.Camera.Error" : aiStatus == 2 ? "Penguin.Camera.Ready" : "Penguin.Camera.Loading";
+	} else if (cameraBackground->currentIndex() == 1) {
+		statusKey = aiStatus == 3   ? "Penguin.Camera.Error"
+			    : aiStatus == 2 ? "Penguin.Camera.Ready"
+					    : "Penguin.Camera.Loading";
+	}
 	cameraStatus->setText(QTStr(statusKey));
 	transformCard->setEnabled(editable);
 	cropCard->setEnabled(editable);
@@ -643,11 +664,13 @@ void PenguinInspector::ChangeFlag(bool visibility, bool value)
 
 void PenguinInspector::ChangeCamera()
 {
-	if (syncing)
+	if (syncing) {
 		return;
+	}
 	const auto item = CurrentItem();
-	if (!item || obs_sceneitem_locked(item))
+	if (!item || obs_sceneitem_locked(item)) {
 		return;
+	}
 	auto *source = obs_sceneitem_get_source(item);
 	const auto undo = SaveCamera(source);
 	auto filter = CameraFilter(source);
@@ -660,7 +683,8 @@ void PenguinInspector::ChangeCamera()
 		obs_source_update(filter, settings);
 		obs_source_set_enabled(filter, true);
 	} else {
-		filter = obs_source_create(CameraFilterId, QT_TO_UTF8(QTStr("Penguin.Camera.Title")), settings, nullptr);
+		filter =
+			obs_source_create(CameraFilterId, QT_TO_UTF8(QTStr("Penguin.Camera.Title")), settings, nullptr);
 		if (!filter) {
 			cameraStatus->setText(QTStr("Penguin.Camera.Error"));
 			return;
@@ -668,8 +692,10 @@ void PenguinInspector::ChangeCamera()
 		obs_source_filter_add(source, filter);
 	}
 	const auto redo = SaveCamera(source);
-	if (undo != redo)
-		main->undo_s.add_action(QTStr("Penguin.Camera.Undo").arg(obs_source_get_name(source)), RestoreCamera, RestoreCamera, undo, redo);
+	if (undo != redo) {
+		main->undo_s.add_action(QTStr("Penguin.Camera.Undo").arg(obs_source_get_name(source)), RestoreCamera,
+					RestoreCamera, undo, redo);
+	}
 	main->SaveProject();
 	RefreshSelection();
 }

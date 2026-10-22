@@ -2,6 +2,23 @@
 
 This is a development preview based on OBS Studio 32.2.2. The new Penguin code must not be described as fully production-tested until the checks below have real recorded results.
 
+## Camera appearance 0.5.0 — 2026-10-23
+
+The new camera module passed native Wayland rendering tests using generated
+color fixtures and a public test portrait in an isolated profile. Pixel checks
+verified circles versus ovals, rounded corners, green and blue keying, local AI
+masking, and restored unfiltered output. Source settings survived a restart.
+Closing with automatic removal active produced no warnings/errors or reported
+memory leaks. A deliberately missing model produced one actionable error while
+preserving the original video and shape effect; shutdown remained clean.
+
+These initial checks dynamically loaded the new module into the installed 0.4.4
+application. Full 0.5.0 package builds and Inspector integration checks are still
+in progress. A physical webcam, moving hair, multiple simultaneous cameras and
+other desktop environments have not yet been validated for this feature.
+See [camera-effects-0.5.0.json](validation/camera-effects-0.5.0.json) and the
+[camera guide](CAMERA-EFFECTS.md).
+
 ## AAC encoder shutdown correction — 2026-10-22
 
 The FFmpeg audio encoder now enters draining mode and retrieves delayed packets

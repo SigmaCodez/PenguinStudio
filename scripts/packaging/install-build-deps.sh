@@ -4,8 +4,8 @@ set -euo pipefail
 source /etc/os-release
 case "$ID" in
   ubuntu|debian)
-    apt-get update
-    apt-get install -y --no-install-recommends \
+    apt-get -o Acquire::Retries=3 -o Acquire::http::Timeout=30 -o Acquire::https::Timeout=30 update
+    apt-get -o Acquire::Retries=3 -o Acquire::http::Timeout=30 -o Acquire::https::Timeout=30 install -y --no-install-recommends \
       build-essential cmake ninja-build pkg-config git curl ca-certificates python3 \
       extra-cmake-modules dpkg-dev file \
       libavcodec-dev libavdevice-dev libavfilter-dev libavformat-dev libavutil-dev \

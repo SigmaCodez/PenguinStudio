@@ -142,7 +142,14 @@ jobs:
           submodules: recursive
           fetch-depth: 0
       - name: Install build dependencies
-        run: sudo bash scripts/packaging/install-build-deps.sh
+        run: |
+          # Avoid stalled downloads from the runner-specific Azure mirror.
+          # Keep Ubuntu's signed archive and the runner's selected release.
+          for source in /etc/apt/sources.list /etc/apt/sources.list.d/*.list /etc/apt/sources.list.d/*.sources; do
+            [ -f "$source" ] || continue
+            sudo sed -i 's|http://azure.archive.ubuntu.com/ubuntu|https://archive.ubuntu.com/ubuntu|g; s|https://azure.archive.ubuntu.com/ubuntu|https://archive.ubuntu.com/ubuntu|g' "$source"
+          done
+          sudo bash scripts/packaging/install-build-deps.sh
       - name: Configure publisher YouTube browser sign-in
         env:
           PENGUIN_YOUTUBE_CLIENT_ID: ${{ secrets.PENGUIN_YOUTUBE_CLIENT_ID }}

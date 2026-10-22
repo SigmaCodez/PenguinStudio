@@ -1,0 +1,53 @@
+{
+  "feature_source_commit": "4ff7d9cc0dff9ed299ee2d96524f734083ecc0f6",
+  "date": "2026-10-23",
+  "host": "Ubuntu 26.04.1, native Wayland",
+  "application_host_version": "0.4.4",
+  "test_mode": "New camera module loaded into the existing application using an isolated profile; full 0.5.0 package/Inspector test pending",
+  "physical_camera_used": false,
+  "images_uploaded": false,
+  "model_sha256": "1511ab5564cb0ae179cba9bcad6ad931003ccc71656f11fd270967023678c6a5",
+  "runtime": "ONNX Runtime 1.20.1 CPU",
+  "render_checks": {
+    "ai_status": 2,
+    "automatic": "512x512",
+    "automatic-circle": "512x512",
+    "blue-key": "640x360",
+    "circle": "640x360",
+    "disabled": "512x512",
+    "green-key": "640x360",
+    "oval": "640x360",
+    "platform": "wayland",
+    "rectangle": "640x360",
+    "rounded": "640x360",
+    "visible": true
+  },
+  "pixel_assertions_passed": true,
+  "restart_and_active_ai_shutdown": {
+    "ai_active_at_shutdown": true,
+    "platform": "wayland",
+    "restored_background": 2,
+    "restored_radius": 25,
+    "restored_shape": 3
+  },
+  "normal_runs": {
+    "warnings": 0,
+    "errors": 0,
+    "reported_memory_leaks": 0
+  },
+  "missing_model_test": {
+    "expected_ai_status": 3,
+    "original_frame_preserved": true,
+    "shape_still_active": true,
+    "actionable_error_count": 1,
+    "reported_memory_leaks": 0
+  },
+  "gui_graphics_timing_ms": {
+    "median": 0.449,
+    "p99": 2.016,
+    "maximum": 8.613,
+    "frame_budget": 33.333
+  },
+  "fixture": "Generated green/blue images and the scikit-image astronaut test image; no user camera or account data",
+  "fixture_url": "https://github.com/scikit-image/scikit-image/blob/v0.24.0/skimage/data/astronaut.png"
+}

@@ -44,8 +44,9 @@ void Capture(void *data)
 		if (gs_stagesurface_map(stage, &pixels, &stride)) {
 			QFile file(directory + '/' + name + ".rgba");
 			if (file.open(QIODevice::WriteOnly)) {
-				for (uint32_t row = 0; row < height; ++row)
+				for (uint32_t row = 0; row < height; ++row) {
 					file.write(reinterpret_cast<char *>(pixels + row * stride), width * 4);
+				}
 				report[name] = QString("%1x%2").arg(width).arg(height);
 			}
 			gs_stagesurface_unmap(stage);
@@ -55,7 +56,10 @@ void Capture(void *data)
 	gs_texrender_destroy(texture);
 	obs_leave_graphics();
 }
-void Snap(const char *name) { obs_queue_task(OBS_TASK_GRAPHICS, Capture, const_cast<char *>(name), true); }
+void Snap(const char *name)
+{
+	obs_queue_task(OBS_TASK_GRAPHICS, Capture, const_cast<char *>(name), true);
+}
 void Mode(int shape, int background)
 {
 	auto *shapes = mainWindow->findChild<QComboBox *>("cameraShape");
@@ -82,18 +86,25 @@ void Image(const QString &path)
 void Start()
 {
 	directory = qEnvironmentVariable("PENGUIN_CAMERA_RESULTS");
-	if (directory.isEmpty())
+	if (directory.isEmpty()) {
 		return;
+	}
 	QTimer::singleShot(3000, qApp, [] {
-		for (auto *widget : QApplication::topLevelWidgets())
-			if (!std::strcmp(widget->metaObject()->className(), "OBSBasic"))
+		for (auto *widget : QApplication::topLevelWidgets()) {
+			if (!std::strcmp(widget->metaObject()->className(), "OBSBasic")) {
 				mainWindow = widget;
-		if (!mainWindow) { QCoreApplication::exit(42); return; }
+			}
+		}
+		if (!mainWindow) {
+			QCoreApplication::exit(42);
+			return;
+		}
 		if (!obs_source_get_display_name("penguin_camera_filter")) {
 			obs_module_t *module = nullptr;
 			const auto path = qgetenv("PENGUIN_CAMERA_MODULE");
 			const auto data = qgetenv("PENGUIN_CAMERA_DATA");
-			if (obs_open_module(&module, path.constData(), data.constData()) != MODULE_SUCCESS || !obs_init_module(module)) {
+			if (obs_open_module(&module, path.constData(), data.constData()) != MODULE_SUCCESS ||
+			    !obs_init_module(module)) {
 				QCoreApplication::exit(43);
 				return;
 			}
@@ -104,25 +115,47 @@ void Start()
 			QPainter painter(&image);
 			painter.fillRect(240, 100, 161, 201, Qt::red);
 			painter.end();
-			if (!image.save(directory + '/' + name + ".png")) { QCoreApplication::exit(44); return; }
+			if (!image.save(directory + '/' + name + ".png")) {
+				QCoreApplication::exit(44);
+				return;
+			}
 		}
 		auto *settings = obs_data_create();
 		obs_data_set_string(settings, "file", (directory + "/green.png").toUtf8().constData());
 		source = obs_source_create("image_source", "Camera fixture", settings, nullptr);
 		obs_data_release(settings);
 		filter = obs_source_create("penguin_camera_filter", "Camera appearance", nullptr, nullptr);
-		if (!source || !filter) { QCoreApplication::exit(45); return; }
+		if (!source || !filter) {
+			QCoreApplication::exit(45);
+			return;
+		}
 		obs_source_filter_add(source, filter);
 		scene = obs_scene_create("Camera fixture scene");
 		auto *item = obs_scene_add(scene, source);
 		obs_frontend_set_current_scene(obs_scene_get_source(scene));
 		obs_sceneitem_select(item, true);
 	});
-	QTimer::singleShot(4500, qApp, [] { Snap("rectangle"); Mode(1, 0); });
-	QTimer::singleShot(5500, qApp, [] { Snap("circle"); Mode(2, 0); });
-	QTimer::singleShot(6500, qApp, [] { Snap("oval"); Mode(3, 0); });
-	QTimer::singleShot(7500, qApp, [] { Snap("rounded"); Mode(0, 2); });
-	QTimer::singleShot(8500, qApp, [] { Snap("green-key"); Image(directory + "/blue.png"); Mode(0, 3); });
+	QTimer::singleShot(4500, qApp, [] {
+		Snap("rectangle");
+		Mode(1, 0);
+	});
+	QTimer::singleShot(5500, qApp, [] {
+		Snap("circle");
+		Mode(2, 0);
+	});
+	QTimer::singleShot(6500, qApp, [] {
+		Snap("oval");
+		Mode(3, 0);
+	});
+	QTimer::singleShot(7500, qApp, [] {
+		Snap("rounded");
+		Mode(0, 2);
+	});
+	QTimer::singleShot(8500, qApp, [] {
+		Snap("green-key");
+		Image(directory + "/blue.png");
+		Mode(0, 3);
+	});
 	QTimer::singleShot(9500, qApp, [] {
 		Snap("blue-key");
 		const QString portrait = qEnvironmentVariable("PENGUIN_CAMERA_PORTRAIT");
@@ -138,19 +171,28 @@ void Start()
 		calldata_free(&parameters);
 		Mode(1, 1);
 	});
-	QTimer::singleShot(16000, qApp, [] { Snap("automatic-circle"); Mode(0, 0); });
+	QTimer::singleShot(16000, qApp, [] {
+		Snap("automatic-circle");
+		Mode(0, 0);
+	});
 	QTimer::singleShot(17500, qApp, [] {
 		Snap("disabled");
 		Mode(3, 2);
 		auto *saved = obs_save_source(source);
 		QFile settings(directory + "/source.json");
-		if (!settings.open(QIODevice::WriteOnly)) { QCoreApplication::exit(46); return; }
+		if (!settings.open(QIODevice::WriteOnly)) {
+			QCoreApplication::exit(46);
+			return;
+		}
 		settings.write(obs_data_get_json(saved));
 		obs_data_release(saved);
 		report["platform"] = QGuiApplication::platformName();
 		report["visible"] = mainWindow->isVisible();
 		QFile result(directory + "/result.json");
-		if (!result.open(QIODevice::WriteOnly)) { QCoreApplication::exit(47); return; }
+		if (!result.open(QIODevice::WriteOnly)) {
+			QCoreApplication::exit(47);
+			return;
+		}
 		result.write(QJsonDocument(report).toJson());
 		obs_source_release(filter);
 		obs_source_release(source);

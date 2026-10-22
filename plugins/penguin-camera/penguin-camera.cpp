@@ -45,14 +45,16 @@ struct Camera {
 			{
 				std::unique_lock lock(mutex);
 				wake.wait(lock, [&] { return stopping || !pending.empty(); });
-				if (stopping)
+				if (stopping) {
 					return;
+				}
 				frame.swap(pending);
 				version = pendingGeneration;
 			}
 			try {
-				if (!segmenter)
+				if (!segmenter) {
 					segmenter = std::make_unique<Segmenter>(model.c_str());
+				}
 				auto result = segmenter->Process(frame);
 				std::lock_guard lock(mutex);
 				if (generation == version && background == 1) {
@@ -82,8 +84,9 @@ struct Camera {
 			stopping = true;
 		}
 		wake.notify_one();
-		if (worker.joinable())
+		if (worker.joinable()) {
 			worker.join();
+		}
 		obs_enter_graphics();
 		gs_texture_destroy(maskTexture);
 		gs_stagesurface_destroy(stage);
@@ -93,7 +96,10 @@ struct Camera {
 	}
 };
 
-const char *Name(void *) { return obs_module_text("CameraEffects"); }
+const char *Name(void *)
+{
+	return obs_module_text("CameraEffects");
+}
 void Defaults(obs_data_t *settings)
 {
 	obs_data_set_default_double(settings, "radius", 25.0);
@@ -130,13 +136,15 @@ void *Create(obs_data_t *settings, obs_source_t *source)
 		camera->stage = gs_stagesurface_create(Segmenter::Width, Segmenter::Height, GS_RGBA);
 		obs_leave_graphics();
 		bfree(path);
-		if (!camera->effect || !camera->capture || !camera->stage)
+		if (!camera->effect || !camera->capture || !camera->stage) {
 			return nullptr;
+		}
 		path = obs_module_file("selfie_segmentation.onnx");
 		camera->model = path ? path : "";
 		bfree(path);
 		Update(camera.get(), settings);
-		proc_handler_add(obs_source_get_proc_handler(source), "void camera_status(out int status)", Status, camera.get());
+		proc_handler_add(obs_source_get_proc_handler(source), "void camera_status(out int status)", Status,
+				 camera.get());
 		camera->worker = std::thread(&Camera::Run, camera.get());
 		return camera.release();
 	} catch (const std::exception &error) {
@@ -144,20 +152,27 @@ void *Create(obs_data_t *settings, obs_source_t *source)
 		return nullptr;
 	}
 }
-void Destroy(void *data) { delete static_cast<Camera *>(data); }
+void Destroy(void *data)
+{
+	delete static_cast<Camera *>(data);
+}
 
 obs_properties_t *Properties(void *)
 {
 	auto *properties = obs_properties_create();
-	auto *shape = obs_properties_add_list(properties, "shape", obs_module_text("Shape"), OBS_COMBO_TYPE_LIST, OBS_COMBO_FORMAT_INT);
+	auto *shape = obs_properties_add_list(properties, "shape", obs_module_text("Shape"), OBS_COMBO_TYPE_LIST,
+					      OBS_COMBO_FORMAT_INT);
 	const char *shapes[] = {"Rectangle", "Circle", "Oval", "Rounded"};
-	for (int i = 0; i < 4; ++i)
+	for (int i = 0; i < 4; ++i) {
 		obs_property_list_add_int(shape, obs_module_text(shapes[i]), i);
+	}
 	obs_properties_add_float_slider(properties, "radius", obs_module_text("Radius"), 0, 100, 1);
-	auto *background = obs_properties_add_list(properties, "background", obs_module_text("Background"), OBS_COMBO_TYPE_LIST, OBS_COMBO_FORMAT_INT);
+	auto *background = obs_properties_add_list(properties, "background", obs_module_text("Background"),
+						   OBS_COMBO_TYPE_LIST, OBS_COMBO_FORMAT_INT);
 	const char *backgrounds[] = {"Off", "Automatic", "Green", "Blue"};
-	for (int i = 0; i < 4; ++i)
+	for (int i = 0; i < 4; ++i) {
 		obs_property_list_add_int(background, obs_module_text(backgrounds[i]), i);
+	}
 	obs_properties_add_float_slider(properties, "similarity", obs_module_text("Similarity"), 0, 90, 1);
 	obs_properties_add_text(properties, "privacy", obs_module_text("Privacy"), OBS_TEXT_INFO);
 	return properties;
@@ -168,43 +183,50 @@ obs_properties_t *Properties(void *)
 void Capture(Camera *camera, obs_source_t *target, uint32_t width, uint32_t height)
 {
 	const auto now = os_gettime_ns();
-	if (now - camera->lastCapture < 66666666 || camera->status == 3)
+	if (now - camera->lastCapture < 66666666 || camera->status == 3) {
 		return;
+	}
 	uint64_t version;
 	{
 		std::lock_guard lock(camera->mutex);
-		if (camera->busy)
+		if (camera->busy) {
 			return;
+		}
 		version = camera->generation;
 	}
 	gs_texrender_reset(camera->capture);
-	if (!gs_texrender_begin(camera->capture, Segmenter::Width, Segmenter::Height))
+	if (!gs_texrender_begin(camera->capture, Segmenter::Width, Segmenter::Height)) {
 		return;
+	}
 	vec4 clear{};
 	gs_clear(GS_CLEAR_COLOR, &clear, 0, 0);
 	gs_ortho(0, float(width), 0, float(height), -100, 100);
 	gs_blend_state_push();
 	gs_blend_function(GS_BLEND_ONE, GS_BLEND_ZERO);
 	const auto flags = obs_source_get_output_flags(target);
-	if (target == obs_filter_get_parent(camera->source) && !(flags & (OBS_SOURCE_CUSTOM_DRAW | OBS_SOURCE_ASYNC)))
+	if (target == obs_filter_get_parent(camera->source) && !(flags & (OBS_SOURCE_CUSTOM_DRAW | OBS_SOURCE_ASYNC))) {
 		obs_source_default_render(target);
-	else
+	} else {
 		obs_source_video_render(target);
+	}
 	gs_blend_state_pop();
 	gs_texrender_end(camera->capture);
 	gs_stage_texture(camera->stage, gs_texrender_get_texture(camera->capture));
 	uint8_t *pixels;
 	uint32_t stride;
-	if (!gs_stagesurface_map(camera->stage, &pixels, &stride))
+	if (!gs_stagesurface_map(camera->stage, &pixels, &stride)) {
 		return;
+	}
 	std::vector<uint8_t> frame(Segmenter::Width * Segmenter::Height * 4);
-	for (uint32_t row = 0; row < Segmenter::Height; ++row)
+	for (uint32_t row = 0; row < Segmenter::Height; ++row) {
 		memcpy(frame.data() + row * Segmenter::Width * 4, pixels + row * stride, Segmenter::Width * 4);
+	}
 	gs_stagesurface_unmap(camera->stage);
 	{
 		std::lock_guard lock(camera->mutex);
-		if (version != camera->generation || camera->background != 1)
+		if (version != camera->generation || camera->background != 1) {
 			return;
+		}
 		camera->pending = std::move(frame);
 		camera->pendingGeneration = version;
 		camera->busy = true;
@@ -227,30 +249,38 @@ void Render(void *data, gs_effect_t *)
 		if (width != camera->lastWidth || height != camera->lastHeight) {
 			++camera->generation;
 			camera->newMask = false;
-			if (camera->background == 1 && camera->status != 3)
+			if (camera->background == 1 && camera->status != 3) {
 				camera->status = 1;
+			}
 			camera->lastWidth = width;
 			camera->lastHeight = height;
 		}
-		if (camera->textureGeneration != camera->generation)
+		if (camera->textureGeneration != camera->generation) {
 			camera->maskReady = false;
+		}
 		if (camera->newMask && camera->outputGeneration == camera->generation) {
 			const uint8_t *pixels = camera->output.data();
-			if (!camera->maskTexture)
-				camera->maskTexture = gs_texture_create(Segmenter::Width, Segmenter::Height, GS_R8, 1, &pixels, GS_DYNAMIC);
-			else
+			if (!camera->maskTexture) {
+				camera->maskTexture = gs_texture_create(Segmenter::Width, Segmenter::Height, GS_R8, 1,
+									&pixels, GS_DYNAMIC);
+			} else {
 				gs_texture_set_image(camera->maskTexture, pixels, Segmenter::Width, false);
+			}
 			camera->maskReady = camera->maskTexture != nullptr;
 			camera->textureGeneration = camera->generation;
 			camera->newMask = false;
 		}
 	}
-	if (camera->background == 1)
+	if (camera->background == 1) {
 		Capture(camera, target, width, height);
-	if (!obs_source_process_filter_begin(camera->source, GS_RGBA, OBS_NO_DIRECT_RENDERING))
+	}
+	if (!obs_source_process_filter_begin(camera->source, GS_RGBA, OBS_NO_DIRECT_RENDERING)) {
 		return;
+	}
 	const vec2 dimensions{float(width), float(height)};
-	auto param = [&](const char *name) { return gs_effect_get_param_by_name(camera->effect, name); };
+	auto param = [&](const char *name) {
+		return gs_effect_get_param_by_name(camera->effect, name);
+	};
 	gs_effect_set_vec2(param("dimensions"), &dimensions);
 	gs_effect_set_int(param("shape"), camera->shape);
 	gs_effect_set_int(param("background"), camera->background);
@@ -278,4 +308,7 @@ bool obs_module_load(void)
 	obs_register_source(&info);
 	return true;
 }
-MODULE_EXPORT const char *obs_module_description(void) { return "Penguin Studio camera shapes and local portrait removal"; }
+MODULE_EXPORT const char *obs_module_description(void)
+{
+	return "Penguin Studio camera shapes and local portrait removal";
+}
