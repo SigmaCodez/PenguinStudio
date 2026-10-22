@@ -27,6 +27,7 @@ for name in ("circle", "oval", "rounded", "green-key", "blue-key"):
 assert pixel("circle", 20, 180)[3] == 0
 assert pixel("oval", 20, 180)[3] == 255
 assert pixel("rounded", 20, 180)[3] == 255
+assert pixel("automatic", 0, 0)[3] == 0
 assert pixel("automatic-circle", 0, 0)[3] == 0
 assert pixel("disabled", 0, 0)[3] == 255
 saved = json.loads((root / "source.json").read_text())

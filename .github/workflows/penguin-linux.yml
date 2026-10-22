@@ -45,6 +45,8 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Configure Ubuntu package downloads
+        run: sudo --preserve-env=GITHUB_ACTIONS bash scripts/packaging/configure-ci-apt.sh
       - name: Validate branding and translations
         run: |
           python3 scripts/check-branding.py
@@ -141,15 +143,10 @@ jobs:
         with:
           submodules: recursive
           fetch-depth: 0
+      - name: Configure Ubuntu package downloads
+        run: sudo --preserve-env=GITHUB_ACTIONS bash scripts/packaging/configure-ci-apt.sh
       - name: Install build dependencies
-        run: |
-          # Avoid stalled downloads from the runner-specific Azure mirror.
-          # Keep Ubuntu's signed archive and the runner's selected release.
-          for source in /etc/apt/sources.list /etc/apt/sources.list.d/*.list /etc/apt/sources.list.d/*.sources; do
-            [ -f "$source" ] || continue
-            sudo sed -i 's|http://azure.archive.ubuntu.com/ubuntu|https://archive.ubuntu.com/ubuntu|g; s|https://azure.archive.ubuntu.com/ubuntu|https://archive.ubuntu.com/ubuntu|g' "$source"
-          done
-          sudo bash scripts/packaging/install-build-deps.sh
+        run: sudo bash scripts/packaging/install-build-deps.sh
       - name: Configure publisher YouTube browser sign-in
         env:
           PENGUIN_YOUTUBE_CLIENT_ID: ${{ secrets.PENGUIN_YOUTUBE_CLIENT_ID }}
@@ -247,6 +244,8 @@ jobs:
           else
             python3 scripts/packaging/configure-youtube.py
           fi
+      - name: Configure Ubuntu package downloads
+        run: sudo --preserve-env=GITHUB_ACTIONS bash scripts/packaging/configure-ci-apt.sh
       - name: Install Snapcraft
         run: sudo snap install snapcraft --classic
       - name: Build snap
@@ -273,6 +272,8 @@ jobs:
         with:
           name: penguin-studio-ubuntu-24.04-amd64
           path: deb-artifact
+      - name: Configure Ubuntu package downloads
+        run: sudo --preserve-env=GITHUB_ACTIONS bash scripts/packaging/configure-ci-apt.sh
       - name: Install packaging dependencies
         run: |
           sudo apt-get update
