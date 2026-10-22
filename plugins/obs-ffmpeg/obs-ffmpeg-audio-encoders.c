@@ -26,6 +26,7 @@
 
 #include "obs-ffmpeg-formats.h"
 #include "obs-ffmpeg-compat.h"
+#include "audio-encoder-drain.h"
 
 #define do_log(level, format, ...) \
 	blog(level, "[FFmpeg %s encoder: '%s'] " format, enc->type, obs_encoder_get_name(enc->encoder), ##__VA_ARGS__)
@@ -100,6 +101,10 @@ static const char *flac_getname(void *unused)
 static void enc_destroy(void *data)
 {
 	struct enc_encoder *enc = data;
+
+	int ret = ffmpeg_audio_encoder_drain(enc->context);
+	if (ret < 0)
+		warn("Failed to drain audio encoder: %s", av_err2str(ret));
 
 	if (enc->samples[0])
 		av_freep(&enc->samples[0]);

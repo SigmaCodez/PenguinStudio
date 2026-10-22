@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.4.4 — 2026-10-22
+
+- Drain delayed FFmpeg audio encoder packets before freeing the stopped encoder, preventing the AAC queue warning at recording shutdown. Output stop timestamps remain unchanged.
+- Add regression coverage for empty, short and longer AAC sessions, pending packets, repeated cleanup and PCM encoders.
+
 ## 0.4.3 — 2026-10-22
 
 - Add an x86_64 AppImage built from the Ubuntu 24.04 package, including Qt Wayland plugins and publisher-configured browser sign-in.

@@ -55,6 +55,12 @@ jobs:
           python3 test/penguin-portable.py
       - name: Check optional Linux runtime diagnostics
         run: bash scripts/packaging/test-optional-library.sh
+      - name: Check delayed audio encoder shutdown
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libavcodec-dev libavutil-dev
+          cc -std=c11 -Wall -Wextra -Werror -I. test/penguin-audio-drain.c $(pkg-config --cflags --libs libavcodec libavutil) -o /tmp/penguin-audio-drain
+          /tmp/penguin-audio-drain
       - name: Compile and run configuration isolation checks
         run: |
           c++ -std=c++17 -Wall -Wextra -Werror -I. test/penguin-config-paths.cpp -o /tmp/penguin-config-paths-test
