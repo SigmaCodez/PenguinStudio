@@ -7,7 +7,8 @@ if [[ ${GITHUB_ACTIONS:-} != true || $EUID != 0 ]]; then
 fi
 source /etc/os-release
 [[ $ID == ubuntu ]] || { echo 'Expected an Ubuntu runner' >&2; exit 2; }
-for source in /etc/apt/sources.list /etc/apt/sources.list.d/*.list /etc/apt/sources.list.d/*.sources; do
+# Hosted runners may use mirror+file: URIs rather than direct archive URLs.
+for source in /etc/apt/sources.list /etc/apt/sources.list.d/*.list /etc/apt/sources.list.d/*.sources /etc/apt/apt-mirrors*.txt; do
   [[ -f $source ]] || continue
   # Preserve release suites, components, signing keys and third-party sources.
   sed -i 's|http://azure\.archive\.ubuntu\.com/ubuntu|https://archive.ubuntu.com/ubuntu|g; s|https://azure\.archive\.ubuntu\.com/ubuntu|https://archive.ubuntu.com/ubuntu|g' "$source"
