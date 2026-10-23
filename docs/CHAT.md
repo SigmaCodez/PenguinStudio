@@ -14,7 +14,7 @@ for confirmation and are applied only when the platform accepts the request.
 - Receive and send messages with EventSub and the Twitch chat API.
 - Delete a message, apply a ten-minute timeout, ban or unban a participant.
 - Change emote-only, follower-only, subscriber-only, slow and unique-message modes.
-- Search connected chat participants and display the live viewer count.
+- Search connected chat participants or recent chatters and display the live viewer count.
 
 Existing accounts can continue reading and sending. Reconnect Twitch once to
 grant the additional moderation and participant-list permissions. A rejected
@@ -44,7 +44,7 @@ named viewer/presence list through this integration.
 
 ## Platform-specific features
 
-**Open platform dashboard** opens the official Twitch or YouTube dashboard for
+**Dashboard ↗** opens the official Twitch or YouTube dashboard for
 features not implemented natively, including platform-specific monetization,
 advanced AutoMod workflows, polls and management of older YouTube bans. This is
 not a claim of feature parity with either platform's website. Twitch emote codes

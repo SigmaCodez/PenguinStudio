@@ -29,7 +29,7 @@ class YoutubeChat final : public QWidget {
 	QPushButton *refresh = new QPushButton("Load live broadcasts", this);
 	QString token, account, chat, page;
 	quint64 generation = 0;
-	bool sending = false, moderating = false;
+	bool sending = false, moderating = false, authorizationExpired = false, ready = false;
 	QSet<QString> seen, loadPages;
 	QQueue<QString> seenOrder;
 	int failures = 0;
@@ -93,6 +93,9 @@ class YoutubeChat final : public QWidget {
 			"GET", {}, [this](int code, const QJsonObject &data) {
 				if (code != 200) {
 					if (code == 401 || code == 403 || code == 404) {
+						authorizationExpired = code == 401;
+						ready = false;
+						audienceTimer.stop();
 						status->setText(
 							"Chat unavailable: check sign-in, live status, permissions or YouTube API quota. Reload to retry.");
 						send->setEnabled(false);
@@ -107,10 +110,13 @@ class YoutubeChat final : public QWidget {
 				ApplyMessages(data.value("items").toArray());
 				if (!data.value("offlineAt").toString().isEmpty()) {
 					status->setText("This live chat has ended");
+					ready = false;
+					audienceTimer.stop();
 					send->setEnabled(false);
 					return;
 				}
 				status->setText("Connected · YouTube live chat");
+				ready = true;
 				send->setEnabled(!sending);
 				// Respect YouTube's minimum interval. A 10s floor limits polling quota use.
 				poll.start(std::max(10000, data.value("pollingIntervalMillis").toInt(10000)));
@@ -126,7 +132,7 @@ class YoutubeChat final : public QWidget {
 		bans.clear();
 		seen.clear();
 		seenOrder.clear();
-		sending = moderating = false;
+		sending = moderating = ready = authorizationExpired = false;
 		chat = broadcasts->currentData().toString();
 		send->setEnabled(false);
 		audienceTimer.stop();
@@ -317,7 +323,7 @@ public:
 		});
 		connect(send, &QPushButton::clicked, this, [this] {
 			const auto message = input->text().trimmed();
-			if (chat.isEmpty() || token.isEmpty() || sending || message.isEmpty()) {
+			if (!ready || chat.isEmpty() || token.isEmpty() || sending || message.isEmpty()) {
 				return;
 			}
 			sending = true;
@@ -329,7 +335,7 @@ public:
 					      {"textMessageDetails", QJsonObject{{"messageText", message}}}}}},
 				[this, message](int code, const QJsonObject &) {
 					sending = false;
-					send->setEnabled(true);
+					send->setEnabled(ready);
 					if (code >= 200 && code < 300) {
 						if (input->text().trimmed() == message) {
 							input->clear();
@@ -347,6 +353,11 @@ public:
 	{
 		if (!token.isEmpty() && account == identity) {
 			token = access;
+			if (authorizationExpired && !chat.isEmpty()) {
+				authorizationExpired = false;
+				Read();
+				audienceTimer.start(60000);
+			}
 			return;
 		}
 		Stop();
@@ -377,8 +388,9 @@ public:
 		seen.clear();
 		seenOrder.clear();
 		input->clear();
-		sending = moderating = false;
+		sending = moderating = ready = authorizationExpired = false;
 		failures = 0;
+		authorizationExpired = false;
 		send->setEnabled(false);
 		refresh->setEnabled(false);
 		status->setText("Connect YouTube in Stream details to use live chat.");

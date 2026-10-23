@@ -151,6 +151,16 @@ struct PenguinChatTest {
 			"YouTube unban requires ban id, not user id");
 		youtubeNetwork.Finish(204, {});
 		Require(!youtube.bans.contains("viewer"), "unban must clear stored ban id");
+		youtube.Read();
+		youtubeNetwork.Finish(401, {});
+		Require(!youtube.ready && !youtube.audienceTimer.isActive(),
+			"expired credentials must stop chat actions and audience polling");
+		youtube.SetSession("renewed-again", "fixture-account");
+		Require(youtubeNetwork.calls.last().request.rawHeader("Authorization") == "Bearer renewed-again",
+			"reauthorization must retry with refreshed token");
+		youtubeNetwork.Finish(
+			200, {{"items", QJsonArray()}, {"nextPageToken", "later"}, {"pollingIntervalMillis", 30000}});
+		Require(youtube.ready, "successful reauthorization must restore chat actions");
 		// A queued reply for an old account must never repopulate a disconnected view.
 		youtube.Read();
 		auto pending = youtubeNetwork.calls.last().reply;

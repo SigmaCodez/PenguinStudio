@@ -127,7 +127,7 @@ void Update(void *data, obs_data_t *settings)
 		gs_image_file_free(&camera->backgroundImage);
 		camera->backgroundImage = {};
 		camera->imagePath = imagePath;
-		if (!imagePath.empty()) {
+		if (!imagePath.empty() && os_file_exists(imagePath.c_str())) {
 			gs_image_file_init(&camera->backgroundImage, imagePath.c_str());
 			gs_image_file_init_texture(&camera->backgroundImage);
 		}

@@ -55,3 +55,6 @@ for x in range(100, 120):
 assert pixel("custom-background", 0, 0)[3] == 0
 assert pixel("custom-background", 100, 180) == (0, 0, 255, 255)
 print("Automatic blur, custom image, rounded corners and background undo/restore passed")
+
+assert pixel("missing-background", 100, 180)[3] == 0
+print("Missing custom image falls back to transparent background")

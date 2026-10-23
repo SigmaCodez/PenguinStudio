@@ -337,9 +337,14 @@ void Start()
 		report["background_restored"] = obs_data_get_int(settings, "background") == 5 &&
 						QString::fromUtf8(obs_data_get_string(settings, "background_image")) ==
 							directory + "/replacement.png";
+		PenguinCamera::Apply(source, "Camera appearance", 3, 5, 25, 15, 8,
+				     (directory + "/missing-background.png").toUtf8().constData());
+	});
+	At(21000, [] {
+		Snap("missing-background");
 		Mode(0, 0);
 	});
-	At(21500, [] {
+	At(22500, [] {
 		Snap("disabled");
 		Mode(3, 2);
 		auto *saved = obs_save_source(source);
