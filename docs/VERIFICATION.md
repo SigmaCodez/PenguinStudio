@@ -21,7 +21,16 @@ Both Ubuntu CI jobs passed the installed-package camera tests. Their headless
 Xvfb environment explicitly permits only the recorded missing portal-settings,
 DRM render-node and EWMH diagnostics; these exceptions do not apply on the desktop.
 The Linux package jobs passed for both DEBs, RPM, Flatpak, Snap, AppImage and the
-Arch recipe. System installation awaits Ubuntu administrator approval.
+Arch recipe.
+
+The released Ubuntu 26.04 package was then installed on Ubuntu 26.04.1, upgrading
+only Penguin Studio from 0.4.4 to 0.5.0. Package-file verification passed. Fresh
+native Wayland tests of the installed application passed the Inspector and pixel
+checks for shapes, local AI removal, green/blue keying, disabling, Undo/Redo and
+synthetic asynchronous camera frames. A separate restart restored the saved
+settings and closed normally with AI removal active. All three runs exited with
+code 0, no warnings/errors and zero reported memory leaks. Personal profiles and
+accounts were not used.
 A physical webcam, moving hair, multiple simultaneous cameras and other desktop
 environments have not yet been validated for this feature.
 See [camera-effects-0.5.0.json](validation/camera-effects-0.5.0.json) and the

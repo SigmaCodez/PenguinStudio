@@ -58,7 +58,7 @@
   },
   "fixture": "Generated green/blue images and the scikit-image astronaut test image; no user camera or account data",
   "fixture_url": "https://github.com/scikit-image/scikit-image/blob/v0.24.0/skimage/data/astronaut.png",
-  "installation_status": "System installation awaits Ubuntu administrator approval; installed version remains 0.4.4",
+  "installation_status": "Installed and verified: 0.5.0-1+ubuntu26.04 on Ubuntu 26.04.1; upgraded only Penguin Studio from 0.4.4; dpkg package-file verification passed",
   "creation_and_radius_checks": {
     "ai_status": 2,
     "automatic": "512x512",
@@ -102,5 +102,69 @@
   },
   "package_sha256": "edf0d21603c897cac8def55bb54cf0b21b1769bf05cc8ccc323663aefa15e307",
   "workflow_url": "https://github.com/SigmaCodez/PenguinStudio/actions/runs/39876796588",
-  "ci_headless_environment": "Ubuntu Xvfb checks retain and allow only the exact missing portal-settings, DRM render-node and EWMH messages. Native Wayland checks allow no warnings/errors."
+  "ci_headless_environment": "Ubuntu Xvfb checks retain and allow only the exact missing portal-settings, DRM render-node and EWMH messages. Native Wayland checks allow no warnings/errors.",
+  "installed_package_validation": {
+    "date": "2026-10-23",
+    "platform": "wayland",
+    "isolated_profile": true,
+    "physical_camera_used": false,
+    "render_checks": {
+      "ai_status": 2,
+      "automatic": "512x512",
+      "automatic-circle": "512x512",
+      "blue-key": "640x360",
+      "circle": "640x360",
+      "controls_enabled": true,
+      "controls_visible": true,
+      "default_redo_shape": 1,
+      "default_undo_radius": 25,
+      "default_undo_shape": 0,
+      "disabled": "512x512",
+      "green-key": "640x360",
+      "initial_shape": 0,
+      "inspector_used": true,
+      "oval": "640x360",
+      "platform": "wayland",
+      "rectangle": "640x360",
+      "rounded": "640x360",
+      "selected_rows": 1,
+      "visible": true
+    },
+    "asynchronous_camera_checks": {
+      "ai_status": 2,
+      "automatic": "512x512",
+      "automatic-circle": "512x512",
+      "blue-key": "640x360",
+      "circle": "640x360",
+      "controls_enabled": true,
+      "controls_visible": true,
+      "default_redo_shape": 1,
+      "default_undo_radius": 25,
+      "default_undo_shape": 0,
+      "disabled": "512x512",
+      "green-key": "640x360",
+      "initial_shape": 0,
+      "inspector_used": true,
+      "oval": "640x360",
+      "platform": "wayland",
+      "rectangle": "640x360",
+      "rounded": "640x360",
+      "selected_rows": 1,
+      "visible": true
+    },
+    "restart_and_active_ai_shutdown": {
+      "ai_active_at_shutdown": true,
+      "platform": "wayland",
+      "restored_background": 2,
+      "restored_radius": 25,
+      "restored_shape": 3
+    },
+    "all_three_runs": {
+      "exit_code": 0,
+      "warnings": 0,
+      "errors": 0,
+      "reported_memory_leaks": 0
+    },
+    "pixel_assertions_passed": true
+  }
 }
