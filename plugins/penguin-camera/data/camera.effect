@@ -1,6 +1,9 @@
 uniform float4x4 ViewProj;
 uniform texture2d image;
 uniform texture2d person_mask;
+uniform texture2d replacement;
+uniform bool replacement_ready;
+uniform float2 replacement_scale;
 uniform float2 dimensions;
 uniform int shape;
 uniform int background;
@@ -43,6 +46,11 @@ float4 PSCamera(VertData v) : TARGET
 		if (background == 2) rgb.g = min(rgb.g, other);
 		else rgb.b = min(rgb.b, other);
 		color.rgb = rgb * color.a;
+	}
+	if (background == 5 && replacement_ready) {
+		float4 backdrop = replacement.Sample(linearClamp, (v.uv - 0.5) * replacement_scale + 0.5);
+		// Matting output is premultiplied. Composite before applying the camera shape.
+		color = color + float4(backdrop.rgb * backdrop.a, backdrop.a) * (1.0 - color.a);
 	}
 	return color * opacity;
 }

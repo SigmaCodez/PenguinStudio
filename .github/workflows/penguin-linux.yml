@@ -51,10 +51,15 @@ jobs:
         run: |
           python3 scripts/check-branding.py
           python3 scripts/check-penguin-locales.py
-          python3 scripts/check-publication.py
+          if [[ '${{ needs.version.outputs.publish }}' == 'true' ]]; then
+            python3 scripts/check-publication.py
+          else
+            python3 scripts/check-publication.py --candidate
+          fi
       - name: Validate automatic releases
         run: |
           python3 test/penguin-release.py
+          python3 test/penguin-publication.py
           python3 test/penguin-portable.py
       - name: Check optional Linux runtime diagnostics
         run: bash scripts/packaging/test-optional-library.sh
@@ -84,6 +89,8 @@ jobs:
           /tmp/penguin-update-test
           c++ -std=c++17 -Wall -Wextra -Werror -fPIC -I. test/penguin-twitch-chat.cpp $(pkg-config --cflags --libs Qt6Widgets Qt6Network Qt6WebSockets) -o /tmp/penguin-chat-test
           QT_QPA_PLATFORM=offscreen /tmp/penguin-chat-test
+          c++ -std=c++17 -Wall -Wextra -Werror -fPIC -I. test/penguin-chat-actions.cpp $(pkg-config --cflags --libs Qt6Widgets Qt6Network Qt6WebSockets) -o /tmp/penguin-chat-actions
+          QT_QPA_PLATFORM=offscreen /tmp/penguin-chat-actions
       - name: Compile and run Qt button translation checks
         run: |
           c++ -std=c++17 -Wall -Wextra -Werror -fPIC -I. test/penguin-qt-translation.cpp $(pkg-config --cflags --libs Qt6Core) -o /tmp/penguin-qt-translation-test

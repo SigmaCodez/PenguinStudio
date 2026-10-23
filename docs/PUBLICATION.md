@@ -32,3 +32,14 @@ The current previews were captured from the installed application using native
 window capture on Ubuntu. The program canvas contains original local demo artwork;
 the rounded-corner example demonstrates shape controls, not portrait segmentation.
 Provider views are intentionally signed out.
+
+## Building a candidate before capturing its interface
+
+A non-publishing candidate build may retain the previous reviewed images with an
+explicit `pending_version` in the manifest. CI then uses `--candidate`, still
+checking image hashes and the candidate's text/version references. This allows a
+real package to be built before its GUI is captured. Replace the images from that
+package, update their manifest and remove `pending_version` before merging the
+version change. Publishing workflows and main's documentation check always use
+strict validation and reject pending previews. Never relabel old images as new
+captures just to pass the check.

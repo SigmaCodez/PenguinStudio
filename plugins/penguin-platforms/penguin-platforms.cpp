@@ -2,6 +2,7 @@
 // Native metadata controls: no embedded browser or X11 dependency.
 #include "oauth-helpers.hpp"
 #include "twitch-chat.hpp"
+#include "youtube-chat.hpp"
 #include "category-picker.hpp"
 #include "credential-store.hpp"
 #if __has_include("youtube-app-config.hpp")
@@ -360,7 +361,8 @@ class TwitchPane final : public PlatformPane {
 	quint64 categoryRevision = 0;
 	QPointer<TwitchChat> chat;
 	QPushButton *loadDetails = nullptr;
-	static constexpr const char *scopes = "channel:manage:broadcast user:read:chat user:write:chat";
+	static constexpr const char *scopes =
+		"channel:manage:broadcast user:read:chat user:write:chat moderator:read:chatters moderator:manage:chat_messages moderator:manage:banned_users moderator:manage:chat_settings";
 
 	void Reset() override
 	{
@@ -598,6 +600,7 @@ public:
 };
 
 class YoutubePane final : public PlatformPane {
+	QPointer<YoutubeChat> chat;
 	QTcpServer listener{this};
 	QTimer authorizationTimeout{this};
 	QLineEdit *secret = new QLineEdit(this);
@@ -646,6 +649,9 @@ class YoutubePane final : public PlatformPane {
 
 	void Reset() override
 	{
+		if (chat) {
+			chat->Stop();
+		}
 		category->clear();
 		category->setEnabled(false);
 		++broadcastLoad;
@@ -680,6 +686,9 @@ class YoutubePane final : public PlatformPane {
 				return;
 			}
 			SetConnected(true);
+			if (chat) {
+				chat->SetSession(accessToken, activeClient);
+			}
 			SaveSession();
 			if (category->count() == 0) {
 				LoadCategories();
@@ -808,8 +817,9 @@ class YoutubePane final : public PlatformPane {
 
 public:
 	explicit YoutubePane(QWidget *parent, QNetworkAccessManager *transport = nullptr,
-			     CredentialStore *store = nullptr)
-		: PlatformPane("youtube", parent, transport, store)
+			     CredentialStore *store = nullptr, YoutubeChat *chatPane = nullptr)
+		: PlatformPane("youtube", parent, transport, store),
+		  chat(chatPane)
 	{
 		// Preserve the client associated with an existing saved sign-in.
 		if (client->text().trimmed().isEmpty()) {
@@ -966,6 +976,7 @@ public:
 constexpr char DockId[] = "penguin-stream-details";
 QPointer<QWidget> dock;
 QPointer<TwitchChat> chatDock;
+QPointer<YoutubeChat> youtubeChatDock;
 constexpr const char *ChatDockId = "penguinTwitchChat";
 bool frontendShutdown = false;
 
@@ -978,6 +989,9 @@ void FrontendEvent(enum obs_frontend_event event, void *)
 	frontendShutdown = true;
 	if (chatDock) {
 		chatDock->Stop();
+		if (youtubeChatDock) {
+			youtubeChatDock->Stop();
+		}
 		obs_frontend_remove_dock(ChatDockId);
 	}
 	if (dock) {
@@ -1012,13 +1026,25 @@ void CreateDock()
 		scroll->setWidget(pane);
 		tabs->addTab(scroll, name);
 	};
-	chatDock = new TwitchChat(parent, Text);
-	if (!obs_frontend_add_dock_by_id(ChatDockId, obs_module_text("Chat.Title"), chatDock.data())) {
-		delete chatDock.data();
+	auto *chatTabs = new QTabWidget(parent);
+	chatTabs->setDocumentMode(true);
+	chatDock = new TwitchChat(chatTabs, Text);
+	youtubeChatDock = new YoutubeChat(chatTabs);
+	chatTabs->addTab(chatDock, "Twitch");
+	chatTabs->addTab(youtubeChatDock, "YouTube");
+	auto *dashboard = new QPushButton("Dashboard ↗", chatTabs);
+	dashboard->setToolTip("Open Twitch or YouTube for platform features not available through their APIs.");
+	chatTabs->setCornerWidget(dashboard);
+	QObject::connect(dashboard, &QPushButton::clicked, chatTabs, [chatTabs] {
+		QDesktopServices::openUrl(QUrl(chatTabs->currentIndex() == 0 ? "https://dashboard.twitch.tv/"
+									     : "https://studio.youtube.com/"));
+	});
+	if (!obs_frontend_add_dock_by_id(ChatDockId, obs_module_text("Chat.Title"), chatTabs)) {
+		delete chatTabs;
 		chatDock = nullptr;
 	}
 	addPlatform(new TwitchPane(tabs, nullptr, chatDock), QStringLiteral("Twitch"));
-	addPlatform(new YoutubePane(tabs), QStringLiteral("YouTube"));
+	addPlatform(new YoutubePane(tabs, nullptr, nullptr, youtubeChatDock), QStringLiteral("YouTube"));
 	layout->addWidget(tabs, 1);
 	auto *accountAction = new QAction(parent);
 	accountAction->setObjectName("penguinConnectAccountAction");
@@ -1097,6 +1123,9 @@ void obs_module_unload(void)
 	obs_frontend_remove_event_callback(FrontendEvent, nullptr);
 	if (chatDock) {
 		chatDock->Stop();
+		if (youtubeChatDock) {
+			youtubeChatDock->Stop();
+		}
 		obs_frontend_remove_dock(ChatDockId);
 	}
 	if (dock) {

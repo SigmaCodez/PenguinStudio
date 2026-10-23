@@ -9,7 +9,8 @@ The Filters dialog exposes the individual appearance and matting filters.
 - **Shape:** Rectangle, Circle, Oval, or Rounded corners. A circle keeps equal
   pixel radii; an oval fills the source's original aspect ratio. Rounded corners
   have an adjustable radius, expressed as a percentage of half the shorter edge.
-- **Background removal:** Off, Automatic (local AI), Green screen, or Blue screen.
+- **Background:** Off, Automatic removal (local AI), Green screen, Blue screen,
+  Blur background, or Custom background image.
   Shapes and background removal can be combined.
 - **Key threshold:** Adjusts the green/blue screen separation. Lower values remove
   weaker color spill; higher values retain more of the original image.
@@ -25,7 +26,7 @@ reduce accuracy; use even lighting and check the live preview before recording.
 Penguin Studio applies matting to the full frame, then applies the selected shape.
 The mask is calculated from the current frame before compositing, including the
 first frame after enabling Automatic. It is not reused from the previous video tick.
-A tagged companion filter is created for Automatic and removed when switching to
+A tagged companion filter is created for Automatic, Blur and Custom image and removed when switching to
 Off, Green screen or Blue screen. Other user-added filters are retained.
 The Inspector reports preparation, readiness or failure; errors remain in the
 application log. Switch removal off and on to retry initialization.
@@ -46,7 +47,7 @@ See `plugins/penguin-backgroundremoval/PROVENANCE.md` for the RVM plugin,
 model licenses and exact upstream revision. The legacy model retains its notices
 in `plugins/penguin-camera/data/MODEL-NOTICE.txt`.
 
-Current English interface, captured from Penguin Studio 0.5.3. The sample artwork demonstrates rounded corners; it is not a webcam or an AI-removal quality demonstration.
+Current English interface, captured from Penguin Studio 0.6.0. The sample artwork demonstrates rounded corners; it is not a webcam or an AI-removal quality demonstration.
 
 ## Validation
 
@@ -59,3 +60,21 @@ The first-frame regression renders a newly created matting filter before any vid
 tick and verifies that the raw background is already removed.
 The DEB jobs run the GUI check before uploading a package. Native Wayland testing
 uses the same helper with `QT_QPA_PLATFORM=wayland`.
+
+## Background blur and custom images
+
+The Camera appearance inspector adds **Blur background (automatic)** and
+**Custom background image (automatic)**. Both use the existing local Robust Video
+Matting model. Shape controls, including rounded corners, apply after background
+processing so the whole camera composition has the selected outline.
+
+Blur strength ranges from 1 to 20. Higher strengths require more GPU work. Custom
+images are centered and cropped to fill the camera area without stretching.
+Choose a PNG, JPEG or BMP image up to 8192 × 8192 pixels. Keep the image at
+its selected path: the scene stores a reference, not an embedded copy. Missing
+images leave the removed background transparent. Effect settings and the image
+path participate in undo/redo and scene persistence.
+
+Background processing stays on the device. As with removal, segmentation can
+have soft edges around fast movement, hair or low-contrast subjects; these modes
+do not promise perfect separation.

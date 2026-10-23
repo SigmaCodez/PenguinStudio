@@ -1,17 +1,23 @@
 #!/usr/bin/env python3
 """Reject stale release references and untracked current preview images."""
+import argparse
 import hashlib
 import json
 import re
 from pathlib import Path
 
 
-def validate(root: Path) -> None:
+def validate(root: Path, candidate: bool = False) -> None:
     version = (root / "packaging/version.txt").read_text().strip()
     current = root / "docs/images/current"
     manifest = json.loads((current / "manifest.json").read_text())
-    if manifest["version"] != version or manifest["language"] != "en-US":
+    pending = candidate and manifest.get("pending_version") == version
+    if (manifest["version"] != version and not pending) or manifest["language"] != "en-US":
         raise ValueError("Capture and inspect current-version English GUI previews before release")
+    if manifest.get("pending_version") and not candidate:
+        raise ValueError("Replace pending previews with reviewed candidate captures before publication")
+    if pending:
+        print("Candidate build only: current-version English captures are still required before publication")
     expected = {"workspace-en.png", "camera-en.png", "stream-details-en.png"}
     if {image["file"] for image in manifest["images"]} != expected:
         raise ValueError("Current preview manifest must contain all three product views")
@@ -36,5 +42,7 @@ def validate(root: Path) -> None:
 
 
 if __name__ == "__main__":
-    validate(Path(__file__).resolve().parents[1])
-    print("Current release references and reviewed English preview manifest match")
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--candidate", action="store_true", help="Allow explicitly pending previews for non-publishing candidate builds only")
+    validate(Path(__file__).resolve().parents[1], parser.parse_args().candidate)
+    print("Publication checks passed")

@@ -126,6 +126,14 @@ void Mode(int shape, int background)
 {
 	auto *shapes = mainWindow->findChild<QComboBox *>("cameraShape");
 	auto *backgrounds = mainWindow->findChild<QComboBox *>("cameraBackground");
+	if (backgrounds && background >= backgrounds->count()) {
+		report["background_controls_available"] = false;
+		PenguinCamera::Apply(source, "Camera appearance", shape, background, 25, 15);
+		return;
+	}
+	if (background >= 4) {
+		report["background_controls_available"] = true;
+	}
 	if (shapes && backgrounds) {
 		report["controls_enabled"] = shapes->isEnabled() && backgrounds->isEnabled();
 		report["controls_visible"] = shapes->isVisible();
@@ -170,7 +178,8 @@ void Start()
 			obs_module_t *module = nullptr;
 			const auto path = qgetenv("PENGUIN_CAMERA_MODULE");
 			const auto data = qgetenv("PENGUIN_CAMERA_DATA");
-			if (obs_open_module(&module, path.constData(), data.constData()) != MODULE_SUCCESS ||
+			if (path.isEmpty() || data.isEmpty() ||
+			    obs_open_module(&module, path.constData(), data.constData()) != MODULE_SUCCESS ||
 			    !obs_init_module(module)) {
 				Fail(43);
 				return;
@@ -295,7 +304,47 @@ void Start()
 		Snap("automatic-circle");
 		Mode(0, 0);
 	});
-	At(17500, [] {
+	At(17000, [] {
+		QImage checker(640, 360, QImage::Format_RGBA8888);
+		for (int y = 0; y < checker.height(); ++y) {
+			for (int x = 0; x < checker.width(); ++x) {
+				checker.setPixelColor(x, y, ((x / 4 + y / 4) % 2) ? Qt::white : Qt::black);
+			}
+		}
+		checker.save(directory + "/checker.png");
+		Image(directory + "/checker.png");
+		Mode(3, 4);
+	});
+	At(18500, [] {
+		Snap("blurred");
+		auto matting = PenguinCamera::CameraMatting(source);
+		OBSDataAutoRelease settings = matting ? obs_source_get_settings(matting) : obs_data_create();
+		report["blur_strength"] = int(obs_data_get_int(settings, "blur_background"));
+		QImage image(800, 800, QImage::Format_RGBA8888);
+		image.fill(Qt::blue);
+		image.save(directory + "/replacement.png");
+		Image(directory + "/green.png");
+		report["image_applied"] = PenguinCamera::Apply(source, "Camera appearance", 3, 5, 25, 15, 8,
+							       (directory + "/replacement.png").toUtf8().constData());
+	});
+	At(20000, [] {
+		Snap("custom-background");
+		const auto saved = PenguinCamera::SaveCamera(source);
+		PenguinCamera::Apply(source, "Camera appearance", 0, 0, 25, 15);
+		PenguinCamera::RestoreCamera(saved);
+		auto appearance = PenguinCamera::CameraFilter(source);
+		OBSDataAutoRelease settings = obs_source_get_settings(appearance);
+		report["background_restored"] = obs_data_get_int(settings, "background") == 5 &&
+						QString::fromUtf8(obs_data_get_string(settings, "background_image")) ==
+							directory + "/replacement.png";
+		PenguinCamera::Apply(source, "Camera appearance", 3, 5, 25, 15, 8,
+				     (directory + "/missing-background.png").toUtf8().constData());
+	});
+	At(21000, [] {
+		Snap("missing-background");
+		Mode(0, 0);
+	});
+	At(22500, [] {
 		Snap("disabled");
 		Mode(3, 2);
 		auto *saved = obs_save_source(source);
