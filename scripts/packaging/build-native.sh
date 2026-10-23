@@ -27,6 +27,9 @@ cmake -S "$project_root" -B "$build_dir" -G Ninja \
   -DCEF_ROOT_DIR="$cef_dir" -DENABLE_AJA=OFF -DENABLE_VLC=ON \
   -DENABLE_WEBRTC=OFF -DENABLE_LIBFDK=OFF -DPENGUIN_BUILD_TESTS=ON \
   -DOBS_COMPILE_DEPRECATION_AS_WARNING=ON "${package_options[@]}"
+cmake -DPACKAGE_CONFIG="$build_dir/CPackConfig.cmake" -DPACKAGE_BUILD_DIR="$(realpath "$build_dir")" \
+  -DPACKAGE_VERSION="$(cat "$project_root/packaging/version.txt")" \
+  -P "$project_root/test/penguin-cpack.cmake"
 cmake --build "$build_dir" --parallel "${CMAKE_BUILD_PARALLEL_LEVEL:-2}"
 "$build_dir/plugins/penguin-camera/penguin-camera-model" "$project_root/plugins/penguin-camera/data/selfie_segmentation.onnx"
 "$build_dir/frontend/penguin-hardware-encoder"
