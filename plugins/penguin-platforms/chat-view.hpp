@@ -12,6 +12,7 @@
 #include <QLineEdit>
 #include <QListWidget>
 #include <QMenu>
+#include <QMap>
 #include <QMessageBox>
 #include <QPushButton>
 #include <QScrollBar>
@@ -111,6 +112,41 @@ inline void Participants(QWidget *parent, const QString &title, const QString &e
 	QObject::connect(search, &QLineEdit::textChanged, list, [list](const QString &query) {
 		for (int i = 0; i < list->count(); ++i) {
 			list->item(i)->setHidden(!list->item(i)->text().contains(query, Qt::CaseInsensitive));
+		}
+	});
+	auto *buttons = new QDialogButtonBox(QDialogButtonBox::Close, dialog);
+	layout->addWidget(buttons);
+	QObject::connect(buttons, &QDialogButtonBox::rejected, dialog, &QDialog::reject);
+	dialog->show();
+}
+inline void SessionBans(QWidget *parent, const QMap<QString, QString> &users, const std::function<void(QString)> &unban)
+{
+	auto *dialog = new QDialog(parent);
+	dialog->setAttribute(Qt::WA_DeleteOnClose);
+	dialog->setWindowTitle("Bans and timeouts from this session");
+	dialog->resize(380, 420);
+	auto *layout = new QVBoxLayout(dialog);
+	auto *hint = new QLabel(
+		"Only actions completed in this session are listed. Use the platform dashboard for older bans.",
+		dialog);
+	hint->setWordWrap(true);
+	layout->addWidget(hint);
+	auto *list = new QListWidget(dialog);
+	layout->addWidget(list);
+	for (auto it = users.cbegin(); it != users.cend(); ++it) {
+		auto *item = new QListWidgetItem(it.value(), list);
+		item->setData(Qt::UserRole, it.key());
+	}
+	auto *remove = new QPushButton("Remove selected ban / timeout", dialog);
+	remove->setEnabled(false);
+	layout->addWidget(remove);
+	QObject::connect(list, &QListWidget::currentRowChanged, remove,
+			 [remove](int row) { remove->setEnabled(row >= 0); });
+	QObject::connect(remove, &QPushButton::clicked, dialog, [dialog, list, unban] {
+		if (list->currentItem()) {
+			const auto target = list->currentItem()->data(Qt::UserRole).toString();
+			dialog->accept();
+			unban(target);
 		}
 	});
 	auto *buttons = new QDialogButtonBox(QDialogButtonBox::Close, dialog);

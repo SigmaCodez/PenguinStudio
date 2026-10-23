@@ -27,7 +27,7 @@ Penguin Studio 0.6.0, captured from the installed Linux application in English w
 
 ## Get started
 
-**Current release: [Penguin Studio 0.6.0](https://github.com/SigmaCodez/PenguinStudio/releases/tag/penguin-v0.6.0)** — camera shapes, local background removal with corrected motion masks, browser sign-in and saved accounts.
+**Current release: [Penguin Studio 0.6.0](https://github.com/SigmaCodez/PenguinStudio/releases/tag/penguin-v0.6.0)** — native Twitch/YouTube chat and moderation, camera background blur and custom images, browser sign-in and saved accounts.
 
 **[Download Linux packages](https://github.com/SigmaCodez/PenguinStudio/releases)** — Ubuntu DEB, Fedora RPM, Flatpak, Snap, AppImage and an Arch/AUR recipe, with SHA-256 checksums.
 
@@ -38,7 +38,7 @@ Flatpak bundle. Choose the package matching your distribution release. See [inst
 2. Launch `penguin-studio`. Finish the hardware configuration and destination assistants. Twitch and YouTube sign-in is optional during setup.
 3. Choose a platform, copy its RTMP(S) server and stream key from its creator dashboard, and choose landscape or portrait output.
 4. Use **Destinations** to add further destinations. **Go live** starts all configured Penguin destinations; **End stream** stops them. The live button's menu also exposes OBS's separate primary stream action.
-5. Open the arrow menu beside **Go live**, then choose **Stream details** to connect Twitch or YouTube for title updates. Official packages include the application configuration for browser sign-in with both providers; you do not need to enter client IDs. Use the searchable Twitch game and YouTube category lists, and **Docks → Twitch chat** for native chat. See [platform setup](docs/PLATFORMS.md).
+5. Open the arrow menu beside **Go live**, then choose **Stream details** to connect Twitch or YouTube for title updates. Official packages include the application configuration for browser sign-in with both providers; you do not need to enter client IDs. Use the searchable Twitch game and YouTube category lists, and **Docks → Stream chat** for native chat and moderation. See the [chat guide](docs/CHAT.md). See [platform setup](docs/PLATFORMS.md).
 6. Make a private test stream before a public broadcast. Check picture framing, sound, reconnects, CPU/GPU load, dropped frames and total upload bandwidth.
 
 Twitch and YouTube sign-ins are saved in the system keyring and restored after restart when the keyring is available. **Disconnect** removes the saved account. The **Broadcast destinations** dock keeps stream keys in memory for the current session; they must be entered again after restart. Destination names, nonsecret server URLs and encoder choices are saved locally. Never put a stream key into a saved server URL. The separate **Settings → Stream** workflow can persist stream credentials in the local profile.

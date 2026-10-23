@@ -279,7 +279,7 @@ public:
 		layout->addWidget(audience);
 		layout->addWidget(broadcasts);
 		auto *toolbar = new QHBoxLayout;
-		auto *participants = new QPushButton("Recent chatters", this);
+		auto *participants = new QPushButton("People / moderation", this);
 		toolbar->addWidget(refresh);
 		toolbar->addWidget(participants);
 		layout->addLayout(toolbar);
@@ -299,7 +299,8 @@ public:
 		connect(&poll, &QTimer::timeout, this, [this] { Read(); });
 		connect(refresh, &QPushButton::clicked, this, [this] { Load(); });
 		connect(broadcasts, &QComboBox::currentIndexChanged, this, [this] { Select(); });
-		connect(participants, &QPushButton::clicked, this, [this] {
+		auto *peopleMenu = new QMenu(participants);
+		peopleMenu->addAction("Recent chatters (15 minutes)", this, [this] {
 			QStringList names;
 			const auto cutoff = QDateTime::currentDateTimeUtc().addSecs(-900);
 			for (auto it = active.begin(); it != active.end();) {
@@ -315,6 +316,19 @@ public:
 				"People observed posting in the last 15 minutes. This is not a viewer list or a complete presence list.",
 				names);
 		});
+		peopleMenu->addAction("Manage session bans / timeouts…", this, [this] {
+			QMap<QString, QString> users;
+			for (auto it = bans.cbegin(); it != bans.cend(); ++it) {
+				users[it.key()] = active.value(it.key(), {it.key(), {}}).first;
+			}
+			const auto epoch = generation;
+			PenguinChat::SessionBans(this, users, [this, epoch](QString target) {
+				if (epoch == generation) {
+					Moderate("unban", {}, target);
+				}
+			});
+		});
+		participants->setMenu(peopleMenu);
 		connect(history, &QListWidget::customContextMenuRequested, this, [this](const QPoint &point) {
 			PenguinChat::MessageMenu(this, history, point,
 						 [this](QString action, QString id, QString user) {

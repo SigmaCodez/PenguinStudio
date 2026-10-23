@@ -9,7 +9,8 @@ The Filters dialog exposes the individual appearance and matting filters.
 - **Shape:** Rectangle, Circle, Oval, or Rounded corners. A circle keeps equal
   pixel radii; an oval fills the source's original aspect ratio. Rounded corners
   have an adjustable radius, expressed as a percentage of half the shorter edge.
-- **Background removal:** Off, Automatic (local AI), Green screen, or Blue screen.
+- **Background:** Off, Automatic removal (local AI), Green screen, Blue screen,
+  Blur background, or Custom background image.
   Shapes and background removal can be combined.
 - **Key threshold:** Adjusts the green/blue screen separation. Lower values remove
   weaker color spill; higher values retain more of the original image.
@@ -25,7 +26,7 @@ reduce accuracy; use even lighting and check the live preview before recording.
 Penguin Studio applies matting to the full frame, then applies the selected shape.
 The mask is calculated from the current frame before compositing, including the
 first frame after enabling Automatic. It is not reused from the previous video tick.
-A tagged companion filter is created for Automatic and removed when switching to
+A tagged companion filter is created for Automatic, Blur and Custom image and removed when switching to
 Off, Green screen or Blue screen. Other user-added filters are retained.
 The Inspector reports preparation, readiness or failure; errors remain in the
 application log. Switch removal off and on to retry initialization.
@@ -60,7 +61,7 @@ tick and verifies that the raw background is already removed.
 The DEB jobs run the GUI check before uploading a package. Native Wayland testing
 uses the same helper with `QT_QPA_PLATFORM=wayland`.
 
-## Background blur and custom images (next release)
+## Background blur and custom images
 
 The Camera appearance inspector adds **Blur background (automatic)** and
 **Custom background image (automatic)**. Both use the existing local Robust Video

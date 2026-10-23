@@ -9,9 +9,9 @@ Current 0.6.0 interface before sign-in. This preview contains no account informa
 1. Open **Docks → Stream details → Twitch** and select **Connect with Twitch**.
 2. Penguin opens the official Twitch activation page in your system browser. Enter the displayed device code and authorize the application. No Twitch password is entered into Penguin Studio.
 3. Use **Load current stream details** to retrieve the current title and category name, or enter a title and select an optional category from the searchable game list, then select **Update stream details**.
-4. Open **Docks → Twitch chat**. The native dock reads and sends messages in the connected account's channel on Wayland as well as X11. It follows chat deletion/clear events and reconnects after connection loss. The current implementation displays plain text, including emote names; it does not embed Twitch's web dashboard or render third-party emote extensions.
+4. Open **Docks → Stream chat → Twitch**. The native dock reads and sends messages in the connected account's channel on Wayland as well as X11. It follows chat deletion/clear events and reconnects after connection loss. Right-click messages for moderation, open Chat settings for chat modes, or use Chat participants for connected/recent chatters and session bans. The implementation displays plain text, including emote names; it does not embed Twitch's web dashboard or render third-party emote extensions.
 
-The maintainer's public Twitch application ID is bundled with Penguin Studio. The application must remain registered with client type **Public**; no client secret is embedded. Device authorization requests `channel:manage:broadcast`, `user:read:chat` and `user:write:chat`. The module validates tokens after connection and periodically while connected, and refreshes them before expiration. Access tokens and chat history remain in memory. Refresh tokens are saved in the system keyring and exchanged for a new access token on startup. Rotated refresh tokens replace the saved value. Disconnect disables automatic sign-in and deletes the saved credentials. Revoking the application itself is done in Twitch account settings.
+The maintainer's public Twitch application ID is bundled with Penguin Studio. The application must remain registered with client type **Public**; no client secret is embedded. Device authorization requests `channel:manage:broadcast`, `user:read:chat`, `user:write:chat`, `moderator:read:chatters`, `moderator:manage:chat_messages`, `moderator:manage:banned_users` and `moderator:manage:chat_settings`. Existing accounts should reconnect once to grant the new moderation permissions. The module validates tokens after connection and periodically while connected, and refreshes them before expiration. Access tokens and chat history remain in memory. Refresh tokens are saved in the system keyring and exchanged for a new access token on startup. Rotated refresh tokens replace the saved value. Disconnect disables automatic sign-in and deletes the saved credentials. Revoking the application itself is done in Twitch account settings.
 
 The chat uses Twitch EventSub WebSockets and the Send Chat Message API, with bounded history and authenticated HTTPS requests that do not follow redirects. An API failure is shown in the dock; it never falls back to sending unauthenticated messages. This login manages chat and metadata; broadcast destinations and their stream keys remain a separate setup step.
 
@@ -22,6 +22,7 @@ References: [device grant](https://dev.twitch.tv/docs/authentication/getting-tok
 1. Open **Docks → Stream details → YouTube** and select **Connect with YouTube**.
 2. Complete account selection and authorization in your system browser. Penguin restores saved sign-ins from the system keyring on subsequent starts.
 3. Create or schedule a broadcast in [YouTube Studio](https://studio.youtube.com), load your broadcasts in Penguin, select one, and update its title.
+4. Open **Docks → Stream chat → YouTube** and load an active broadcast to read, send and moderate its chat. **People / moderation** shows recent chatters and bans created in this session. See the [chat guide](CHAT.md) for permissions, viewer counts, polling and platform limitations.
 
 Publisher-configured packages use Penguin Studio's Google Desktop app. Users do not
 need to register their own Google application or enter client credentials. Maintainers
@@ -46,7 +47,7 @@ The implementation updates the video's title and an optionally selected video ca
    testing, keep publishing status **Testing** and add the Google account that owns
    the intended YouTube channel as a test user.
 4. Under **Data Access**, add `https://www.googleapis.com/auth/youtube.force-ssl`.
-   This is the scope requested by the current metadata editor; Google controls the
+   This is the scope requested by the current metadata editor and live-chat tools; Google controls the
    permissions described on its consent screen. The read-only validation below does
    not send metadata changes despite requesting the editor's scope.
 5. Under **Clients**, create an OAuth client of type **Desktop app**, named
@@ -91,7 +92,7 @@ The first-launch wizard includes Twitch, YouTube, Kick, Facebook Live, TikTok LI
 
 ## Wayland
 
-Platform metadata controls and the native Twitch chat use Qt Network/WebSockets and system-browser authorization, so they do not rely on the embedded Twitch browser panel that OBS disables under Wayland. Screen capture continues to use OBS's PipeWire source and the desktop's screen-sharing portal. Install a portal backend appropriate to the desktop (for example GNOME, KDE or wlroots). Test the actual compositor, graphics driver and sandbox package being shipped.
+Platform metadata controls and the native Twitch/YouTube chat tabs use Qt Network/WebSockets and system-browser authorization, so they do not rely on the embedded Twitch browser panel that OBS disables under Wayland. Screen capture continues to use OBS's PipeWire source and the desktop's screen-sharing portal. Install a portal backend appropriate to the desktop (for example GNOME, KDE or wlroots). Test the actual compositor, graphics driver and sandbox package being shipped.
 
 ## Secret handling
 

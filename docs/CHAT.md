@@ -1,6 +1,6 @@
 # Stream chat
 
-The next Penguin Studio release adds native Twitch and YouTube chat tabs. They
+Penguin Studio provides native Twitch and YouTube chat tabs. They
 work under Wayland without an embedded browser. Connect the corresponding account
 in **Stream details**, then open **Docks → Stream chat**.
 
@@ -49,6 +49,9 @@ features not implemented natively, including platform-specific monetization,
 advanced AutoMod workflows, polls and management of older YouTube bans. This is
 not a claim of feature parity with either platform's website. Twitch emote codes
 remain text; this native view does not download third-party emote images.
+
+Use the participant menu to manage bans/timeouts completed during this session,
+even after the affected messages disappear.
 
 Signing out clears message history and participant data. Tokens continue to use
 the existing system-keychain sign-in flow; chat history is not saved to disk.

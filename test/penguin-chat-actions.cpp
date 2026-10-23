@@ -94,6 +94,7 @@ struct PenguinChatTest {
 		Require(twitchNetwork.calls.last().body.value("data").toObject().value("duration").toInt() == 600,
 			"wrong timeout duration");
 		twitchNetwork.Finish(200, {});
+		Require(twitch.recentBans.contains("viewer"), "completed timeout must remain manageable after messages disappear");
 		Confirm();
 		twitch.Moderate("delete", "message+id", "viewer");
 		Require(twitchNetwork.calls.last().request.attribute(QNetworkRequest::CustomVerbAttribute).toByteArray() ==

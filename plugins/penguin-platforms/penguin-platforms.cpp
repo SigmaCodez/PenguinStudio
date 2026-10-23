@@ -1039,7 +1039,7 @@ void CreateDock()
 		QDesktopServices::openUrl(QUrl(chatTabs->currentIndex() == 0 ? "https://dashboard.twitch.tv/"
 									     : "https://studio.youtube.com/"));
 	});
-	if (!obs_frontend_add_dock_by_id(ChatDockId, "Stream chat", chatTabs)) {
+	if (!obs_frontend_add_dock_by_id(ChatDockId, obs_module_text("Chat.Title"), chatTabs)) {
 		delete chatTabs;
 		chatDock = nullptr;
 	}
