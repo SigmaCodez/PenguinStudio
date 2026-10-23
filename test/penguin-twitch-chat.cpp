@@ -15,7 +15,7 @@ int main(int argc, char **argv)
 {
 	QApplication app(argc, argv);
 	TwitchChat chat(nullptr, [](const char *key) { return QString::fromUtf8(key); });
-	auto *history = chat.findChild<QPlainTextEdit *>("penguinChatHistory");
+	auto *history = chat.findChild<QListWidget *>("penguinChatHistory");
 	Require(history != nullptr, "native chat history missing");
 	const QJsonObject event{{"message_id", "one"},
 				{"chatter_user_id", "42"},
@@ -23,22 +23,22 @@ int main(int argc, char **argv)
 				{"message", QJsonObject{{"text", "<script>alert('text only')</script>"}}}};
 	chat.ApplyEvent("channel.chat.message", event);
 	chat.ApplyEvent("channel.chat.message", event);
-	Require(history->toPlainText() == "Alice: <script>alert('text only')</script>",
+	Require(history->count() == 1 && history->item(0)->text() == "Alice: <script>alert('text only')</script>",
 		"chat must be plain text and deduplicated");
 	chat.ApplyEvent("channel.chat.message_delete", {{"message_id", "one"}});
-	Require(history->toPlainText().isEmpty(), "deleted message retained");
+	Require(history->count() == 0, "deleted message retained");
 	chat.ApplyEvent("channel.chat.message", event);
 	chat.ApplyEvent("channel.chat.clear_user_messages", {{"target_user_id", "42"}});
-	Require(history->toPlainText().isEmpty(), "moderated user messages retained");
+	Require(history->count() == 0, "moderated user messages retained");
 	chat.ApplyEvent("channel.chat.message", event);
 	chat.ApplyEvent("channel.chat.clear", {});
-	Require(history->toPlainText().isEmpty(), "cleared chat retained");
+	Require(history->count() == 0, "cleared chat retained");
 	for (int i = 0; i < 600; ++i) {
 		auto message = event;
 		message["message_id"] = QString::number(i);
 		chat.ApplyEvent("channel.chat.message", message);
 	}
-	Require(history->document()->blockCount() == 500, "chat history must be bounded");
+	Require(history->count() == 500, "chat history must be bounded");
 	Require(TwitchChat::IsEndpoint(QUrl("wss://eventsub.wss.twitch.tv/ws?reconnect=123")),
 		"legitimate reconnect rejected");
 	for (const auto *url :
@@ -47,6 +47,6 @@ int main(int argc, char **argv)
 		Require(!TwitchChat::IsEndpoint(QUrl(url)), "unsafe reconnect accepted");
 	}
 	chat.Stop();
-	Require(history->toPlainText().isEmpty(), "disconnect must clear account messages");
+	Require(history->count() == 0, "disconnect must clear account messages");
 	std::cout << "Native chat moderation, bounded history and reconnect validation passed\n";
 }

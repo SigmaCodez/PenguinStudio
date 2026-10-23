@@ -10,6 +10,10 @@
 #include <QComboBox>
 #include <QDoubleSpinBox>
 #include <QFrame>
+#include <QFileDialog>
+#include <QFileInfo>
+#include <QImageReader>
+#include <QMessageBox>
 #include <QGridLayout>
 #include <QHBoxLayout>
 #include <QLabel>
@@ -229,7 +233,7 @@ PenguinInspector::PenguinInspector(OBSBasic *mainWindow, QWidget *parent)
 
 	cameraCard = Card(content, contents, QTStr("Penguin.Camera.Title"));
 	auto *cameraLayout = static_cast<QVBoxLayout *>(cameraCard->layout());
-	auto addChoice = [&](const char *key, const char *name, const std::array<const char *, 4> &choices) {
+	auto addChoice = [&](const char *key, const char *name, const std::initializer_list<const char *> &choices) {
 		cameraLayout->addWidget(Label(QTStr(key), cameraCard, "inspectorFieldLabel"));
 		auto *box = new QComboBox(cameraCard);
 		box->setObjectName(QString::fromUtf8(name));
@@ -261,8 +265,29 @@ PenguinInspector::PenguinInspector(OBSBasic *mainWindow, QWidget *parent)
 	cameraRadius = addSlider("Penguin.Camera.Radius", "cameraRadius", 100);
 	cameraBackground = addChoice("Penguin.Camera.Background", "cameraBackground",
 				     {"Penguin.Camera.Off", "Penguin.Camera.Automatic", "Penguin.Camera.Green",
-				      "Penguin.Camera.Blue"});
+				      "Penguin.Camera.Blue", "Penguin.Camera.Blur", "Penguin.Camera.Image"});
 	cameraSimilarity = addSlider("Penguin.Camera.Similarity", "cameraSimilarity", 90);
+	auto *cameraBlur = addSlider("Penguin.Camera.BlurStrength", "cameraBlur", 20);
+	cameraBlur->setRange(1, 20);
+	cameraBlur->setSuffix(QString());
+	auto *cameraImage = new QPushButton(QTStr("Penguin.Camera.ChooseImage"), cameraCard);
+	cameraImage->setObjectName("cameraImage");
+	cameraLayout->addWidget(cameraImage);
+	connect(cameraImage, &QPushButton::clicked, this, [this, cameraImage]() {
+		const auto path = QFileDialog::getOpenFileName(this, QTStr("Penguin.Camera.ChooseImage"), {},
+							       "Images (*.png *.jpg *.jpeg *.webp *.bmp)");
+		if (path.isEmpty()) {
+			return;
+		}
+		QImageReader reader(path);
+		const auto size = reader.size();
+		if (!size.isValid() || size.width() > 8192 || size.height() > 8192 || reader.read().isNull()) {
+			QMessageBox::warning(this, QTStr("Penguin.Camera.Title"), QTStr("Penguin.Camera.InvalidImage"));
+			return;
+		}
+		cameraImage->setProperty("backgroundPath", path);
+		ChangeCamera();
+	});
 	cameraStatus = Label(QString(), cameraCard, "inspectorFieldLabel");
 	cameraStatus->setWordWrap(true);
 	cameraLayout->addWidget(cameraStatus);
@@ -471,7 +496,7 @@ void PenguinInspector::RefreshSelection()
 	}
 	if (changed || !Editing(cameraBackground)) {
 		cameraBackground->setCurrentIndex(
-			std::clamp(int(obs_data_get_int(cameraSettings, "background")), 0, 3));
+			std::clamp(int(obs_data_get_int(cameraSettings, "background")), 0, 5));
 	}
 	if (changed || !Editing(cameraRadius)) {
 		cameraRadius->setValue(int(obs_data_get_double(cameraSettings, "radius")));
@@ -479,8 +504,22 @@ void PenguinInspector::RefreshSelection()
 	if (changed || !Editing(cameraSimilarity)) {
 		cameraSimilarity->setValue(int(obs_data_get_double(cameraSettings, "similarity")));
 	}
+	auto *cameraBlur = findChild<QSpinBox *>("cameraBlur");
+	auto *cameraImage = findChild<QPushButton *>("cameraImage");
+	if (changed || !Editing(cameraBlur)) {
+		cameraBlur->setValue(obs_data_has_user_value(cameraSettings, "blur")
+					     ? int(obs_data_get_int(cameraSettings, "blur"))
+					     : 8);
+	}
+	const auto cameraImagePath = QString::fromUtf8(obs_data_get_string(cameraSettings, "background_image"));
+	cameraImage->setText(cameraImagePath.isEmpty() ? QTStr("Penguin.Camera.ChooseImage")
+						       : QFileInfo(cameraImagePath).fileName());
+	cameraImage->setToolTip(cameraImagePath);
+	cameraImage->setProperty("backgroundPath", cameraImagePath);
+	cameraImage->setVisible(cameraBackground->currentIndex() == 5);
+	cameraBlur->setVisible(cameraBackground->currentIndex() == 4);
 	cameraRadius->setVisible(cameraShape->currentIndex() == 3);
-	cameraSimilarity->setVisible(cameraBackground->currentIndex() >= 2);
+	cameraSimilarity->setVisible((cameraBackground->currentIndex() == 2 || cameraBackground->currentIndex() == 3));
 	calldata_t status;
 	calldata_init(&status);
 	auto matting = CameraMatting(source);
@@ -495,7 +534,7 @@ void PenguinInspector::RefreshSelection()
 	const char *statusKey = "Penguin.Camera.Privacy";
 	if (camera && !obs_source_enabled(camera)) {
 		statusKey = "Penguin.Camera.Disabled";
-	} else if (cameraBackground->currentIndex() == 1) {
+	} else if ((cameraBackground->currentIndex() == 1 || cameraBackground->currentIndex() >= 4)) {
 		statusKey = aiStatus == 3   ? "Penguin.Camera.Error"
 			    : aiStatus == 2 ? "Penguin.Camera.Ready"
 					    : "Penguin.Camera.Loading";
@@ -688,8 +727,11 @@ void PenguinInspector::ChangeCamera()
 	}
 	auto *source = obs_sceneitem_get_source(item);
 	const auto undo = SaveCamera(source);
+	auto *cameraBlur = findChild<QSpinBox *>("cameraBlur");
+	const auto cameraImagePath = findChild<QPushButton *>("cameraImage")->property("backgroundPath").toString();
 	if (!PenguinCamera::Apply(source, QT_TO_UTF8(QTStr("Penguin.Camera.Title")), cameraShape->currentIndex(),
-				  cameraBackground->currentIndex(), cameraRadius->value(), cameraSimilarity->value())) {
+				  cameraBackground->currentIndex(), cameraRadius->value(), cameraSimilarity->value(),
+				  cameraBlur->value(), QT_TO_UTF8(cameraImagePath))) {
 		cameraStatus->setText(QTStr("Penguin.Camera.Error"));
 		return;
 	}

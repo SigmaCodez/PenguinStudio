@@ -129,13 +129,14 @@ inline void RestoreCamera(const std::string &json)
 	}
 }
 
-inline bool Apply(obs_source_t *source, const char *name, int shape, int background, double radius, double similarity)
+inline bool Apply(obs_source_t *source, const char *name, int shape, int background, double radius, double similarity,
+		  int blur = 8, const char *image = "")
 {
 	GraphicsGuard guard;
 	const auto undo = SaveCamera(source);
 	auto filter = CameraFilter(source);
 	auto matting = CameraMatting(source);
-	const bool automatic = background == 1;
+	const bool automatic = background == 1 || background == 4 || background == 5;
 	if (automatic && !matting) {
 		OBSDataAutoRelease mattingSettings = obs_data_create();
 		obs_data_set_bool(mattingSettings, "penguin_camera_managed", true);
@@ -157,6 +158,8 @@ inline bool Apply(obs_source_t *source, const char *name, int shape, int backgro
 	obs_data_set_string(settings, "automatic_backend", automatic ? "rvm" : "");
 	obs_data_set_double(settings, "radius", radius);
 	obs_data_set_double(settings, "similarity", similarity);
+	obs_data_set_int(settings, "blur", std::clamp(blur, 1, 20));
+	obs_data_set_string(settings, "background_image", image);
 	if (filter) {
 		obs_source_update(filter, settings);
 		obs_source_set_enabled(filter, true);
@@ -170,6 +173,10 @@ inline bool Apply(obs_source_t *source, const char *name, int shape, int backgro
 	}
 	if (matting) {
 		if (automatic) {
+			OBSDataAutoRelease mattingSettings = obs_source_get_settings(matting);
+			obs_data_set_int(mattingSettings, "blur_background",
+					 background == 4 ? std::clamp(blur, 1, 20) : 0);
+			obs_source_update(matting, mattingSettings);
 			obs_source_set_enabled(matting, true);
 			const int cameraIndex = obs_source_filter_get_index(source, filter);
 			const int mattingIndex = obs_source_filter_get_index(source, matting);

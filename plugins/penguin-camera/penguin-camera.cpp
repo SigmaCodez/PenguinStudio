@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 #include <obs-module.h>
 #include <graphics/vec2.h>
+#include <graphics/image-file.h>
 #include <graphics/vec4.h>
 #include <util/platform.h>
 #include "segmenter.hpp"
@@ -22,6 +23,8 @@ struct Camera {
 	gs_texrender_t *capture = nullptr;
 	gs_stagesurf_t *stage = nullptr;
 	gs_texture_t *maskTexture = nullptr;
+	gs_image_file_t backgroundImage{};
+	std::string imagePath;
 	std::atomic<int> shape{0}, background{0}, status{0};
 	std::atomic<float> radius{0.25f}, similarity{0.15f};
 	std::mutex mutex;
@@ -88,6 +91,7 @@ struct Camera {
 			worker.join();
 		}
 		obs_enter_graphics();
+		gs_image_file_free(&backgroundImage);
 		gs_texture_destroy(maskTexture);
 		gs_stagesurface_destroy(stage);
 		gs_texrender_destroy(capture);
@@ -111,10 +115,24 @@ void Update(void *data, obs_data_t *settings)
 	camera->shape = std::clamp(int(obs_data_get_int(settings, "shape")), 0, 3);
 	camera->radius = float(std::clamp(obs_data_get_double(settings, "radius"), 0.0, 100.0) / 100.0);
 	camera->similarity = float(std::clamp(obs_data_get_double(settings, "similarity"), 0.0, 90.0) / 100.0);
-	int background = std::clamp(int(obs_data_get_int(settings, "background")), 0, 3);
-	if (background == 1 && std::strcmp(obs_data_get_string(settings, "automatic_backend"), "rvm") == 0) {
+	int background = std::clamp(int(obs_data_get_int(settings, "background")), 0, 5);
+	if ((background == 1 || background == 4) &&
+	    std::strcmp(obs_data_get_string(settings, "automatic_backend"), "rvm") == 0) {
 		background = 0;
 	}
+	// OBS serializes graphics updates with rendering; never replace a live texture outside this lock.
+	obs_enter_graphics();
+	const std::string imagePath = obs_data_get_string(settings, "background_image");
+	if (imagePath != camera->imagePath) {
+		gs_image_file_free(&camera->backgroundImage);
+		camera->backgroundImage = {};
+		camera->imagePath = imagePath;
+		if (!imagePath.empty()) {
+			gs_image_file_init(&camera->backgroundImage, imagePath.c_str());
+			gs_image_file_init_texture(&camera->backgroundImage);
+		}
+	}
+	obs_leave_graphics();
 	std::lock_guard lock(camera->mutex);
 	if (background != camera->background) {
 		camera->background = background;
@@ -172,10 +190,12 @@ obs_properties_t *Properties(void *data)
 	obs_properties_add_float_slider(properties, "radius", obs_module_text("Radius"), 0, 100, 1);
 	auto *background = obs_properties_add_list(properties, "background", obs_module_text("Background"),
 						   OBS_COMBO_TYPE_LIST, OBS_COMBO_FORMAT_INT);
-	const char *backgrounds[] = {"Off", "Automatic", "Green", "Blue"};
-	for (int i = 0; i < 4; ++i) {
+	const char *backgrounds[] = {"Off", "Automatic", "Green", "Blue", "Blur", "Image"};
+	for (int i = 0; i < 6; ++i) {
 		obs_property_list_add_int(background, obs_module_text(backgrounds[i]), i);
 	}
+	obs_property_list_item_disable(background, 4, true);
+	obs_property_list_item_disable(background, 5, true);
 	if (data) {
 		auto *camera = static_cast<Camera *>(data);
 		obs_data_t *settings = obs_source_get_settings(camera->source);
@@ -301,6 +321,19 @@ void Render(void *data, gs_effect_t *)
 	gs_effect_set_float(param("similarity"), camera->similarity);
 	gs_effect_set_bool(param("mask_ready"), camera->maskReady);
 	gs_effect_set_texture(param("person_mask"), camera->maskTexture);
+	gs_effect_set_texture(param("replacement"), camera->backgroundImage.texture);
+	gs_effect_set_bool(param("replacement_ready"), camera->backgroundImage.texture != nullptr);
+	vec2 replacementScale{1.0f, 1.0f};
+	if (camera->backgroundImage.cx && camera->backgroundImage.cy) {
+		const float ratio =
+			(float(camera->backgroundImage.cx) / camera->backgroundImage.cy) / (float(width) / height);
+		if (ratio > 1.0f) {
+			replacementScale.x = 1.0f / ratio;
+		} else {
+			replacementScale.y = ratio;
+		}
+	}
+	gs_effect_set_vec2(param("replacement_scale"), &replacementScale);
 	obs_source_process_filter_end(camera->source, camera->effect, width, height);
 }
 } // namespace

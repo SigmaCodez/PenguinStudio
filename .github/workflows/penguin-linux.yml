@@ -84,6 +84,8 @@ jobs:
           /tmp/penguin-update-test
           c++ -std=c++17 -Wall -Wextra -Werror -fPIC -I. test/penguin-twitch-chat.cpp $(pkg-config --cflags --libs Qt6Widgets Qt6Network Qt6WebSockets) -o /tmp/penguin-chat-test
           QT_QPA_PLATFORM=offscreen /tmp/penguin-chat-test
+          c++ -std=c++17 -Wall -Wextra -Werror -fPIC -I. test/penguin-chat-actions.cpp $(pkg-config --cflags --libs Qt6Widgets Qt6Network Qt6WebSockets) -o /tmp/penguin-chat-actions
+          QT_QPA_PLATFORM=offscreen /tmp/penguin-chat-actions
       - name: Compile and run Qt button translation checks
         run: |
           c++ -std=c++17 -Wall -Wextra -Werror -fPIC -I. test/penguin-qt-translation.cpp $(pkg-config --cflags --libs Qt6Core) -o /tmp/penguin-qt-translation-test

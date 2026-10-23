@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.28...3.30)
 find_package(Qt6 REQUIRED COMPONENTS Widgets Network WebSockets)
 find_package(Qt6Keychain REQUIRED)
 add_library(penguin-platforms MODULE)
-target_sources(penguin-platforms PRIVATE penguin-platforms.cpp oauth-helpers.hpp twitch-chat.hpp category-picker.hpp credential-store.hpp)
+target_sources(penguin-platforms PRIVATE penguin-platforms.cpp oauth-helpers.hpp twitch-chat.hpp youtube-chat.hpp chat-view.hpp category-picker.hpp credential-store.hpp)
 target_link_libraries(penguin-platforms PRIVATE OBS::libobs OBS::frontend-api Qt::Widgets Qt::Network Qt::WebSockets qt6keychain)
 set_target_properties_obs(penguin-platforms PROPERTIES FOLDER plugins PREFIX "")
 

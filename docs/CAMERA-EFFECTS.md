@@ -59,3 +59,21 @@ The first-frame regression renders a newly created matting filter before any vid
 tick and verifies that the raw background is already removed.
 The DEB jobs run the GUI check before uploading a package. Native Wayland testing
 uses the same helper with `QT_QPA_PLATFORM=wayland`.
+
+## Background blur and custom images (next release)
+
+The Camera appearance inspector adds **Blur background (automatic)** and
+**Custom background image (automatic)**. Both use the existing local Robust Video
+Matting model. Shape controls, including rounded corners, apply after background
+processing so the whole camera composition has the selected outline.
+
+Blur strength ranges from 1 to 20. Higher strengths require more GPU work. Custom
+images are centered and cropped to fill the camera area without stretching.
+Choose a PNG, JPEG, WebP or BMP image up to 8192 × 8192 pixels. Keep the image at
+its selected path: the scene stores a reference, not an embedded copy. Missing
+images leave the removed background transparent. Effect settings and the image
+path participate in undo/redo and scene persistence.
+
+Background processing stays on the device. As with removal, segmentation can
+have soft edges around fast movement, hair or low-contrast subjects; these modes
+do not promise perfect separation.
