@@ -25,6 +25,8 @@ procedure exposes initialization, readiness and errors to the camera inspector.
 The integration serializes managed filter-pair changes with rendering to prevent
 partially detached filters from being rendered. The expected wait for the first asynchronous mask is not logged as a warning;
 actual inference failures remain errors and bypass matting to preserve the input.
+Input capture explicitly uses the default shader for image sources; asynchronous
+cameras retain the upstream rendering path.
 
 The camera inspector manages a tagged companion filter before the shape filter.
 It uses CPU inference with two threads, no threshold, no image-similarity frame

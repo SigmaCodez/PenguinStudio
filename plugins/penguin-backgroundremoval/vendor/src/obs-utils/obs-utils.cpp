@@ -42,7 +42,14 @@ bool getRGBAFromStageSurface(filter_data *tf, uint32_t &width, uint32_t &height)
 	gs_ortho(0.0f, static_cast<float>(width), 0.0f, static_cast<float>(height), -100.0f, 100.0f);
 	gs_blend_state_push();
 	gs_blend_function(GS_BLEND_ONE, GS_BLEND_ZERO);
-	obs_source_video_render(target);
+	// Image sources need the default shader when rendered as a filter's input.
+	// Async cameras and custom-draw sources already provide their own rendering.
+	const uint32_t flags = obs_source_get_output_flags(target);
+	if (target == obs_filter_get_parent(tf->source) && !(flags & (OBS_SOURCE_CUSTOM_DRAW | OBS_SOURCE_ASYNC))) {
+		obs_source_default_render(target);
+	} else {
+		obs_source_video_render(target);
+	}
 	gs_blend_state_pop();
 	gs_texrender_end(tf->texrender);
 

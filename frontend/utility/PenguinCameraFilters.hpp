@@ -96,7 +96,8 @@ inline void RestoreCamera(const std::string &json)
 			}
 		}
 	}
-	// Restore positions after both filters exist, in ascending index order.
+	// Rebuild the full order first. Moving only the managed pair sequentially
+	// can displace the first filter again when another filter was added later.
 	filter = CameraFilter(source);
 	matting = CameraMatting(source);
 	std::vector<std::pair<int, obs_source_t *>> positions;
@@ -107,8 +108,21 @@ inline void RestoreCamera(const std::string &json)
 		}
 	}
 	std::sort(positions.begin(), positions.end(), [](const auto &a, const auto &b) { return a.first < b.first; });
+	std::vector<obs_source_t *> order;
+	obs_source_enum_filters(
+		source,
+		[](obs_source_t *, obs_source_t *current, void *context) {
+			static_cast<std::vector<obs_source_t *> *>(context)->push_back(current);
+		},
+		&order);
 	for (const auto &[index, current] : positions) {
-		obs_source_filter_set_index(source, current, index);
+		order.erase(std::remove(order.begin(), order.end(), current), order.end());
+	}
+	for (const auto &[index, current] : positions) {
+		order.insert(order.begin() + std::clamp(index, 0, int(order.size())), current);
+	}
+	for (size_t index = 0; index < order.size(); ++index) {
+		obs_source_filter_set_index(source, order[index], index);
 	}
 }
 
