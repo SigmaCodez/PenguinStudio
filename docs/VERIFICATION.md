@@ -12,10 +12,18 @@ Closing with automatic removal active produced no warnings/errors or reported
 memory leaks. A deliberately missing model produced one actionable error while
 preserving the original video and shape effect; shutdown remained clean.
 
-These initial checks dynamically loaded the new module into the installed 0.4.4
-application. Full 0.5.0 package builds and Inspector integration checks are still
-in progress. A physical webcam, moving hair, multiple simultaneous cameras and
-other desktop environments have not yet been validated for this feature.
+The exact 0.5.0 Ubuntu 26.04 DEB also passed in a temporary filesystem namespace
+at its normal install paths, without replacing the installed application. Tests
+covered the Inspector, existing-filter default Undo/Redo, new-filter creation
+and removal, corner-radius Undo/Redo, and synthetic asynchronous camera frames.
+All native runs closed with zero warnings/errors and zero reported memory leaks.
+Both Ubuntu CI jobs passed the installed-package camera tests. Their headless
+Xvfb environment explicitly permits only the recorded missing portal-settings,
+DRM render-node and EWMH diagnostics; these exceptions do not apply on the desktop.
+The Linux package jobs passed for both DEBs, RPM, Flatpak, Snap, AppImage and the
+Arch recipe. System installation awaits Ubuntu administrator approval.
+A physical webcam, moving hair, multiple simultaneous cameras and other desktop
+environments have not yet been validated for this feature.
 See [camera-effects-0.5.0.json](validation/camera-effects-0.5.0.json) and the
 [camera guide](CAMERA-EFFECTS.md).
 

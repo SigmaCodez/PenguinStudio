@@ -3,6 +3,8 @@
 Select a camera or another video source and open **Camera appearance** in the
 source Inspector. The same controls are available in **Filters → Camera appearance**.
 
+![Camera appearance controls in the source Inspector](images/camera-appearance.png)
+
 - **Shape:** Rectangle, Circle, Oval, or Rounded corners. A circle keeps equal
   pixel radii; an oval fills the source's original aspect ratio. Rounded corners
   have an adjustable radius, expressed as a percentage of half the shorter edge.
