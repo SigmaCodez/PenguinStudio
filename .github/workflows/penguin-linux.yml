@@ -178,6 +178,8 @@ jobs:
           penguin-studio --version
       - name: Exercise camera shapes and local background removal
         run: |
+          c++ -std=c++17 -Wall -Wextra -Werror -Ilibobs test/penguin-camera-threads.cpp -lobs -o /tmp/penguin-camera-threads
+          /tmp/penguin-camera-threads
           sudo apt-get install -y --no-install-recommends xvfb xauth
           c++ -std=c++17 -shared -fPIC -Wall -Wextra -Werror test/penguin-camera-gui.cpp $(pkg-config --cflags --libs Qt6Widgets) -I/usr/include/obs -lobs -lobs-frontend-api -o /tmp/penguin-camera-gui.so
           xvfb-run -a env QT_QPA_PLATFORM=xcb LIBGL_ALWAYS_SOFTWARE=1 PENGUIN_CAMERA_HEADLESS=1 bash scripts/packaging/test-camera.sh /tmp/penguin-camera-gui.so /tmp/penguin-camera-test
