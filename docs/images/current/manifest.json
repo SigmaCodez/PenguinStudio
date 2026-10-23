@@ -19,5 +19,6 @@
       "file": "stream-details-en.png",
       "sha256": "5523ccfb6366eb3163b83794769f9ea3dcb12ea0d584b561f3d19a63693af2e6"
     }
-  ]
+  ],
+  "pending_version": "0.6.1"
 }

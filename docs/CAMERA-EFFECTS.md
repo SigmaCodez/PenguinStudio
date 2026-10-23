@@ -47,7 +47,7 @@ See `plugins/penguin-backgroundremoval/PROVENANCE.md` for the RVM plugin,
 model licenses and exact upstream revision. The legacy model retains its notices
 in `plugins/penguin-camera/data/MODEL-NOTICE.txt`.
 
-Current English interface, captured from Penguin Studio 0.6.0. The sample artwork demonstrates rounded corners; it is not a webcam or an AI-removal quality demonstration.
+Current English interface, captured from Penguin Studio 0.6.1. The sample artwork demonstrates rounded corners; it is not a webcam or an AI-removal quality demonstration.
 
 ## Validation
 
@@ -78,3 +78,9 @@ path participate in undo/redo and scene persistence.
 Background processing stays on the device. As with removal, segmentation can
 have soft edges around fast movement, hair or low-contrast subjects; these modes
 do not promise perfect separation.
+
+Custom-image compositing suppresses low-confidence alpha spill before blending
+with the replacement image. The foreground color remains premultiplied and
+intermediate alpha retains a soft transition. Background blur and transparent
+removal are unchanged. This reduces weak background halos; it does not replace
+the segmentation model or guarantee perfect edges under all lighting/motion.

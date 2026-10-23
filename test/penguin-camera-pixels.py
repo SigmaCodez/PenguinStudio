@@ -58,3 +58,14 @@ print("Automatic blur, custom image, rounded corners and background undo/restore
 
 assert pixel("missing-background", 100, 180)[3] == 0
 print("Missing custom image falls back to transparent background")
+
+# Suppress weak background spill while preserving a soft middle and opaque subjects.
+assert pixel("edge-composite", 64, 180) == (0, 0, 255, 255)
+assert pixel("edge-composite", 192, 180) == (0, 0, 255, 255)
+r, g, b, a = pixel("edge-composite", 320, 180)
+assert 90 < r < 170 and g == 0 and 90 < b < 170 and a == 255, (r, g, b, a)
+assert pixel("edge-composite", 448, 180) == (255, 0, 0, 255)
+assert pixel("edge-composite", 576, 180) == (255, 0, 0, 255)
+assert pixel("edge-unchanged", 192, 180)[3] == 24
+assert pixel("edge-unchanged", 448, 180)[3] == 232
+print("Custom-background alpha cleanup removes weak spill without changing other modes")

@@ -108,6 +108,29 @@ void Snap(const char *name)
 	obs_queue_task(OBS_TASK_GRAPHICS, Capture, const_cast<char *>(name), true);
 }
 
+// Exercise the compositor with known alpha, independently of model predictions.
+void EdgeComposite(void *)
+{
+	auto *previous = source;
+	OBSDataAutoRelease image = obs_data_create();
+	obs_data_set_string(image, "file", (directory + "/edge-alpha.png").toUtf8().constData());
+	for (int mode : {5, 0}) {
+		// Separate sources avoid reusing OBS's per-frame cached filter output.
+		source = obs_source_create("image_source", "Alpha edge fixture", image, nullptr);
+		OBSDataAutoRelease settings = obs_data_create();
+		obs_data_set_int(settings, "background", mode);
+		obs_data_set_string(settings, "background_image",
+				    (directory + "/replacement.png").toUtf8().constData());
+		OBSSourceAutoRelease effect =
+			obs_source_create("penguin_camera_filter", "Edge compositor", settings, nullptr);
+		if (source && effect) {
+			obs_source_filter_add(source, effect);
+			Capture(const_cast<char *>(mode == 5 ? "edge-composite" : "edge-unchanged"));
+		}
+		obs_source_release(source);
+	}
+	source = previous;
+}
 void FirstMattingFrame(void *)
 {
 	// Create and render within one graphics task: no tick can prepare a mask
@@ -196,6 +219,14 @@ void Start()
 				return;
 			}
 		}
+		QImage edge(640, 360, QImage::Format_RGBA8888);
+		const int alpha[] = {0, 24, 128, 232, 255};
+		for (int y = 0; y < edge.height(); ++y) {
+			for (int x = 0; x < edge.width(); ++x) {
+				edge.setPixelColor(x, y, QColor(255, 0, 0, alpha[x / 128]));
+			}
+		}
+		edge.save(directory + "/edge-alpha.png");
 		auto *settings = obs_data_create();
 		obs_data_set_string(settings, "file", (directory + "/green.png").toUtf8().constData());
 		source = obs_source_create("image_source", "Camera fixture", settings, nullptr);
@@ -329,6 +360,7 @@ void Start()
 	});
 	At(20000, [] {
 		Snap("custom-background");
+		obs_queue_task(OBS_TASK_GRAPHICS, EdgeComposite, nullptr, true);
 		const auto saved = PenguinCamera::SaveCamera(source);
 		PenguinCamera::Apply(source, "Camera appearance", 0, 0, 25, 15);
 		PenguinCamera::RestoreCamera(saved);
