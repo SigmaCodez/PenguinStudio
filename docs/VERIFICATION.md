@@ -2,6 +2,27 @@
 
 This is a development preview based on OBS Studio 32.2.2. The new Penguin code must not be described as fully production-tested until the checks below have real recorded results.
 
+## Current-frame camera matting 0.5.3
+
+Real Facecam head and hand movements on Ubuntu 26.04.1 under native Wayland
+reproduced bright background strips around moving contours in 0.5.2. A comparison
+recording without matting also showed substantial camera motion blur. Replaying
+the same local input with current-frame inference reduced the exposed background
+strips, without changing the model, threshold, smoothing or camera controls.
+
+The corrected component passed the Inspector, shape, chroma-key, filter-pair
+lifecycle and shutdown tests. The new first-render alpha assertion fails on the
+installed 0.5.2 component and passes with the correction. It checks a freshly
+created filter before a video tick can prepare a mask.
+
+A corrected live Facecam recording and a replay comparison each produced a fully
+decodable, approximately 20-second 720p/30 H.264/AAC file with rounded corners.
+Each reported one render/encoding stall (about 0.2%); the stricter zero-stall
+recording check therefore did **not** pass. Both closed with exit code 0, no
+warnings/errors and zero reported memory leaks. Fast, blurred hands can still
+have incomplete edges. These local component results do not certify a release
+package or guarantee perfect matting. Personal footage is not in this repository.
+
 ## Camera appearance 0.5.0 — 2026-10-23
 
 The new camera module passed native Wayland rendering tests using generated

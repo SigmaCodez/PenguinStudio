@@ -23,6 +23,8 @@ continuity. Hair, transparent items, fast motion and difficult lighting can stil
 reduce accuracy; use even lighting and check the live preview before recording.
 
 Penguin Studio applies matting to the full frame, then applies the selected shape.
+The mask is calculated from the current frame before compositing, including the
+first frame after enabling Automatic. It is not reused from the previous video tick.
 A tagged companion filter is created for Automatic and removed when switching to
 Off, Green screen or Blue screen. Other user-added filters are retained.
 The Inspector reports preparation, readiness or failure; errors remain in the
@@ -51,5 +53,7 @@ invalid input rejection. `test/penguin-camera-gui.cpp` exercises the installed
 filter and Inspector with generated images in an isolated profile.
 `test/penguin-camera-pixels.py` checks rendered alpha, circle versus oval geometry,
 green and blue removal, restored unfiltered output, and serialized settings.
+The first-frame regression renders a newly created matting filter before any video
+tick and verifies that the raw background is already removed.
 The DEB jobs run the GUI check before uploading a package. Native Wayland testing
 uses the same helper with `QT_QPA_PLATFORM=wayland`.
