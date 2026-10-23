@@ -274,10 +274,14 @@ void Start()
 		for (int i = 0; i < 5; ++i) {
 			pairsOk &= PenguinCamera::Apply(source, "Camera appearance", i % 4, 1, 25, 15);
 			const auto automatic = PenguinCamera::SaveCamera(source);
+			// Keep the removed instance alive to exercise UUID reuse reliably.
+			auto previousMatting = PenguinCamera::CameraMatting(source);
 			PenguinCamera::RestoreCamera(before);
 			pairsOk &= !PenguinCamera::CameraMatting(source);
 			PenguinCamera::RestoreCamera(automatic);
 			auto matting = PenguinCamera::CameraMatting(source);
+			pairsOk &= matting && previousMatting &&
+				   std::strcmp(obs_source_get_uuid(matting), obs_source_get_uuid(previousMatting)) != 0;
 			pairsOk &= matting && obs_source_filter_get_index(source, matting) ==
 						      obs_source_filter_get_index(source, filter) + 1;
 		}

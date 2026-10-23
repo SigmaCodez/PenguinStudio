@@ -49,3 +49,10 @@ circle/oval geometry, rounded corners, green/blue keying, automatic matting,
 disabling and serialized settings all passed. Image-source capture now supplies
 the default shader when required, avoiding invalid-shader diagnostics. This run
 exited normally with no warning/error entries and zero reported memory leaks.
+
+Ubuntu package CI exposed a duplicate UUID during rapid restoration: a removed
+filter may still exist on the deferred destruction queue. Recreated managed
+filters now receive a fresh UUID, while existing filters retain their identity.
+The lifecycle test holds the removed instance alive deliberately and verifies
+that its replacement has a different UUID. The expanded pixel/lifecycle test
+passed under Wayland with no diagnostics and zero reported memory leaks.

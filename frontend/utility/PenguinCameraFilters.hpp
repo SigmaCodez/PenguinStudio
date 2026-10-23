@@ -90,6 +90,9 @@ inline void RestoreCamera(const std::string &json)
 			obs_source_reset_settings(current, settings);
 			obs_source_set_enabled(current, obs_data_get_bool(saved, "enabled"));
 		} else {
+			// Removed filters may still be alive on the deferred destroy queue
+			// or held by a dialog. A recreated companion needs its own identity.
+			obs_data_erase(saved, "uuid");
 			OBSSourceAutoRelease restored = obs_load_source(saved);
 			if (restored) {
 				obs_source_filter_add(source, restored);
