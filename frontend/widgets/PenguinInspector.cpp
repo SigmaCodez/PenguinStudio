@@ -539,6 +539,10 @@ void PenguinInspector::RefreshSelection()
 			    : aiStatus == 2 ? "Penguin.Camera.Ready"
 					    : "Penguin.Camera.Loading";
 	}
+	if (cameraBackground->currentIndex() == 5 &&
+	    (cameraImagePath.isEmpty() || !QFileInfo::exists(cameraImagePath))) {
+		statusKey = "Penguin.Camera.MissingImage";
+	}
 	cameraStatus->setText(QTStr(statusKey));
 	transformCard->setEnabled(editable);
 	cropCard->setEnabled(editable);

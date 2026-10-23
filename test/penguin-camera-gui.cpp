@@ -131,7 +131,9 @@ void Mode(int shape, int background)
 		PenguinCamera::Apply(source, "Camera appearance", shape, background, 25, 15);
 		return;
 	}
-	if (background >= 4) report["background_controls_available"] = true;
+	if (background >= 4) {
+		report["background_controls_available"] = true;
+	}
 	if (shapes && backgrounds) {
 		report["controls_enabled"] = shapes->isEnabled() && backgrounds->isEnabled();
 		report["controls_visible"] = shapes->isVisible();

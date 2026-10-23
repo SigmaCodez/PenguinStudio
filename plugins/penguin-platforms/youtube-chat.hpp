@@ -284,8 +284,10 @@ public:
 		layout->addWidget(hint);
 		input->setPlaceholderText("Send a YouTube message…");
 		input->setMaxLength(200);
-		layout->addWidget(input);
-		layout->addWidget(send);
+		auto *compose = new QHBoxLayout;
+		compose->addWidget(input, 1);
+		compose->addWidget(send);
+		layout->addLayout(compose);
 		poll.setSingleShot(true);
 		connect(&audienceTimer, &QTimer::timeout, this, [this] { LoadAudience(); });
 		connect(&poll, &QTimer::timeout, this, [this] { Read(); });
@@ -440,6 +442,8 @@ public:
 			auto *row = new QListWidgetItem(badge + name + ": " + text, history);
 			row->setData(Qt::UserRole, id);
 			row->setData(Qt::UserRole + 1, user);
+			row->setData(Qt::UserRole + 2, badge + name);
+			row->setData(Qt::UserRole + 3, text);
 			const auto published =
 				QDateTime::fromString(snippet.value("publishedAt").toString(), Qt::ISODate);
 			if (!user.isEmpty() && published.isValid()) {

@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 #pragma once
 #include <QDateTime>
+#include <QStyledItemDelegate>
+#include <QPainter>
+#include <QTextLayout>
 #include <QDesktopServices>
 #include <QUrl>
 #include <QDialog>
@@ -14,13 +17,70 @@
 #include <QScrollBar>
 #include <QVBoxLayout>
 #include <functional>
+#include <algorithm>
 
 namespace PenguinChat {
+class MessageDelegate final : public QStyledItemDelegate {
+	static qreal Layout(QTextLayout &layout, qreal width)
+	{
+		QTextOption options;
+		options.setWrapMode(QTextOption::WrapAtWordBoundaryOrAnywhere);
+		layout.setTextOption(options);
+		qreal height = 0;
+		layout.beginLayout();
+		for (;;) {
+			auto line = layout.createLine();
+			if (!line.isValid()) {
+				break;
+			}
+			line.setLineWidth(std::max(40.0, width));
+			line.setPosition(QPointF(0, height));
+			height += line.height();
+		}
+		layout.endLayout();
+		return height;
+	}
+
+public:
+	explicit MessageDelegate(QObject *parent) : QStyledItemDelegate(parent) {}
+	QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const override
+	{
+		const auto *list = qobject_cast<const QListWidget *>(parent());
+		const int width = list ? list->viewport()->width() - 16 : option.rect.width();
+		QTextLayout layout(index.data(Qt::UserRole + 3).toString(), option.font);
+		return QSize(width, int(Layout(layout, width - 24)) + option.fontMetrics.height() + 30);
+	}
+	void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override
+	{
+		painter->save();
+		painter->setRenderHint(QPainter::Antialiasing);
+		const QRect rect = option.rect.adjusted(2, 1, -2, -1);
+		painter->setPen(Qt::NoPen);
+		painter->setBrush(option.palette.color(
+			option.state & QStyle::State_Selected ? QPalette::Highlight : QPalette::AlternateBase));
+		painter->drawRoundedRect(rect, 8, 8);
+		const QColor color = option.palette.color(
+			option.state & QStyle::State_Selected ? QPalette::HighlightedText : QPalette::Text);
+		painter->setPen(color);
+		auto bold = option.font;
+		bold.setBold(true);
+		painter->setFont(bold);
+		const QString header = index.data(Qt::UserRole + 2).toString();
+		painter->drawText(rect.adjusted(12, 8, -12, 0), Qt::AlignTop | Qt::AlignLeft,
+				  QFontMetrics(bold).elidedText(header, Qt::ElideRight, rect.width() - 24));
+		painter->setFont(option.font);
+		QTextLayout layout(index.data(Qt::UserRole + 3).toString(), option.font);
+		Layout(layout, rect.width() - 24);
+		layout.draw(painter, QPointF(rect.x() + 12, rect.y() + option.fontMetrics.height() + 13));
+		painter->restore();
+	}
+};
 // Store identifiers separately from display text. Never parse a screen name to authorize an action.
 inline void Style(QWidget *widget, QListWidget *history)
 {
 	history->setObjectName("penguinChatHistory");
 	history->setWordWrap(true);
+	history->setItemDelegate(new MessageDelegate(history));
 	history->setSpacing(6);
 	history->setAlternatingRowColors(true);
 	history->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);

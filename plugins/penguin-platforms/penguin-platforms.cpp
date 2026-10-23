@@ -1032,7 +1032,7 @@ void CreateDock()
 	youtubeChatDock = new YoutubeChat(chatTabs);
 	chatTabs->addTab(chatDock, "Twitch");
 	chatTabs->addTab(youtubeChatDock, "YouTube");
-	auto *dashboard = new QPushButton("Open platform dashboard", chatTabs);
+	auto *dashboard = new QPushButton("Dashboard ↗", chatTabs);
 	dashboard->setToolTip("Open Twitch or YouTube for platform features not available through their APIs.");
 	chatTabs->setCornerWidget(dashboard);
 	QObject::connect(dashboard, &QPushButton::clicked, chatTabs, [chatTabs] {

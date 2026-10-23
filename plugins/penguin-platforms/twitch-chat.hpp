@@ -3,6 +3,7 @@
 
 #include "chat-view.hpp"
 #include <QCheckBox>
+#include <QMap>
 #include <QSpinBox>
 #include <QFormLayout>
 #include <QJsonArray>
@@ -28,7 +29,7 @@
 class TwitchChat final : public QWidget {
 	friend struct PenguinChatTest;
 	struct Message {
-		QString id, user, text;
+		QString id, user, text, name, body;
 	};
 	QNetworkAccessManager ownedNetwork{this};
 	QNetworkAccessManager &network;
@@ -41,6 +42,7 @@ class TwitchChat final : public QWidget {
 	QTimer audienceTimer{this};
 	bool moderating = false;
 	QSet<QString> participantPages;
+	QMap<QString, QPair<QString, QDateTime>> activeChatters;
 	QLineEdit *input = new QLineEdit(this);
 	QPushButton *send = new QPushButton(this);
 	QLabel *status = new QLabel(this);
@@ -65,6 +67,8 @@ class TwitchChat final : public QWidget {
 			auto *item = new QListWidgetItem(message.text, history);
 			item->setData(Qt::UserRole, message.id);
 			item->setData(Qt::UserRole + 1, message.user);
+			item->setData(Qt::UserRole + 2, message.name);
+			item->setData(Qt::UserRole + 3, message.body);
 			if (message.id == selected) {
 				history->setCurrentItem(item);
 			}
@@ -456,7 +460,24 @@ public:
 		toolbar->addWidget(participants);
 		toolbar->addWidget(settings);
 		layout->addLayout(toolbar);
-		connect(participants, &QPushButton::clicked, this, [this] { LoadParticipants(); });
+		auto *peopleMenu = new QMenu(participants);
+		peopleMenu->addAction("Connected to chat", this, [this] { LoadParticipants(); });
+		peopleMenu->addAction("Recent chatters (15 minutes)", this, [this] {
+			QStringList names;
+			const auto cutoff = QDateTime::currentDateTimeUtc().addSecs(-900);
+			for (auto it = activeChatters.begin(); it != activeChatters.end();) {
+				if (it.value().second < cutoff) {
+					it = activeChatters.erase(it);
+				} else {
+					names.append(it.value().first);
+					++it;
+				}
+			}
+			PenguinChat::Participants(
+				this, "Recent Twitch chatters",
+				"People observed posting in the last 15 minutes. This is not a viewer list.", names);
+		});
+		participants->setMenu(peopleMenu);
 		connect(settings, &QPushButton::clicked, this, [this] { ChatSettings(); });
 		connect(&audienceTimer, &QTimer::timeout, this, [this] { LoadAudience(); });
 		connect(history, &QListWidget::customContextMenuRequested, this, [this](const QPoint &point) {
@@ -475,8 +496,10 @@ public:
 		auto *hint = new QLabel("Right-click a message for moderation", this);
 		hint->setWordWrap(true);
 		layout->addWidget(hint);
-		layout->addWidget(input);
-		layout->addWidget(send);
+		auto *compose = new QHBoxLayout;
+		compose->addWidget(input, 1);
+		compose->addWidget(send);
+		layout->addLayout(compose);
 		retry.setSingleShot(true);
 		heartbeat.setSingleShot(true);
 		connect(&retry, &QTimer::timeout, this, [this]() { Open(); });
@@ -533,6 +556,7 @@ public:
 		settings->setEnabled(false);
 		moderating = false;
 		participantPages.clear();
+		activeChatters.clear();
 		for (auto *ws : findChildren<QWebSocket *>()) {
 			disconnect(ws, nullptr, this, nullptr);
 			ws->abort();
@@ -572,6 +596,18 @@ public:
 					return;
 				}
 			}
+			const auto author = event.value("chatter_user_id").toString();
+			if (!author.isEmpty()) {
+				activeChatters[author] = {event.value("chatter_user_name").toString().left(100),
+							  QDateTime::currentDateTimeUtc()};
+			}
+			const auto cutoff = QDateTime::currentDateTimeUtc().addSecs(-900);
+			for (auto it = activeChatters.begin(); it != activeChatters.end();) {
+				it = it.value().second < cutoff ? activeChatters.erase(it) : std::next(it);
+			}
+			while (activeChatters.size() > 10000) {
+				activeChatters.erase(activeChatters.begin());
+			}
 			QString role;
 			for (const auto &value : event.value("badges").toArray()) {
 				const auto badge = value.toObject().value("set_id").toString();
@@ -590,7 +626,9 @@ public:
 			messages.push_back(
 				{id, event.value("chatter_user_id").toString(),
 				 role + event.value("chatter_user_name").toString().left(100) + ": " +
-					 event.value("message").toObject().value("text").toString().left(2000)});
+					 event.value("message").toObject().value("text").toString().left(2000),
+				 role + event.value("chatter_user_name").toString().left(100),
+				 event.value("message").toObject().value("text").toString().left(2000)});
 			if (messages.size() > 500) {
 				messages.removeFirst();
 			}
