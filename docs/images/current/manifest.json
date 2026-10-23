@@ -1,0 +1,23 @@
+{
+  "version": "0.5.3",
+  "language": "en-US",
+  "source_commit": "831464569e339a45ca458227e6a18c6fa2f45952",
+  "package": "0.5.3-1+ubuntu26.04",
+  "captured_on": "2026-10-23",
+  "capture_method": "Native XComposite window capture of the installed Qt application under XWayland; includes the actual program preview",
+  "content": "Synthetic local demo artwork and audio; no camera footage or signed-in accounts",
+  "images": [
+    {
+      "file": "workspace-en.png",
+      "sha256": "62e355eed45e1727089f9025c52651d3b17e5b9b61fc73c8e5aee489df8147b7"
+    },
+    {
+      "file": "camera-en.png",
+      "sha256": "1f5a6ed1cd60d899147d5cb8f85eb05fc3f460cc0d8fcac8ea11684e07777b86"
+    },
+    {
+      "file": "stream-details-en.png",
+      "sha256": "46c3e73d71fd7c54c72f26930c7493640014e152179ac522be27bb3b90432c44"
+    }
+  ]
+}

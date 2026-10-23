@@ -1,0 +1,15 @@
+name: Current product documentation
+on:
+  push:
+    branches: [main]
+    paths: ['README.md', 'AGENTS.md', 'CONTRIBUTING.md', 'docs/**', 'packaging/version.txt', 'scripts/check-publication.py', '.github/workflows/publication-docs.yml']
+  pull_request:
+    paths: ['README.md', 'AGENTS.md', 'CONTRIBUTING.md', 'docs/**', 'packaging/version.txt', 'scripts/check-publication.py', '.github/workflows/publication-docs.yml']
+permissions:
+  contents: read
+jobs:
+  current-docs:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      - run: python3 scripts/check-publication.py

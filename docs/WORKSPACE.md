@@ -1,6 +1,10 @@
 # Penguin Studio workspace
 
-The third workspace layout redesigns the native Qt application around a large canvas, searchable layers and scenes, channel strips, and an integrated production sidebar. Its charcoal surfaces, violet actions, compact headers, and restrained borders are inspired by [Meld Studio](https://meldstudio.co/), with original Penguin icons and the existing OBS production engine.
+Penguin Studio organizes the native Qt application around a large canvas, searchable layers and scenes, audio channel strips, and an integrated production sidebar.
+
+![Penguin Studio 0.5.3 workspace in English](images/current/workspace-en.png)
+
+Captured from the installed 0.5.3 application with local demo media.
 
 ## Compose and inspect
 

@@ -89,6 +89,15 @@ Source: `{sha}`. [Build and checks]({manifest['workflow_url']}).
     version_notes = Path('docs/releases') / f'{version}.md'
     if version_notes.is_file():
         notes.write_text(notes.read_text() + '\n' + version_notes.read_text())
+    # The checks job verifies the reviewed English preview manifest for this
+    # version. Pin image URLs to the built commit so older releases stay honest.
+    previews = '\n### Current English interface\n\n'
+    previews += f'Penguin Studio {version}, captured from the real application with local demo media.\n\n'
+    for label, filename in [('Workspace', 'workspace-en.png'),
+                            ('Camera appearance', 'camera-en.png'),
+                            ('Stream details before sign-in', 'stream-details-en.png')]:
+        previews += f'![{label}](https://raw.githubusercontent.com/{repo}/{sha}/docs/images/current/{filename})\n\n'
+    notes.write_text(notes.read_text() + previews)
     # An existing tag must identify precisely the built source. Never move it.
     refs = json.loads(gh('api', f'repos/{repo}/git/matching-refs/tags/{tag}'))
     exact = [r for r in refs if r['ref'] == f'refs/tags/{tag}']

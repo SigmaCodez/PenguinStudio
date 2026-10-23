@@ -81,6 +81,9 @@ class Releases(unittest.TestCase):
                     manifest = json.loads(Path('release-assets/build-manifest.json').read_text())
                     self.assertEqual(manifest['source_commit'], 'a' * 40)
                     self.assertEqual(manifest['packages'][0]['bytes'], len(b'fixture'))
+                    notes = Path('release-notes.md').read_text()
+                    for name in ('workspace-en.png', 'camera-en.png', 'stream-details-en.png'):
+                        self.assertIn(f'https://raw.githubusercontent.com/test/test/{"a" * 40}/docs/images/current/{name}', notes)
                 finally:
                     os.chdir(previous)
 

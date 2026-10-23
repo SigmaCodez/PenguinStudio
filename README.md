@@ -6,9 +6,9 @@
 
 Penguin Studio brings a redesigned production workspace, native multi-destination output controls, portrait output and platform connections to the OBS production engine. See the [architecture documentation](docs/ARCHITECTURE.md) for the engine baseline and technical details.
 
-![Penguin Studio modern workspace with searchable layers and scenes, audio channel strips and an integrated inspector](docs/validation/workspace-modern-en.png)
+![Penguin Studio modern workspace with searchable layers and scenes, audio channel strips and an integrated inspector](docs/images/current/workspace-en.png)
 
-Actual Linux application capture with test media. See the [workspace guide](docs/WORKSPACE.md) for the controls and layout.
+Penguin Studio 0.5.3, captured from the installed Linux application in English with local demo media. See the [workspace guide](docs/WORKSPACE.md) for the controls and layout.
 
 > Development preview. See [verification status](docs/VERIFICATION.md) for completed checks and remaining release tests, and [packaging](docs/PACKAGING.md) for development downloads and supported build targets. Validate your devices and streaming accounts before relying on this build for a live show.
 
@@ -16,7 +16,7 @@ Actual Linux application capture with test media. See the [workspace guide](docs
 
 - A native production workspace with searchable layers and numbered scenes on the left, canvas in the center, a channel-strip audio mixer below, and tabbed inspector/output/details tools on the right. The top bar brings together destinations, live output, recording and replay clips.
 - An editable inspector for source position, size, rotation, crop, visibility and locking, with undo/redo, source properties and filters. See the [workspace guide](docs/WORKSPACE.md).
-- [Camera appearance](docs/CAMERA-EFFECTS.md): circle, oval and rounded-corner shapes, automatic local AI portrait removal, and green/blue screen options with adjustable thresholds.
+- [Camera appearance](docs/CAMERA-EFFECTS.md): circle, oval and rounded-corner shapes, automatic local AI background removal, and green/blue screen options with adjustable thresholds.
 - Original Penguin Studio logo, a complete dark control theme, English defaults and a separate `PenguinStudio` configuration directory.
 - The upstream OBS capture, scene, recording, mixer, filter, plugin and translation infrastructure, including all 77 frontend locale files.
 - A first-launch destination assistant, platform dashboard links and up to eight independently controlled RTMP(S) outputs.
@@ -27,7 +27,7 @@ Actual Linux application capture with test media. See the [workspace guide](docs
 
 ## Get started
 
-**Current release: [Penguin Studio 0.4.3](https://github.com/SigmaCodez/PenguinStudio/releases/tag/penguin-v0.4.3)** — AppImage and Arch packaging, hardware encoding, browser sign-in and saved accounts.
+**Current release: [Penguin Studio 0.5.3](https://github.com/SigmaCodez/PenguinStudio/releases/tag/penguin-v0.5.3)** — camera shapes, local background removal with corrected motion masks, browser sign-in and saved accounts.
 
 **[Download Linux packages](https://github.com/SigmaCodez/PenguinStudio/releases)** — Ubuntu DEB, Fedora RPM, Flatpak, Snap, AppImage and an Arch/AUR recipe, with SHA-256 checksums.
 
