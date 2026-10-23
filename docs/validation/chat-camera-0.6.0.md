@@ -1,4 +1,4 @@
-# Chat and camera background validation — 0.6.0 candidate
+# Chat and camera background validation — 0.6.0
 
 ## Local checks completed
 
@@ -49,5 +49,21 @@ XWayland, using synthetic media and explicitly labelled local chat messages.
 Each was visually reviewed; capture provenance is in the current-image manifest.
 Later chat fixes are covered by the current request/event regression fixtures.
 
-Release-build and installed-version verification are recorded separately after
-all final artifacts are available.
+## Final Ubuntu package and installation
+
+The package from release source `73bd5d5b` passed the same strict native Wayland
+Inspector tests and both chat-tab GUI checks. Its checksum and dependency
+simulation passed; installing `0.6.0-1+ubuntu26.04` on Ubuntu 26.04.1 upgraded only
+Penguin Studio, with no added or removed dependencies. Installed-file verification
+passed.
+
+The installed application then passed the Inspector/pixel suite and both chat-tab
+checks again. A 20.033-second 1280 × 720, 30 fps H.264/AAC recording switched blur
+to a custom image with rounded corners. Full decoding, synthetic audio and visual
+frame checks passed with zero reported dropped frames. All three installed runs
+closed normally without warnings/errors or reported memory leaks. No personal
+profile, webcam, microphone or live moderation action was used.
+
+See [machine-readable results](chat-camera-0.6.0.json) for the package hash and
+recording/control evidence. The complete download set is gated by the
+[release workflow](https://github.com/SigmaCodez/PenguinStudio/actions/runs/40035647084).

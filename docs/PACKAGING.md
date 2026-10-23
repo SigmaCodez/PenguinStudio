@@ -63,9 +63,10 @@ Download the Ubuntu 26.04 DEB from [Penguin Studio releases](https://github.com/
 Ubuntu 26.04.1 uses the same package. Do not install the Ubuntu 24.04 DEB on
 26.04 or mix distribution repositories to satisfy its dependencies.
 
-The Ubuntu 26.04 candidate passed native Wayland camera-control, blur, custom-image
-and clean-shutdown tests. Chat request fixtures and a synthetic recording were also
-checked; see [0.6.0 validation](validation/chat-camera-0.6.0.md) for scope and limits.
+The final Ubuntu 26.04 package was installed and passed native Wayland camera-control,
+blur, custom-image, chat-tab and clean-shutdown tests. A synthetic H.264/AAC recording
+fully decoded with zero reported dropped frames; see
+[0.6.0 validation](validation/chat-camera-0.6.0.md) for scope and limits.
 Earlier installed-version results remain in the [verification history](VERIFICATION.md).
 
 The download is `penguin-studio_0.6.0-1+ubuntu26.04_amd64.deb`.

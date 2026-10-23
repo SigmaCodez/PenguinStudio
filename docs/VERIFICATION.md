@@ -7,6 +7,21 @@
 
 This is a development preview based on OBS Studio 32.2.2. The new Penguin code must not be described as fully production-tested until the checks below have real recorded results.
 
+## Native chat and camera backgrounds 0.6.0 — 2026-10-24
+
+The final Ubuntu 26.04 package was installed on Ubuntu 26.04.1, upgrading only
+Penguin Studio. Installed-file verification, all six camera background controls,
+GPU pixel tests, undo/restore and both native chat tabs passed under Wayland.
+A 20.033-second synthetic H.264/AAC recording switched between blur and a custom
+image while retaining rounded corners; it fully decoded with zero reported
+frame drops. Start and normal shutdown emitted no warning/error diagnostics or
+reported memory leaks.
+
+Moderation and participant requests were verified using in-memory API fixtures;
+no real viewers were moderated or messages sent. Viewer counts and chat-participant
+lists are distinct. See [detailed results](validation/chat-camera-0.6.0.md) and
+[machine-readable evidence](validation/chat-camera-0.6.0.json).
+
 ## Current-frame camera matting 0.5.3
 
 Real Facecam head and hand movements on Ubuntu 26.04.1 under native Wayland
