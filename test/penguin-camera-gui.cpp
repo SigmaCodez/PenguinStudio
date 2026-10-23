@@ -107,6 +107,21 @@ void Snap(const char *name)
 {
 	obs_queue_task(OBS_TASK_GRAPHICS, Capture, const_cast<char *>(name), true);
 }
+
+void FirstMattingFrame(void *)
+{
+	// Create and render within one graphics task: no tick can prepare a mask
+	// between these operations. A fresh filter must not flash the raw background.
+	auto *previous = source;
+	OBSDataAutoRelease settings = obs_data_create();
+	obs_data_set_string(settings, "file", (directory + "/green.png").toUtf8().constData());
+	source = obs_source_create("image_source", "First matting frame fixture", settings, nullptr);
+	if (source && PenguinCamera::Apply(source, "Camera appearance", 0, 1, 25, 15)) {
+		Capture(const_cast<char *>("automatic-first-frame"));
+	}
+	obs_source_release(source);
+	source = previous;
+}
 void Mode(int shape, int background)
 {
 	auto *shapes = mainWindow->findChild<QComboBox *>("cameraShape");
@@ -199,6 +214,7 @@ void Start()
 		}
 	});
 	At(4500, [] {
+		obs_queue_task(OBS_TASK_GRAPHICS, FirstMattingFrame, nullptr, true);
 		Snap("rectangle");
 		Mode(1, 0);
 	});

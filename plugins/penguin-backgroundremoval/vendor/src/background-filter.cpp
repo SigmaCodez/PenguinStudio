@@ -72,6 +72,7 @@ struct background_removal_filter : public filter_data, public std::enable_shared
 
 	std::mutex modelMutex;
 	std::atomic<int> penguinStatus{1};
+	bool maskPending = true;
 
 	~background_removal_filter() { obs_log(LOG_INFO, "Background removal filter destructor called"); }
 };
@@ -510,6 +511,14 @@ static void processImageForBackground(struct background_removal_filter *tf, cons
 void background_filter_video_tick(void *data, float seconds)
 {
 	UNUSED_PARAMETER(seconds);
+	auto *ptr = static_cast<std::shared_ptr<background_removal_filter> *>(data);
+	if (ptr && *ptr) {
+		(*ptr)->maskPending = true;
+	}
+}
+
+static void background_filter_process_current_frame(void *data)
+{
 
 	// Cast to shared_ptr pointer and create a local shared_ptr
 	auto *ptr = static_cast<std::shared_ptr<background_removal_filter> *>(data);
@@ -763,6 +772,18 @@ void background_filter_video_render(void *data, gs_effect_t *_effect)
 		return;
 	}
 
+	// The tick runs before rendering and therefore only has the previous input.
+	// Infer after staging this frame so moving hands and heads use their own
+	// mask. Multiple renders in one video tick must not advance recurrent state.
+	if (tf->maskPending) {
+		tf->maskPending = false;
+		background_filter_process_current_frame(data);
+	}
+	if (tf->isDisabled) {
+		obs_source_skip_video_filter(tf->source);
+		return;
+	}
+
 	if (!tf->effect) {
 		// Effect failed to load, skip rendering
 		if (tf->source) {
@@ -776,8 +797,8 @@ void background_filter_video_render(void *data, gs_effect_t *_effect)
 		std::lock_guard<std::mutex> lock(tf->outputLock);
 
 		if (tf->backgroundMask.empty()) {
-			// The first asynchronous mask has not arrived yet; preserve the input.
-			// Inference failures are reported by the worker and camera_status.
+			// Preserve the input if no mask could be produced.
+			// Inference failures are reported through camera_status.
 			if (tf->source) {
 				obs_source_skip_video_filter(tf->source);
 			}

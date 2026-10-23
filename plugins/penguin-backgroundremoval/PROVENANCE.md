@@ -23,8 +23,10 @@ packaged and offered in the model selector. The model, inference and mask
 processing are otherwise the upstream implementation. A read-only `camera_status`
 procedure exposes initialization, readiness and errors to the camera inspector.
 The integration serializes managed filter-pair changes with rendering to prevent
-partially detached filters from being rendered. The expected wait for the first asynchronous mask is not logged as a warning;
-actual inference failures remain errors and bypass matting to preserve the input.
+partially detached filters from being rendered. Mask inference runs after capturing
+the current render input, once per video tick, rather than applying the previous
+frame's mask to a moving subject. This also prevents an unmasked first-frame flash.
+Actual inference failures remain errors and bypass matting to preserve the input.
 Input capture explicitly uses the default shader for image sources; asynchronous
 cameras retain the upstream rendering path.
 
