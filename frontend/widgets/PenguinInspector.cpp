@@ -275,7 +275,7 @@ PenguinInspector::PenguinInspector(OBSBasic *mainWindow, QWidget *parent)
 	cameraLayout->addWidget(cameraImage);
 	connect(cameraImage, &QPushButton::clicked, this, [this, cameraImage]() {
 		const auto path = QFileDialog::getOpenFileName(this, QTStr("Penguin.Camera.ChooseImage"), {},
-							       "Images (*.png *.jpg *.jpeg *.webp *.bmp)");
+							       "Images (*.png *.jpg *.jpeg *.bmp)");
 		if (path.isEmpty()) {
 			return;
 		}

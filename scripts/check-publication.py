@@ -45,4 +45,4 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--candidate", action="store_true", help="Allow explicitly pending previews for non-publishing candidate builds only")
     validate(Path(__file__).resolve().parents[1], parser.parse_args().candidate)
-    print("Current release references and reviewed English preview manifest match")
+    print("Publication checks passed")

@@ -34,7 +34,7 @@ class TwitchChat final : public QWidget {
 	QNetworkAccessManager ownedNetwork{this};
 	QNetworkAccessManager &network;
 	QPointer<QWebSocket> socket;
-	QTimer retry{this}, heartbeat{this};
+	QTimer retry{this}, heartbeat{this}, renderTimer{this};
 	QListWidget *history = new QListWidget(this);
 	QLabel *audience = new QLabel(this);
 	QPushButton *participants = new QPushButton("Chat participants", this);
@@ -74,6 +74,7 @@ class TwitchChat final : public QWidget {
 				history->setCurrentItem(item);
 			}
 		}
+		history->doItemsLayout();
 		if (follow) {
 			history->scrollToBottom();
 		} else {
@@ -517,6 +518,8 @@ public:
 		compose->addWidget(input, 1);
 		compose->addWidget(send);
 		layout->addLayout(compose);
+		renderTimer.setSingleShot(true);
+		connect(&renderTimer, &QTimer::timeout, this, [this] { Render(); });
 		retry.setSingleShot(true);
 		heartbeat.setSingleShot(true);
 		connect(&retry, &QTimer::timeout, this, [this]() { Open(); });
@@ -567,6 +570,7 @@ public:
 		++generation;
 		retry.stop();
 		heartbeat.stop();
+		renderTimer.stop();
 		audienceTimer.stop();
 		audience->setText("Twitch · Not connected");
 		participants->setEnabled(false);
@@ -660,6 +664,9 @@ public:
 				it = remove ? messages.erase(it) : std::next(it);
 			}
 		}
-		Render();
+		// Coalesce high-volume EventSub bursts without rebuilding 500 rows per message.
+		if (!renderTimer.isActive()) {
+			renderTimer.start(50);
+		}
 	}
 };

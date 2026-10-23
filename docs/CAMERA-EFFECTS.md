@@ -70,7 +70,7 @@ processing so the whole camera composition has the selected outline.
 
 Blur strength ranges from 1 to 20. Higher strengths require more GPU work. Custom
 images are centered and cropped to fill the camera area without stretching.
-Choose a PNG, JPEG, WebP or BMP image up to 8192 × 8192 pixels. Keep the image at
+Choose a PNG, JPEG or BMP image up to 8192 × 8192 pixels. Keep the image at
 its selected path: the scene stores a reference, not an embedded copy. Missing
 images leave the removed background transparent. Effect settings and the image
 path participate in undo/redo and scene persistence.
