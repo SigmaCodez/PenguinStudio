@@ -160,7 +160,7 @@ void Destroy(void *data)
 	delete static_cast<Camera *>(data);
 }
 
-obs_properties_t *Properties(void *)
+obs_properties_t *Properties(void *data)
 {
 	auto *properties = obs_properties_create();
 	auto *shape = obs_properties_add_list(properties, "shape", obs_module_text("Shape"), OBS_COMBO_TYPE_LIST,
@@ -175,6 +175,16 @@ obs_properties_t *Properties(void *)
 	const char *backgrounds[] = {"Off", "Automatic", "Green", "Blue"};
 	for (int i = 0; i < 4; ++i) {
 		obs_property_list_add_int(background, obs_module_text(backgrounds[i]), i);
+	}
+	if (data) {
+		auto *camera = static_cast<Camera *>(data);
+		obs_data_t *settings = obs_source_get_settings(camera->source);
+		const bool managed = std::strcmp(obs_data_get_string(settings, "automatic_backend"), "rvm") == 0;
+		obs_data_release(settings);
+		if (managed) {
+			obs_property_set_enabled(background, false);
+			obs_property_set_long_description(background, obs_module_text("ManagedBackground"));
+		}
 	}
 	obs_properties_add_float_slider(properties, "similarity", obs_module_text("Similarity"), 0, 90, 1);
 	obs_properties_add_text(properties, "privacy", obs_module_text("Privacy"), OBS_TEXT_INFO);

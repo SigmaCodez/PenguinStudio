@@ -582,9 +582,10 @@ void background_filter_video_tick(void *data, float seconds)
 			}
 
 			if (backgroundMask.empty()) {
-				// Something went wrong. Just use the previous mask.
-				obs_log(LOG_WARNING,
-					"Background mask is empty. This shouldn't happen. Using previous mask.");
+				// Do not leave a stale mask hiding the person after inference fails.
+				tf->penguinStatus = 3;
+				tf->isDisabled = true;
+				obs_log(LOG_ERROR, "Background inference produced an empty mask; preserving the input.");
 				return;
 			}
 
@@ -667,10 +668,12 @@ void background_filter_video_tick(void *data, float seconds)
 		}
 	} catch (const Ort::Exception &e) {
 		tf->penguinStatus = 3;
+		tf->isDisabled = true;
 		obs_log(LOG_ERROR, "ONNXRuntime Exception: %s", e.what());
 		// TODO: Fall back to CPU if it makes sense
 	} catch (const std::exception &e) {
 		tf->penguinStatus = 3;
+		tf->isDisabled = true;
 		obs_log(LOG_ERROR, "%s", e.what());
 	}
 }
