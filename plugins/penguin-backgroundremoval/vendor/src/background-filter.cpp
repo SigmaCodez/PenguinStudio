@@ -306,7 +306,7 @@ void background_filter_update(void *data, obs_data_t *settings)
 	const std::string newModel = obs_data_get_string(settings, "model_select");
 	const uint32_t newNumThreads = (uint32_t)obs_data_get_int(settings, "numThreads");
 
-	if (tf->modelSelection.empty() || tf->modelSelection != newModel || tf->useGPU != newUseGpu ||
+	if (!tf->model || tf->modelSelection.empty() || tf->modelSelection != newModel || tf->useGPU != newUseGpu ||
 	    tf->numThreads != newNumThreads) {
 		// lock modelMutex
 		std::unique_lock<std::mutex> lock(tf->modelMutex);
@@ -403,7 +403,7 @@ void background_filter_activate(void *data)
 	}
 
 	std::shared_ptr<background_removal_filter> tf = *ptr;
-	if (tf && tf->stopWhenSourceIsInactive) {
+	if (tf && tf->stopWhenSourceIsInactive && tf->penguinStatus != 3) {
 		obs_log(LOG_INFO, "Background filter activated");
 		tf->isDisabled = false;
 	}
@@ -528,6 +528,8 @@ void background_filter_video_tick(void *data, float seconds)
 	}
 
 	if (!tf->model) {
+		tf->penguinStatus = 3;
+		tf->isDisabled = true;
 		obs_log(LOG_ERROR, "Model is not initialized");
 		return;
 	}
