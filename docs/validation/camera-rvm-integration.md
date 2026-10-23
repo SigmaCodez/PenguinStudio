@@ -37,3 +37,15 @@ Boundary cases are covered by `test/penguin-v4l2-timeout.c`.
 Undo/Redo, rapid filter-pair lifecycle and preservation of unrelated filters in
 Linux package CI. Package CI and installation checks are separate from these
 local component tests. No personal camera images are stored in this repository.
+
+A package regression test also caught reordered companion filters when an
+unrelated filter was added after the Undo snapshot. Restoration now constructs
+the complete filter order before moving entries, preserving unrelated filters'
+relative order. The reproduced scenario passed locally under Wayland with five
+rapid restore cycles, no diagnostics and zero reported memory leaks.
+
+The full pixel comparisons were then run locally with the managed filter API:
+circle/oval geometry, rounded corners, green/blue keying, automatic matting,
+disabling and serialized settings all passed. Image-source capture now supplies
+the default shader when required, avoiding invalid-shader diagnostics. This run
+exited normally with no warning/error entries and zero reported memory leaks.
