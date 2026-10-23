@@ -40,6 +40,8 @@
 #include "ort-utils/ort-session-utils.hpp"
 #include "obs-utils/obs-utils.hpp"
 #include "consts.h"
+#include "../../managed-threads.hpp"
+#include <util/platform.h>
 // Penguin Studio manages component updates.
 
 struct background_removal_filter : public filter_data, public std::enable_shared_from_this<background_removal_filter> {
@@ -304,6 +306,7 @@ void background_filter_update(void *data, obs_data_t *settings)
 
 	const std::string newUseGpu = obs_data_get_string(settings, "useGPU");
 	const std::string newModel = obs_data_get_string(settings, "model_select");
+	penguin_configure_managed_threads(settings, os_get_physical_cores());
 	const uint32_t newNumThreads = (uint32_t)obs_data_get_int(settings, "numThreads");
 
 	if (!tf->model || tf->modelSelection.empty() || tf->modelSelection != newModel || tf->useGPU != newUseGpu ||

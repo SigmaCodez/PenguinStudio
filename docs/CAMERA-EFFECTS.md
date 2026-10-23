@@ -16,7 +16,7 @@ The Filters dialog exposes the individual appearance and matting filters.
 
 Automatic mode uses **Robust Video Matting** through the bundled
 [obs-backgroundremoval](https://github.com/royshil/obs-backgroundremoval) plugin.
-It runs locally on the CPU with two inference threads. No green screen, model
+It runs locally on the CPU with up to four physical CPU cores. No green screen, model
 download, cloud account or particular GPU is required. Camera frames stay on the
 device. The recurrent model retains information between frames to improve motion
 continuity. Hair, transparent items, fast motion and difficult lighting can still

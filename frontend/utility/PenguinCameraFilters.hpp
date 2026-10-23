@@ -142,7 +142,6 @@ inline bool Apply(obs_source_t *source, const char *name, int shape, int backgro
 		obs_data_set_string(mattingSettings, "model_select",
 				    "models/rvm_mobilenetv3_fp32.with_runtime_opt.ort");
 		obs_data_set_string(mattingSettings, "useGPU", "cpu");
-		obs_data_set_int(mattingSettings, "numThreads", 2);
 		obs_data_set_bool(mattingSettings, "enable_threshold", false);
 		obs_data_set_bool(mattingSettings, "enable_image_similarity", false);
 		obs_data_set_double(mattingSettings, "temporal_smooth_factor", 0.0);

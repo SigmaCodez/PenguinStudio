@@ -29,9 +29,13 @@ Input capture explicitly uses the default shader for image sources; asynchronous
 cameras retain the upstream rendering path.
 
 The camera inspector manages a tagged companion filter before the shape filter.
-It uses CPU inference with two threads, no threshold, no image-similarity frame
-skipping and no additional temporal smoothing. These are the settings accepted
-in a real Facecam movement test under Wayland. RVM maintains its own recurrent
+It uses CPU inference with up to four physical CPU cores, no threshold, no image-similarity frame
+skipping and no additional temporal smoothing. The original two-thread default
+was raised after real Wayland recording tests exposed render stalls; four threads
+eliminated the reported stalls on the tested eight-core CPU. Existing managed
+defaults migrate once; explicit non-default thread counts and independent filters
+remain unchanged. The model and mask settings accepted
+in a real Facecam movement test under Wayland are unchanged. RVM maintains its own recurrent
 state. Existing legacy camera scenes remain readable.
 
 This component does not change the licensing of unrelated files. Preserve all
