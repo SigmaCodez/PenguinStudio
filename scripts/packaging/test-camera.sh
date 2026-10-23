@@ -31,8 +31,21 @@ timeout --kill-after=5s 35s env XDG_CONFIG_HOME="$results/config" XDG_CACHE_HOME
   LD_PRELOAD="$probe" PENGUIN_CAMERA_RESULTS="$results" \
   "${PENGUIN_EXECUTABLE:-penguin-studio}" --multi --disable-updater > "$results/application.log" 2>&1
 python3 "$root/test/penguin-camera-pixels.py" "$results" "${PENGUIN_CAMERA_UI_CHECK:---inspector}"
-if grep -Ei 'error:|warning:|segmentation fault|assertion.*failed' "$results/application.log"; then
-  echo 'Camera test emitted diagnostics requiring investigation' >&2
-  exit 1
-fi
+# Headless CI has no portal settings service, DRM render node or window manager.
+# Retain every diagnostic in the log, allowing only these exact environment
+# messages there. Native desktop checks remain strict.
+python3 - "$results/application.log" "${PENGUIN_CAMERA_HEADLESS:-0}" <<'CHECK'
+import pathlib, re, sys
+allowed = {
+    "warning: Get on org.freedesktop.portal.Settings returned an invalid reply",
+    "warning: Unable to open DRM render node.",
+    "error: window manager does not support Extended Window Manager Hints (EWMH).",
+} if sys.argv[2] == "1" else set()
+lines = pathlib.Path(sys.argv[1]).read_text().splitlines()
+failures = [line for line in lines
+            if re.search(r"error:|warning:|segmentation fault|assertion.*failed", line, re.I)
+            and line not in allowed]
+if failures:
+    raise SystemExit("Camera test emitted unexpected diagnostics:\n" + "\n".join(failures))
+CHECK
 grep -F 'Number of memory leaks: 0' "$results/application.log"

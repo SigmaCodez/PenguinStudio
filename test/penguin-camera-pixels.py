@@ -9,6 +9,8 @@ report = json.loads((root / "result.json").read_text())
 assert report["visible"] and report["ai_status"] == 2, report
 if "--inspector" in sys.argv:
     assert report.get("inspector_used"), report
+    assert report["controls_enabled"] and report["controls_visible"], report
+    assert report["selected_rows"] == 1, report
     assert report["default_undo_shape"] == 0, report
     assert report["default_undo_radius"] == 25, report
     assert report["default_redo_shape"] == 1, report

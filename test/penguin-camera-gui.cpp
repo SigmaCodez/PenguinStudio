@@ -5,6 +5,7 @@
 #include <QComboBox>
 #include <QFile>
 #include <QImage>
+#include <QListView>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QPainter>
@@ -22,6 +23,22 @@ obs_scene_t *scene = nullptr;
 QJsonObject report;
 QString directory;
 QWidget *mainWindow = nullptr;
+
+void Fail(int code)
+{
+	report["failure_code"] = code;
+	QFile result(directory + "/result.json");
+	if (result.open(QIODevice::WriteOnly)) {
+		result.write(QJsonDocument(report).toJson());
+	}
+	obs_source_release(filter);
+	filter = nullptr;
+	obs_source_release(source);
+	source = nullptr;
+	obs_scene_release(scene);
+	scene = nullptr;
+	QCoreApplication::exit(code);
+}
 
 void Capture(void *data)
 {
@@ -66,6 +83,11 @@ void Mode(int shape, int background)
 	auto *shapes = mainWindow->findChild<QComboBox *>("cameraShape");
 	auto *backgrounds = mainWindow->findChild<QComboBox *>("cameraBackground");
 	if (shapes && backgrounds) {
+		report["controls_enabled"] = shapes->isEnabled() && backgrounds->isEnabled();
+		report["controls_visible"] = shapes->isVisible();
+		auto *sources = mainWindow->findChild<QListView *>("sources");
+		report["selected_rows"] = sources ? sources->selectionModel()->selectedRows().size() : -1;
+		report["initial_shape"] = shapes->currentIndex();
 		shapes->setCurrentIndex(shape);
 		backgrounds->setCurrentIndex(background);
 		report["inspector_used"] = true;
@@ -97,7 +119,7 @@ void Start()
 			}
 		}
 		if (!mainWindow) {
-			QCoreApplication::exit(42);
+			Fail(42);
 			return;
 		}
 		if (!obs_source_get_display_name("penguin_camera_filter")) {
@@ -106,7 +128,7 @@ void Start()
 			const auto data = qgetenv("PENGUIN_CAMERA_DATA");
 			if (obs_open_module(&module, path.constData(), data.constData()) != MODULE_SUCCESS ||
 			    !obs_init_module(module)) {
-				QCoreApplication::exit(43);
+				Fail(43);
 				return;
 			}
 		}
@@ -117,7 +139,7 @@ void Start()
 			painter.fillRect(240, 100, 161, 201, Qt::red);
 			painter.end();
 			if (!image.save(directory + '/' + name + ".png")) {
-				QCoreApplication::exit(44);
+				Fail(44);
 				return;
 			}
 		}
@@ -127,7 +149,7 @@ void Start()
 		obs_data_release(settings);
 		filter = obs_source_create("penguin_camera_filter", "Camera appearance", nullptr, nullptr);
 		if (!source || !filter) {
-			QCoreApplication::exit(45);
+			Fail(45);
 			return;
 		}
 		obs_source_filter_add(source, filter);
@@ -135,6 +157,17 @@ void Start()
 		auto *item = obs_scene_add(scene, source);
 		obs_frontend_set_current_scene(obs_scene_get_source(scene));
 		obs_sceneitem_select(item, true);
+	});
+	QTimer::singleShot(4000, qApp, [] {
+		// Scene changes reach the source tree asynchronously. Select its row
+		// after that update, just as a user selecting the source would do.
+		auto *sources = mainWindow->findChild<QListView *>("sources");
+		if (sources && sources->model()->rowCount() == 1) {
+			const auto index = sources->model()->index(0, 0);
+			sources->setCurrentIndex(index);
+			sources->selectionModel()->select(index, QItemSelectionModel::ClearAndSelect |
+									 QItemSelectionModel::Rows);
+		}
 	});
 	QTimer::singleShot(4500, qApp, [] {
 		Snap("rectangle");
@@ -144,9 +177,9 @@ void Start()
 		if (!report["inspector_used"].toBool()) {
 			return;
 		}
-		auto *undo = mainWindow->findChild<QAction *>("actionUndo");
+		auto *undo = mainWindow->findChild<QAction *>("actionMainUndo");
 		if (!undo || !undo->isEnabled()) {
-			QCoreApplication::exit(48);
+			Fail(48);
 			return;
 		}
 		undo->trigger();
@@ -159,9 +192,9 @@ void Start()
 		if (!report["inspector_used"].toBool()) {
 			return;
 		}
-		auto *redo = mainWindow->findChild<QAction *>("actionRedo");
+		auto *redo = mainWindow->findChild<QAction *>("actionMainRedo");
 		if (!redo || !redo->isEnabled()) {
-			QCoreApplication::exit(49);
+			Fail(49);
 			return;
 		}
 		redo->trigger();
@@ -211,7 +244,8 @@ void Start()
 		auto *saved = obs_save_source(source);
 		QFile settings(directory + "/source.json");
 		if (!settings.open(QIODevice::WriteOnly)) {
-			QCoreApplication::exit(46);
+			obs_data_release(saved);
+			Fail(46);
 			return;
 		}
 		settings.write(obs_data_get_json(saved));
@@ -220,7 +254,7 @@ void Start()
 		report["visible"] = mainWindow->isVisible();
 		QFile result(directory + "/result.json");
 		if (!result.open(QIODevice::WriteOnly)) {
-			QCoreApplication::exit(47);
+			Fail(47);
 			return;
 		}
 		result.write(QJsonDocument(report).toJson());
