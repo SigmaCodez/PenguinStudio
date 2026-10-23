@@ -40,6 +40,12 @@ not need an OBS remote or a source checkout.
 
 ## Review and validation
 
+Every release must refresh current GitHub text and English GUI previews. Follow
+[publication maintenance](docs/PUBLICATION.md), including visual review, before
+changing `packaging/version.txt`. The release checks reject stale version references
+and preview manifests. Historical localization evidence is an archive, not product
+preview material.
+
 Explain the problem, resulting behavior and verification in each pull request.
 Use focused changes and disclose untested environments or external account flows.
 All contributors are responsible for understanding and reviewing submitted code,

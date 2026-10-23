@@ -1,5 +1,10 @@
 # Verification and release gates
 
+> Historical test archive: dated screenshots below document the version and locale
+> tested at that time, including German localization tests. They are not current
+> product previews. For the current English GUI, see the [workspace guide](WORKSPACE.md)
+> and [preview provenance](images/current/manifest.json).
+
 This is a development preview based on OBS Studio 32.2.2. The new Penguin code must not be described as fully production-tested until the checks below have real recorded results.
 
 ## Current-frame camera matting 0.5.3
@@ -22,6 +27,12 @@ recording check therefore did **not** pass. Both closed with exit code 0, no
 warnings/errors and zero reported memory leaks. Fast, blurred hands can still
 have incomplete edges. These local component results do not certify a release
 package or guarantee perfect matting. Personal footage is not in this repository.
+
+The final 0.5.3 Ubuntu 26.04 package subsequently passed the same recording checks
+without reported rendering/encoding stalls. The installed-package GUI and replay
+checks passed under Wayland with normal shutdown and zero reported memory leaks.
+The tester accepted the corrected live result as significantly better and usable.
+All seven downloads passed [release build 40023377072](https://github.com/SigmaCodez/PenguinStudio/actions/runs/40023377072).
 
 ## Camera appearance 0.5.0 — 2026-10-23
 

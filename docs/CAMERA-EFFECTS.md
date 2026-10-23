@@ -4,7 +4,7 @@ Select a camera or another video source and open **Camera appearance** in the
 source Inspector. Use the Inspector to manage background removal together with camera shapes.
 The Filters dialog exposes the individual appearance and matting filters.
 
-![Camera appearance controls in the source Inspector](images/camera-appearance.png)
+![Camera appearance controls in the source Inspector](images/current/camera-en.png)
 
 - **Shape:** Rectangle, Circle, Oval, or Rounded corners. A circle keeps equal
   pixel radii; an oval fills the source's original aspect ratio. Rounded corners
@@ -45,6 +45,8 @@ AppImage and the Arch binary package inherit the same files from the native pack
 See `plugins/penguin-backgroundremoval/PROVENANCE.md` for the RVM plugin,
 model licenses and exact upstream revision. The legacy model retains its notices
 in `plugins/penguin-camera/data/MODEL-NOTICE.txt`.
+
+Current English interface, captured from Penguin Studio 0.5.3. The sample artwork demonstrates rounded corners; it is not a webcam or an AI-removal quality demonstration.
 
 ## Validation
 
