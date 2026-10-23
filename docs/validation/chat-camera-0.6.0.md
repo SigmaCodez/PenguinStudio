@@ -38,4 +38,16 @@ leaks on normal shutdown. No webcam or microphone was captured.
 
 ## Full-package validation
 
-Pending the 0.6.0 candidate builds and packaged Wayland checks.
+The Ubuntu 26.04 candidate built from `197550e4` passed the full native Wayland
+Inspector test: all six background choices were available, blur and image paths
+were applied through the real controls, and shape/keying, rounded corners,
+undo/redo, settings restoration and missing-image fallback passed. It closed
+with no warning/error diagnostics and zero reported memory leaks.
+
+The three English product previews were captured from that actual package under
+XWayland, using synthetic media and explicitly labelled local chat messages.
+Each was visually reviewed; capture provenance is in the current-image manifest.
+Later chat fixes are covered by the current request/event regression fixtures.
+
+Release-build and installed-version verification are recorded separately after
+all final artifacts are available.

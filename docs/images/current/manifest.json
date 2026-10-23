@@ -1,24 +1,23 @@
 {
-  "version": "0.5.3",
+  "version": "0.6.0",
   "language": "en-US",
-  "source_commit": "831464569e339a45ca458227e6a18c6fa2f45952",
-  "package": "0.5.3-1+ubuntu26.04",
-  "captured_on": "2026-10-23",
-  "capture_method": "Native XComposite window capture of the installed Qt application under XWayland; includes the actual program preview",
-  "content": "Synthetic local demo artwork and audio; no camera footage or signed-in accounts",
+  "source_commit": "197550e4fb79adbff6b0b4798e259141b760f5ba",
+  "package": "0.6.0-1+ubuntu26.04",
+  "captured_on": "2026-10-24",
+  "capture_method": "XComposite window capture of the real Ubuntu 26.04 candidate package under XWayland, using an isolated English profile; native Wayland tested separately",
+  "content": "Synthetic local artwork, audio and explicitly labelled local demo chat messages; no camera footage or signed-in accounts",
   "images": [
     {
       "file": "workspace-en.png",
-      "sha256": "62e355eed45e1727089f9025c52651d3b17e5b9b61fc73c8e5aee489df8147b7"
+      "sha256": "9b8b0634913963a320a94b00951f1e8ae9c5eb6835f631ad1fd50eeb9b9f3c14"
     },
     {
       "file": "camera-en.png",
-      "sha256": "1f5a6ed1cd60d899147d5cb8f85eb05fc3f460cc0d8fcac8ea11684e07777b86"
+      "sha256": "171ee6d31b4efba3c829337cdf3a3e9ab60ce98e5c5ee84d8c67f5f278b08a09"
     },
     {
       "file": "stream-details-en.png",
-      "sha256": "46c3e73d71fd7c54c72f26930c7493640014e152179ac522be27bb3b90432c44"
+      "sha256": "5523ccfb6366eb3163b83794769f9ea3dcb12ea0d584b561f3d19a63693af2e6"
     }
-  ],
-  "pending_version": "0.6.0"
+  ]
 }

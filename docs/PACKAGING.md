@@ -30,9 +30,8 @@ recipes deliberately target x86_64 only.
 ## Automatic versioned downloads
 
 **[Download Penguin Studio 0.6.0](https://github.com/SigmaCodez/PenguinStudio/releases/tag/penguin-v0.6.0)**
-The candidate is being validated. Publication requires every package build and
-release check to pass; refer to the release build manifest for the final source
-commit and checksums.
+Publication requires every package build and release check to pass. Refer to
+the release build manifest for the final source commit and checksums.
 
 [GitHub Releases](https://github.com/SigmaCodez/PenguinStudio/releases) provides
 permanent downloads of Ubuntu 24.04 and 26.04 DEBs, Fedora 44 RPM, Flatpak,
@@ -64,7 +63,9 @@ Download the Ubuntu 26.04 DEB from [Penguin Studio releases](https://github.com/
 Ubuntu 26.04.1 uses the same package. Do not install the Ubuntu 24.04 DEB on
 26.04 or mix distribution repositories to satisfy its dependencies.
 
-The new chat and camera modes are undergoing packaged Wayland validation.
+The Ubuntu 26.04 candidate passed native Wayland camera-control, blur, custom-image
+and clean-shutdown tests. Chat request fixtures and a synthetic recording were also
+checked; see [0.6.0 validation](validation/chat-camera-0.6.0.md) for scope and limits.
 Earlier installed-version results remain in the [verification history](VERIFICATION.md).
 
 The download is `penguin-studio_0.6.0-1+ubuntu26.04_amd64.deb`.
