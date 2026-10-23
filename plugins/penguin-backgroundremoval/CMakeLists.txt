@@ -10,6 +10,12 @@ FetchContent_GetProperties(penguin_ort)
 # Build only the two required OpenCV modules, privately and without optional
 # downloads or device backends. This keeps all Linux package formats consistent.
 function(penguin_build_camera_opencv)
+  # OpenCV caches this legacy global variable. Do not redirect Penguin's test
+  # executables away from the paths used by package verification scripts.
+  if(DEFINED CACHE{EXECUTABLE_OUTPUT_PATH})
+    set(saved_executable_output_path "$CACHE{EXECUTABLE_OUTPUT_PATH}")
+    set(had_executable_output_path TRUE)
+  endif()
   set(CMAKE_COMPILE_WARNING_AS_ERROR OFF)
   set(BUILD_LIST core,imgproc)
   set(BUILD_SHARED_LIBS OFF)
@@ -36,6 +42,11 @@ function(penguin_build_camera_opencv)
     EXCLUDE_FROM_ALL
   )
   FetchContent_MakeAvailable(penguin_cv)
+  if(had_executable_output_path)
+    set(EXECUTABLE_OUTPUT_PATH "${saved_executable_output_path}" CACHE PATH "Output directory for applications" FORCE)
+  else()
+    unset(EXECUTABLE_OUTPUT_PATH CACHE)
+  endif()
 endfunction()
 penguin_build_camera_opencv()
 FetchContent_GetProperties(penguin_cv)
