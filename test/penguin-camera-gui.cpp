@@ -16,6 +16,8 @@
 #include <obs-frontend-api.h>
 #include <graphics/vec4.h>
 #include <cstring>
+#include <deque>
+#include <functional>
 #include "../frontend/utility/PenguinCameraFilters.hpp"
 
 namespace {
@@ -24,6 +26,32 @@ obs_scene_t *scene = nullptr;
 QJsonObject report;
 QString directory;
 QWidget *mainWindow = nullptr;
+
+// Each wait starts after the preceding step completes. Independent coarse Qt
+// timers can overlap (notably Undo/Redo/capture) on a loaded CI runner.
+struct TestStep {
+	int delay;
+	std::function<void()> run;
+};
+std::deque<TestStep> steps;
+int previousDeadline = 0;
+void NextStep()
+{
+	if (steps.empty()) {
+		return;
+	}
+	auto step = std::move(steps.front());
+	steps.pop_front();
+	QTimer::singleShot(step.delay, Qt::PreciseTimer, qApp, [run = std::move(step.run)] {
+		run();
+		NextStep();
+	});
+}
+void At(int deadline, std::function<void()> run)
+{
+	steps.push_back({deadline - previousDeadline, std::move(run)});
+	previousDeadline = deadline;
+}
 
 void Fail(int code)
 {
@@ -113,7 +141,7 @@ void Start()
 	if (directory.isEmpty()) {
 		return;
 	}
-	QTimer::singleShot(3000, qApp, [] {
+	At(3000, [] {
 		for (auto *widget : QApplication::topLevelWidgets()) {
 			if (!std::strcmp(widget->metaObject()->className(), "OBSBasic")) {
 				mainWindow = widget;
@@ -159,7 +187,7 @@ void Start()
 		obs_frontend_set_current_scene(obs_scene_get_source(scene));
 		obs_sceneitem_select(item, true);
 	});
-	QTimer::singleShot(4000, qApp, [] {
+	At(4000, [] {
 		// Scene changes reach the source tree asynchronously. Select its row
 		// after that update, just as a user selecting the source would do.
 		auto *sources = mainWindow->findChild<QListView *>("sources");
@@ -170,11 +198,11 @@ void Start()
 									 QItemSelectionModel::Rows);
 		}
 	});
-	QTimer::singleShot(4500, qApp, [] {
+	At(4500, [] {
 		Snap("rectangle");
 		Mode(1, 0);
 	});
-	QTimer::singleShot(5000, qApp, [] {
+	At(5000, [] {
 		if (!report["inspector_used"].toBool()) {
 			return;
 		}
@@ -189,7 +217,7 @@ void Start()
 		report["default_undo_radius"] = obs_data_get_double(settings, "radius");
 		obs_data_release(settings);
 	});
-	QTimer::singleShot(5250, qApp, [] {
+	At(5250, [] {
 		if (!report["inspector_used"].toBool()) {
 			return;
 		}
@@ -203,30 +231,30 @@ void Start()
 		report["default_redo_shape"] = int(obs_data_get_int(settings, "shape"));
 		obs_data_release(settings);
 	});
-	QTimer::singleShot(5500, qApp, [] {
+	At(5500, [] {
 		Snap("circle");
 		Mode(2, 0);
 	});
-	QTimer::singleShot(6500, qApp, [] {
+	At(6500, [] {
 		Snap("oval");
 		Mode(3, 0);
 	});
-	QTimer::singleShot(7500, qApp, [] {
+	At(7500, [] {
 		Snap("rounded");
 		Mode(0, 2);
 	});
-	QTimer::singleShot(8500, qApp, [] {
+	At(8500, [] {
 		Snap("green-key");
 		Image(directory + "/blue.png");
 		Mode(0, 3);
 	});
-	QTimer::singleShot(9500, qApp, [] {
+	At(9500, [] {
 		Snap("blue-key");
 		const QString portrait = qEnvironmentVariable("PENGUIN_CAMERA_PORTRAIT");
 		Image(portrait.isEmpty() ? directory + "/green.png" : portrait);
 		Mode(0, 1);
 	});
-	QTimer::singleShot(10500, qApp, [] {
+	At(10500, [] {
 		if (!report["inspector_used"].toBool()) {
 			return;
 		}
@@ -235,7 +263,7 @@ void Start()
 		mainWindow->findChild<QAction *>("actionMainRedo")->trigger();
 		report["automatic_redo_restored_matting"] = bool(PenguinCamera::CameraMatting(source));
 	});
-	QTimer::singleShot(14500, qApp, [] {
+	At(14500, [] {
 		Snap("automatic");
 		calldata_t parameters;
 		calldata_init(&parameters);
@@ -247,11 +275,11 @@ void Start()
 		calldata_free(&parameters);
 		Mode(1, 1);
 	});
-	QTimer::singleShot(16000, qApp, [] {
+	At(16000, [] {
 		Snap("automatic-circle");
 		Mode(0, 0);
 	});
-	QTimer::singleShot(17500, qApp, [] {
+	At(17500, [] {
 		Snap("disabled");
 		Mode(3, 2);
 		auto *saved = obs_save_source(source);
@@ -302,6 +330,7 @@ void Start()
 		obs_scene_release(scene);
 		mainWindow->close();
 	});
+	NextStep();
 }
 } // namespace
 Q_COREAPP_STARTUP_FUNCTION(Start)
