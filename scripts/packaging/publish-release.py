@@ -86,6 +86,9 @@ all listed files, or compare the entry for the package you downloaded.
 
 Source: `{sha}`. [Build and checks]({manifest['workflow_url']}).
 ''')
+    version_notes = Path('docs/releases') / f'{version}.md'
+    if version_notes.is_file():
+        notes.write_text(notes.read_text() + '\n' + version_notes.read_text())
     # An existing tag must identify precisely the built source. Never move it.
     refs = json.loads(gh('api', f'repos/{repo}/git/matching-refs/tags/{tag}'))
     exact = [r for r in refs if r['ref'] == f'refs/tags/{tag}']
