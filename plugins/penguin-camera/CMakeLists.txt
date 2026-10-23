@@ -8,8 +8,8 @@ endif()
 include(FetchContent)
 FetchContent_Declare(
   penguin_ort
-  URL https://github.com/microsoft/onnxruntime/releases/download/v1.20.1/onnxruntime-linux-x64-1.20.1.tgz
-  URL_HASH SHA256=67db4dc1561f1e3fd42e619575c82c601ef89849afc7ea85a003abbac1a1a105
+  URL https://github.com/microsoft/onnxruntime/releases/download/v1.23.2/onnxruntime-linux-x64-1.23.2.tgz
+  URL_HASH SHA256=1fa4dcaef22f6f7d5cd81b28c2800414350c10116f5fdd46a2160082551c5f9b
 )
 FetchContent_MakeAvailable(penguin_ort)
 add_library(penguin-camera MODULE penguin-camera.cpp)
@@ -30,3 +30,6 @@ if(PENGUIN_BUILD_TESTS)
   target_include_directories(penguin-camera-model PRIVATE "${CMAKE_SOURCE_DIR}" "${penguin_ort_SOURCE_DIR}/include")
   target_link_libraries(penguin-camera-model PRIVATE "${penguin_ort_SOURCE_DIR}/lib/libonnxruntime.so")
 endif()
+
+install(FILES "${penguin_ort_SOURCE_DIR}/LICENSE" "${penguin_ort_SOURCE_DIR}/ThirdPartyNotices.txt"
+  DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/licenses/penguin-studio/onnxruntime" COMPONENT Runtime)

@@ -4,6 +4,7 @@
 #include "OBSBasic.hpp"
 
 #include <utility/PenguinIcons.hpp>
+#include <utility/PenguinCameraFilters.hpp>
 
 #include <QApplication>
 #include <QComboBox>
@@ -30,8 +31,9 @@ QLabel *Label(const QString &text, QWidget *parent, const char *name = nullptr)
 {
 	auto *label = new QLabel(text, parent);
 	label->setTextFormat(Qt::PlainText);
-	if (name)
+	if (name) {
 		label->setObjectName(QString::fromUtf8(name));
+	}
 	return label;
 }
 
@@ -42,8 +44,9 @@ QFrame *Card(QWidget *parent, QVBoxLayout *layout, const QString &title)
 	auto *box = new QVBoxLayout(card);
 	box->setContentsMargins(0, 12, 0, 0);
 	box->setSpacing(10);
-	if (!title.isEmpty())
+	if (!title.isEmpty()) {
 		box->addWidget(Label(title, card, "inspectorSectionTitle"));
+	}
 	layout->addWidget(card);
 	return card;
 }
@@ -70,59 +73,14 @@ bool Editing(const QWidget *widget)
 	return widget->hasFocus() || (focus && widget->isAncestorOf(focus));
 }
 
-constexpr const char *CameraFilterId = "penguin_camera_filter";
-
-OBSSourceAutoRelease CameraFilter(obs_source_t *source)
-{
-	obs_source_t *result = nullptr;
-	obs_source_enum_filters(
-		source,
-		[](obs_source_t *, obs_source_t *filter, void *data) {
-			auto **found = static_cast<obs_source_t **>(data);
-			if (!*found && std::strcmp(obs_source_get_id(filter), CameraFilterId) == 0) {
-				*found = obs_source_get_ref(filter);
-			}
-		},
-		&result);
-	return OBSSourceAutoRelease(result);
-}
-
-std::string SaveCamera(obs_source_t *source)
-{
-	OBSDataAutoRelease data = obs_data_create();
-	obs_data_set_string(data, "source_uuid", obs_source_get_uuid(source));
-	auto filter = CameraFilter(source);
-	if (filter) {
-		OBSDataAutoRelease saved = obs_save_source(filter);
-		obs_data_set_obj(data, "filter", saved);
-	}
-	return obs_data_get_json(data);
-}
+using PenguinCamera::CameraFilterId;
+using PenguinCamera::CameraFilter;
+using PenguinCamera::CameraMatting;
+using PenguinCamera::SaveCamera;
 
 void RestoreCamera(const std::string &json)
 {
-	OBSDataAutoRelease data = obs_data_create_from_json(json.c_str());
-	OBSSourceAutoRelease source = obs_get_source_by_uuid(obs_data_get_string(data, "source_uuid"));
-	if (!source) {
-		return;
-	}
-	auto filter = CameraFilter(source);
-	OBSDataAutoRelease saved = obs_data_get_obj(data, "filter");
-	if (!saved) {
-		if (filter) {
-			obs_source_filter_remove(source, filter);
-		}
-	} else if (filter) {
-		OBSDataAutoRelease settings = obs_data_get_obj(saved, "settings");
-		// Empty snapshots mean defaults, so merging would leave later edits active.
-		obs_source_reset_settings(filter, settings);
-		obs_source_set_enabled(filter, obs_data_get_bool(saved, "enabled"));
-	} else {
-		OBSSourceAutoRelease restored = obs_load_source(saved);
-		if (restored) {
-			obs_source_filter_add(source, restored);
-		}
-	}
+	PenguinCamera::RestoreCamera(json);
 	OBSBasic::Get()->SaveProject();
 }
 
@@ -130,15 +88,18 @@ void RestoreTransform(const std::string &json)
 {
 	OBSDataAutoRelease data = obs_data_create_from_json(json.c_str());
 	OBSSourceAutoRelease scene = obs_get_source_by_uuid(obs_data_get_string(data, "scene_uuid"));
-	if (!scene)
+	if (!scene) {
 		return;
+	}
 	OBSBasic::Get()->SetCurrentScene(scene.Get(), true);
 	obs_scene_load_transform_states(json.c_str());
 }
 } // namespace
 
 PenguinInspector::PenguinInspector(OBSBasic *mainWindow, QWidget *parent)
-	: QWidget(parent), main(mainWindow), refreshTimer(this)
+	: QWidget(parent),
+	  main(mainWindow),
+	  refreshTimer(this)
 {
 	setObjectName(QStringLiteral("penguinInspector"));
 	setMinimumWidth(340);
@@ -230,7 +191,7 @@ PenguinInspector::PenguinInspector(OBSBasic *mainWindow, QWidget *parent)
 	connect(locked, &QToolButton::clicked, this, [this](bool value) { ChangeFlag(false, value); });
 
 	auto addAction = [this](QGridLayout *grid, int row, int column, const char *key, const char *name,
-			       const std::function<void()> &callback) {
+				const std::function<void()> &callback) {
 		const QString label = QTStr(key);
 		// Action labels are plain language, not keyboard mnemonics.
 		auto *button = new QPushButton(QString(label).replace(QLatin1Char('&'), QStringLiteral("&&")), content);
@@ -241,8 +202,9 @@ PenguinInspector::PenguinInspector(OBSBasic *mainWindow, QWidget *parent)
 		button->setMinimumHeight(32);
 		grid->addWidget(button, row, column);
 		connect(button, &QPushButton::clicked, this, [this, callback]() {
-			if (!CurrentItem())
+			if (!CurrentItem()) {
 				return;
+			}
 			callback();
 			RefreshSelection();
 		});
@@ -250,14 +212,17 @@ PenguinInspector::PenguinInspector(OBSBasic *mainWindow, QWidget *parent)
 	};
 	auto *sourceActions = new QGridLayout;
 	sourceActions->setSpacing(6);
-	auto *properties = addAction(sourceActions, 0, 0, "Penguin.Inspector.Properties", "inspectorProperties", [this]() {
-		if (auto item = CurrentItem())
-			main->CreatePropertiesWindow(obs_sceneitem_get_source(item));
-	});
+	auto *properties =
+		addAction(sourceActions, 0, 0, "Penguin.Inspector.Properties", "inspectorProperties", [this]() {
+			if (auto item = CurrentItem()) {
+				main->CreatePropertiesWindow(obs_sceneitem_get_source(item));
+			}
+		});
 	properties->setIcon(PenguinStudio::StudioIcon(PenguinStudio::Icon::Settings));
 	auto *filters = addAction(sourceActions, 1, 0, "Penguin.Inspector.Filters", "inspectorFilters", [this]() {
-		if (auto item = CurrentItem())
+		if (auto item = CurrentItem()) {
 			main->CreateFiltersWindow(obs_sceneitem_get_source(item));
+		}
 	});
 	filters->setIcon(PenguinStudio::StudioIcon(PenguinStudio::Icon::Inspect));
 	contents->addLayout(sourceActions);
@@ -316,7 +281,8 @@ PenguinInspector::PenguinInspector(OBSBasic *mainWindow, QWidget *parent)
 	transformLayout->addLayout(position);
 
 	auto *dimensionsTitle = new QHBoxLayout;
-	dimensionsTitle->addWidget(Label(QTStr("Penguin.Inspector.Dimensions"), transformCard, "inspectorFieldLabel"), 1);
+	dimensionsTitle->addWidget(Label(QTStr("Penguin.Inspector.Dimensions"), transformCard, "inspectorFieldLabel"),
+				   1);
 	aspectLock = new QToolButton(transformCard);
 	aspectLock->setObjectName(QStringLiteral("inspectorAspectLock"));
 	aspectLock->setIcon(PenguinStudio::StudioIcon(PenguinStudio::Icon::Link));
@@ -346,21 +312,25 @@ PenguinInspector::PenguinInspector(OBSBasic *mainWindow, QWidget *parent)
 	transformFields[4]->setSuffix(QStringLiteral("°"));
 	rotation->addWidget(transformFields[4], 1);
 	transformLayout->addLayout(rotation);
-	for (size_t index = 0; index < transformFields.size(); ++index)
+	for (size_t index = 0; index < transformFields.size(); ++index) {
 		connect(transformFields[index], &QDoubleSpinBox::valueChanged, this,
 			[this, index](double value) { ChangeTransform(index, value); });
+	}
 
 	auto *arrange = new QGridLayout;
 	arrange->setSpacing(6);
 	const std::array<QPushButton *, 4> arrangeButtons = {
-		addAction(arrange, 0, 0, "Penguin.Inspector.Fit", "inspectorFit", [this]() { main->on_actionFitToScreen_triggered(); }),
-		addAction(arrange, 0, 1, "Penguin.Inspector.Center", "inspectorCenter", [this]() { main->on_actionCenterToScreen_triggered(); }),
+		addAction(arrange, 0, 0, "Penguin.Inspector.Fit", "inspectorFit",
+			  [this]() { main->on_actionFitToScreen_triggered(); }),
+		addAction(arrange, 0, 1, "Penguin.Inspector.Center", "inspectorCenter",
+			  [this]() { main->on_actionCenterToScreen_triggered(); }),
 		addAction(arrange, 0, 2, "Penguin.Inspector.FlipHorizontal", "inspectorFlipHorizontal",
 			  [this]() { main->on_actionFlipHorizontal_triggered(); }),
 		addAction(arrange, 0, 3, "Penguin.Inspector.FlipVertical", "inspectorFlipVertical",
 			  [this]() { main->on_actionFlipVertical_triggered(); })};
 	const std::array<PenguinStudio::Icon, 4> arrangeIcons = {PenguinStudio::Icon::Fit, PenguinStudio::Icon::Center,
-		PenguinStudio::Icon::FlipHorizontal, PenguinStudio::Icon::FlipVertical};
+								 PenguinStudio::Icon::FlipHorizontal,
+								 PenguinStudio::Icon::FlipVertical};
 	for (size_t index = 0; index < arrangeButtons.size(); ++index) {
 		auto *button = arrangeButtons[index];
 		button->setProperty("class", "inspector-arrange");
@@ -387,9 +357,10 @@ PenguinInspector::PenguinInspector(OBSBasic *mainWindow, QWidget *parent)
 	cropGrid->setContentsMargins(0, 0, 0, 0);
 	cropGrid->setHorizontalSpacing(6);
 	cropGrid->setVerticalSpacing(6);
-	const std::array<const char *, 4> cropNames = {"inspectorCropLeft", "inspectorCropRight", "inspectorCropTop", "inspectorCropBottom"};
+	const std::array<const char *, 4> cropNames = {"inspectorCropLeft", "inspectorCropRight", "inspectorCropTop",
+						       "inspectorCropBottom"};
 	const std::array<const char *, 4> cropLabels = {"Penguin.Inspector.CropLeft", "Penguin.Inspector.CropRight",
-		"Penguin.Inspector.CropTop", "Penguin.Inspector.CropBottom"};
+							"Penguin.Inspector.CropTop", "Penguin.Inspector.CropBottom"};
 	for (size_t index = 0; index < cropFields.size(); ++index) {
 		auto *field = new QSpinBox(cropBody);
 		cropFields[index] = field;
@@ -402,7 +373,8 @@ PenguinInspector::PenguinInspector(OBSBasic *mainWindow, QWidget *parent)
 		field->setMinimumHeight(30);
 		field->setMinimumWidth(0);
 		field->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Fixed);
-		cropGrid->addWidget(Label(QTStr(cropLabels[index]), cropBody, "inspectorFieldLabel"), int(index / 2) * 2, int(index % 2));
+		cropGrid->addWidget(Label(QTStr(cropLabels[index]), cropBody, "inspectorFieldLabel"),
+				    int(index / 2) * 2, int(index % 2));
 		cropGrid->addWidget(field, int(index / 2) * 2 + 1, int(index % 2));
 		connect(field, &QSpinBox::valueChanged, this, [this, index](int value) { ChangeCrop(index, value); });
 	}
@@ -415,12 +387,10 @@ PenguinInspector::PenguinInspector(OBSBasic *mainWindow, QWidget *parent)
 
 	auto *advancedActions = new QGridLayout;
 	advancedActions->setSpacing(6);
-	addAction(advancedActions, 0, 0, "Penguin.Inspector.Advanced", "inspectorAdvanced", [this]() {
-		main->CreateEditTransformWindow(CurrentItem());
-	});
-	auto *reset = addAction(advancedActions, 1, 0, "Penguin.Inspector.Reset", "inspectorReset", [this]() {
-		main->on_actionResetTransform_triggered();
-	});
+	addAction(advancedActions, 0, 0, "Penguin.Inspector.Advanced", "inspectorAdvanced",
+		  [this]() { main->CreateEditTransformWindow(CurrentItem()); });
+	auto *reset = addAction(advancedActions, 1, 0, "Penguin.Inspector.Reset", "inspectorReset",
+				[this]() { main->on_actionResetTransform_triggered(); });
 	reset->setIcon(PenguinStudio::StudioIcon(PenguinStudio::Icon::Reset));
 	contents->addLayout(advancedActions);
 	connect(&refreshTimer, &QTimer::timeout, this, &PenguinInspector::RefreshSelection);
@@ -432,8 +402,10 @@ PenguinInspector::~PenguinInspector() = default;
 
 OBSSceneItem PenguinInspector::CurrentItem() const
 {
-	if (stopped || !main || !obs_initialized() || main->isClosing() || main->GetAllSelectedSourceItems().size() != 1)
+	if (stopped || !main || !obs_initialized() || main->isClosing() ||
+	    main->GetAllSelectedSourceItems().size() != 1) {
 		return nullptr;
+	}
 	return main->GetCurrentSceneItem();
 }
 
@@ -446,8 +418,9 @@ void PenguinInspector::Shutdown()
 
 void PenguinInspector::RefreshSelection()
 {
-	if (stopped)
+	if (stopped) {
 		return;
+	}
 	if (main && main->isClosing()) {
 		Shutdown();
 		return;
@@ -458,15 +431,19 @@ void PenguinInspector::RefreshSelection()
 	emptyState->setVisible(!item);
 	if (!item) {
 		selectionToken.clear();
-		emptyTitle->setText(selected > 1 ? QTStr("Penguin.Inspector.Multiple").arg(selected) : QTStr("Penguin.Inspector.EmptyTitle"));
-		emptyHint->setText(QTStr(selected > 1 ? "Penguin.Inspector.MultipleHint" : "Penguin.Inspector.EmptyHint"));
+		emptyTitle->setText(selected > 1 ? QTStr("Penguin.Inspector.Multiple").arg(selected)
+						 : QTStr("Penguin.Inspector.EmptyTitle"));
+		emptyHint->setText(
+			QTStr(selected > 1 ? "Penguin.Inspector.MultipleHint" : "Penguin.Inspector.EmptyHint"));
 		return;
 	}
 	auto *source = obs_sceneitem_get_source(item);
 	auto *scene = obs_sceneitem_get_scene(item);
-	if (!source || !scene)
+	if (!source || !scene) {
 		return;
-	const QString token = QString::fromUtf8(obs_source_get_uuid(obs_scene_get_source(scene))) + ':' + QString::number(obs_sceneitem_get_id(item));
+	}
+	const QString token = QString::fromUtf8(obs_source_get_uuid(obs_scene_get_source(scene))) + ':' +
+			      QString::number(obs_sceneitem_get_id(item));
 	const bool changed = token != selectionToken;
 	selectionToken = token;
 	syncing = true;
@@ -478,7 +455,8 @@ void PenguinInspector::RefreshSelection()
 	const uint32_t sourceWidth = obs_source_get_width(source);
 	const uint32_t sourceHeight = obs_source_get_height(source);
 	sourceSize->setText(QTStr("Penguin.Inspector.SourceSize").arg(sourceWidth).arg(sourceHeight));
-	const bool editable = !obs_sceneitem_locked(item) && (obs_source_get_output_flags(source) & OBS_SOURCE_VIDEO) && sourceWidth && sourceHeight;
+	const bool editable = !obs_sceneitem_locked(item) && (obs_source_get_output_flags(source) & OBS_SOURCE_VIDEO) &&
+			      sourceWidth && sourceHeight;
 	const bool cameraAvailable = obs_source_get_display_name(CameraFilterId) != nullptr;
 	cameraCard->setVisible(cameraAvailable && (obs_source_get_output_flags(source) & OBS_SOURCE_VIDEO));
 	cameraCard->setEnabled(editable);
@@ -505,10 +483,14 @@ void PenguinInspector::RefreshSelection()
 	cameraSimilarity->setVisible(cameraBackground->currentIndex() >= 2);
 	calldata_t status;
 	calldata_init(&status);
-	if (camera) {
-		proc_handler_call(obs_source_get_proc_handler(camera), "camera_status", &status);
+	auto matting = CameraMatting(source);
+	const bool usesRvm = std::strcmp(obs_data_get_string(cameraSettings, "automatic_backend"), "rvm") == 0;
+	auto *statusSource = usesRvm ? matting.Get() : camera.Get();
+	int aiStatus = 3;
+	if (statusSource && obs_source_enabled(statusSource) &&
+	    proc_handler_call(obs_source_get_proc_handler(statusSource), "camera_status", &status)) {
+		aiStatus = int(calldata_int(&status, "status"));
 	}
-	const int aiStatus = int(calldata_int(&status, "status"));
 	calldata_free(&status);
 	const char *statusKey = "Penguin.Camera.Privacy";
 	if (camera && !obs_source_enabled(camera)) {
@@ -527,33 +509,47 @@ void PenguinInspector::RefreshSelection()
 	obs_sceneitem_crop crop;
 	obs_sceneitem_get_info2(item, &info);
 	obs_sceneitem_get_crop(item, &crop);
-	const double width = info.bounds_type == OBS_BOUNDS_NONE ? std::max(0.0, double(sourceWidth) - crop.left - crop.right) * std::abs(info.scale.x) : info.bounds.x;
-	const double height = info.bounds_type == OBS_BOUNDS_NONE ? std::max(0.0, double(sourceHeight) - crop.top - crop.bottom) * std::abs(info.scale.y) : info.bounds.y;
+	const double width =
+		info.bounds_type == OBS_BOUNDS_NONE
+			? std::max(0.0, double(sourceWidth) - crop.left - crop.right) * std::abs(info.scale.x)
+			: info.bounds.x;
+	const double height =
+		info.bounds_type == OBS_BOUNDS_NONE
+			? std::max(0.0, double(sourceHeight) - crop.top - crop.bottom) * std::abs(info.scale.y)
+			: info.bounds.y;
 	const std::array<double, 5> values = {info.pos.x, info.pos.y, width, height, info.rot};
-	for (size_t index = 0; index < transformFields.size(); ++index)
-		if (changed || !Editing(transformFields[index]))
+	for (size_t index = 0; index < transformFields.size(); ++index) {
+		if (changed || !Editing(transformFields[index])) {
 			transformFields[index]->setValue(values[index]);
+		}
+	}
 	const std::array<int, 4> crops = {crop.left, crop.right, crop.top, crop.bottom};
-	const std::array<int, 4> maxima = {std::max(0, int(sourceWidth) - crop.right - 1), std::max(0, int(sourceWidth) - crop.left - 1),
-		std::max(0, int(sourceHeight) - crop.bottom - 1), std::max(0, int(sourceHeight) - crop.top - 1)};
+	const std::array<int, 4> maxima = {std::max(0, int(sourceWidth) - crop.right - 1),
+					   std::max(0, int(sourceWidth) - crop.left - 1),
+					   std::max(0, int(sourceHeight) - crop.bottom - 1),
+					   std::max(0, int(sourceHeight) - crop.top - 1)};
 	for (size_t index = 0; index < cropFields.size(); ++index) {
 		cropFields[index]->setMaximum(maxima[index]);
-		if (changed || !Editing(cropFields[index]))
+		if (changed || !Editing(cropFields[index])) {
 			cropFields[index]->setValue(crops[index]);
+		}
 	}
 	syncing = false;
 }
 
 void PenguinInspector::ApplyTransform(const std::function<void(obs_sceneitem_t *)> &edit)
 {
-	if (syncing)
+	if (syncing) {
 		return;
+	}
 	const auto item = CurrentItem();
-	if (!item || obs_sceneitem_locked(item))
+	if (!item || obs_sceneitem_locked(item)) {
 		return;
+	}
 	const OBSScene scene = main->GetCurrentScene();
-	if (!scene)
+	if (!scene) {
 		return;
+	}
 	const char *sceneUuid = obs_source_get_uuid(obs_scene_get_source(scene));
 	// Resizing a group rebases its children and moves the parent on the next
 	// video frame. Keep those related transforms when editing a group child.
@@ -567,9 +563,11 @@ void PenguinInspector::ApplyTransform(const std::function<void(obs_sceneitem_t *
 	OBSDataAutoRelease after = obs_scene_save_transform_states(scene, includeGroupTransforms);
 	obs_data_set_string(after, "scene_uuid", sceneUuid);
 	const std::string redo = obs_data_get_json(after);
-	if (undo != redo)
-		main->undo_s.add_action(QTStr("Penguin.Inspector.Undo").arg(obs_source_get_name(obs_sceneitem_get_source(item))),
+	if (undo != redo) {
+		main->undo_s.add_action(
+			QTStr("Penguin.Inspector.Undo").arg(obs_source_get_name(obs_sceneitem_get_source(item))),
 			RestoreTransform, RestoreTransform, undo, redo);
+	}
 	RefreshSelection();
 }
 
@@ -578,33 +576,37 @@ void PenguinInspector::ChangeTransform(size_t field, double value)
 	ApplyTransform([this, field, value](obs_sceneitem_t *item) {
 		obs_transform_info info;
 		obs_sceneitem_get_info2(item, &info);
-		if (field == 0)
+		if (field == 0) {
 			info.pos.x = float(value);
-		else if (field == 1)
+		} else if (field == 1) {
 			info.pos.y = float(value);
-		else if (field == 4)
+		} else if (field == 4) {
 			info.rot = float(value);
-		else {
+		} else {
 			const bool horizontal = field == 2;
 			if (info.bounds_type != OBS_BOUNDS_NONE) {
 				float &dimension = horizontal ? info.bounds.x : info.bounds.y;
 				float &other = horizontal ? info.bounds.y : info.bounds.x;
-				if (aspectLock->isChecked() && dimension > 0.0f)
+				if (aspectLock->isChecked() && dimension > 0.0f) {
 					other *= float(value / dimension);
+				}
 				dimension = float(value);
 			} else {
 				obs_sceneitem_crop crop;
 				obs_sceneitem_get_crop(item, &crop);
 				auto *source = obs_sceneitem_get_source(item);
-				const double extent = horizontal ? double(obs_source_get_width(source)) - crop.left - crop.right
-							: double(obs_source_get_height(source)) - crop.top - crop.bottom;
-				if (extent <= 0)
+				const double extent =
+					horizontal ? double(obs_source_get_width(source)) - crop.left - crop.right
+						   : double(obs_source_get_height(source)) - crop.top - crop.bottom;
+				if (extent <= 0) {
 					return;
+				}
 				float &scale = horizontal ? info.scale.x : info.scale.y;
 				float &other = horizontal ? info.scale.y : info.scale.x;
 				const float next = std::copysign(float(value / extent), scale);
-				if (aspectLock->isChecked() && scale != 0.0f)
+				if (aspectLock->isChecked() && scale != 0.0f) {
 					other *= std::abs(next / scale);
+				}
 				scale = next;
 			}
 		}
@@ -618,45 +620,57 @@ void PenguinInspector::ChangeCrop(size_t field, int value)
 		obs_sceneitem_crop crop;
 		obs_sceneitem_get_crop(item, &crop);
 		auto *source = obs_sceneitem_get_source(item);
-		if (field == 0)
-			crop.left = std::clamp(value, 0, std::max(0, int(obs_source_get_width(source)) - crop.right - 1));
-		else if (field == 1)
-			crop.right = std::clamp(value, 0, std::max(0, int(obs_source_get_width(source)) - crop.left - 1));
-		else if (field == 2)
-			crop.top = std::clamp(value, 0, std::max(0, int(obs_source_get_height(source)) - crop.bottom - 1));
-		else
-			crop.bottom = std::clamp(value, 0, std::max(0, int(obs_source_get_height(source)) - crop.top - 1));
+		if (field == 0) {
+			crop.left =
+				std::clamp(value, 0, std::max(0, int(obs_source_get_width(source)) - crop.right - 1));
+		} else if (field == 1) {
+			crop.right =
+				std::clamp(value, 0, std::max(0, int(obs_source_get_width(source)) - crop.left - 1));
+		} else if (field == 2) {
+			crop.top =
+				std::clamp(value, 0, std::max(0, int(obs_source_get_height(source)) - crop.bottom - 1));
+		} else {
+			crop.bottom =
+				std::clamp(value, 0, std::max(0, int(obs_source_get_height(source)) - crop.top - 1));
+		}
 		obs_sceneitem_set_crop(item, &crop);
 	});
 }
 
 void PenguinInspector::ChangeFlag(bool visibility, bool value)
 {
-	if (syncing)
+	if (syncing) {
 		return;
+	}
 	const auto item = CurrentItem();
-	if (!item)
+	if (!item) {
 		return;
+	}
 	const bool previous = visibility ? obs_sceneitem_visible(item) : obs_sceneitem_locked(item);
-	if (previous == value)
+	if (previous == value) {
 		return;
+	}
 	const std::string uuid = obs_source_get_uuid(obs_scene_get_source(obs_sceneitem_get_scene(item)));
 	const int64_t id = obs_sceneitem_get_id(item);
 	auto restore = [id, visibility](const std::string &sceneUuid, bool enabled) {
 		OBSSourceAutoRelease source = obs_get_source_by_uuid(sceneUuid.c_str());
-		if (!source)
+		if (!source) {
 			return;
+		}
 		auto *scene = obs_group_or_scene_from_source(source);
 		auto *item = scene ? obs_scene_find_sceneitem_by_id(scene, id) : nullptr;
-		if (!item)
+		if (!item) {
 			return;
-		if (visibility)
+		}
+		if (visibility) {
 			obs_sceneitem_set_visible(item, enabled);
-		else
+		} else {
 			obs_sceneitem_set_locked(item, enabled);
+		}
 	};
-	main->undo_s.add_action(QTStr(visibility ? "Penguin.Inspector.UndoVisibility" : "Penguin.Inspector.UndoLock")
-		.arg(obs_source_get_name(obs_sceneitem_get_source(item))),
+	main->undo_s.add_action(
+		QTStr(visibility ? "Penguin.Inspector.UndoVisibility" : "Penguin.Inspector.UndoLock")
+			.arg(obs_source_get_name(obs_sceneitem_get_source(item))),
 		[restore, previous](const std::string &data) { restore(data, previous); },
 		[restore, value](const std::string &data) { restore(data, value); }, uuid, uuid);
 	restore(uuid, value);
@@ -674,23 +688,10 @@ void PenguinInspector::ChangeCamera()
 	}
 	auto *source = obs_sceneitem_get_source(item);
 	const auto undo = SaveCamera(source);
-	auto filter = CameraFilter(source);
-	OBSDataAutoRelease settings = filter ? obs_source_get_settings(filter) : obs_data_create();
-	obs_data_set_int(settings, "shape", cameraShape->currentIndex());
-	obs_data_set_int(settings, "background", cameraBackground->currentIndex());
-	obs_data_set_double(settings, "radius", cameraRadius->value());
-	obs_data_set_double(settings, "similarity", cameraSimilarity->value());
-	if (filter) {
-		obs_source_update(filter, settings);
-		obs_source_set_enabled(filter, true);
-	} else {
-		filter =
-			obs_source_create(CameraFilterId, QT_TO_UTF8(QTStr("Penguin.Camera.Title")), settings, nullptr);
-		if (!filter) {
-			cameraStatus->setText(QTStr("Penguin.Camera.Error"));
-			return;
-		}
-		obs_source_filter_add(source, filter);
+	if (!PenguinCamera::Apply(source, QT_TO_UTF8(QTStr("Penguin.Camera.Title")), cameraShape->currentIndex(),
+				  cameraBackground->currentIndex(), cameraRadius->value(), cameraSimilarity->value())) {
+		cameraStatus->setText(QTStr("Penguin.Camera.Error"));
+		return;
 	}
 	const auto redo = SaveCamera(source);
 	if (undo != redo) {

@@ -111,7 +111,10 @@ void Update(void *data, obs_data_t *settings)
 	camera->shape = std::clamp(int(obs_data_get_int(settings, "shape")), 0, 3);
 	camera->radius = float(std::clamp(obs_data_get_double(settings, "radius"), 0.0, 100.0) / 100.0);
 	camera->similarity = float(std::clamp(obs_data_get_double(settings, "similarity"), 0.0, 90.0) / 100.0);
-	const int background = std::clamp(int(obs_data_get_int(settings, "background")), 0, 3);
+	int background = std::clamp(int(obs_data_get_int(settings, "background")), 0, 3);
+	if (background == 1 && std::strcmp(obs_data_get_string(settings, "automatic_backend"), "rvm") == 0) {
+		background = 0;
+	}
 	std::lock_guard lock(camera->mutex);
 	if (background != camera->background) {
 		camera->background = background;

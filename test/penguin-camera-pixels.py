@@ -7,8 +7,10 @@ import sys
 root = pathlib.Path(sys.argv[1])
 report = json.loads((root / "result.json").read_text())
 assert report["visible"] and report["ai_status"] == 2, report
+assert report["pair_lifecycle"] and report["unrelated_filter_preserved"], report
 if "--inspector" in sys.argv:
     assert report.get("inspector_used"), report
+    assert report["rvm_backend"] and report["automatic_undo_removed_matting"] and report["automatic_redo_restored_matting"], report
     assert report["controls_enabled"] and report["controls_visible"], report
     assert report["selected_rows"] == 1, report
     assert report["default_undo_shape"] == 0, report

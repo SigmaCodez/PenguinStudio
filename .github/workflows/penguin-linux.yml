@@ -57,6 +57,10 @@ jobs:
           python3 test/penguin-portable.py
       - name: Check optional Linux runtime diagnostics
         run: bash scripts/packaging/test-optional-library.sh
+      - name: Check camera startup timeout boundaries
+        run: |
+          cc -std=c11 -Wall -Wextra -Werror -I. test/penguin-v4l2-timeout.c -o /tmp/penguin-v4l2-timeout
+          /tmp/penguin-v4l2-timeout
       - name: Check delayed audio encoder shutdown
         run: |
           sudo apt-get update

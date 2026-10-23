@@ -186,7 +186,8 @@
                 "-DENABLE_DECKLINK=OFF",
                 "-DOBS_VERSION_OVERRIDE=32.2.2",
                 "-DCMAKE_COMPILE_WARNING_AS_ERROR=OFF",
-                "-DFETCHCONTENT_SOURCE_DIR_PENGUIN_ORT=/run/build/penguin-studio/onnxruntime"
+                "-DFETCHCONTENT_SOURCE_DIR_PENGUIN_ORT=/run/build/penguin-studio/onnxruntime",
+                "-DFETCHCONTENT_SOURCE_DIR_PENGUIN_CV=/run/build/penguin-studio/opencv"
             ],
             "secret-opts": [
                 "-DRESTREAM_CLIENTID=$RESTREAM_CLIENTID",
@@ -209,9 +210,15 @@
                 },
                 {
                     "type": "archive",
-                    "url": "https://github.com/microsoft/onnxruntime/releases/download/v1.20.1/onnxruntime-linux-x64-1.20.1.tgz",
-                    "sha256": "67db4dc1561f1e3fd42e619575c82c601ef89849afc7ea85a003abbac1a1a105",
+                    "url": "https://github.com/microsoft/onnxruntime/releases/download/v1.23.2/onnxruntime-linux-x64-1.23.2.tgz",
+                    "sha256": "1fa4dcaef22f6f7d5cd81b28c2800414350c10116f5fdd46a2160082551c5f9b",
                     "dest": "onnxruntime"
+                },
+                {
+                    "type": "archive",
+                    "url": "https://github.com/opencv/opencv/archive/refs/tags/4.10.0.tar.gz",
+                    "sha256": "b2171af5be6b26f7a06b1229948bbb2bdaa74fcf5cd097e0af6378fce50a6eb9",
+                    "dest": "opencv"
                 }
             ]
         }

@@ -6,8 +6,8 @@ SHA256: 1511ab5564cb0ae179cba9bcad6ad931003ccc71656f11fd270967023678c6a5
 License: Apache-2.0; see selfie_segmentation.onnx.license and Apache-2.0.txt.
 Copyright: Google LLC, Katsuya Hyodo, Roy Shilkrot, Kaito Udagawa.
 
-Inference: Microsoft ONNX Runtime 1.20.1, CPU execution provider.
-Source: https://github.com/microsoft/onnxruntime/releases/tag/v1.20.1
+Inference: Microsoft ONNX Runtime 1.23.2, CPU execution provider.
+Source: https://github.com/microsoft/onnxruntime/releases/tag/v1.23.2
 License: MIT; see ONNX-Runtime-LICENSE and ONNX-ThirdPartyNotices.txt.
 
 The model and runtime are distributed with the application. No camera frames,

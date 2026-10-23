@@ -16,6 +16,7 @@
 #include <obs-frontend-api.h>
 #include <graphics/vec4.h>
 #include <cstring>
+#include "../frontend/utility/PenguinCameraFilters.hpp"
 
 namespace {
 obs_source_t *source = nullptr, *filter = nullptr;
@@ -225,11 +226,23 @@ void Start()
 		Image(portrait.isEmpty() ? directory + "/green.png" : portrait);
 		Mode(0, 1);
 	});
+	QTimer::singleShot(10500, qApp, [] {
+		if (!report["inspector_used"].toBool()) {
+			return;
+		}
+		mainWindow->findChild<QAction *>("actionMainUndo")->trigger();
+		report["automatic_undo_removed_matting"] = !PenguinCamera::CameraMatting(source);
+		mainWindow->findChild<QAction *>("actionMainRedo")->trigger();
+		report["automatic_redo_restored_matting"] = bool(PenguinCamera::CameraMatting(source));
+	});
 	QTimer::singleShot(14500, qApp, [] {
 		Snap("automatic");
 		calldata_t parameters;
 		calldata_init(&parameters);
-		proc_handler_call(obs_source_get_proc_handler(filter), "camera_status", &parameters);
+		auto matting = PenguinCamera::CameraMatting(source);
+		proc_handler_call(obs_source_get_proc_handler(matting ? matting.Get() : filter), "camera_status",
+				  &parameters);
+		report["rvm_backend"] = bool(matting);
 		report["ai_status"] = int(calldata_int(&parameters, "status"));
 		calldata_free(&parameters);
 		Mode(1, 1);
@@ -250,6 +263,28 @@ void Start()
 		}
 		settings.write(obs_data_get_json(saved));
 		obs_data_release(saved);
+		// Reproduce rapid pair creation/removal while the graphics thread renders.
+		const auto before = PenguinCamera::SaveCamera(source);
+		OBSDataAutoRelease unrelatedSettings = obs_data_create();
+		OBSSourceAutoRelease unrelated =
+			obs_source_create("color_filter", "Unrelated camera test filter", unrelatedSettings, nullptr);
+		obs_source_set_enabled(unrelated, false);
+		obs_source_filter_add(source, unrelated);
+		bool pairsOk = true;
+		for (int i = 0; i < 5; ++i) {
+			pairsOk &= PenguinCamera::Apply(source, "Camera appearance", i % 4, 1, 25, 15);
+			const auto automatic = PenguinCamera::SaveCamera(source);
+			PenguinCamera::RestoreCamera(before);
+			pairsOk &= !PenguinCamera::CameraMatting(source);
+			PenguinCamera::RestoreCamera(automatic);
+			auto matting = PenguinCamera::CameraMatting(source);
+			pairsOk &= matting && obs_source_filter_get_index(source, matting) ==
+						      obs_source_filter_get_index(source, filter) + 1;
+		}
+		PenguinCamera::RestoreCamera(before);
+		report["pair_lifecycle"] = pairsOk;
+		report["unrelated_filter_preserved"] = obs_source_filter_get_index(source, unrelated) >= 0 &&
+						       !obs_source_enabled(unrelated);
 		report["platform"] = QGuiApplication::platformName();
 		report["visible"] = mainWindow->isVisible();
 		QFile result(directory + "/result.json");

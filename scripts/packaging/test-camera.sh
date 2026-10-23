@@ -27,7 +27,7 @@ OutputCY=720
 FPSType=0
 FPSCommon=30
 PROFILE
-timeout --kill-after=5s 35s env XDG_CONFIG_HOME="$results/config" XDG_CACHE_HOME="$results/cache" \
+timeout --kill-after=5s 50s env XDG_CONFIG_HOME="$results/config" XDG_CACHE_HOME="$results/cache" XDG_DATA_HOME="$results/data" \
   LD_PRELOAD="$probe" PENGUIN_CAMERA_RESULTS="$results" \
   "${PENGUIN_EXECUTABLE:-penguin-studio}" --multi --disable-updater > "$results/application.log" 2>&1
 python3 "$root/test/penguin-camera-pixels.py" "$results" "${PENGUIN_CAMERA_UI_CHECK:---inspector}"

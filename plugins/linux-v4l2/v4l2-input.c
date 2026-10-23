@@ -38,6 +38,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "v4l2-controls.h"
 #include "v4l2-helpers.h"
 #include "v4l2-decoder.h"
+#include "v4l2-timeout.h"
 
 #define FALLBACK_FRAMERATE 30
 
@@ -188,6 +189,7 @@ static void *v4l2_thread(void *vptr)
 	if (v4l2_start_capture(data->dev, &data->buffers) < 0)
 		goto exit;
 
+	const uint64_t capture_started = os_gettime_ns();
 	blog(LOG_DEBUG, "%s: new capture started", data->device_id);
 
 	frames = 0;
@@ -201,8 +203,12 @@ static void *v4l2_thread(void *vptr)
 		FD_SET(data->dev, &fds);
 
 		/* Set timeout timevalue. */
-		tv.tv_sec = 0;
-		tv.tv_usec = timeout_usec;
+		/* USB cameras can need time to deliver their first frame after STREAMON.
+		 * Keep the configured timeout once capture is established. */
+		const uint64_t wait_usec = v4l2_capture_timeout(timeout_usec, (os_gettime_ns() - capture_started) / 1000,
+							     frames != 0);
+		tv.tv_sec = wait_usec / 1000000;
+		tv.tv_usec = wait_usec % 1000000;
 
 		r = select(data->dev + 1, &fds, NULL, NULL, &tv);
 		if (r < 0) {
