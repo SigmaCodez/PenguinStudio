@@ -1,0 +1,54 @@
+{
+  "version_tested": "0.6.0 with isolated candidate shader for 0.6.1",
+  "date": "2026-10-24",
+  "device": "Elgato Facecam 4K",
+  "capture": "1280x720, 30 fps",
+  "platform": "Wayland",
+  "feedback": {
+    "blur": "Looks good during head and hand movement",
+    "original_custom_image": "Background residue or flicker",
+    "corrected_custom_image": "Significantly better and usable"
+  },
+  "runs": {
+    "baseline": {
+      "samples": 221,
+      "ai_status": 2,
+      "effect_applied": true,
+      "warning_error_lines": [],
+      "reported_memory_leaks": 0
+    },
+    "clean-edges": {
+      "samples": 119,
+      "ai_status": 2,
+      "effect_applied": true,
+      "warning_error_lines": [],
+      "reported_memory_leaks": 0
+    }
+  },
+  "restart": {
+    "ai_active_at_shutdown": true,
+    "image_restored": true,
+    "platform": "wayland",
+    "restored_background": 5,
+    "restored_radius": 18,
+    "restored_shape": 3
+  },
+  "private_frames_included": false,
+  "candidate_package": {
+    "version": "0.6.1-1+ubuntu26.04",
+    "source_commit": "0c136b20541482db9aa71cc41c6a54b30a92915b",
+    "camera_gpu_suite": "passed",
+    "restart": {
+      "ai_active_at_shutdown": true,
+      "height": 720,
+      "image_restored": true,
+      "platform": "wayland",
+      "restored_background": 5,
+      "restored_radius": 18,
+      "restored_shape": 3,
+      "width": 1280
+    },
+    "warning_error_lines": [],
+    "reported_memory_leaks": 0
+  }
+}
