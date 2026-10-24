@@ -23,6 +23,10 @@ public:
 	virtual void prepareInputToNetwork(cv::Mat &image, cv::Mat &prepared) override
 	{
 		if (preserveHands) {
+			// A failed primary inference may skip postprocessing. Join its companion
+			// before reusing the hand model and its buffers for another frame.
+			if (handTask.valid())
+				handTask.get();
 			if (!handRecovery)
 				handRecovery = std::make_unique<HandRecovery>(handThreads);
 			handTask = std::async(std::launch::async, [this, frame = image.clone()] {

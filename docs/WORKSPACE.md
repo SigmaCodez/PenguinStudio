@@ -4,7 +4,7 @@ Penguin Studio organizes the native Qt application around a large canvas, search
 
 ![Penguin Studio 0.6.2 workspace in English](images/current/workspace-en.png)
 
-Captured from the installed 0.6.2 application with local demo media.
+Captured from the 0.6.2 Linux release package with local demo media.
 
 ## Compose and inspect
 
