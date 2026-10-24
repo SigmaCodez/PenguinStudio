@@ -1,8 +1,8 @@
 {
-  "version": "0.6.0",
+  "version": "0.6.1",
   "language": "en-US",
-  "source_commit": "197550e4fb79adbff6b0b4798e259141b760f5ba",
-  "package": "0.6.0-1+ubuntu26.04",
+  "source_commit": "0c136b20541482db9aa71cc41c6a54b30a92915b",
+  "package": "0.6.1-1+ubuntu26.04",
   "captured_on": "2026-10-24",
   "capture_method": "XComposite window capture of the real Ubuntu 26.04 candidate package under XWayland, using an isolated English profile; native Wayland tested separately",
   "content": "Synthetic local artwork, audio and explicitly labelled local demo chat messages; no camera footage or signed-in accounts",
@@ -13,12 +13,11 @@
     },
     {
       "file": "camera-en.png",
-      "sha256": "171ee6d31b4efba3c829337cdf3a3e9ab60ce98e5c5ee84d8c67f5f278b08a09"
+      "sha256": "b725c316fb8840eb5a93117d2d6440cbeb8f81f4a13f86ae5d3a3e7ae1301fdc"
     },
     {
       "file": "stream-details-en.png",
-      "sha256": "5523ccfb6366eb3163b83794769f9ea3dcb12ea0d584b561f3d19a63693af2e6"
+      "sha256": "fddd81f3a0dd8874c336ca955dc004d437b24685b53d571b783d9d7070810787"
     }
-  ],
-  "pending_version": "0.6.1"
+  ]
 }
