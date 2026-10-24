@@ -1,6 +1,6 @@
 # AppImage and Arch Linux packages
 
-For the current 0.6.1 release, the Linux workflow builds an
+For the current 0.6.2 release, the Linux workflow builds an
 x86_64 AppImage and a checksum-pinned `penguin-studio-bin` Arch packaging recipe.
 Use only downloads actually present on the selected [release page](https://github.com/SigmaCodez/PenguinStudio/releases).
 A recipe archive on GitHub does not mean the package has been submitted to AUR.
@@ -17,14 +17,14 @@ drivers or a desktop portal. Older distributions should use Flatpak instead.
 Download the AppImage and compare its SHA-256 with the release checksum file:
 
 ```sh
-chmod +x penguin-studio-0.6.1-x86_64.AppImage
-./penguin-studio-0.6.1-x86_64.AppImage
+chmod +x penguin-studio-0.6.2-x86_64.AppImage
+./penguin-studio-0.6.2-x86_64.AppImage
 ```
 
 If FUSE is unavailable, use:
 
 ```sh
-./penguin-studio-0.6.1-x86_64.AppImage --appimage-extract-and-run
+./penguin-studio-0.6.2-x86_64.AppImage --appimage-extract-and-run
 ```
 
 Wayland screen capture needs PipeWire and the desktop's portal backend. Account
@@ -41,10 +41,10 @@ do not run two copies against the same profile concurrently.
 
 ## Arch Linux / AUR recipe
 
-Download `penguin-studio-0.6.1-aur.tar.gz`, extract it, review `PKGBUILD`, then:
+Download `penguin-studio-0.6.2-aur.tar.gz`, extract it, review `PKGBUILD`, then:
 
 ```sh
-tar -xzf penguin-studio-0.6.1-aur.tar.gz
+tar -xzf penguin-studio-0.6.2-aur.tar.gz
 cd penguin-studio-bin
 makepkg -si
 ```

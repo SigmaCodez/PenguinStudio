@@ -1,4 +1,6 @@
-# Experimental hand preservation
+# Historical hand-preservation prototype
+
+> This archive records the isolated prototype and its original test status. Penguin Studio 0.6.2 promotes the approach as an optional, disabled-by-default control. See the [current camera guide](../../CAMERA-EFFECTS.md). The prototype snapshots and historical evidence below are retained unchanged.
 
 This prototype is **not enabled in release packages**. The user has accepted live hand visibility; reproducible zero-loss performance during motion remains unproven. Do not replace the installed filter with it as a released fix.
 

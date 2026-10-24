@@ -23,6 +23,7 @@
 struct filter_data : public ORTModelData, public std::enable_shared_from_this<filter_data> {
 	std::string useGPU;
 	uint32_t numThreads;
+	bool preserveHands = false;
 	std::string modelSelection;
 	std::unique_ptr<Model> model;
 

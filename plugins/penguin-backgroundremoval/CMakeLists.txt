@@ -100,3 +100,8 @@ file(SHA256 "${CMAKE_CURRENT_SOURCE_DIR}/vendor/data/models/rvm_mobilenetv3_fp32
 if(NOT rvm_hash STREQUAL "29ea41074104b9a76f210881226862f44f3e0a5cdadc4998f9bc6b626ee4bc41")
   message(FATAL_ERROR "The bundled RVM model does not match its reviewed checksum")
 endif()
+
+file(SHA256 "${CMAKE_CURRENT_SOURCE_DIR}/vendor/data/models/selfie_multiclass_256x256.with_runtime_opt.ort" hand_model_hash)
+if(NOT hand_model_hash STREQUAL "317054e916e36f47457a85afa3ef6a6cc8f5d35f3cb22e5358fd1a3e6cfb8eed")
+  message(FATAL_ERROR "The bundled hand-detail model does not match its reviewed checksum")
+endif()

@@ -8,6 +8,7 @@
 
 #include <QApplication>
 #include <QComboBox>
+#include <QCheckBox>
 #include <QDoubleSpinBox>
 #include <QFrame>
 #include <QFileDialog>
@@ -266,6 +267,11 @@ PenguinInspector::PenguinInspector(OBSBasic *mainWindow, QWidget *parent)
 	cameraBackground = addChoice("Penguin.Camera.Background", "cameraBackground",
 				     {"Penguin.Camera.Off", "Penguin.Camera.Automatic", "Penguin.Camera.Green",
 				      "Penguin.Camera.Blue", "Penguin.Camera.Blur", "Penguin.Camera.Image"});
+	auto *cameraHands = new QCheckBox(QTStr("Penguin.Camera.PreserveHands"), cameraCard);
+	cameraHands->setObjectName("cameraPreserveHands");
+	cameraHands->setToolTip(QTStr("Penguin.Camera.PreserveHandsHint"));
+	cameraLayout->addWidget(cameraHands);
+	connect(cameraHands, &QCheckBox::toggled, this, &PenguinInspector::ChangeCamera);
 	cameraSimilarity = addSlider("Penguin.Camera.Similarity", "cameraSimilarity", 90);
 	auto *cameraBlur = addSlider("Penguin.Camera.BlurStrength", "cameraBlur", 20);
 	cameraBlur->setRange(1, 20);
@@ -516,6 +522,9 @@ void PenguinInspector::RefreshSelection()
 						       : QFileInfo(cameraImagePath).fileName());
 	cameraImage->setToolTip(cameraImagePath);
 	cameraImage->setProperty("backgroundPath", cameraImagePath);
+	auto *cameraHands = findChild<QCheckBox *>("cameraPreserveHands");
+	cameraHands->setChecked(obs_data_get_bool(cameraSettings, "preserve_hands"));
+	cameraHands->setVisible(cameraBackground->currentIndex() == 1 || cameraBackground->currentIndex() >= 4);
 	cameraImage->setVisible(cameraBackground->currentIndex() == 5);
 	cameraBlur->setVisible(cameraBackground->currentIndex() == 4);
 	cameraRadius->setVisible(cameraShape->currentIndex() == 3);
@@ -735,7 +744,8 @@ void PenguinInspector::ChangeCamera()
 	const auto cameraImagePath = findChild<QPushButton *>("cameraImage")->property("backgroundPath").toString();
 	if (!PenguinCamera::Apply(source, QT_TO_UTF8(QTStr("Penguin.Camera.Title")), cameraShape->currentIndex(),
 				  cameraBackground->currentIndex(), cameraRadius->value(), cameraSimilarity->value(),
-				  cameraBlur->value(), QT_TO_UTF8(cameraImagePath))) {
+				  cameraBlur->value(), QT_TO_UTF8(cameraImagePath),
+				  findChild<QCheckBox *>("cameraPreserveHands")->isChecked())) {
 		cameraStatus->setText(QTStr("Penguin.Camera.Error"));
 		return;
 	}

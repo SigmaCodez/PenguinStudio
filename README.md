@@ -8,7 +8,7 @@ Penguin Studio brings a redesigned production workspace, native multi-destinatio
 
 ![Penguin Studio modern workspace with searchable layers and scenes, audio channel strips and an integrated inspector](docs/images/current/workspace-en.png)
 
-Penguin Studio 0.6.1, captured from the installed Linux application in English with local demo media. See the [workspace guide](docs/WORKSPACE.md) for the controls and layout.
+Penguin Studio 0.6.2, captured from the Linux release package in English with local demo media. See the [workspace guide](docs/WORKSPACE.md) for the controls and layout.
 
 > Development preview. See [verification status](docs/VERIFICATION.md) for completed checks and remaining release tests, and [packaging](docs/PACKAGING.md) for development downloads and supported build targets. Validate your devices and streaming accounts before relying on this build for a live show.
 
@@ -16,7 +16,7 @@ Penguin Studio 0.6.1, captured from the installed Linux application in English w
 
 - A native production workspace with searchable layers and numbered scenes on the left, canvas in the center, a channel-strip audio mixer below, and tabbed inspector/output/details tools on the right. The top bar brings together destinations, live output, recording and replay clips.
 - An editable inspector for source position, size, rotation, crop, visibility and locking, with undo/redo, source properties and filters. See the [workspace guide](docs/WORKSPACE.md).
-- [Camera appearance](docs/CAMERA-EFFECTS.md): circle, oval and rounded-corner shapes, automatic local AI background removal, and green/blue screen options with adjustable thresholds.
+- [Camera appearance](docs/CAMERA-EFFECTS.md): circle, oval and rounded-corner shapes, automatic local AI background removal, background blur, custom images, optional moving-hand preservation, and green/blue screen options with adjustable thresholds.
 - Original Penguin Studio logo, a complete dark control theme, English defaults and a separate `PenguinStudio` configuration directory.
 - The upstream OBS capture, scene, recording, mixer, filter, plugin and translation infrastructure, including all 77 frontend locale files.
 - A first-launch destination assistant, platform dashboard links and up to eight independently controlled RTMP(S) outputs.
@@ -27,7 +27,7 @@ Penguin Studio 0.6.1, captured from the installed Linux application in English w
 
 ## Get started
 
-**Current release: [Penguin Studio 0.6.1](https://github.com/SigmaCodez/PenguinStudio/releases/tag/penguin-v0.6.1)** — native Twitch/YouTube chat and moderation, camera background blur and custom images, browser sign-in and saved accounts.
+**Current release: [Penguin Studio 0.6.2](https://github.com/SigmaCodez/PenguinStudio/releases/tag/penguin-v0.6.2)** — optional moving-hand preservation for automatic camera effects, plus native Twitch/YouTube chat, moderation and saved browser sign-in.
 
 **[Download Linux packages](https://github.com/SigmaCodez/PenguinStudio/releases)** — Ubuntu DEB, Fedora RPM, Flatpak, Snap, AppImage and an Arch/AUR recipe, with SHA-256 checksums.
 

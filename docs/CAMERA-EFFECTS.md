@@ -47,7 +47,7 @@ See `plugins/penguin-backgroundremoval/PROVENANCE.md` for the RVM plugin,
 model licenses and exact upstream revision. The legacy model retains its notices
 in `plugins/penguin-camera/data/MODEL-NOTICE.txt`.
 
-Current English interface, captured from Penguin Studio 0.6.1. The sample artwork demonstrates rounded corners; it is not a webcam or an AI-removal quality demonstration.
+Current English interface, captured from Penguin Studio 0.6.2. The sample artwork demonstrates rounded corners; it is not a webcam or an AI-removal quality demonstration.
 
 ## Validation
 
@@ -84,3 +84,9 @@ with the replacement image. The foreground color remains premultiplied and
 intermediate alpha retains a soft transition. Background blur and transparent
 removal are unchanged. This reduces weak background halos; it does not replace
 the segmentation model or guarantee perfect edges under all lighting/motion.
+
+## Preserve moving hands
+
+Enable **Preserve moving hands** in the camera inspector after choosing automatic removal, background blur or a custom image. The option is off by default and is saved with the source, including undo/redo. It supplements RVM with a local body-skin segmentation model, processing the same frame before compositing. No camera images are uploaded.
+
+This mode uses extra CPU capacity. A real Facecam movement test under Wayland retained both hands and was accepted as fluid by the tester. Rapid edges remain soft, and that 70-second motion recording logged one render-lag event and one encoder-skip event. Zero-loss motion performance is not guaranteed. Disable the option if your recording/stream statistics worsen. Unrelated filters and scenes without this option retain their existing inference mode.
