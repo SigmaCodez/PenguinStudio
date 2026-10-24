@@ -63,8 +63,8 @@ Download the Ubuntu 26.04 DEB from [Penguin Studio releases](https://github.com/
 Ubuntu 26.04.1 uses the same package. Do not install the Ubuntu 24.04 DEB on
 26.04 or mix distribution repositories to satisfy its dependencies.
 
-The Ubuntu 26.04 candidate passed the full Wayland camera and alpha-spill tests,
-plus a real Facecam restart with the saved custom image. See
+The installed Ubuntu 26.04 package passed the full Wayland camera and alpha-spill
+tests, plus a real Facecam restart with the saved custom image and clean shutdown. See
 [0.6.1 validation](validation/camera-background-edges-0.6.1.md) for scope.
 Earlier installed results remain in the [verification history](VERIFICATION.md).
 
