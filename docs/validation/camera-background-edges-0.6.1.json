@@ -50,5 +50,25 @@
     },
     "warning_error_lines": [],
     "reported_memory_leaks": 0
+  },
+  "installed_package": {
+    "version": "0.6.1-1+ubuntu26.04",
+    "source_commit": "a515b1acf85acb00a47399fac27731e6b51889de",
+    "build_run": 40043295576,
+    "sha256": "bca788af4883a2a4311d3ea2c765e72df93c2fa1ea25650468a16b33545f6d37",
+    "package_file_verification": "passed",
+    "camera_gpu_suite": "passed",
+    "restart": {
+      "ai_active_at_shutdown": true,
+      "height": 720,
+      "image_restored": true,
+      "platform": "wayland",
+      "restored_background": 5,
+      "restored_radius": 18,
+      "restored_shape": 3,
+      "width": 1280
+    },
+    "warning_error_lines": [],
+    "reported_memory_leaks": 0
   }
 }

@@ -32,4 +32,17 @@ the saved real Facecam scene restored the custom image and rounded corners, with
 an active 1280 × 720 input and working matting. Both runs closed without warning/
 error diagnostics or reported leaks.
 
-Final release installation is recorded after the complete Linux build succeeds.
+## Installed Ubuntu package
+
+The final Ubuntu 26.04 package from release build `40043295576` (source
+`a515b1ac`) was checksum-verified and installed as `0.6.1-1+ubuntu26.04`.
+Only Penguin Studio was upgraded; no dependencies were added or removed.
+Installed package-file verification passed.
+
+The installed build passed the full native Wayland camera/Inspector suite,
+including blur, custom images, rounded corners, alpha cleanup and undo/restore.
+A real Facecam restart restored the saved image and rounded corners with active
+matting at 1280 × 720. Both runs exited normally with no warning/error diagnostics
+or reported memory leaks. The live motion feedback above remains the user's
+assessment of the identical shader correction; the post-install restart was a
+functional check, not a new subjective motion assessment.
