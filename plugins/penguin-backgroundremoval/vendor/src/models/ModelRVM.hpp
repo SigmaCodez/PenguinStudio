@@ -7,13 +7,43 @@
 #define MODELRVM_H
 
 #include "Model.hpp"
+#include <future>
+#include "HandRecovery.hpp"
 
 class ModelRVM : public ModelBCHW {
 private:
-	/* data */
+	bool preserveHands;
+	int handThreads;
+	std::unique_ptr<HandRecovery> handRecovery;
+	std::future<void> handTask;
 public:
-	ModelRVM(/* args */) {}
+	explicit ModelRVM(bool preserve = false, int threads = 3) : preserveHands(preserve), handThreads(threads) {}
 	~ModelRVM() {}
+
+	virtual void prepareInputToNetwork(cv::Mat &image, cv::Mat &prepared) override
+	{
+		if (preserveHands) {
+			// A failed primary inference may skip postprocessing. Join its companion
+			// before reusing the hand model and its buffers for another frame.
+			if (handTask.valid())
+				handTask.get();
+			if (!handRecovery)
+				handRecovery = std::make_unique<HandRecovery>(handThreads);
+			handTask = std::async(std::launch::async, [this, frame = image.clone()] {
+				handRecovery->infer(frame);
+			});
+		}
+		ModelBCHW::prepareInputToNetwork(image, prepared);
+	}
+
+	virtual void postprocessOutput(cv::Mat &output) override
+	{
+		ModelBCHW::postprocessOutput(output);
+		if (handRecovery) {
+			handTask.get();
+			handRecovery->merge(output);
+		}
+	}
 
 	virtual void populateInputOutputNames(const std::unique_ptr<Ort::Session> &session,
 					      std::vector<Ort::AllocatedStringPtr> &inputNames,

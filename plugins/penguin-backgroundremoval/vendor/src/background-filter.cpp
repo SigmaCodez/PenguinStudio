@@ -308,10 +308,12 @@ void background_filter_update(void *data, obs_data_t *settings)
 	const std::string newUseGpu = obs_data_get_string(settings, "useGPU");
 	const std::string newModel = obs_data_get_string(settings, "model_select");
 	penguin_configure_managed_threads(settings, os_get_physical_cores());
-	const uint32_t newNumThreads = (uint32_t)obs_data_get_int(settings, "numThreads");
+	const bool preserveHands = obs_data_get_bool(settings, "penguin_preserve_hands") && newModel == MODEL_RVM;
+	const uint32_t configuredThreads = (uint32_t)obs_data_get_int(settings, "numThreads");
+	const uint32_t newNumThreads = preserveHands ? std::clamp(configuredThreads, 1u, 3u) : configuredThreads;
 
 	if (!tf->model || tf->modelSelection.empty() || tf->modelSelection != newModel || tf->useGPU != newUseGpu ||
-	    tf->numThreads != newNumThreads) {
+	    tf->numThreads != newNumThreads || tf->preserveHands != preserveHands) {
 		// lock modelMutex
 		std::unique_lock<std::mutex> lock(tf->modelMutex);
 
@@ -320,6 +322,7 @@ void background_filter_update(void *data, obs_data_t *settings)
 		tf->modelSelection = newModel;
 		tf->useGPU = newUseGpu;
 		tf->numThreads = newNumThreads;
+		tf->preserveHands = preserveHands;
 
 		if (tf->modelSelection == MODEL_SINET) {
 			tf->model.reset(new ModelSINET);
@@ -334,7 +337,7 @@ void background_filter_update(void *data, obs_data_t *settings)
 			tf->model.reset(new ModelMediaPipe);
 		}
 		if (tf->modelSelection == MODEL_RVM) {
-			tf->model.reset(new ModelRVM);
+			tf->model.reset(new ModelRVM(tf->preserveHands, int(tf->numThreads)));
 		}
 		if (tf->modelSelection == MODEL_PPHUMANSEG) {
 			tf->model.reset(new ModelPPHumanSeg);

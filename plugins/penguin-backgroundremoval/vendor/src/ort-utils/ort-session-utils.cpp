@@ -30,13 +30,18 @@ int createOrtSession(filter_data *tf)
 	}
 
 	Ort::SessionOptions sessionOptions;
+	if (tf->preserveHands) {
+		// Concurrent same-frame inference must not leave either pool busy-waiting.
+		sessionOptions.AddConfigEntry("session.intra_op.allow_spinning", "0");
+		sessionOptions.AddConfigEntry("session.inter_op.allow_spinning", "0");
+	}
 
 	sessionOptions.SetGraphOptimizationLevel(GraphOptimizationLevel::ORT_ENABLE_ALL);
 	if (tf->useGPU != USEGPU_CPU) {
 		sessionOptions.DisableMemPattern();
 		sessionOptions.SetExecutionMode(ExecutionMode::ORT_SEQUENTIAL);
 	} else {
-		sessionOptions.SetInterOpNumThreads(tf->numThreads);
+		sessionOptions.SetInterOpNumThreads(tf->preserveHands ? 1 : tf->numThreads);
 		sessionOptions.SetIntraOpNumThreads(tf->numThreads);
 	}
 

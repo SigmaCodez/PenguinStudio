@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.6.2 — 2026-10-25
+
+- Add optional moving-hand preservation for automatic camera removal, blur and custom images, with same-frame parallel local inference.
+- Keep the option disabled by default; save and restore it with source settings and undo/redo.
+- Include the additional model and its author/license notices in every Linux package.
+- Document the accepted hand-visibility improvement and the single render/encoder event observed during the live motion test; no zero-loss guarantee is made.
+
 ## 0.4.4 — 2026-10-22
 
 - Drain delayed FFmpeg audio encoder packets before freeing the stopped encoder, preventing the AAC queue warning at recording shutdown. Output stop timestamps remain unchanged.

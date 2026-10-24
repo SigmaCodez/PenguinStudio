@@ -3,6 +3,7 @@
 #include <QApplication>
 #include <QAction>
 #include <QComboBox>
+#include <QCheckBox>
 #include <QFile>
 #include <QImage>
 #include <QListView>
@@ -376,7 +377,34 @@ void Start()
 		Snap("missing-background");
 		Mode(0, 0);
 	});
-	At(22500, [] {
+	At(21500, [] {
+		Mode(3, 1);
+		auto *hands = mainWindow->findChild<QCheckBox *>("cameraPreserveHands");
+		if (hands) {
+			hands->setChecked(true);
+			report["hand_inspector_used"] = true;
+		} else {
+			PenguinCamera::Apply(source, "Camera appearance", 3, 1, 25, 15, 8, "", true);
+		}
+	});
+	At(23500, [] {
+		auto matting = PenguinCamera::CameraMatting(source);
+		OBSDataAutoRelease settings = matting ? obs_source_get_settings(matting) : obs_data_create();
+		report["hand_setting_enabled"] = obs_data_get_bool(settings, "penguin_preserve_hands");
+		calldata_t status;
+		calldata_init(&status);
+		if (matting) proc_handler_call(obs_source_get_proc_handler(matting), "camera_status", &status);
+		report["hand_ai_status"] = int(calldata_int(&status, "status"));
+		calldata_free(&status);
+		const auto saved = PenguinCamera::SaveCamera(source);
+		PenguinCamera::Apply(source, "Camera appearance", 3, 1, 25, 15, 8, "", false);
+		PenguinCamera::RestoreCamera(saved);
+		matting = PenguinCamera::CameraMatting(source);
+		OBSDataAutoRelease restored = obs_source_get_settings(matting);
+		report["hand_setting_restored"] = obs_data_get_bool(restored, "penguin_preserve_hands");
+		Mode(0, 0);
+	});
+	At(25000, [] {
 		Snap("disabled");
 		Mode(3, 2);
 		auto *saved = obs_save_source(source);

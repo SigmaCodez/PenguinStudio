@@ -18,8 +18,7 @@ by Roy Shilkrot, Kaito Udagawa and the upstream contributors.
 ## Local integration changes
 
 The standalone plugin updater and enhancement filter are not registered. Penguin
-Studio manages updates for the complete application. Only the RVM model is
-packaged and offered in the model selector. The model, inference and mask
+Studio manages updates for the complete application. RVM is the model offered in the model selector. An additional MediaPipe Selfie Multiclass model is packaged for the optional moving-hand mode. The model, inference and mask
 processing are otherwise the upstream implementation. A read-only `camera_status`
 procedure exposes initialization, readiness and errors to the camera inspector.
 The integration serializes managed filter-pair changes with rendering to prevent
@@ -43,3 +42,9 @@ state. Existing legacy camera scenes remain readable.
 This component does not change the licensing of unrelated files. Preserve all
 upstream copyright notices and provide this corresponding source with binary
 redistributions. Personal camera recordings and test images are not distributed.
+
+## Optional moving-hand preservation (0.6.2)
+
+The MediaPipe Selfie Multiclass model from the same upstream distribution is Apache-2.0 licensed; its adjacent notice retains the Google, Katsuya Hyodo, Roy Shilkrot and Kaito Udagawa credits. Its reviewed SHA-256 is `317054e916e36f47457a85afa3ef6a6cc8f5d35f3cb22e5358fd1a3e6cfb8eed`.
+
+Penguin's optional adapter applies stable softmax to the model logits and supplements the RVM alpha with its body-skin class. Both models process the same frame concurrently, and compositing waits for both results. Each session uses at most three intra-op threads, with busy-wait spinning disabled. The option is off by default; independent filters and existing scenes remain unchanged unless explicitly enabled. Model failures remain visible errors through the existing camera status path.

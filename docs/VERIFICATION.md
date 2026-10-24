@@ -7,6 +7,10 @@
 
 This is a development preview based on OBS Studio 32.2.2. The new Penguin code must not be described as fully production-tested until the checks below have real recorded results.
 
+## Optional hand preservation 0.6.2 — 2026-10-25
+
+The live prototype movement test was visually accepted: both hands remained identifiable and the image appeared fluid. The full recording decoded and shutdown was clean, but one render-lag event and one encoder-skip event remain recorded. The subsequent zero-event control had no person in the inspected frames. See [test evidence](experiments/hand-preservation/results.json). The Ubuntu 26.04 candidate package passed native Wayland GUI regressions and a 40.021-second private motion replay with no reported frame-loss events, full decode and clean shutdown. See [package validation](validation/hand-preservation-0.6.2.md).
+
 ## Native chat and camera backgrounds 0.6.0 — 2026-10-24
 
 The final Ubuntu 26.04 package was installed on Ubuntu 26.04.1, upgrading only

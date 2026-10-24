@@ -69,3 +69,8 @@ assert pixel("edge-composite", 576, 180) == (255, 0, 0, 255)
 assert pixel("edge-unchanged", 192, 180)[3] == 24
 assert pixel("edge-unchanged", 448, 180)[3] == 232
 print("Custom-background alpha cleanup removes weak spill without changing other modes")
+
+assert report["hand_setting_enabled"] and report["hand_setting_restored"] and report["hand_ai_status"] == 2, report
+if "--inspector" in sys.argv:
+    assert report["hand_inspector_used"], report
+print("Optional hand recovery initializes, switches and restores with camera settings")
