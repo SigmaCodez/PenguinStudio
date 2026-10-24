@@ -1,6 +1,6 @@
 # Experimental hand preservation
 
-This prototype is **not enabled in release packages**. Final live motion acceptance is pending. Do not replace the installed filter with it as a released fix.
+This prototype is **not enabled in release packages**. The user has accepted live hand visibility; reproducible zero-loss performance during motion remains unproven. Do not replace the installed filter with it as a released fix.
 
 ## Approach
 
@@ -28,8 +28,14 @@ Promotion requires repeatable live results without additional frame loss, user c
 
 ## Results so far
 
-See `results.json` for the redacted counters. The final three-thread configuration completed a 40-second motion-reference replay and a 70-second Facecam capture without logged render-lag or encoder-skip events; both files decoded fully and both sessions reported zero memory leaks. Sampled processed Facecam frames showed only the replacement background, so the live hand-quality acceptance remains pending. This is not a completed motion validation.
+See `results.json` for the redacted counters. The final three-thread configuration completed a 40-second motion-reference replay and a 70-second Facecam capture without logged render-lag or encoder-skip events; both files decoded fully and both sessions reported zero memory leaks. Sampled processed Facecam frames showed only the replacement background, so that earlier run did not complete live motion validation. See the subsequent test below.
 
 Rejected candidates include MODNet (webcam/photographic), PP-HumanSeg, standalone Selfie Multiclass, RVM ResNet50, and Live Background Removal Lite 4.0.1. The inspected examples either lost hand detail, introduced unwanted foreground regions, or added cost without a clear quality benefit. These are observations for this local reference, not universal rankings. The Lite test also logged a frontend callback-removal warning during shutdown and is not proposed for integration.
 
 The first dual-model implementation and several thread configurations caused additional frame losses. They are recorded as failures rather than being hidden by the output's separate zero-dropped-frame counter. The diagnostic run includes frame-dump overhead and is not a clean performance baseline.
+
+## Repeated live motion test — 2026-10-25
+
+The user returned to the Facecam and repeated rapid head and hand movements. They confirmed that hands remained visible and the image looked fluid. Inspected frames show both hands retained; fast-moving boundaries remain soft rather than perfectly defined. The approximately 70-second recording fully decoded, and normal shutdown reported zero memory leaks with no logged application warnings/errors.
+
+The motion run nevertheless logged **one rendering-lag frame and one encoder-skipped frame**. The displayed percentage rounded to 0.0%; the events must not be described as zero. A subsequent 70-second control capture reported neither event and decoded successfully, but sampled frames showed no person. That control is not evidence of a second successful moving-person test. The installed 0.6.1 package remains unchanged, and the prototype is still outside the production build.
