@@ -1,0 +1,10 @@
+--- a/plugins/penguin-backgroundremoval/vendor/src/ort-utils/ort-session-utils.cpp
++++ b/plugins/penguin-backgroundremoval/vendor/src/ort-utils/ort-session-utils.cpp
+@@ -32,0 +33,2 @@
++ sessionOptions.AddConfigEntry("session.intra_op.allow_spinning","0");
++ sessionOptions.AddConfigEntry("session.inter_op.allow_spinning","0");
+@@ -39,2 +41,2 @@
+-		sessionOptions.SetInterOpNumThreads(tf->numThreads);
+-		sessionOptions.SetIntraOpNumThreads(tf->numThreads);
++		sessionOptions.SetInterOpNumThreads(1);
++		sessionOptions.SetIntraOpNumThreads(3);

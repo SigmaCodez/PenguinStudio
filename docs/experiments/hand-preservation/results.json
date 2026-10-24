@@ -1,0 +1,100 @@
+{
+  "status": "experimental; live motion acceptance pending",
+  "dates": [
+    "2026-10-24",
+    "2026-10-25"
+  ],
+  "hardware": "AMD Ryzen 7 9800X3D, AMD Radeon GPU, Elgato Facecam 4K",
+  "recording": "1280x720 at 30 fps, VAAPI H.264, synthetic AAC audio",
+  "privacy": "No camera frames, recordings, account data or device serials included.",
+  "runs": [
+    {
+      "test": "diagnostic",
+      "wayland": true,
+      "render_lag_frames": 5,
+      "encoder_skipped_frames": 5,
+      "shutdown_memory_leaks": 0,
+      "frontend_shutdown_warning": false
+    },
+    {
+      "test": "fusion",
+      "wayland": true,
+      "render_lag_frames": 159,
+      "encoder_skipped_frames": 846,
+      "shutdown_memory_leaks": 0,
+      "frontend_shutdown_warning": false
+    },
+    {
+      "test": "fusion-nospin",
+      "wayland": true,
+      "render_lag_frames": 42,
+      "encoder_skipped_frames": 106,
+      "shutdown_memory_leaks": 0,
+      "frontend_shutdown_warning": false
+    },
+    {
+      "test": "fusion-parallel",
+      "wayland": true,
+      "render_lag_frames": 0,
+      "encoder_skipped_frames": 0,
+      "shutdown_memory_leaks": 0,
+      "frontend_shutdown_warning": false
+    },
+    {
+      "test": "live-parallel",
+      "wayland": true,
+      "render_lag_frames": 45,
+      "encoder_skipped_frames": 46,
+      "shutdown_memory_leaks": 0,
+      "frontend_shutdown_warning": false
+    },
+    {
+      "test": "live-balanced",
+      "wayland": true,
+      "render_lag_frames": 4,
+      "encoder_skipped_frames": 4,
+      "shutdown_memory_leaks": 0,
+      "frontend_shutdown_warning": false
+    },
+    {
+      "test": "live-reserved",
+      "wayland": true,
+      "render_lag_frames": 0,
+      "encoder_skipped_frames": 0,
+      "shutdown_memory_leaks": 0,
+      "frontend_shutdown_warning": false,
+      "full_recording_decode": "passed",
+      "visual_limitation": "Sampled processed frames contain only the replacement background. Live person/motion acceptance is pending; no conclusion about absence versus segmentation failure."
+    },
+    {
+      "test": "lite/replay",
+      "wayland": true,
+      "render_lag_frames": 0,
+      "encoder_skipped_frames": 0,
+      "shutdown_memory_leaks": 0,
+      "frontend_shutdown_warning": true
+    },
+    {
+      "test": "replay-reserved",
+      "wayland": true,
+      "render_lag_frames": 0,
+      "encoder_skipped_frames": 0,
+      "shutdown_memory_leaks": 0,
+      "frontend_shutdown_warning": false,
+      "full_recording_decode": "passed"
+    }
+  ],
+  "candidate": {
+    "intra_op_threads_per_model": 3,
+    "inter_op_threads_per_model": 1,
+    "spinning": false,
+    "execution": "parallel, same frame, wait before compositing",
+    "reference_quality": "Inspected replay samples preserve more hand area; fast edges remain soft. Not a guarantee for all movements."
+  },
+  "source_validation": {
+    "compilation": "passed",
+    "link": "passed using generated linker arguments directly; CMake launcher has a local permission issue",
+    "publication_checks": "passed",
+    "installed_version_unchanged": "0.6.1-1+ubuntu26.04"
+  }
+}
