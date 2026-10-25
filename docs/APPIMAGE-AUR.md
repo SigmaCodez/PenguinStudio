@@ -1,6 +1,6 @@
 # AppImage and Arch Linux packages
 
-For the current 0.6.4 release, the Linux workflow builds an
+For the current 0.7.0 release, the Linux workflow builds an
 x86_64 AppImage and a checksum-pinned `penguin-studio-bin` Arch packaging recipe.
 Use only downloads actually present on the selected [release page](https://github.com/SigmaCodez/PenguinStudio/releases).
 A recipe archive on GitHub does not mean the package has been submitted to AUR.
@@ -8,8 +8,8 @@ The project does not yet have an AUR maintainer account configured.
 
 ## AppImage
 
-The AppImage bundles the tested Ubuntu 24.04 application, Qt and application
-libraries. It requires an x86_64 Linux host with glibc 2.39 or newer, compatible
+The AppImage bundles the tested Ubuntu 26.04 application, Qt and application
+libraries. It requires an x86_64 Linux host with glibc 2.43 or newer, compatible
 GPU drivers, the host VA-API runtime, common desktop/font/audio libraries and a
 working desktop session. It does not bundle a kernel, graphics
 drivers or a desktop portal. Older distributions should use Flatpak instead.
@@ -17,14 +17,14 @@ drivers or a desktop portal. Older distributions should use Flatpak instead.
 Download the AppImage and compare its SHA-256 with the release checksum file:
 
 ```sh
-chmod +x penguin-studio-0.6.4-x86_64.AppImage
-./penguin-studio-0.6.4-x86_64.AppImage
+chmod +x penguin-studio-0.7.0-x86_64.AppImage
+./penguin-studio-0.7.0-x86_64.AppImage
 ```
 
 If FUSE is unavailable, use:
 
 ```sh
-./penguin-studio-0.6.4-x86_64.AppImage --appimage-extract-and-run
+./penguin-studio-0.7.0-x86_64.AppImage --appimage-extract-and-run
 ```
 
 Wayland screen capture needs PipeWire and the desktop's portal backend. Account
@@ -41,10 +41,10 @@ do not run two copies against the same profile concurrently.
 
 ## Arch Linux / AUR recipe
 
-Download `penguin-studio-0.6.4-aur.tar.gz`, extract it, review `PKGBUILD`, then:
+Download `penguin-studio-0.7.0-aur.tar.gz`, extract it, review `PKGBUILD`, then:
 
 ```sh
-tar -xzf penguin-studio-0.6.4-aur.tar.gz
+tar -xzf penguin-studio-0.7.0-aur.tar.gz
 cd penguin-studio-bin
 makepkg -si
 ```
@@ -80,7 +80,7 @@ private SSH keys or account passwords to this repository.
 
 ## Build provenance
 
-`scripts/packaging/build-appimage.sh` uses the Ubuntu 24.04 DEB from the same CI
+`scripts/packaging/build-appimage.sh` uses the Ubuntu 26.04 DEB from the same CI
 run, discovers dependencies of OBS plugins as well as the main executable, and
 bundles Qt's Wayland platform, shell and graphics-integration plugins. VA-API
 libraries remain host-provided so they match the installed graphics driver. AppImage tooling is pinned by SHA-256 in

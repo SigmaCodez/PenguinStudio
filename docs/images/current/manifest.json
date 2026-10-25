@@ -1,23 +1,25 @@
 {
-  "version": "0.6.4",
+  "version": "0.7.0",
   "language": "en-US",
-  "source_commit": "a81523e3723d01119a1d0602cd26e673599b6eff",
-  "package": "0.6.4-1+ubuntu26.04",
+  "source_commit": "011eb6811ebcec260a1975a96615e30c70a7da8b",
+  "package": "0.7.0-1+ubuntu26.04",
+  "package_sha256": "fa81df0186944c74000ecba1dd4779b7498a8c362875afae22e380057e868a9a",
   "captured_on": "2026-10-25",
   "capture_method": "XComposite window capture of the real Ubuntu 26.04 candidate package under XWayland, using an isolated English profile; native Wayland tested separately",
   "content": "Synthetic local artwork and audio; no camera footage, private desktop content or signed-in accounts",
+  "visual_review": "All three images visually inspected: current Penguin workspace, rounded-corner Inspector and disconnected Twitch/YouTube details; English text and synthetic media only.",
   "images": [
     {
       "file": "workspace-en.png",
-      "sha256": "a35eded174a16e96559b5ff96b15666ad51d499d0eb5649ce0863b7573d415b7"
+      "sha256": "81f075d3e3d4c676c8fda50e2334c2b2173b10e2b979c202952013291e04776b"
     },
     {
       "file": "camera-en.png",
-      "sha256": "050580334ae634c6f88a7f51cb8908b267e99bcf1301277a9e528e1335fdf492"
+      "sha256": "9ee225cfa993d69cbdddcb71bad63fbb54f16e22e103635df3ddd7162dfe117e"
     },
     {
       "file": "stream-details-en.png",
-      "sha256": "704cbcd0ab2bc6f4ecd5ea0985a4da695911d07ed6350c0df44b50c04f410403"
+      "sha256": "1b17074a14e6958c3cb6ceced5814261998b33e6409db1b79e6e9feb27cd2c50"
     }
   ]
 }

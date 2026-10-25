@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
-# Package the tested Ubuntu 24.04 binaries; run on that distribution after build-native.sh.
+# Package the tested Ubuntu 26.04 binaries; run on that distribution after build-native.sh.
 set -euo pipefail
 root=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/../.." && pwd)
-deb=$(realpath "${1:?Usage: build-appimage.sh ubuntu24.04.deb [output-directory]}")
+deb=$(realpath "${1:?Usage: build-appimage.sh ubuntu26.04.deb [output-directory]}")
 out=$(realpath -m "${2:-$root/build_penguin_appimage}")
 version=$(cat "$root/packaging/version.txt")
 source /etc/os-release
-[[ "$ID" == ubuntu && "$VERSION_ID" == 24.04 && $(uname -m) == x86_64 ]]
+[[ "$ID" == ubuntu && "$VERSION_ID" == 26.04 && $(uname -m) == x86_64 ]]
 [[ $(dpkg-deb -f "$deb" Package) == penguin-studio ]]
-[[ $(dpkg-deb -f "$deb" Version) == "$version"-*+ubuntu24.04 ]]
+[[ $(dpkg-deb -f "$deb" Version) == "$version"-*+ubuntu26.04 ]]
 mkdir -p "$out/tools"
 appdir="$out/AppDir"
 [[ ! -e "$appdir" ]] || { echo 'Use a fresh AppImage output directory' >&2; exit 1; }
@@ -24,7 +24,8 @@ for tool in json.loads(pathlib.Path(sys.argv[1]).read_text()):
 PY
 # OBS initializes Python at startup. Shipping libpython without its matching
 # standard library would abort on hosts with a different Python version.
-cp -aL /usr/lib/python3.12 "$appdir/usr/lib/"
+python_stdlib=$(python3 -c 'import sysconfig; print(sysconfig.get_path("stdlib"))')
+cp -aL "$python_stdlib" "$appdir/usr/lib/"
 install -m755 "$root/packaging/appimage/penguin-studio" "$appdir/usr/bin/penguin-studio"
 # linuxdeploy cannot discover dlopen-loaded OBS modules from the executable alone.
 libraries=()
@@ -32,7 +33,12 @@ while IFS= read -r -d '' lib; do libraries+=(--library "$lib"); done \
   < <(find "$appdir/usr/lib" -type f -name '*.so*' -print0)
 export APPIMAGE_EXTRACT_AND_RUN=1
 export QMAKE=/usr/bin/qmake6
-export EXTRA_PLATFORM_PLUGINS='libqwayland-egl.so;libqwayland-generic.so'
+qt_plugins=$($QMAKE -query QT_INSTALL_PLUGINS)
+for plugin in platforms/libqwayland.so iconengines/libqsvgicon.so imageformats/libqsvg.so; do
+  [[ -f "$qt_plugins/$plugin" ]] || { echo "Missing Qt runtime plugin: $plugin" >&2; exit 1; }
+done
+# Qt 6.10 consolidates the former Wayland EGL/generic platform plugins.
+export EXTRA_PLATFORM_PLUGINS='libqwayland.so'
 export EXTRA_QT_MODULES='svg;waylandclient'
 export LD_LIBRARY_PATH="$appdir/usr/lib/x86_64-linux-gnu${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
 export NO_STRIP=1
@@ -43,7 +49,6 @@ export NO_STRIP=1
   --icon-file "$appdir/usr/share/icons/hicolor/scalable/apps/io.github.SigmaCodez.PenguinStudio.svg"
 # Qt's platform plugins also need the Wayland shell/graphics integrations.
 # The Qt deploy plugin does not currently copy these Qt 6 subdirectories.
-qt_plugins=$($QMAKE -query QT_INSTALL_PLUGINS)
 for integration in wayland-decoration-client wayland-graphics-integration-client wayland-shell-integration; do
   cp -a "$qt_plugins/$integration" "$appdir/usr/plugins/"
 done

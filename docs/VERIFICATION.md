@@ -5,7 +5,26 @@
 > product previews. For the current English GUI, see the [workspace guide](WORKSPACE.md)
 > and [preview provenance](images/current/manifest.json).
 
-This is a development preview based on OBS Studio 32.2.2. The new Penguin code must not be described as fully production-tested until the checks below have real recorded results.
+Version 0.7.0 is based on OBS Studio 33.0.0. Its [integration record](validation/obs33-integration.md) separates new engine tests from historical results. All seven candidate package targets and the AMD add-on migration checks passed; historical results alone are not used to validate this major update.
+
+## OBS 33 foundation 0.7.0 — 2026-10-25
+
+Native Ubuntu 26.04.1 Wayland candidates passed 210 workspace assertions,
+camera pixel/Inspector checks, 30-second GPU and CPU-fallback recordings,
+all ten startup/shutdown scenarios, saved synthetic-profile migration and
+local landscape/portrait output with reconnect. Offline browser output was
+visually confirmed in a decoded recording. AppImage and Flatpak candidates
+also passed graphical startup and camera checks; the Flatpak workspace
+recording passed after correcting reserved XDG-variable handling in the
+private test launcher.
+
+The existing host RADV diagnostic also reproduces on 0.6.4. Flatpak reports
+absent optional AJA devices on this machine. Those messages are documented,
+not hidden. Qt 6.11.1's confirmed destroyed-surface leave diagnostic is
+classified at debug level, with real focus mismatches preserved. Fresh live
+provider authorization, another Facecam movement acceptance, AJA operation
+and full GUI testing on every target distribution are not claimed.
+
 
 ## Security and camera GPU processing 0.6.3 — 2026-10-25
 

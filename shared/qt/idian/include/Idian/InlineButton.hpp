@@ -1,5 +1,5 @@
 /******************************************************************************
-    Copyright (C) 2023 by Dennis Sädtler <dennis@obsproject.com>
+    Copyright (C) 2026 by Taylor Giampaolo <warchamp7@obsproject.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -15,32 +15,21 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
-#include <Idian/SpinBox.hpp>
+#pragma once
 
-#include <Idian/moc_SpinBox.cpp>
+#include <Idian/Utils.hpp>
 
-using idian::SpinBox;
+#include <QPushButton>
 
-SpinBox::SpinBox(QWidget *parent) : QFrame(parent)
-{
-	layout = new QHBoxLayout();
-	setLayout(layout);
+class QPixmap;
 
-	layout->setContentsMargins(0, 0, 0, 0);
+namespace idian {
+class Utils;
 
-	decr = new QPushButton("-");
-	decr->setObjectName("obsSpinBoxButton");
-	layout->addWidget(decr);
+class InlineButton : public QPushButton {
+	Q_OBJECT
 
-	sbox = new QSpinBox();
-	sbox->setObjectName("obsSpinBox");
-	sbox->setButtonSymbols(QAbstractSpinBox::NoButtons);
-	layout->addWidget(sbox);
-
-	incr = new QPushButton("+");
-	incr->setObjectName("obsSpinBoxButton");
-	layout->addWidget(incr);
-
-	connect(decr, &QPushButton::pressed, sbox, &QSpinBox::stepDown);
-	connect(incr, &QPushButton::pressed, sbox, &QSpinBox::stepUp);
-}
+public:
+	explicit InlineButton(QWidget *parent = nullptr);
+};
+} // namespace idian

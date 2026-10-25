@@ -19,7 +19,7 @@ def build(runtime, output):
     output.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(prefix="penguin-amd-deb-", dir=output) as temporary:
         root = Path(temporary)
-        destination = root / "usr/lib/x86_64-linux-gnu/obs-plugins/penguin-camera-gpu"
+        destination = root / "usr/lib/x86_64-linux-gnu/obs-modules/penguin-camera-gpu"
         shutil.copytree(runtime, destination, symlinks=True)
         control = root / "DEBIAN"
         control.mkdir()

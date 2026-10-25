@@ -17,7 +17,7 @@ target_include_directories(penguin-camera PRIVATE "${penguin_ort_SOURCE_DIR}/inc
 target_link_libraries(penguin-camera PRIVATE OBS::libobs "${penguin_ort_SOURCE_DIR}/lib/libonnxruntime.so")
 set_target_properties_obs(penguin-camera PROPERTIES FOLDER plugins PREFIX "")
 # Keep this runtime private to our plugin, including inside portable packages.
-set_property(TARGET penguin-camera APPEND PROPERTY INSTALL_RPATH "$ORIGIN/penguin-camera")
+set_property(TARGET penguin-camera APPEND PROPERTY INSTALL_RPATH "$ORIGIN/../penguin-camera")
 install(DIRECTORY "${penguin_ort_SOURCE_DIR}/lib/" DESTINATION "${OBS_PLUGIN_DESTINATION}/penguin-camera"
   COMPONENT Runtime FILES_MATCHING PATTERN "libonnxruntime.so*")
 

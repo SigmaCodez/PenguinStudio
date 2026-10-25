@@ -115,18 +115,21 @@ void EdgeComposite(void *)
 	auto *previous = source;
 	OBSDataAutoRelease image = obs_data_create();
 	obs_data_set_string(image, "file", (directory + "/edge-alpha.png").toUtf8().constData());
-	for (int mode : {5, 0}) {
+	for (int variant : {0, 1, 2}) {
+		const int mode = variant == 1 ? 0 : 5;
 		// Separate sources avoid reusing OBS's per-frame cached filter output.
 		source = obs_source_create("image_source", "Alpha edge fixture", image, nullptr);
 		OBSDataAutoRelease settings = obs_data_create();
 		obs_data_set_int(settings, "background", mode);
 		obs_data_set_string(settings, "background_image",
-				    (directory + "/replacement.png").toUtf8().constData());
+				    (directory + (variant == 2 ? "/replacement-alpha.png" : "/replacement.png"))
+				    .toUtf8().constData());
 		OBSSourceAutoRelease effect =
 			obs_source_create("penguin_camera_filter", "Edge compositor", settings, nullptr);
 		if (source && effect) {
 			obs_source_filter_add(source, effect);
-			Capture(const_cast<char *>(mode == 5 ? "edge-composite" : "edge-unchanged"));
+			Capture(const_cast<char *>(variant == 2 ? "edge-transparent-background"
+						       : mode == 5 ? "edge-composite" : "edge-unchanged"));
 		}
 		obs_source_release(source);
 	}
@@ -355,6 +358,11 @@ void Start()
 		QImage image(800, 800, QImage::Format_RGBA8888);
 		image.fill(Qt::blue);
 		image.save(directory + "/replacement.png");
+		image.fill(QColor(0, 0, 255, 128));
+		if (!image.save(directory + "/replacement-alpha.png")) {
+			Fail(46);
+			return;
+		}
 		Image(directory + "/green.png");
 		report["image_applied"] = PenguinCamera::Apply(source, "Camera appearance", 3, 5, 25, 15, 8,
 							       (directory + "/replacement.png").toUtf8().constData());

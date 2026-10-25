@@ -76,7 +76,7 @@ changes; the new Git history has no shared merge base with OBS.
 
 Changes intended for OBS itself must follow the OBS Project's own contribution
 policies and be submitted separately. Its original guidelines remain available in
-[the pinned upstream source](https://github.com/obsproject/obs-studio/blob/ba2f32bdf791005443988a4955e963663e16b1ed/CONTRIBUTING.md).
+[the pinned upstream source](https://github.com/obsproject/obs-studio/blob/72e86655715d9a25d69ce446aa4dd44ba58e10d2/CONTRIBUTING.md).
 
 Original Penguin contributions are licensed under GPL-2.0-or-later, matching the
 derived application. See [COPYING](COPYING). Preserve the licenses of third-party

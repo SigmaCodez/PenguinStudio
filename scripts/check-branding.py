@@ -73,7 +73,7 @@ def main():
     # Product text must not regress when upstream translations are imported.
     # These entries name a real source application, upstream attribution or service.
     upstream_entries = {
-        "About.Contribute", "Importer.HelpText", "OBSStudio", "OBSClassic",
+        "EncoderMissing.NVENC.Unsupported.Kepler", "About.Contribute", "Importer.HelpText", "OBSStudio", "OBSClassic",
         "PenguinStudio.About", "CrashHandling.Labels.PrivacyNotice",
         "LogUploadDialog.Labels.PrivacyNotice", "MacPermissions.Item.Accessibility.Details",
     }

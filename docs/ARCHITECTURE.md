@@ -2,7 +2,7 @@
 
 ## Upstream baseline
 
-OBS Studio 32.2.2 (`ba2f32bdf791005443988a4955e963663e16b1ed`) is the pinned baseline. The libobs ABI and internal OBS data paths remain unchanged to reduce plugin breakage. Product identity, configuration root, desktop identity and theme are separate. The `main` branch starts from an independent source snapshot without OBS Git ancestry; [source provenance and history](HISTORY.md) records the distinction. Review upstream changes against the baseline and import selected patches with their attribution, followed by validation.
+OBS Studio 33.0.0 (`72e86655715d9a25d69ce446aa4dd44ba58e10d2`) is the baseline. This major update changes plugin loading, resource paths and some APIs; external plugin compatibility requires validation. Product identity, configuration root, desktop identity and theme are separate. The `main` branch starts from an independent source snapshot without OBS Git ancestry; [source provenance and history](HISTORY.md) records the distinction. Review upstream changes against the baseline and import selected patches with their attribution, followed by validation.
 
 ## Native workspace
 

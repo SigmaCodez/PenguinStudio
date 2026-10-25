@@ -28,6 +28,16 @@ int main()
 	const QString disable = QStringLiteral(
 		"virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) "
 		"Try to disable surface 0x0 with focusing surface 0x1234ab");
+	Require(IsBenignQtWaylandTeardownWarning(QtWarningMsg, context, leave, "6.11.1",
+						QStringLiteral("wayland")),
+		"Qt 6.11.1 retains the confirmed null-surface leave diagnostic");
+	Require(!IsBenignQtWaylandTeardownWarning(QtWarningMsg, context, disable, "6.11.1",
+						 QStringLiteral("wayland")),
+		"Qt 6.11.1 no longer has the separate disableSurface warning");
+	Require(!IsBenignQtWaylandTeardownWarning(QtWarningMsg, context,
+						QString(leave).replace("surface 0x0", "surface 0x5678"), "6.11.1",
+						QStringLiteral("wayland")),
+		"Qt 6.11.1 real surface mismatches remain warnings");
 	const char *version = "6.10.2";
 	const QString platform = QStringLiteral("wayland");
 	const auto matches = [&](const QString &message) {
@@ -42,7 +52,7 @@ int main()
 		for (QtMsgType severity : {QtDebugMsg, QtInfoMsg, QtCriticalMsg, QtFatalMsg})
 			Require(!IsBenignQtWaylandTeardownWarning(severity, context, message, version, platform),
 				"other severities must retain their original handling");
-		for (const auto &otherVersion : {"6.10.1", "6.10.3", "6.11.0", "6.9.2", "6.10.2.1", ""})
+		for (const auto &otherVersion : {"6.10.1", "6.10.3", "6.11.0", "6.11.2", "6.11.1.1", "6.9.2", "6.10.2.1", ""})
 			Require(!IsBenignQtWaylandTeardownWarning(QtWarningMsg, context, message, otherVersion, platform),
 				"other runtime versions must retain their original handling");
 		Require(!IsBenignQtWaylandTeardownWarning(QtWarningMsg, context, message, nullptr, platform),

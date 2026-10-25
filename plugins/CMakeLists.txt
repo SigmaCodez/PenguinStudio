@@ -1,13 +1,25 @@
 cmake_minimum_required(VERSION 3.28...3.30)
 
-option(ENABLE_PLUGINS "Enable building OBS plugins" ON)
+if(NOT TARGET libobs)
+  message(FATAL_ERROR "OBS Core modules require 'libobs' target.")
+endif()
 
-if(NOT ENABLE_PLUGINS)
-  set_property(GLOBAL APPEND PROPERTY OBS_FEATURES_DISABLED "Plugin Support")
+option(ENABLE_CORE_MODULES "Enable building OBS Core Modules" ON)
+set_property(GLOBAL PROPERTY ENABLE_PLUGINS ${ENABLE_CORE_MODULES})
+
+# FIXME: Remove with OBS 34.0.0
+if(DEFINED ENABLE_PLUGINS)
+  message(DEPRECATION "The ENABLE_PLUGINS cache variable is deprecated, use 'ENABLE_CORE_MODULES' instead")
+  set(ENABLE_CORE_MODULES ${ENABLE_PLUGINS})
+endif()
+
+if(NOT ENABLE_CORE_MODULES)
+  set_property(GLOBAL APPEND PROPERTY OBS_FEATURES_DISABLED "Core Modules")
+  set_obs_core_modules()
   return()
 endif()
 
-set_property(GLOBAL APPEND PROPERTY OBS_FEATURES_ENABLED "Plugin Support")
+set_property(GLOBAL APPEND PROPERTY OBS_FEATURES_ENABLED "Core Modules")
 
 include("${CMAKE_SOURCE_DIR}/cmake/common/penguin_ui_locale_patches.cmake")
 
@@ -17,7 +29,7 @@ macro(check_obs_browser)
       message(FATAL_ERROR "Required submodule 'obs-browser' not available.")
     else()
       penguin_apply_ui_locale_patch(obs-browser)
-      add_subdirectory(obs-browser)
+      add_core_module(obs-browser)
     endif()
   else()
     add_custom_target(obs-browser)
@@ -31,88 +43,93 @@ macro(check_obs_websocket)
   else()
     include("${CMAKE_SOURCE_DIR}/cmake/common/penguin_websocket_patch.cmake")
     penguin_apply_ui_locale_patch(obs-websocket)
-    add_subdirectory(obs-websocket)
+    add_core_module(obs-websocket)
   endif()
 endmacro()
 
 # Add plugins in alphabetical order to retain order in IDE projects
-add_obs_plugin(
+add_core_module(
     aja
     PLATFORMS WINDOWS MACOS LINUX
     WITH_MESSAGE
 )
-add_obs_plugin(aja-output-ui PLATFORMS WINDOWS MACOS LINUX WITH_MESSAGE)
-add_obs_plugin(coreaudio-encoder PLATFORMS WINDOWS MACOS)
-add_obs_plugin(
+add_core_module(aja-output-ui PLATFORMS WINDOWS MACOS LINUX WITH_MESSAGE)
+add_core_module(coreaudio-encoder PLATFORMS WINDOWS MACOS)
+add_core_module(
     decklink
     PLATFORMS WINDOWS MACOS LINUX
     WITH_MESSAGE
 )
-add_obs_plugin(
+add_core_module(
     decklink-captions
     PLATFORMS WINDOWS MACOS LINUX
     WITH_MESSAGE
 )
-add_obs_plugin(
+add_core_module(
     decklink-output-ui
     PLATFORMS WINDOWS MACOS LINUX
     WITH_MESSAGE
 )
-add_obs_plugin(
+add_core_module(
     frontend-tools
     PLATFORMS WINDOWS MACOS LINUX
     WITH_MESSAGE
 )
-add_obs_plugin(image-source)
-add_obs_plugin(linux-alsa PLATFORMS LINUX FREEBSD OPENBSD)
-add_obs_plugin(linux-capture PLATFORMS LINUX FREEBSD OPENBSD)
-add_obs_plugin(linux-jack PLATFORMS LINUX FREEBSD OPENBSD)
-add_obs_plugin(linux-pipewire PLATFORMS LINUX FREEBSD OPENBSD)
-add_obs_plugin(linux-pulseaudio PLATFORMS LINUX FREEBSD OPENBSD)
-add_obs_plugin(linux-v4l2 PLATFORMS LINUX FREEBSD OPENBSD)
-add_obs_plugin(mac-avcapture PLATFORMS MACOS)
-add_obs_plugin(mac-capture PLATFORMS MACOS)
-add_obs_plugin(mac-syphon PLATFORMS MACOS)
-add_obs_plugin(mac-videotoolbox PLATFORMS MACOS)
-add_obs_plugin(mac-virtualcam PLATFORMS MACOS)
-add_obs_plugin(nv-filters PLATFORMS WINDOWS)
+add_core_module(image-source)
+add_core_module(linux-alsa PLATFORMS LINUX FREEBSD OPENBSD)
+add_core_module(linux-capture PLATFORMS LINUX FREEBSD OPENBSD)
+add_core_module(linux-jack PLATFORMS LINUX FREEBSD OPENBSD)
+add_core_module(linux-pipewire PLATFORMS LINUX FREEBSD OPENBSD)
+add_core_module(linux-pulseaudio PLATFORMS LINUX FREEBSD OPENBSD)
+add_core_module(linux-v4l2 PLATFORMS LINUX FREEBSD OPENBSD)
+add_core_module(mac-avcapture PLATFORMS MACOS)
+add_core_module(mac-capture PLATFORMS MACOS)
+add_core_module(mac-syphon PLATFORMS MACOS)
+add_core_module(mac-videotoolbox PLATFORMS MACOS)
+add_core_module(mac-virtualcam PLATFORMS MACOS)
+add_core_module(nv-filters PLATFORMS WINDOWS)
 
 check_obs_browser()
 
-add_obs_plugin(obs-ffmpeg)
-add_obs_plugin(obs-filters)
-add_obs_plugin(obs-libfdk)
-add_obs_plugin(obs-nvenc PLATFORMS WINDOWS LINUX ARCHITECTURES x64 x86_64)
-add_obs_plugin(obs-outputs)
-add_obs_plugin(
+add_core_module(obs-ffmpeg)
+add_core_module(obs-filters)
+add_core_module(obs-libfdk)
+add_core_module(obs-nvenc PLATFORMS WINDOWS LINUX)
+add_core_module(obs-outputs)
+add_core_module(
     obs-qsv11
     PLATFORMS WINDOWS LINUX
     ARCHITECTURES x64 x86_64
 )
-add_obs_plugin(obs-text PLATFORMS WINDOWS)
-add_obs_plugin(obs-transitions)
-add_obs_plugin(
+add_core_module(obs-text PLATFORMS WINDOWS)
+add_core_module(obs-transitions)
+add_core_module(
     obs-vst
     PLATFORMS WINDOWS MACOS LINUX
     WITH_MESSAGE
 )
-add_obs_plugin(obs-webrtc)
+add_core_module(obs-webrtc)
 
 check_obs_websocket()
 
-add_obs_plugin(obs-x264)
-add_obs_plugin(oss-audio PLATFORMS FREEBSD OPENBSD)
-add_obs_plugin(penguin-camera PLATFORMS LINUX)
-add_obs_plugin(penguin-backgroundremoval PLATFORMS LINUX)
+add_core_module(obs-x264)
+add_core_module(oss-audio PLATFORMS FREEBSD OPENBSD)
+add_core_module(penguin-camera PLATFORMS LINUX)
+add_core_module(penguin-backgroundremoval PLATFORMS LINUX)
+if(TARGET obs-backgroundremoval)
+  target_enable(obs-backgroundremoval)
+endif()
 if(ENABLE_FRONTEND)
-  add_obs_plugin(penguin-outputs)
-  add_obs_plugin(penguin-platforms)
+  add_core_module(penguin-outputs)
+  add_core_module(penguin-platforms)
 endif()
 
-add_obs_plugin(rtmp-services)
-add_obs_plugin(sndio PLATFORMS LINUX FREEBSD OPENBSD)
-add_obs_plugin(text-freetype2)
-add_obs_plugin(vlc-video WITH_MESSAGE)
-add_obs_plugin(win-capture PLATFORMS WINDOWS)
-add_obs_plugin(win-dshow PLATFORMS WINDOWS)
-add_obs_plugin(win-wasapi PLATFORMS WINDOWS)
+add_core_module(rtmp-services)
+add_core_module(sndio PLATFORMS LINUX FREEBSD OPENBSD)
+add_core_module(text-freetype2)
+add_core_module(vlc-video WITH_MESSAGE)
+add_core_module(win-capture PLATFORMS WINDOWS)
+add_core_module(win-dshow PLATFORMS WINDOWS)
+add_core_module(win-wasapi PLATFORMS WINDOWS)
+
+set_obs_core_modules()
