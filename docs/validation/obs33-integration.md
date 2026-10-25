@@ -72,3 +72,11 @@ The in-app updater installs the main package, so an existing 0.6.x AMD runtime a
 [CI run 40228829022](https://github.com/SigmaCodez/PenguinStudio/actions/runs/40228829022), source `3948825ea04874feae95f867398a61c3709ae22a`, completed successfully: Ubuntu DEB, Fedora RPM, Flatpak, Snap, AppImage, Arch recipe/package validation and the optional AMD runtime. Branding, translations, configuration, OAuth and update-selection checks also passed. Publication was intentionally skipped for this pull-request candidate.
 
 The same Ubuntu package repeated the missing-runtime case with both new and legacy GPU directories hidden: CPU fallback was active; the 30.100-second recording fully decoded (900 video / 1,405 audio frames), no rendering/encoding losses were reported, and shutdown reported zero OBS leaks. This is a synthetic processing regression, not a renewed claim about live hand segmentation quality.
+
+## Final Ubuntu release artifact
+
+Release source `e7d7f58e75bcc72670d2a334d47be8db8650c059` was built in [run 40231127224](https://github.com/SigmaCodez/PenguinStudio/actions/runs/40231127224). The Ubuntu DEB SHA-256 is `26c81098edbf6d74eef736775b5f9c062310d6f5ea2101b132d47020ab037091`; the matching AMD add-on SHA-256 is `34b8d3b21fb06018a166c54bc5ec35e21ed76f38bd40658a12adf48a24d458b5`. Its ONNX Runtime library matches the tested runtime byte-for-byte.
+
+Before system installation, the exact extracted release packages passed native Wayland camera pixels/Inspector checks, all 210 workspace assertions and a fully decoded H.264/AAC workspace recording. All ten startup/shutdown scenarios passed without warning/error diagnostics, late frontend unregisters, Qt focus diagnostics or reported OBS leaks. A separate 30.100-second synthetic recording used the RX 9070 XT GPU without CPU fallback: 900 video and 1,405 audio frames decoded, 901 OBS output frames, no reported rendering/encoding losses, clean shutdown.
+
+APT's installation simulation upgraded only Penguin Studio and its existing AMD runtime add-on, with no additions or removals. This simulation is not evidence that the user has authorized or completed the privileged installation.
