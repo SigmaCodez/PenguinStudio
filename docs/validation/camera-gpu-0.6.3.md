@@ -106,3 +106,50 @@ This supersedes the missing user-presence/visual-acceptance limitation for the
 live test only. Final inspector UI testing, distributable runtime packaging and
 release/install validation remain outstanding. No release or system update was
 performed during this test.
+
+## Packaged runtime preparation checks
+
+The pinned gfx1201 runtime was staged from verified upstream archives and built
+into the optional Ubuntu 26.04 add-on. A cold-cache test kept the application
+responsive during GPU preparation and exited normally while preparation was
+still active, with no warning/error diagnostics or reported memory leaks.
+
+A subsequent 1,501-frame reference recording with this staged runtime reported
+no rendering/encoding losses and kept GPU processing active. Its shutdown did
+report one uncleared-source diagnostic before the source was destroyed; it is
+therefore not a clean-shutdown pass. Three targeted warm-GPU shutdown repeats
+then exited in 0.26–0.31 seconds without warning/error diagnostics or reported
+memory leaks. These runs used the earlier frontend candidate with the updated
+component; final complete-package regression results must be recorded separately.
+
+## Complete candidate package — commit 205c06b
+
+[CI run 40201246032](https://github.com/SigmaCodez/PenguinStudio/actions/runs/40201246032) passed all eight Linux artifacts, including the optional gfx1201 add-on.
+The exact Ubuntu 26.04 main package and add-on were extracted and mounted at their
+normal installation paths for testing; no locally compiled plugin replaced them.
+
+Native Wayland camera tests passed all three processing selections and legacy CPU
+selection preservation. Nine startup/shutdown scenarios and 211 workspace checks
+passed. Saved Twitch/YouTube connections, Minecraft search, YouTube Gaming and
+the release query passed without changing provider content. Local landscape and
+portrait RTMP output and full recording decode passed.
+
+The CPU reference recording produced 1,501 output frames without reported frame
+losses. The GPU reference recording produced 1,498 output frames, kept GPU active
+without fallback, decoded fully, and exited normally with no warnings/errors or
+reported leaks. Inspected motion frames retain the subject and hands with soft
+finger edges. The earlier uncleared-source shutdown diagnostic did not recur.
+The short workspace smoke recording reported two render-lag frames (1.5%); this
+is retained as a separate result and prevents a universal zero-loss claim.
+
+A sporadic Qt Wayland text-input focus warning occurred while opening the updater,
+including a restart test. A delayed-opening repeat and the dedicated focus/close
+scenario passed without it. There is not enough evidence to attribute it solely
+to the test helper, so the warning remains an explicit known limitation. Release
+queries and normal shutdown succeeded. The local RTMP harness reported a
+temporary-services-directory warning; its output tests and decode passed.
+These diagnostics are retained in private logs.
+
+All three public previews were recaptured from the actual candidate package using
+an isolated English profile and synthetic media, visually reviewed, and hashed in
+the current manifest. Private camera test recordings remain outside the repository.

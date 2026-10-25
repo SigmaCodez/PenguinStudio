@@ -1,8 +1,11 @@
 # Core security and reliability maintenance — 0.6.3
 
-Status: candidate; all Linux package builds passed before an additional updater
-focus correction. Rebuilt packages, real YouTube consent and
-Facecam movement validation remain pending before publication and installation.
+Status: the complete candidate at commit 205c06b passed all eight Linux package
+builds and functional regression checks. Real YouTube authorization, saved
+provider sessions and Facecam movement acceptance have been verified. Final
+publication and installation follow the release workflow. See the
+[complete package results](camera-gpu-0.6.3.md#complete-candidate-package--commit-205c06b)
+for measured performance and the remaining sporadic updater focus warning.
 
 ## Scope
 

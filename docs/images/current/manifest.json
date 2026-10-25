@@ -1,7 +1,7 @@
 {
   "version": "0.6.3",
   "language": "en-US",
-  "source_commit": "474dc4ca1b6f27e1b908092d399115ad4f41561c",
+  "source_commit": "205c06b78b9c482784ae86297a1e390fa9ecdcfa",
   "package": "0.6.3-1+ubuntu26.04",
   "captured_on": "2026-10-25",
   "capture_method": "XComposite window capture of the real Ubuntu 26.04 candidate package under XWayland, using an isolated English profile; native Wayland tested separately",
@@ -9,17 +9,15 @@
   "images": [
     {
       "file": "workspace-en.png",
-      "sha256": "8769d27a7d70850a7e0143faedf3c1a651b40f6c894ab18b58862d773697b4bf"
+      "sha256": "a56903dccb087fda7e27f47bad231f0c1a14a6edf43efa2b79c9622863821a30"
     },
     {
       "file": "camera-en.png",
-      "sha256": "fc9dd319c178d6e46097318fe9c991193352b092a3f63d265f0956e95eced8ec"
+      "sha256": "8c945e2fb65c04575bed1de4411c77f8f07b93b4e95b391d4fded1574f968f48"
     },
     {
       "file": "stream-details-en.png",
-      "sha256": "5e1e2a1c7dcda9264d6cff7490241d0f8f08ecacd47161366f4b065f1da5b2e9"
+      "sha256": "e84f2d53a8ddab879de48b6854c18f471e730c1efca59573b061a6ab867f660c"
     }
-  ],
-  "pending_version": "0.6.3",
-  "pending_reason": "Recapture the final package with Automatic/GPU/CPU camera controls before publication."
+  ]
 }
