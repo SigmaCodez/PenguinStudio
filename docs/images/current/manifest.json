@@ -19,5 +19,7 @@
       "file": "stream-details-en.png",
       "sha256": "e84f2d53a8ddab879de48b6854c18f471e730c1efca59573b061a6ab867f660c"
     }
-  ]
+  ],
+  "pending_version": "0.6.4",
+  "pending_reason": "Capture and review the real 0.6.4 package after the window-title change."
 }
