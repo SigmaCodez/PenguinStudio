@@ -166,6 +166,6 @@ parts:
       - libatk-bridge2.0-0t64
       - libxss1
     # The GNOME content snap supplies the SVG loader and its matching librsvg.
-    # Noble's transitive FFmpeg dependency is older and shadows that ABI.
+    # Avoid shadowing the content snap's matching SVG dependencies.
     prime:
       - -usr/lib/x86_64-linux-gnu/librsvg-2.so.*

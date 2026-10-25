@@ -287,7 +287,20 @@ jobs:
       - name: Install Snapcraft
         run: sudo snap install snapcraft --classic
       - name: Build snap
-        run: sudo snapcraft --destructive-mode
+        run: sudo snapcraft pack --destructive-mode --verbosity=debug
+      - name: Preserve Snapcraft diagnostics
+        if: failure()
+        run: |
+          mkdir -p snap-debug
+          sudo cp /root/.local/state/snapcraft/log/*.log snap-debug/ || true
+          sudo chown -R "$(id -u):$(id -g)" snap-debug
+          apt-cache policy libxcb-composite0 libswscale9 > snap-debug/packages.txt
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: failure()
+        with:
+          name: penguin-debug-snap
+          path: snap-debug/
+          if-no-files-found: ignore
       - name: Verify compiled YouTube configuration
         run: python3 scripts/packaging/configure-youtube.py --verify prime
       - name: Install Snap and verify confined launcher
