@@ -10,6 +10,8 @@ assert report["visible"] and report["ai_status"] == 2, report
 assert report["pair_lifecycle"] and report["unrelated_filter_preserved"], report
 if "--inspector" in sys.argv:
     assert report.get("inspector_used"), report
+    assert report.get("processing_controls"), report
+    assert all(report.get(f"processing_{index}") for index in range(3)), report
     assert report.get("background_controls_available"), report
     assert report["rvm_backend"] and report["automatic_undo_removed_matting"] and report["automatic_redo_restored_matting"], report
     assert report["controls_enabled"] and report["controls_visible"], report

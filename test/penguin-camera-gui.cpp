@@ -387,13 +387,34 @@ void Start()
 			PenguinCamera::Apply(source, "Camera appearance", 3, 1, 25, 15, 8, "", true);
 		}
 	});
+	for (const auto &choice : {std::pair{22000, 2}, std::pair{22250, 1}, std::pair{22500, 0}}) {
+		At(choice.first, [index = choice.second] {
+			auto *processing = mainWindow->findChild<QComboBox *>("cameraProcessing");
+			if (!processing || processing->count() != 3) {
+				report["processing_controls"] = false;
+				return;
+			}
+			processing->setCurrentIndex(index);
+			auto appearance = PenguinCamera::CameraFilter(source);
+			auto matting = PenguinCamera::CameraMatting(source);
+			OBSDataAutoRelease settings = obs_source_get_settings(appearance);
+			OBSDataAutoRelease modelSettings = obs_source_get_settings(matting);
+			const char *expected = index == 2 ? "cpu" : index == 1 ? "gpu" : "auto";
+			report[QString("processing_%1").arg(index)] =
+				std::strcmp(obs_data_get_string(settings, "inference_device"), expected) == 0 &&
+				std::strcmp(obs_data_get_string(modelSettings, "useGPU"), expected) == 0;
+			report["processing_controls"] = processing->isEnabled() && processing->isVisible();
+		});
+	}
 	At(23500, [] {
 		auto matting = PenguinCamera::CameraMatting(source);
 		OBSDataAutoRelease settings = matting ? obs_source_get_settings(matting) : obs_data_create();
 		report["hand_setting_enabled"] = obs_data_get_bool(settings, "penguin_preserve_hands");
 		calldata_t status;
 		calldata_init(&status);
-		if (matting) proc_handler_call(obs_source_get_proc_handler(matting), "camera_status", &status);
+		if (matting) {
+			proc_handler_call(obs_source_get_proc_handler(matting), "camera_status", &status);
+		}
 		report["hand_ai_status"] = int(calldata_int(&status, "status"));
 		calldata_free(&status);
 		const auto saved = PenguinCamera::SaveCamera(source);

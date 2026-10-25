@@ -118,7 +118,7 @@ target_compile_features(penguin-gpu-worker PRIVATE cxx_std_20)
 target_compile_definitions(penguin-gpu-worker PRIVATE ORT_API_MANUAL_INIT)
 target_include_directories(penguin-gpu-worker PRIVATE
   "${penguin_ort_SOURCE_DIR}/include" "${penguin_cv_SOURCE_DIR}/modules/core/include"
-  "${penguin_cv_SOURCE_DIR}/modules/imgproc/include" "${penguin_cv_BINARY_DIR}")
+  "${penguin_cv_SOURCE_DIR}/modules/imgproc/include" "${penguin_cv_BINARY_DIR}" "${CMAKE_BINARY_DIR}")
 target_link_libraries(penguin-gpu-worker PRIVATE OBS::libobs opencv_core opencv_imgproc ${CMAKE_DL_LIBS})
 set_property(TARGET penguin-gpu-worker PROPERTY COMPILE_WARNING_AS_ERROR OFF)
 install(TARGETS penguin-gpu-worker RUNTIME DESTINATION "${OBS_PLUGIN_DESTINATION}/penguin-camera" COMPONENT Runtime)
