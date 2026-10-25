@@ -20,13 +20,22 @@ static void check()
         result["main_window_visible"] = main && main->isVisible();
         result["executable"] = QCoreApplication::applicationFilePath();
         QFile maps("/proc/self/maps");
-        maps.open(QIODevice::ReadOnly);
+        if (!maps.open(QIODevice::ReadOnly)) {
+            QCoreApplication::exit(43);
+            return;
+        }
         QFile evidence(qEnvironmentVariable("PENGUIN_TEST_RESULT") + ".maps");
-        evidence.open(QIODevice::WriteOnly);
-        evidence.write(maps.readAll());
+        const QByteArray loadedMaps = maps.readAll();
+        if (!evidence.open(QIODevice::WriteOnly) || evidence.write(loadedMaps) != loadedMaps.size()) {
+            QCoreApplication::exit(44);
+            return;
+        }
         QFile output(qEnvironmentVariable("PENGUIN_TEST_RESULT"));
-        output.open(QIODevice::WriteOnly);
-        output.write(QJsonDocument(result).toJson());
+        const QByteArray report = QJsonDocument(result).toJson();
+        if (!output.open(QIODevice::WriteOnly) || output.write(report) != report.size()) {
+            QCoreApplication::exit(45);
+            return;
+        }
         if (!main || !main->isVisible())
             QCoreApplication::exit(42);
         else
