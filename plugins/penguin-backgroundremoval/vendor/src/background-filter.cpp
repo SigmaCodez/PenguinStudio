@@ -353,7 +353,13 @@ void background_filter_update(void *data, obs_data_t *settings)
 		if (tf->useGPU != "cpu" && tf->modelSelection == MODEL_RVM) {
 			const auto module =
 				std::filesystem::path(obs_get_module_binary_path(obs_current_module())).parent_path();
-			const auto runtime = module.parent_path() / "penguin-camera-gpu/libonnxruntime.so.1";
+			auto runtime = module.parent_path() / "penguin-camera-gpu/libonnxruntime.so.1";
+			// In-app main-package updates may leave the compatible 0.6.x GPU add-on installed.
+			// Prefer the new layout, but retain that private runtime until the add-on is updated.
+			if (!std::filesystem::is_regular_file(runtime)) {
+				runtime = module.parent_path().parent_path() /
+					  "obs-plugins/penguin-camera-gpu/libonnxruntime.so.1";
+			}
 			const auto executable = module.parent_path() / "penguin-camera/penguin-gpu-worker";
 			if (std::filesystem::is_regular_file(runtime) && std::filesystem::is_regular_file(executable)) {
 				char *models = obs_module_file("models");
