@@ -4,7 +4,7 @@
 #include <QLoggingCategory>
 #include <QStringView>
 
-// Qt 6.10.2 reports a destroyed wl_surface proxy as a focus mismatch when the
+// Qt 6.10.2 and 6.11.1 report a destroyed wl_surface proxy as a focus mismatch when the
 // compositor's queued leave event arrives with a null surface. Qt upstream
 // identifies this as normal teardown in QTBUG-120533:
 // https://github.com/qt/qtbase/commit/ac8b2e9b40bf19aa889345f7b617392bef906040
@@ -14,7 +14,8 @@ inline bool IsBenignQtWaylandTeardownWarning(QtMsgType type, const QMessageLogCo
 					    QStringView platformName)
 {
 	if (type != QtWarningMsg || !context.category || qstrcmp(context.category, "qt.qpa.wayland.textinput") != 0 ||
-	    !runtimeQtVersion || qstrcmp(runtimeQtVersion, "6.10.2") != 0 ||
+	    !runtimeQtVersion ||
+	    (qstrcmp(runtimeQtVersion, "6.10.2") != 0 && qstrcmp(runtimeQtVersion, "6.11.1") != 0) ||
 	    (platformName != QLatin1StringView("wayland") && platformName != QLatin1StringView("wayland-egl")))
 		return false;
 
@@ -28,7 +29,7 @@ inline bool IsBenignQtWaylandTeardownWarning(QtMsgType type, const QMessageLogCo
 	QStringView pointer;
 	if (message.startsWith(leavePrefix))
 		pointer = message.sliced(leavePrefix.size());
-	else if (message.startsWith(disablePrefix))
+	else if (qstrcmp(runtimeQtVersion, "6.10.2") == 0 && message.startsWith(disablePrefix))
 		pointer = message.sliced(disablePrefix.size());
 	else
 		return false;

@@ -9,6 +9,11 @@ origin or licensing of the source.
 
 The original upstream baseline was OBS Studio 32.2.2, commit
 [`ba2f32bdf791005443988a4955e963663e16b1ed`](https://github.com/obsproject/obs-studio/commit/ba2f32bdf791005443988a4955e963663e16b1ed).
+Penguin Studio 0.7.0 imports OBS Studio 33.0.0, commit
+[`72e86655715d9a25d69ce446aa4dd44ba58e10d2`](https://github.com/obsproject/obs-studio/commit/72e86655715d9a25d69ce446aa4dd44ba58e10d2),
+as source changes without merging OBS Git ancestry or restoring upstream tags.
+See the [integration record](validation/obs33-integration.md).
+
 Keep [AUTHORS](../AUTHORS), [COPYING](../COPYING), the original
 [OBS README](../README.rst), source copyright headers and third-party notices
 when redistributing or updating the application. `.gitmodules` and its pinned
