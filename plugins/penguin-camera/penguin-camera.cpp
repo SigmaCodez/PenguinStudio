@@ -23,7 +23,7 @@ struct Camera {
 	gs_texrender_t *capture = nullptr;
 	gs_stagesurf_t *stage = nullptr;
 	gs_texture_t *maskTexture = nullptr;
-	gs_image_file_t backgroundImage{};
+	gs_image_file_ex_t backgroundImage{};
 	std::string imagePath;
 	std::atomic<int> shape{0}, background{0}, status{0};
 	std::atomic<float> radius{0.25f}, similarity{0.15f};
@@ -91,7 +91,7 @@ struct Camera {
 			worker.join();
 		}
 		obs_enter_graphics();
-		gs_image_file_free(&backgroundImage);
+		gs_image_file_ex_free(&backgroundImage);
 		gs_texture_destroy(maskTexture);
 		gs_stagesurface_destroy(stage);
 		gs_texrender_destroy(capture);
@@ -124,12 +124,12 @@ void Update(void *data, obs_data_t *settings)
 	obs_enter_graphics();
 	const std::string imagePath = obs_data_get_string(settings, "background_image");
 	if (imagePath != camera->imagePath) {
-		gs_image_file_free(&camera->backgroundImage);
+		gs_image_file_ex_free(&camera->backgroundImage);
 		camera->backgroundImage = {};
 		camera->imagePath = imagePath;
 		if (!imagePath.empty() && os_file_exists(imagePath.c_str())) {
-			gs_image_file_init(&camera->backgroundImage, imagePath.c_str());
-			gs_image_file_init_texture(&camera->backgroundImage);
+			gs_image_file_ex_init(&camera->backgroundImage, imagePath.c_str(), GS_IMAGE_ALPHA_STRAIGHT);
+			gs_image_file_ex_init_texture(&camera->backgroundImage);
 		}
 	}
 	obs_leave_graphics();
