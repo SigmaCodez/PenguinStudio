@@ -40,7 +40,7 @@ Snap, AppImage and an Arch recipe archive, plus `SHA256SUMS` and
 Releases are marked as prereleases while Penguin Studio remains a development preview.
 
 To publish a new version, increase **`packaging/version.txt`** (for example from
-`0.6.3` to `0.6.3`) and push it to `main`. This single file supplies the application,
+`0.6.3` to `0.6.4`) and push it to `main`. This single file supplies the application,
 native package and Snap versions; the Flatpak filename uses the same value.
 Refresh the English product text and real candidate-version screenshots together
 with the version change; the [publication check](PUBLICATION.md) rejects stale previews.
@@ -63,9 +63,8 @@ Download the Ubuntu 26.04 DEB from [Penguin Studio releases](https://github.com/
 Ubuntu 26.04.1 uses the same package. Do not install the Ubuntu 24.04 DEB on
 26.04 or mix distribution repositories to satisfy its dependencies.
 
-The installed Ubuntu 26.04 package passed the full Wayland camera and alpha-spill
-tests, plus a real Facecam restart with the saved custom image and clean shutdown. See
-[0.6.3 validation](validation/camera-background-edges-0.6.3.md) for scope.
+See [0.6.3 validation](validation/core-security-0.6.3.md) for the package-specific
+Wayland, recording, camera, platform-sign-in and shutdown results and their limits.
 Earlier installed results remain in the [verification history](VERIFICATION.md).
 
 The download is `penguin-studio_0.6.3-1+ubuntu26.04_amd64.deb`.

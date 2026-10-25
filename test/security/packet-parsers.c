@@ -80,6 +80,14 @@ int main(void)
 	assert(!obs_av1_keyframe(invalid, sizeof(invalid)));
 	uint8_t *out, *header;
 	size_t out_size, header_size;
+	metadata_obu(NULL, SIZE_MAX, &out, &out_size, METADATA_TYPE_ITUT_T35);
+	assert(!out && !out_size);
+	const uint8_t metadata_payload[] = {'a', 'b', 'c'};
+	metadata_obu(metadata_payload, sizeof(metadata_payload), &out, &out_size, METADATA_TYPE_ITUT_T35);
+	assert(out_size == 7 && out[0] == 0x2a && out[1] == 5 && out[6] == 0x80);
+	bfree(out);
+	const uint8_t oversized[] = {0x32, 0x80, 0x80, 0x80, 0x80, 0x10, 0};
+	assert(!obs_av1_keyframe(oversized, sizeof(oversized)));
 	const uint8_t sequence[] = {0x0a, 1, 0x42, 0x32, 1, 0};
 	obs_extract_av1_headers(sequence, sizeof(sequence), &out, &out_size, &header, &header_size);
 	assert(out_size == sizeof(sequence) && !memcmp(out, sequence, out_size));

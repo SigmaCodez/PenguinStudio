@@ -1,6 +1,7 @@
 # Core security and reliability maintenance — 0.6.3
 
-Status: candidate; package and native Wayland validation pending.
+Status: candidate; all Linux package builds passed. Real YouTube consent and
+Facecam movement validation remain pending before publication and installation.
 
 ## Scope
 
@@ -65,3 +66,56 @@ Reproduction commands: `bash test/security/run-packet-parsers.sh` and
 headers/libraries and SIMDe headers. `PENGUIN_SECURITY_CPPFLAGS` can supply a
 non-system header location. Sanitizer results are not a substitute for codec,
 recording, platform-authentication or hardware regression tests.
+
+## Preliminary package regression checks
+
+The Ubuntu 26.04 candidate built from `53504d2` passed the following native
+Wayland checks. This candidate predates the final ALSA startup and private-scene
+canvas corrections; the final package must repeat these checks before release.
+
+- All 211 workspace checks passed. The short synthetic H.264/AAC recording
+  decoded completely and included the real CEF browser source. No rendering-lag
+  or encoding-skip counters were reported in this run.
+- Synthetic camera checks passed for shapes, chroma key, automatic removal,
+  blur, image replacement, hand preservation, undo and missing-image handling.
+- All nine shutdown scenarios passed without reported startup/shutdown errors,
+  Qt focus warnings or OBS allocation leaks.
+- Local RTMP integration passed horizontal and vertical outputs, reconnection,
+  restart, active-output destruction and failed-connection cleanup.
+- Twitch restored its saved session and returned Minecraft category results.
+  Real YouTube consent and persistence remain pending; simulated provider-flow
+  tests alone do not establish successful real-account authorization.
+
+The workspace exercise still emitted the baseline external RADV Vulkan notice
+and the private-scene canvas warning addressed in the subsequent candidate.
+The ordinary camera and shutdown scenarios did not emit those warnings.
+Browser launch during an isolated account test initially failed because Brave
+inherited the test mount namespace. The test now hands the official Google URL
+to the normal host browser without disabling browser sandboxing.
+
+## Final source candidate checks in progress
+
+The Ubuntu 26.04 package from `474dc4ca1b6f27e1b908092d399115ad4f41561c`
+passed its SHA-256 verification and all synthetic camera-effects checks.
+All 211 workspace checks passed; the recorded browser-source composition was
+visually inspected and the complete recording decoded without errors. The
+private-scene canvas warning is absent. OBS reported zero allocation leaks.
+
+This run reported two rendering-lag frames (1.5%) during the short recording;
+the installed 0.6.2 baseline reported eight (5.9%). This is not a controlled
+performance benchmark and does not establish a universally loss-free result.
+The external RADV Vulkan notice remains visible during the workspace exercise.
+A real Facecam movement recording and final real-account YouTube verification
+remain required before completing the requested release validation.
+
+All seven Linux package jobs in GitHub Actions run `40183842831` succeeded:
+Ubuntu 24.04 and 26.04 DEBs, Fedora 44 RPM, Flatpak, Snap core24, AppImage and
+Arch binary package validation. Publication was correctly skipped for the PR.
+
+The final source candidate also passed all nine native Wayland startup/shutdown
+scenarios and the complete local horizontal/vertical RTMP integration. Twitch
+restored its saved session and returned Minecraft search results. The manual
+in-app updater reached GitHub and correctly reported no newer published release
+(the public version is still 0.6.2); a real installation upgrade is still pending.
+All three current English previews were captured from this package, visually
+reviewed, and checked with `python3 scripts/check-publication.py`.
