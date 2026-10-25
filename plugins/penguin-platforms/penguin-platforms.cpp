@@ -294,6 +294,7 @@ protected:
 			auto *item = form->itemAt(row, QFormLayout::LabelRole);
 			if (auto *label = item ? qobject_cast<QLabel *>(item->widget()) : nullptr) {
 				label->setWordWrap(true);
+				label->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 			}
 		}
 		SetConnected(false);
@@ -311,6 +312,8 @@ public:
 		form->setContentsMargins(12, 14, 12, 14);
 		form->setVerticalSpacing(10);
 		form->setRowWrapPolicy(QFormLayout::WrapAllRows);
+		// Full-width label rows wrap only when the dock actually runs out of space.
+		form->setLabelAlignment({});
 		form->setFieldGrowthPolicy(QFormLayout::AllNonFixedFieldsGrow);
 		form->setFormAlignment(Qt::AlignTop);
 		connectButton->setObjectName(provider + "ConnectAccount");

@@ -36,6 +36,8 @@
 #include <QSet>
 #include <QSpinBox>
 #include <QTimer>
+#include <QToolButton>
+#include <QStyleOptionToolButton>
 #include <QWindow>
 #include <QWizard>
 #include <X11/Xlib.h>
@@ -280,6 +282,29 @@ void CheckWorkspaceLayout(const QString &size, int requestedWidth, int requested
 		auto *button = Control<QAbstractButton>(name);
 		Check(button && button->isVisible() && BoundsInWindow(topbar).contains(BoundsInWindow(button)),
 		      QStringLiteral("toolbar-control-fits-%1-%2").arg(size, QString::fromLatin1(name)));
+	}
+	if (auto *live = Control<QToolButton>("penguinLiveButton")) {
+		for (const char *name : {"penguinRecordButton", "penguinClipButton", "penguinSettingsButton", "penguinToolbarButton"}) {
+			auto *button = Control<QToolButton>(name);
+			Check(button && std::abs(button->height() - live->height()) <= 2 &&
+			      std::abs(BoundsInWindow(button).center().y() - BoundsInWindow(live).center().y()) <= 1,
+			      QStringLiteral("toolbar-action-alignment-%1-%2").arg(size, QString::fromLatin1(name)));
+		}
+	}
+	for (const char *name : {"penguinLiveButton", "penguinRecordButton"}) {
+		if (auto *button = Control<QToolButton>(name)) {
+			QStyleOptionToolButton option;
+			option.initFrom(button);
+			option.features = QStyleOptionToolButton::MenuButtonPopup | QStyleOptionToolButton::HasMenu;
+			option.text = button->text();
+			option.icon = button->icon();
+			option.iconSize = button->iconSize();
+			option.toolButtonStyle = button->toolButtonStyle();
+			const QRect menu = button->style()->subControlRect(QStyle::CC_ToolButton, &option,
+				QStyle::SC_ToolButtonMenu, button);
+			Check(menu.width() >= 20 && button->rect().contains(menu),
+			      QStringLiteral("toolbar-menu-hit-area-%1-%2").arg(size, QString::fromLatin1(name)));
+		}
 	}
 	for (const char *name : {"penguinLayerSearch", "penguinSceneSearch"}) {
 		auto *search = Control<QLineEdit>(name);
@@ -556,12 +581,14 @@ void CheckInspectorWidth(const QString &size)
 	auto *scroll = Control<QScrollArea>("inspectorScroll");
 	if (!scroll)
 		return;
+	Check(scroll->widget()->width() <= scroll->viewport()->width(),
+	      QStringLiteral("inspector-body-fits-viewport-%1").arg(size));
 	for (const char *name : {"inspectorX", "inspectorY", "inspectorWidth", "inspectorHeight", "inspectorRotation",
 		"inspectorCropLeft", "inspectorCropRight", "inspectorCropTop", "inspectorCropBottom",
 		"inspectorVisible",
 		"inspectorLocked", "inspectorAspectLock", "inspectorFit", "inspectorCenter", "inspectorFlipHorizontal",
 		"inspectorFlipVertical", "inspectorProperties", "inspectorFilters", "inspectorAdvanced",
-		"inspectorReset"}) {
+		"inspectorReset", "cameraShape", "cameraBackground", "cameraProcessing"}) {
 		auto *control = mainWindow->findChild<QWidget *>(QString::fromLatin1(name));
 		// A collapsed section has no layout allocation until it is expanded.
 		// Its controls are covered again by the compact run after expansion.
