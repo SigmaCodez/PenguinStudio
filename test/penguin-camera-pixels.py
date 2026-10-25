@@ -77,3 +77,9 @@ assert report["hand_setting_enabled"] and report["hand_setting_restored"] and re
 if "--inspector" in sys.argv:
     assert report["hand_inspector_used"], report
 print("Optional hand recovery initializes, switches and restores with camera settings")
+
+# OBS 33 image loading must retain straight alpha: composite exactly once.
+r, g, b, a = pixel("edge-transparent-background", 64, 180)
+assert r == 0 and g == 0 and 126 <= b <= 130 and 126 <= a <= 130, (r, g, b, a)
+assert pixel("edge-transparent-background", 576, 180) == (255, 0, 0, 255)
+print("Transparent background images retain correct premultiplied output")
