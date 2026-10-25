@@ -76,6 +76,24 @@ int main(void)
 	assert(AMF3_Decode(&obj, (const char *)dynamic, sizeof(dynamic), 1) == sizeof(dynamic));
 	assert(obj.o_num == 1 && obj.o_props[0].p_vu.p_number == 42);
 	AMF_Reset(&obj);
+	/* Every truncated prefix must remain safe, including valid nested syntax. */
+	for (size_t i = 0; i <= sizeof(dynamic); i++)
+		amf(dynamic, (int)i);
+	for (size_t i = 0; i <= sizeof(sequence); i++)
+		av1(sequence, i);
+	const uint8_t sps[] = {0, 0, 1, 0x67, 0x64, 0, 0x1f, 0, 0, 0, 0, 0, 0, 1, 0x68, 0};
+	av1(sps, sizeof(sps));
+	const uint8_t bad_tail[] = {0x0a, 1, 0x42, 0x36};
+	obs_extract_av1_headers(bad_tail, sizeof(bad_tail), &out, &out_size, &header, &header_size);
+	assert(!out && !header && !out_size && !header_size);
+	const uint8_t sealed[] = {AMF3_OBJECT, 0x13, 1, 3, 'x', AMF3_INTEGER, 42};
+	assert(AMF3_Decode(&obj, (const char *)sealed, sizeof(sealed), 1) == sizeof(sealed));
+	assert(obj.o_num == 1 && obj.o_props[0].p_vu.p_number == 42);
+	AMF_Reset(&obj);
+	const uint8_t nested3[] = {AMF3_OBJECT, 0x0b, 1, 3, 'x', AMF3_OBJECT, 3, 1, 1};
+	assert(AMF3_Decode(&obj, (const char *)nested3, sizeof(nested3), 1) == sizeof(nested3));
+	assert(obj.o_num == 1 && obj.o_props[0].p_type == AMF_OBJECT);
+	AMF_Reset(&obj);
 	/* Deep mixed inputs must fail without overflowing the native stack. */
 	uint8_t nested[1024] = {0};
 	for (size_t i = 0; i + 2 < sizeof(nested); i += 3) {
