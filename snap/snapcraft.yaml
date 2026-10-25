@@ -135,18 +135,18 @@ parts:
       - libavdevice62
       - libavfilter11
       - libswscale9
-      - libx264-164
+      - libx264-165
       - libcurl4t64
       - libmbedtls21
       - libjansson4
       - libluajit-5.1-2
       - libpython3.14
-      - libqt6widgets6t64
-      - libqt6network6t64
+      - libqt6widgets6
+      - libqt6network6
       - libqt6keychain1
       - libqt6websockets6
-      - libqt6xml6t64
-      - libqt6dbus6t64
+      - libqt6xml6
+      - libqt6dbus6
       - libqt6svg6
       - qt6-wayland
       - qt6-image-formats-plugins
