@@ -23,6 +23,12 @@ int main()
 		 "https://github.com/SigmaCodez/PenguinStudio/releases/download/penguin-v0.3.0/" + name}};
 	const QJsonObject release{{"tag_name", "penguin-v0.3.0"}, {"prerelease", true}, {"assets", QJsonArray{asset}}};
 	Require(Select({release}, "0.2.1", "ubuntu26.04", true).name == name, "compatible preview not selected");
+	auto addon = asset;
+	addon["name"] = "penguin-studio-camera-amd-gfx1201_0.3.0-1+ubuntu26.04_amd64.deb";
+	auto withAddon = release;
+	withAddon["assets"] = QJsonArray{addon, asset};
+	Require(Select({withAddon}, "0.2.1", "ubuntu26.04", true).name == name,
+		"optional GPU runtime replaced the main update package");
 	auto encodedAsset = asset;
 	encodedAsset["browser_download_url"] = asset.value("browser_download_url").toString().replace("+", "%2B");
 	auto encodedRelease = release;

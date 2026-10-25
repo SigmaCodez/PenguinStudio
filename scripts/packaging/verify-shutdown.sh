@@ -13,7 +13,7 @@ if [[ -e "$results" ]]; then
   exit 2
 fi
 mkdir -p "$results"
-for scenario in normal multi wizard wizard-cancel wizard-input auto-config stats restart signal; do
+for scenario in normal multi wizard wizard-cancel wizard-input auto-config stats updater restart signal; do
   profile=$scenario
   mode=$scenario
   if [[ "$scenario" == restart ]]; then
@@ -26,6 +26,9 @@ for scenario in normal multi wizard wizard-cancel wizard-input auto-config stats
   fi
   # Retain classified Qt teardown diagnostics at DEBUG level for verification.
   args=(--disable-updater --verbose)
+  if [[ "$scenario" == updater ]]; then
+    args=(--verbose)
+  fi
   if [[ "$scenario" == multi || "$scenario" == wizard ]]; then
     args+=(--multi)
   fi
@@ -62,6 +65,8 @@ if scenario in ('wizard-cancel', 'auto-config'):
     assert not report['wizardVisibleAtClose'], report
 if scenario == 'auto-config':
     assert report['autoConfigOpened'], report
+if scenario == 'updater':
+    assert report['updaterOpened'] and report['updaterFocused'] and report['updaterClosed'], report
 if scenario == 'stats':
     assert report['statsOpened'], report
 marker = '==== Shutting down'

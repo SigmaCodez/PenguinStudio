@@ -41,10 +41,14 @@
 #include "obs-utils/obs-utils.hpp"
 #include "consts.h"
 #include "../../managed-threads.hpp"
+#include "../../gpu-worker-client.hpp"
+#include <filesystem>
 #include <util/platform.h>
 // Penguin Studio manages component updates.
 
 struct background_removal_filter : public filter_data, public std::enable_shared_from_this<background_removal_filter> {
+	std::unique_ptr<PenguinGPUWorker> gpuWorker;
+	std::atomic<bool> gpuPreparing{false};
 	bool enableThreshold = true;
 	bool stopWhenSourceIsInactive = true;
 	float threshold = 0.5f;
@@ -177,22 +181,9 @@ obs_properties_t *background_filter_properties(void *data)
 	obs_property_t *p_use_gpu = obs_properties_add_list(props, "useGPU", obs_module_text("InferenceDevice"),
 							    OBS_COMBO_TYPE_LIST, OBS_COMBO_FORMAT_STRING);
 
-	obs_property_list_add_string(p_use_gpu, obs_module_text("CPU"), USEGPU_CPU);
-#ifdef HAVE_ONNXRUNTIME_CUDA_EP
-	obs_property_list_add_string(p_use_gpu, obs_module_text("GPUCUDA"), USEGPU_CUDA);
-#endif
-#ifdef HAVE_ONNXRUNTIME_ROCM_EP
-	obs_property_list_add_string(p_use_gpu, obs_module_text("GPUROCM"), USEGPU_ROCM);
-#endif
-#ifdef HAVE_ONNXRUNTIME_MIGRAPHX_EP
-	obs_property_list_add_string(p_use_gpu, obs_module_text("GPUMIGRAPHX"), USEGPU_MIGRAPHX);
-#endif
-#ifdef HAVE_ONNXRUNTIME_TENSORRT_EP
-	obs_property_list_add_string(p_use_gpu, obs_module_text("TENSORRT"), USEGPU_TENSORRT);
-#endif
-#if defined(__APPLE__)
-	obs_property_list_add_string(p_use_gpu, obs_module_text("CoreML"), USEGPU_COREML);
-#endif
+	obs_property_list_add_string(p_use_gpu, obs_module_text("AutomaticDevice"), "auto");
+	obs_property_list_add_string(p_use_gpu, "GPU", "gpu");
+	obs_property_list_add_string(p_use_gpu, "CPU", "cpu");
 
 	obs_properties_add_int(props, "mask_every_x_frames", obs_module_text("CalculateMaskEveryXFrame"), 1, 300, 1);
 	obs_properties_add_int_slider(props, "numThreads", obs_module_text("NumThreads"), 0, 8, 1);
@@ -253,10 +244,10 @@ void background_filter_defaults(obs_data_t *settings)
 	obs_data_set_default_double(settings, "mask_expansion", 0);
 	obs_data_set_default_double(settings, "feather", 0.0);
 #if defined(__APPLE__)
-	obs_data_set_default_string(settings, "useGPU", USEGPU_CPU);
+	obs_data_set_default_string(settings, "useGPU", "auto");
 #else
 	// Linux
-	obs_data_set_default_string(settings, "useGPU", USEGPU_CPU);
+	obs_data_set_default_string(settings, "useGPU", "auto");
 #endif
 	obs_data_set_default_string(settings, "model_select", MODEL_RVM);
 	obs_data_set_default_int(settings, "mask_every_x_frames", 1);
@@ -337,7 +328,7 @@ void background_filter_update(void *data, obs_data_t *settings)
 			tf->model.reset(new ModelMediaPipe);
 		}
 		if (tf->modelSelection == MODEL_RVM) {
-			tf->model.reset(new ModelRVM(tf->preserveHands, int(tf->numThreads)));
+			tf->model.reset(new ModelRVM(tf->preserveHands, int(tf->numThreads), "cpu"));
 		}
 		if (tf->modelSelection == MODEL_PPHUMANSEG) {
 			tf->model.reset(new ModelPPHumanSeg);
@@ -354,6 +345,30 @@ void background_filter_update(void *data, obs_data_t *settings)
 			tf->isDisabled = true;
 			tf->model.reset();
 			return;
+		}
+		tf->gpuWorker.reset();
+		tf->activeGPU = false;
+		tf->cpuFallback = tf->useGPU != "cpu";
+		tf->gpuPreparing = false;
+		if (tf->useGPU != "cpu" && tf->modelSelection == MODEL_RVM) {
+			const auto module =
+				std::filesystem::path(obs_get_module_binary_path(obs_current_module())).parent_path();
+			const auto runtime = module / "penguin-camera-gpu/libonnxruntime.so.1";
+			const auto executable = module / "penguin-camera/penguin-gpu-worker";
+			if (std::filesystem::is_regular_file(runtime) && std::filesystem::is_regular_file(executable)) {
+				char *models = obs_module_file("models");
+				char *cache = obs_module_config_path("gpu-cache/onnxruntime-1.23.2");
+				if (models && cache) {
+					tf->gpuWorker = std::make_unique<PenguinGPUWorker>(executable.string(),
+											   runtime.string(), models,
+											   cache, int(tf->numThreads),
+											   false);
+					tf->gpuPreparing = tf->gpuWorker->Preparing();
+					tf->cpuFallback = tf->gpuWorker->Failed();
+				}
+				bfree(models);
+				bfree(cache);
+			}
 		}
 	}
 
@@ -450,11 +465,17 @@ void *background_filter_create(obs_data_t *settings, obs_source_t *source)
 		// Create pointer to shared_ptr for the update call
 		auto ptr = new std::shared_ptr<background_removal_filter>(instance);
 		background_filter_update(ptr, settings);
-		proc_handler_add(obs_source_get_proc_handler(source), "void camera_status(out int status)",
+		proc_handler_add(
+			obs_source_get_proc_handler(source),
+			"void camera_status(out int status, out bool gpu, out bool fallback, out bool preparing)",
 			[](void *data, calldata_t *params) {
 				auto *state = static_cast<std::shared_ptr<background_removal_filter> *>(data);
 				calldata_set_int(params, "status", (*state)->penguinStatus.load());
-			}, ptr);
+				calldata_set_bool(params, "gpu", (*state)->activeGPU.load());
+				calldata_set_bool(params, "fallback", (*state)->cpuFallback.load());
+				calldata_set_bool(params, "preparing", (*state)->gpuPreparing.load());
+			},
+			ptr);
 
 		// Return the pointer to the shared_ptr
 		// This keeps the reference count at least 1 until destroy is called
@@ -496,8 +517,58 @@ static void processImageForBackground(struct background_removal_filter *tf, cons
 				      cv::Mat &backgroundMask)
 {
 	cv::Mat outputImage;
-	if (!runFilterModelInference(tf, imageBGRA, outputImage)) {
-		return;
+	auto *rvm = tf->modelSelection == MODEL_RVM ? static_cast<ModelRVM *>(tf->model.get()) : nullptr;
+	bool handStarted = false;
+	auto startHand = [&] {
+		if (!rvm || !tf->preserveHands) {
+			return;
+		}
+		cv::Mat small, rgb, input;
+		cv::resize(imageBGRA, small, cv::Size(320, 192));
+		cv::cvtColor(small, rgb, cv::COLOR_BGRA2RGB);
+		rgb.convertTo(input, CV_32F);
+		rvm->StartHandRecovery(input);
+		handStarted = true;
+	};
+	if (tf->gpuWorker && !tf->gpuWorker->Preparing() && !tf->gpuWorker->Failed()) {
+		startHand();
+	}
+	const bool gpu = tf->gpuWorker && tf->gpuWorker->Infer(imageBGRA, outputImage);
+	if (gpu && tf->preserveHands) {
+		if (!handStarted) {
+			startHand();
+		}
+		cv::Mat alpha;
+		outputImage.convertTo(alpha, CV_32F, 1.0 / 255.0);
+		rvm->FinishHandRecovery(alpha);
+		alpha.convertTo(outputImage, CV_8U, 255.0);
+	}
+	if (!gpu) {
+		if (tf->gpuWorker && tf->gpuWorker->Failed() && !tf->cpuFallback) {
+			obs_log(LOG_INFO, "GPU processing unavailable: %s; using CPU.", tf->gpuWorker->Failure());
+		}
+		if (tf->activeGPU) {
+			obs_log(LOG_INFO, "GPU worker stopped; background removal continues on CPU.");
+			// Keep the already prepared CPU session. Reset only RVM's recurrent
+			// state so a driver failure cannot trigger model compilation here.
+			for (size_t index = 1; index < 5 && index < tf->inputTensorValues.size(); ++index) {
+				std::fill(tf->inputTensorValues[index].begin(), tf->inputTensorValues[index].end(),
+					  0.0f);
+			}
+		}
+		tf->activeGPU = false;
+		tf->gpuPreparing = tf->gpuWorker && tf->gpuWorker->Preparing();
+		tf->cpuFallback = tf->useGPU != "cpu" && !tf->gpuPreparing;
+		if (!runFilterModelInference(tf, imageBGRA, outputImage)) {
+			return;
+		}
+	} else {
+		if (!tf->activeGPU) {
+			obs_log(LOG_INFO, "Background removal is now GPU accelerated.");
+		}
+		tf->activeGPU = true;
+		tf->gpuPreparing = false;
+		tf->cpuFallback = false;
 	}
 	// Assume outputImage is now a single channel, uint8 image with values between 0 and 255
 
@@ -602,7 +673,8 @@ static void background_filter_process_current_frame(void *data)
 				// Do not leave a stale mask hiding the person after inference fails.
 				tf->penguinStatus = 3;
 				tf->isDisabled = true;
-				obs_log(LOG_ERROR, "Background inference produced an empty mask; preserving the input.");
+				obs_log(LOG_ERROR,
+					"Background inference produced an empty mask; preserving the input.");
 				return;
 			}
 
@@ -687,7 +759,6 @@ static void background_filter_process_current_frame(void *data)
 		tf->penguinStatus = 3;
 		tf->isDisabled = true;
 		obs_log(LOG_ERROR, "ONNXRuntime Exception: %s", e.what());
-		// TODO: Fall back to CPU if it makes sense
 	} catch (const std::exception &e) {
 		tf->penguinStatus = 3;
 		tf->isDisabled = true;
@@ -846,10 +917,11 @@ void background_filter_video_render(void *data, gs_effect_t *_effect)
 
 	const char *techName;
 	if (tf->blurBackground > 0) {
-		if (tf->enableFocalBlur)
+		if (tf->enableFocalBlur) {
 			techName = "DrawWithFocalBlur";
-		else
+		} else {
 			techName = "DrawWithBlur";
+		}
 	} else {
 		techName = "DrawWithoutBlur";
 	}

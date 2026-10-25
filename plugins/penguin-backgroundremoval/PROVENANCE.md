@@ -48,3 +48,46 @@ redistributions. Personal camera recordings and test images are not distributed.
 The MediaPipe Selfie Multiclass model from the same upstream distribution is Apache-2.0 licensed; its adjacent notice retains the Google, Katsuya Hyodo, Roy Shilkrot and Kaito Udagawa credits. Its reviewed SHA-256 is `317054e916e36f47457a85afa3ef6a6cc8f5d35f3cb22e5358fd1a3e6cfb8eed`.
 
 Penguin's optional adapter applies stable softmax to the model logits and supplements the RVM alpha with its body-skin class. Both models process the same frame concurrently, and compositing waits for both results. Each session uses at most three intra-op threads, with busy-wait spinning disabled. The option is off by default; independent filters and existing scenes remain unchanged unless explicitly enabled. Model failures remain visible errors through the existing camera status path.
+
+### Supported recovery components (0.6.3)
+
+Penguin's adapter limits additional skin recovery to connected components with
+primary person-mask support. This reduces isolated background objects mistakenly
+classified as skin. The original RVM mask is never reduced. Completely missed
+hands without primary-mask support may still require better lighting or another
+capture angle; this is not a guarantee of perfect segmentation. The regression
+check is `test/penguin-hand-recovery.cpp`.
+
+## Isolated GPU processing (0.6.3 development)
+
+The camera inspector provides Automatic, GPU and CPU processing preferences.
+Automatic and GPU attempt the packaged GPU worker and retain a prepared CPU
+session when the worker is unavailable, still compiling, exits or misses its
+response deadline. Driver initialization runs in a separate process, outside Qt.
+GPU failure clears the CPU recurrent state without rebuilding the CPU session.
+The transfer budget covers the complete frame request and mask response.
+
+The GPU RVM variant is derived from the same official MobileNetV3 model with
+fixed 320×192 input dimensions and a constant downsample ratio of one. It keeps
+its original GPL-3.0-only notice. `scripts/packaging/prepare-camera-gpu-model.py`
+records the source checksum and conversion. The resulting SHA-256 is
+`41377570179d331c11486ae9d9ccf10ef806fa66cf34a6ca3caaeeba0c3a871c`.
+
+An optional AMD runtime bundle is staged by
+`scripts/packaging/prepare-amd-camera-runtime.py` using checksummed official AMD
+artifacts listed in `packaging/amd-camera-runtime.json`. Supply the result through
+`PENGUIN_CAMERA_GPU_RUNTIME_DIR` at build time. Staging does not install system
+drivers. A build without that bundle continues on CPU. Runtime libraries and
+notices are kept private to Penguin Studio. AMD RX 9070 XT testing uses MIGraphX;
+other GPUs and distributable package combinations still require validation.
+
+The optional hand companion remains on CPU in GPU mode. A same-input RX 9070 XT
+comparison found materially different masks from its current MIGraphX graph;
+primary RVM on GPU with CPU hand inference matched the CPU reference within one
+8-bit alpha level across 120 frames. GPU mode therefore means accelerated primary
+matting, not that every processing step runs on the graphics card.
+
+Hand recovery runs in parallel in the application's existing CPU runtime while
+the isolated worker processes primary RVM only. This avoids depending on the
+AMD runtime's CPU hand performance. The helper has a bounded 40 ms frame
+transaction deadline and CPU processing remains available if it fails.

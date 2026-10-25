@@ -1,0 +1,75 @@
+{
+  "rocm": "7.2.1",
+  "onnxruntime": "1.23.2",
+  "wheel": {
+    "url": "https://repo.radeon.com/rocm/manylinux/rocm-rel-7.2.1/onnxruntime_migraphx-1.23.2-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl",
+    "sha256": "663bff4dc3f72582d69f12ad073eb5695dfb526d574376cc8e5b161c7d2f0f08"
+  },
+  "packages": [
+    {
+      "name": "rocm-core",
+      "url": "https://repo.radeon.com/rocm/apt/7.2.1/pool/main/r/rocm-core/rocm-core_7.2.1.70201-81~24.04_amd64.deb",
+      "sha256": "a298fc25c8256d7efe0f6ed91e3eb31898c19562304b129ed80f4dac3b1844f6"
+    },
+    {
+      "name": "rocprofiler-register",
+      "url": "https://repo.radeon.com/rocm/apt/7.2.1/pool/main/r/rocprofiler-register/rocprofiler-register_0.6.0.70201-81~24.04_amd64.deb",
+      "sha256": "027f3ba3fff5f226cb9e4ec8b9fe4d5c2bc5b55db6ad292efc2d77cbcaad8d81"
+    },
+    {
+      "name": "comgr",
+      "url": "https://repo.radeon.com/rocm/apt/7.2.1/pool/main/c/comgr/comgr_3.0.0.70201-81~24.04_amd64.deb",
+      "sha256": "7aec222a4cfdaeafd8689ad9739688f74d1d7a1227d7f6db3237736f3fa2fec2"
+    },
+    {
+      "name": "hsa-rocr",
+      "url": "https://repo.radeon.com/rocm/apt/7.2.1/pool/main/h/hsa-rocr/hsa-rocr_1.18.0.70201-81~24.04_amd64.deb",
+      "sha256": "680cf1dec896732a7a3324eb5650ec9ffdca95f152bbb891dea7799206a9adc5"
+    },
+    {
+      "name": "hip-runtime-amd",
+      "url": "https://repo.radeon.com/rocm/apt/7.2.1/pool/main/h/hip-runtime-amd/hip-runtime-amd_7.2.53211.70201-81~24.04_amd64.deb",
+      "sha256": "1a1be2e7d8e5658922084533216c6a079138f5ca5af3247181db617bff2a5e0d"
+    },
+    {
+      "name": "roctracer",
+      "url": "https://repo.radeon.com/rocm/apt/7.2.1/pool/main/r/roctracer/roctracer_4.1.70201.70201-81~24.04_amd64.deb",
+      "sha256": "6f56da97a3b09abbe2677eeb6a9b9fbadbe480c9cc9a285445125e2372ab5c36"
+    },
+    {
+      "name": "migraphx",
+      "url": "https://repo.radeon.com/rocm/apt/7.2.1/pool/main/m/migraphx/migraphx_2.15.0.70201-81~24.04_amd64.deb",
+      "sha256": "cf0381824856c7181cfc45db415c1d25a98625090cf06de98de564693c02a01e"
+    },
+    {
+      "name": "miopen-hip",
+      "url": "https://repo.radeon.com/rocm/apt/7.2.1/pool/main/m/miopen-hip/miopen-hip_3.5.1.70201-81~24.04_amd64.deb",
+      "sha256": "b0b23199dc24f3a51fa09b1ccf647609ce636bace89afa206f6143bd4b69baa5"
+    },
+    {
+      "name": "rocblas",
+      "url": "https://repo.radeon.com/rocm/apt/7.2.1/pool/main/r/rocblas/rocblas_5.2.0.70201-81~24.04_amd64.deb",
+      "sha256": "ddbbe57ea95101038bede7de0eb9bdb57012bcea105bf5353217d7e01145573c"
+    },
+    {
+      "name": "hipblaslt",
+      "url": "https://repo.radeon.com/rocm/apt/7.2.1/pool/main/h/hipblaslt/hipblaslt_1.2.2.70201-81~24.04_amd64.deb",
+      "sha256": "0d3d18b0e520e1021c8bb303ee4447608f49ab291d327872bef242ab87279b6b"
+    },
+    {
+      "name": "hip-dev",
+      "url": "https://repo.radeon.com/rocm/apt/7.2.1/pool/main/h/hip-dev/hip-dev_7.2.53211.70201-81~24.04_amd64.deb",
+      "sha256": "5fb031d567f08f11a489a9c7dfbad401928d71828f41e2768fa24d3afe41892d"
+    },
+    {
+      "name": "half",
+      "url": "https://repo.radeon.com/rocm/apt/7.2.1/pool/main/h/half/half_1.12.0.70201-81~24.04_amd64.deb",
+      "sha256": "8eb062d56965a537d4c1e12ab20dcc9a5bdea9b5f3b15e4cfbabc2bf83cb5938"
+    },
+    {
+      "name": "rocm-device-libs",
+      "url": "https://repo.radeon.com/rocm/apt/7.2.1/pool/main/r/rocm-device-libs/rocm-device-libs_1.0.0.70201-81~24.04_amd64.deb",
+      "sha256": "5cdbb764a564c9749c026314aa376ead100bec3419c96bc676577896bbf52827"
+    }
+  ]
+}

@@ -67,12 +67,26 @@ jobs:
         run: |
           cc -std=c11 -Wall -Wextra -Werror -I. test/penguin-v4l2-timeout.c -o /tmp/penguin-v4l2-timeout
           /tmp/penguin-v4l2-timeout
+      - name: Check packet decoders with memory and undefined-behavior sanitizers
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libobs-dev libsimde-dev
+          bash test/security/run-packet-parsers.sh
+          python3 test/security/task-queues.py
+          python3 test/security/alsa-shutdown.py
       - name: Check delayed audio encoder shutdown
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends libavcodec-dev libavutil-dev
           cc -std=c11 -Wall -Wextra -Werror -I. test/penguin-audio-drain.c $(pkg-config --cflags --libs libavcodec libavutil) -o /tmp/penguin-audio-drain
           /tmp/penguin-audio-drain
+      - name: Check supported hand recovery
+        run: |
+          sudo apt-get install -y --no-install-recommends libopencv-core-dev libopencv-imgproc-dev
+          c++ -std=c++17 -Wall -Wextra -Werror -I/usr/include/opencv4 test/penguin-hand-recovery.cpp -lopencv_imgproc -lopencv_core -o /tmp/penguin-hand-recovery
+          /tmp/penguin-hand-recovery
+          c++ -std=c++17 -Wall -Wextra -Werror -I/usr/include/opencv4 test/penguin-gpu-worker.cpp -lopencv_imgproc -lopencv_core -o /tmp/penguin-gpu-worker-test
+          /tmp/penguin-gpu-worker-test
       - name: Compile and run configuration isolation checks
         run: |
           c++ -std=c++17 -Wall -Wextra -Werror -I. test/penguin-config-paths.cpp -o /tmp/penguin-config-paths-test
@@ -365,9 +379,27 @@ jobs:
           name: penguin-studio-aur-recipe
           path: aur-artifact/*.tar.gz
           if-no-files-found: error
+  amd-camera:
+    needs: version
+    name: Optional AMD RX 9070 camera runtime (Ubuntu 26.04)
+    if: github.event_name != 'workflow_dispatch' || inputs.packages == 'all' || inputs.packages == 'deb-26.04'
+    runs-on: ubuntu-26.04
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Stage verified private AMD libraries
+        run: python3 scripts/packaging/prepare-amd-camera-runtime.py "$RUNNER_TEMP/penguin-amd" --architecture gfx1201
+      - name: Build optional runtime package
+        run: python3 scripts/packaging/build-amd-camera-addon.py "$RUNNER_TEMP/penguin-amd" amd-artifact
+      - name: Inspect runtime package
+        run: dpkg-deb --info amd-artifact/*.deb
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: penguin-studio-amd-camera-gfx1201
+          path: amd-artifact/*.deb
+          if-no-files-found: error
   release:
     name: Publish complete Linux download set
-    needs: [version, checks, flatpak, deb, rpm, snap, appimage, aur]
+    needs: [version, checks, flatpak, deb, rpm, snap, appimage, aur, amd-camera]
     if: needs.version.outputs.publish == 'true'
     runs-on: ubuntu-24.04
     permissions:

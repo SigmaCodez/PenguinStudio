@@ -8,7 +8,7 @@ Penguin Studio brings a redesigned production workspace, native multi-destinatio
 
 ![Penguin Studio modern workspace with searchable layers and scenes, audio channel strips and an integrated inspector](docs/images/current/workspace-en.png)
 
-Penguin Studio 0.6.2, captured from the Linux release package in English with local demo media. See the [workspace guide](docs/WORKSPACE.md) for the controls and layout.
+Penguin Studio 0.6.3, captured from the Linux release package in English with local demo media. See the [workspace guide](docs/WORKSPACE.md) for the controls and layout.
 
 > Development preview. See [verification status](docs/VERIFICATION.md) for completed checks and remaining release tests, and [packaging](docs/PACKAGING.md) for development downloads and supported build targets. Validate your devices and streaming accounts before relying on this build for a live show.
 
@@ -27,7 +27,9 @@ Penguin Studio 0.6.2, captured from the Linux release package in English with lo
 
 ## Get started
 
-**Current release: [Penguin Studio 0.6.2](https://github.com/SigmaCodez/PenguinStudio/releases/tag/penguin-v0.6.2)** — optional moving-hand preservation for automatic camera effects, plus native Twitch/YouTube chat, moderation and saved browser sign-in.
+**Current release: [Penguin Studio 0.6.3](https://github.com/SigmaCodez/PenguinStudio/releases/tag/penguin-v0.6.3)** — media and RTMP parser hardening, Linux lifecycle fixes and Automatic/GPU/CPU camera processing, with native Twitch/YouTube chat and camera effects.
+
+Camera processing offers **Automatic**, **GPU** and **CPU**, with automatic CPU fallback. The optional Ubuntu 26.04 AMD runtime add-on enables primary GPU matting on the tested RX 9070 XT; hand preservation stays on CPU. Other package/hardware combinations retain CPU processing unless a compatible runtime is provided. See [camera GPU setup](docs/PACKAGING.md#optional-amd-camera-gpu-runtime).
 
 **[Download Linux packages](https://github.com/SigmaCodez/PenguinStudio/releases)** — Ubuntu DEB, Fedora RPM, Flatpak, Snap, AppImage and an Arch/AUR recipe, with SHA-256 checksums.
 

@@ -22,6 +22,8 @@
 */
 struct filter_data : public ORTModelData, public std::enable_shared_from_this<filter_data> {
 	std::string useGPU;
+	std::atomic<bool> activeGPU{false};
+	std::atomic<bool> cpuFallback{false};
 	uint32_t numThreads;
 	bool preserveHands = false;
 	std::string modelSelection;

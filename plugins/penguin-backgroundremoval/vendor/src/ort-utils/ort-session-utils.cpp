@@ -4,7 +4,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include <onnxruntime_cxx_api.h>
-#include <cpu_provider_factory.h>
+#include "InferenceSession.hpp"
 #include <filesystem>
 
 #if defined(__APPLE__)
@@ -29,22 +29,6 @@ int createOrtSession(filter_data *tf)
 		return OBS_BGREMOVAL_ORT_SESSION_ERROR_INVALID_MODEL;
 	}
 
-	Ort::SessionOptions sessionOptions;
-	if (tf->preserveHands) {
-		// Concurrent same-frame inference must not leave either pool busy-waiting.
-		sessionOptions.AddConfigEntry("session.intra_op.allow_spinning", "0");
-		sessionOptions.AddConfigEntry("session.inter_op.allow_spinning", "0");
-	}
-
-	sessionOptions.SetGraphOptimizationLevel(GraphOptimizationLevel::ORT_ENABLE_ALL);
-	if (tf->useGPU != USEGPU_CPU) {
-		sessionOptions.DisableMemPattern();
-		sessionOptions.SetExecutionMode(ExecutionMode::ORT_SEQUENTIAL);
-	} else {
-		sessionOptions.SetInterOpNumThreads(tf->preserveHands ? 1 : tf->numThreads);
-		sessionOptions.SetIntraOpNumThreads(tf->numThreads);
-	}
-
 	char *modelFilepath_rawPtr = obs_module_file(tf->modelSelection.c_str());
 
 	if (modelFilepath_rawPtr == nullptr) {
@@ -65,35 +49,9 @@ int createOrtSession(filter_data *tf)
 	bfree(modelFilepath_rawPtr);
 
 	try {
-#ifdef HAVE_ONNXRUNTIME_CUDA_EP
-		if (tf->useGPU == USEGPU_CUDA) {
-			Ort::ThrowOnError(OrtSessionOptionsAppendExecutionProvider_CUDA(sessionOptions, 0));
-		}
-#endif
-#ifdef HAVE_ONNXRUNTIME_ROCM_EP
-		if (tf->useGPU == USEGPU_ROCM) {
-			Ort::ThrowOnError(OrtSessionOptionsAppendExecutionProvider_ROCM(sessionOptions, 0));
-		}
-#endif
-#ifdef HAVE_ONNXRUNTIME_MIGRAPHX_EP
-		if (tf->useGPU == USEGPU_MIGRAPHX) {
-			Ort::ThrowOnError(OrtSessionOptionsAppendExecutionProvider_MIGraphX(sessionOptions, 0));
-		}
-#endif
-#ifdef HAVE_ONNXRUNTIME_TENSORRT_EP
-		if (tf->useGPU == USEGPU_TENSORRT) {
-			Ort::ThrowOnError(OrtSessionOptionsAppendExecutionProvider_Tensorrt(sessionOptions, 0));
-		}
-#endif
-#if defined(__APPLE__)
-		if (tf->useGPU == USEGPU_COREML) {
-			uint32_t coreml_flags = 0;
-			coreml_flags |= COREML_FLAG_ENABLE_ON_SUBGRAPH;
-			Ort::ThrowOnError(
-				OrtSessionOptionsAppendExecutionProvider_CoreML(sessionOptions, coreml_flags));
-		}
-#endif
-		tf->session.reset(new Ort::Session(*tf->env, tf->modelFilepath.c_str(), sessionOptions));
+		PenguinInference::DeviceState device;
+		tf->session = PenguinInference::CreateSession(*tf->env, tf->modelFilepath.c_str(), "cpu",
+							      int(tf->numThreads), device);
 	} catch (const std::exception &e) {
 		obs_log(LOG_ERROR, "%s", e.what());
 		return OBS_BGREMOVAL_ORT_SESSION_ERROR_STARTUP;

@@ -17,9 +17,20 @@ The Filters dialog exposes the individual appearance and matting filters.
 
 Automatic mode uses **Robust Video Matting** through the bundled
 [obs-backgroundremoval](https://github.com/royshil/obs-backgroundremoval) plugin.
-It runs locally on the CPU with up to four physical CPU cores. No green screen, model
-download, cloud account or particular GPU is required. Camera frames stay on the
-device. The recurrent model retains information between frames to improve motion
+It runs locally, with a bundled CPU backend using up to four physical CPU cores.
+The **Processing** control offers Automatic, GPU and CPU. Automatic and GPU use
+the optional compatible GPU runtime when available and fall back to CPU if
+preparation or processing fails. GPU preparation runs in a separate helper; the
+Inspector shows its status. CPU explicitly keeps inference on the CPU.
+
+The optional Ubuntu 26.04 AMD add-on enables primary matting on the tested
+RX 9070 XT; hand preservation continues on CPU. See [GPU setup](PACKAGING.md#optional-amd-camera-gpu-runtime).
+Other package/hardware combinations retain CPU processing unless a compatible
+runtime is provided. Existing scenes with an explicit CPU preference keep that
+preference; select Automatic or GPU once to opt in.
+
+No green screen, cloud account or particular GPU is required for CPU processing.
+Camera frames stay on the device. The recurrent model retains information between frames to improve motion
 continuity. Hair, transparent items, fast motion and difficult lighting can still
 reduce accuracy; use even lighting and check the live preview before recording.
 
@@ -47,7 +58,7 @@ See `plugins/penguin-backgroundremoval/PROVENANCE.md` for the RVM plugin,
 model licenses and exact upstream revision. The legacy model retains its notices
 in `plugins/penguin-camera/data/MODEL-NOTICE.txt`.
 
-Current English interface, captured from Penguin Studio 0.6.2. The sample artwork demonstrates rounded corners; it is not a webcam or an AI-removal quality demonstration.
+Current English interface, captured from Penguin Studio 0.6.3. The sample artwork demonstrates rounded corners; it is not a webcam or an AI-removal quality demonstration.
 
 ## Validation
 
@@ -90,3 +101,8 @@ the segmentation model or guarantee perfect edges under all lighting/motion.
 Enable **Preserve moving hands** in the camera inspector after choosing automatic removal, background blur or a custom image. The option is off by default and is saved with the source, including undo/redo. It supplements RVM with a local body-skin segmentation model, processing the same frame before compositing. No camera images are uploaded.
 
 This mode uses extra CPU capacity. A real Facecam movement test under Wayland retained both hands and was accepted as fluid by the tester. Rapid edges remain soft, and that 70-second motion recording logged one render-lag event and one encoder-skip event. Zero-loss motion performance is not guaranteed. Disable the option if your recording/stream statistics worsen. Unrelated filters and scenes without this option retain their existing inference mode.
+
+The 0.6.3 RX 9070 XT test combined GPU primary matting with CPU hand preservation.
+The user accepted the live result; the 1,504-frame recording reported no rendering
+or encoding losses, decoded fully and shut down cleanly. This does not guarantee
+perfect segmentation or zero losses on other scenes. See [GPU validation](validation/camera-gpu-0.6.3.md).

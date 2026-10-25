@@ -130,7 +130,7 @@ inline void RestoreCamera(const std::string &json)
 }
 
 inline bool Apply(obs_source_t *source, const char *name, int shape, int background, double radius, double similarity,
-		  int blur = 8, const char *image = "", bool preserveHands = false)
+		  int blur = 8, const char *image = "", bool preserveHands = false, const char *device = "auto")
 {
 	GraphicsGuard guard;
 	const auto undo = SaveCamera(source);
@@ -143,7 +143,7 @@ inline bool Apply(obs_source_t *source, const char *name, int shape, int backgro
 		obs_data_set_bool(mattingSettings, "penguin_preserve_hands", preserveHands);
 		obs_data_set_string(mattingSettings, "model_select",
 				    "models/rvm_mobilenetv3_fp32.with_runtime_opt.ort");
-		obs_data_set_string(mattingSettings, "useGPU", "cpu");
+		obs_data_set_string(mattingSettings, "useGPU", device);
 		obs_data_set_bool(mattingSettings, "enable_threshold", false);
 		obs_data_set_bool(mattingSettings, "enable_image_similarity", false);
 		obs_data_set_double(mattingSettings, "temporal_smooth_factor", 0.0);
@@ -155,6 +155,7 @@ inline bool Apply(obs_source_t *source, const char *name, int shape, int backgro
 	}
 	OBSDataAutoRelease settings = filter ? obs_source_get_settings(filter) : obs_data_create();
 	obs_data_set_bool(settings, "preserve_hands", preserveHands);
+	obs_data_set_string(settings, "inference_device", device);
 	obs_data_set_int(settings, "shape", shape);
 	obs_data_set_int(settings, "background", background);
 	obs_data_set_string(settings, "automatic_backend", automatic ? "rvm" : "");
@@ -177,6 +178,7 @@ inline bool Apply(obs_source_t *source, const char *name, int shape, int backgro
 		if (automatic) {
 			OBSDataAutoRelease mattingSettings = obs_source_get_settings(matting);
 			obs_data_set_bool(mattingSettings, "penguin_preserve_hands", preserveHands);
+			obs_data_set_string(mattingSettings, "useGPU", device);
 			obs_data_set_int(mattingSettings, "blur_background",
 					 background == 4 ? std::clamp(blur, 1, 20) : 0);
 			obs_source_update(matting, mattingSettings);

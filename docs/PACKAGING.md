@@ -1,6 +1,6 @@
 # Linux builds and packages
 
-Penguin Studio's current source version is **0.6.2**, based on OBS Studio
+Penguin Studio's current source version is **0.6.3**, based on OBS Studio
 **32.2.2**. The application ID is `io.github.SigmaCodez.PenguinStudio` and the
 launcher is `penguin-studio`. Internal OBS libraries and plugin paths retain
 their names for compatibility. Application settings are stored separately
@@ -29,7 +29,7 @@ recipes deliberately target x86_64 only.
 
 ## Automatic versioned downloads
 
-**[Download Penguin Studio 0.6.2](https://github.com/SigmaCodez/PenguinStudio/releases/tag/penguin-v0.6.2)**
+**[Download Penguin Studio 0.6.3](https://github.com/SigmaCodez/PenguinStudio/releases/tag/penguin-v0.6.3)**
 Publication requires every package build and release check to pass. Refer to
 the release build manifest for the final source commit and checksums.
 
@@ -40,7 +40,7 @@ Snap, AppImage and an Arch recipe archive, plus `SHA256SUMS` and
 Releases are marked as prereleases while Penguin Studio remains a development preview.
 
 To publish a new version, increase **`packaging/version.txt`** (for example from
-`0.6.2` to `0.6.2`) and push it to `main`. This single file supplies the application,
+`0.6.3` to `0.6.4`) and push it to `main`. This single file supplies the application,
 native package and Snap versions; the Flatpak filename uses the same value.
 Refresh the English product text and real candidate-version screenshots together
 with the version change; the [publication check](PUBLICATION.md) rejects stale previews.
@@ -63,20 +63,19 @@ Download the Ubuntu 26.04 DEB from [Penguin Studio releases](https://github.com/
 Ubuntu 26.04.1 uses the same package. Do not install the Ubuntu 24.04 DEB on
 26.04 or mix distribution repositories to satisfy its dependencies.
 
-The installed Ubuntu 26.04 package passed the full Wayland camera and alpha-spill
-tests, plus a real Facecam restart with the saved custom image and clean shutdown. See
-[0.6.2 validation](validation/camera-background-edges-0.6.2.md) for scope.
+See [0.6.3 validation](validation/core-security-0.6.3.md) for the package-specific
+Wayland, recording, camera, platform-sign-in and shutdown results and their limits.
 Earlier installed results remain in the [verification history](VERIFICATION.md).
 
-The download is `penguin-studio_0.6.2-1+ubuntu26.04_amd64.deb`.
+The download is `penguin-studio_0.6.3-1+ubuntu26.04_amd64.deb`.
 Verify it against `SHA256SUMS` from the same release before installing.
 
 After downloading the matching DEB, the repository's installer checks the
 release, architecture and APT dependency resolution before installation:
 
 ```sh
-bash scripts/packaging/install-deb.sh --check /path/to/penguin-studio_0.6.2-1+ubuntu26.04_amd64.deb
-bash scripts/packaging/install-deb.sh /path/to/penguin-studio_0.6.2-1+ubuntu26.04_amd64.deb
+bash scripts/packaging/install-deb.sh --check /path/to/penguin-studio_0.6.3-1+ubuntu26.04_amd64.deb
+bash scripts/packaging/install-deb.sh /path/to/penguin-studio_0.6.3-1+ubuntu26.04_amd64.deb
 ```
 
 The first command makes no system changes. The second uses the normal Ubuntu
@@ -86,13 +85,13 @@ on the host's Qt, Python or FFmpeg library versions.
 
 ## Flatpak
 
-Download `penguin-studio-0.6.2-x86_64.flatpak` from the Penguin Studio release.
+Download `penguin-studio-0.6.3-x86_64.flatpak` from the Penguin Studio release.
 Only the runtime is needed to install or update the bundle:
 
 ```sh
 flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 flatpak install --user flathub org.freedesktop.Platform//25.08
-flatpak install --user --or-update ./penguin-studio-0.6.2-x86_64.flatpak
+flatpak install --user --or-update ./penguin-studio-0.6.3-x86_64.flatpak
 flatpak run io.github.SigmaCodez.PenguinStudio
 ```
 
@@ -131,10 +130,10 @@ on its supported target distribution:
 
 ```sh
 # Ubuntu 26.04 / 26.04.1, after downloading the matching build:
-sudo apt install --no-remove ./penguin-studio_0.6.2-1+ubuntu26.04_amd64.deb
+sudo apt install --no-remove ./penguin-studio_0.6.3-1+ubuntu26.04_amd64.deb
 # Use a package built for your Ubuntu release.
 # Fedora 44:
-sudo dnf install ./penguin-studio-0.6.2-1.x86_64.rpm
+sudo dnf install ./penguin-studio-0.6.3-1.x86_64.rpm
 ```
 
 To build from source, use the target distribution and start from a recursive checkout:
@@ -170,7 +169,7 @@ on a host with Snapcraft installed. To install a downloaded or locally built
 Snap on a host with snapd:
 
 ```sh
-sudo snap install --dangerous ./penguin-studio_0.6.2_amd64.snap
+sudo snap install --dangerous ./penguin-studio_0.6.3_amd64.snap
 sudo snap connect penguin-studio:audio-record
 sudo snap connect penguin-studio:camera
 # Only if media on removable drives is needed:
@@ -212,3 +211,34 @@ The commands in this guide are the Penguin Studio build instructions. Optional
 Tool references:
 [Flatpak builder documentation](https://docs.flatpak.org/en/latest/flatpak-builder.html),
 and [Snapcraft CMake plugin](https://documentation.ubuntu.com/snapcraft/stable/common/craft-parts/reference/plugins/cmake_plugin/).
+
+
+## Optional AMD camera GPU runtime
+
+Penguin Studio 0.6.3 provides Automatic, GPU and CPU preferences for automatic
+camera background effects. The additional
+`penguin-studio-camera-amd-gfx1201_0.6.3-1+ubuntu26.04_amd64.deb` contains private
+AMD ROCm/MIGraphX libraries for the tested Radeon RX 9070 XT (gfx1201) on Ubuntu
+26.04.1. Install it alongside the matching main Ubuntu 26.04 package:
+
+```sh
+sudo apt install ./penguin-studio_0.6.3-1+ubuntu26.04_amd64.deb ./penguin-studio-camera-amd-gfx1201_0.6.3-1+ubuntu26.04_amd64.deb
+```
+
+Verify both downloads against the release SHA256SUMS first. The add-on does not
+replace the system graphics driver. Select Automatic or GPU in Camera appearance;
+the application shows preparation, GPU processing or CPU fallback. Existing scenes
+that explicitly stored CPU processing keep that setting; select Automatic or GPU
+once to enable acceleration for those scenes. First use
+compiles and caches the model while CPU processing remains available. Primary
+matting runs on GPU; hand recovery runs concurrently on CPU to preserve the tested
+image quality. GPU failure returns to the prepared CPU session.
+
+The add-on is optional and is not installed by the ordinary main-package updater.
+It is specific to native Ubuntu 26.04 packages and gfx1201. It is not injected into
+Snap, Flatpak, AppImage or RPM installations. Those packages retain CPU processing
+unless built with a compatible private GPU runtime. NVIDIA and other AMD families
+have not been validated for this camera path. Hardware video encoding is a
+separate feature and is unaffected. Subsequent add-on changes are published as
+versioned downloads; install an updated add-on explicitly when release notes
+require it.

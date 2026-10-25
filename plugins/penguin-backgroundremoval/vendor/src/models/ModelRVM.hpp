@@ -14,32 +14,56 @@ class ModelRVM : public ModelBCHW {
 private:
 	bool preserveHands;
 	int handThreads;
+	std::string deviceMode;
+	std::string handPath, cachePath;
 	std::unique_ptr<HandRecovery> handRecovery;
 	std::future<void> handTask;
+
 public:
-	explicit ModelRVM(bool preserve = false, int threads = 3) : preserveHands(preserve), handThreads(threads) {}
+	explicit ModelRVM(bool preserve = false, int threads = 3, std::string mode = "cpu", std::string hand = {},
+			  std::string cache = {})
+		: preserveHands(preserve),
+		  handThreads(threads),
+		  deviceMode(std::move(mode)),
+		  handPath(std::move(hand)),
+		  cachePath(std::move(cache))
+	{
+	}
 	~ModelRVM() {}
 
-	virtual void prepareInputToNetwork(cv::Mat &image, cv::Mat &prepared) override
+	void StartHandRecovery(const cv::Mat &image)
 	{
 		if (preserveHands) {
 			// A failed primary inference may skip postprocessing. Join its companion
 			// before reusing the hand model and its buffers for another frame.
-			if (handTask.valid())
+			if (handTask.valid()) {
 				handTask.get();
-			if (!handRecovery)
-				handRecovery = std::make_unique<HandRecovery>(handThreads);
-			handTask = std::async(std::launch::async, [this, frame = image.clone()] {
-				handRecovery->infer(frame);
-			});
+			}
+			// The current MIGraphX hand graph differs materially from CPU output.
+			// Keep this companion on CPU; primary RVM remains GPU accelerated.
+			if (!handRecovery) {
+				handRecovery = std::make_unique<HandRecovery>(handThreads, "cpu", handPath, cachePath);
+			}
+			handTask = std::async(std::launch::async,
+					      [this, frame = image.clone()] { handRecovery->infer(frame); });
 		}
+	}
+
+	virtual void prepareInputToNetwork(cv::Mat &image, cv::Mat &prepared) override
+	{
+		StartHandRecovery(image);
 		ModelBCHW::prepareInputToNetwork(image, prepared);
 	}
 
 	virtual void postprocessOutput(cv::Mat &output) override
 	{
 		ModelBCHW::postprocessOutput(output);
-		if (handRecovery) {
+		FinishHandRecovery(output);
+	}
+
+	void FinishHandRecovery(cv::Mat &output)
+	{
+		if (handRecovery && handTask.valid()) {
 			handTask.get();
 			handRecovery->merge(output);
 		}

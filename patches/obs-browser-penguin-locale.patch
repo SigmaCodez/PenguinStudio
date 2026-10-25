@@ -208,8 +208,9 @@
  CopyUrl="Kopier nuværende adresse"
  WebpageControlLevel="Sidetilladelser"
 -WebpageControlLevel.Level.None="Ingen adgang til OBS"
+-WebpageControlLevel.Level.ReadObs="Læseadgang til OBSs statusinformation"
 +WebpageControlLevel.Level.None="Ingen adgang til Penguin Studio"
- WebpageControlLevel.Level.ReadObs="Læseadgang til OBSs statusinformation"
++WebpageControlLevel.Level.ReadObs="Læseadgang til Penguin Studios statusinformation"
  WebpageControlLevel.Level.ReadUser="Læseadgang til brugerinformation (aktuel Scenesamling, Overgange)"
 -WebpageControlLevel.Level.Basic="Basisadgang til OBS (Gem genafspilningsbuffer mv.)"
 -WebpageControlLevel.Level.Advanced="Avanceret adgang til OBS (Skift scener, Start/Stop genafsp.buffer mv.)"
@@ -351,7 +352,7 @@
  Dialog.Prompt="JavaScript küsimus"
 --- a/data/locale/eu-ES.ini
 +++ b/data/locale/eu-ES.ini
-@@ -7,7 +7,7 @@
+@@ -7,17 +7,17 @@
  RefreshNoCache="Freskatu uneko orriaren cachea"
  BrowserSource="Nabigatzailea"
  CustomFrameRate="Erabili fotograma-emari pertsonalizatua"
@@ -360,6 +361,21 @@
  Inspect="Ikuskatu"
  DevTools="Ikuskatu nabigatzailearen '%1' panela"
  CopyUrl="Kopiatu uneko helbidea"
+ WebpageControlLevel="Orrialde baimenak"
+-WebpageControlLevel.Level.None="Ez dago sarbiderik OBSra"
+-WebpageControlLevel.Level.ReadObs="Irakurri OBSrako sarbidearen informazio maila"
++WebpageControlLevel.Level.None="Ez dago sarbiderik Penguin Studiora"
++WebpageControlLevel.Level.ReadObs="Irakurri Penguin Studiorako sarbidearen informazio maila"
+ WebpageControlLevel.Level.ReadUser="Irakurri sarbidea erabiltzailearen informaziora"
+-WebpageControlLevel.Level.Basic="Oinarrizko sarbidea OBSra"
+-WebpageControlLevel.Level.Advanced="Sarbide Aurreratua OBSra ( Eszenak aldatu, Hasi/Gelditu errepikatu buffereratzea, etab.)"
+-WebpageControlLevel.Level.All="Sarbide osoa OBSra (Hasi/Geldi streaming saioa abisu barik, etab.)"
++WebpageControlLevel.Level.Basic="Oinarrizko sarbidea Penguin Studiora"
++WebpageControlLevel.Level.Advanced="Sarbide Aurreratua Penguin Studiora ( Eszenak aldatu, Hasi/Gelditu errepikatu buffereratzea, etab.)"
++WebpageControlLevel.Level.All="Sarbide osoa Penguin Studiora (Hasi/Geldi streaming saioa abisu barik, etab.)"
+ Dialog.Alert="JavaScript Alerta"
+ Dialog.Confirm="JavaScript baieztapena"
+ Dialog.Prompt="JavaScript mezua"
 --- a/data/locale/fa-IR.ini
 +++ b/data/locale/fa-IR.ini
 @@ -9,17 +9,17 @@
@@ -743,17 +759,6 @@
  Dialog.Alert="JavaScript-ის გაფრთხილება"
  Dialog.Confirm="JavaScript-ის დასტური"
  Dialog.Prompt="JavaScript-ის მითითება"
---- a/data/locale/kaa.ini
-+++ b/data/locale/kaa.ini
-@@ -6,7 +6,7 @@
- RefreshBrowserActive="Saxna aktiv bolǵanda, brauzerdi jańalaw"
- RefreshNoCache="Ámeldegi bet keshin jańalaw"
- BrowserSource="Brauzer"
--RerouteAudio="Audionı OBS arqalı basqarıw"
-+RerouteAudio="Audionı Penguin Studio arqalı basqarıw"
- Inspect="tekseriw"
- CopyUrl="Ámeldegi mánzildi kóshirip alıw"
- WebpageControlLevel="Bet ruqsatları"
 --- a/data/locale/kab-KAB.ini
 +++ b/data/locale/kab-KAB.ini
 @@ -7,16 +7,16 @@
@@ -877,6 +882,21 @@
  Error.Title="Nepavyko užkrauti to puslapio!"
  Error.Description="Užtikrinkite, kad adresas yra tikslus, ir, kad svetainė šiuo metu neturi problemų."
  Error.Retry="Spustelėkite čia, kad pabandyti iš naujo"
+--- a/data/locale/lv-LV.ini
++++ b/data/locale/lv-LV.ini
+@@ -6,9 +6,9 @@
+ ShutdownSourceNotVisible="Izslēgt avotu, kad tas nav redzams"
+ RefreshNoCache="Atsvaidzināt pašreizējās lapas kešatmiņu"
+ BrowserSource="Pārlūks"
+-RerouteAudio="Audio vadība, izmantojot OBS"
++RerouteAudio="Audio vadība, izmantojot Penguin Studio"
+ Inspect="Pārbaudīt"
+ CopyUrl="Kopēt pašreizējo adresi"
+ WebpageControlLevel="Lapas atļaujas"
+-WebpageControlLevel.Level.None="Nav piekļuves OBS"
+-WebpageControlLevel.Level.ReadObs="Lasīšanas piekļuve OBS statusa informācijai"
++WebpageControlLevel.Level.None="Nav piekļuves Penguin Studio"
++WebpageControlLevel.Level.ReadObs="Lasīšanas piekļuve Penguin Studio statusa informācijai"
 --- a/data/locale/ms-MY.ini
 +++ b/data/locale/ms-MY.ini
 @@ -7,17 +7,17 @@
@@ -1185,6 +1205,17 @@
  Dialog.Alert="JavaScript-meddelande"
  Dialog.Confirm="JavaScript-bekräftelse"
  Dialog.Prompt="JavaScript-fråga"
+--- a/data/locale/szl-PL.ini
++++ b/data/locale/szl-PL.ini
+@@ -7,7 +7,7 @@
+ RefreshNoCache="Ôdświyż podrynczno spamiyńć teroźnyj zajty"
+ BrowserSource="Przeziyroczka"
+ CustomFrameRate="Włosne ôpcyje FPS"
+-RerouteAudio="Kōntroluj audio bez OBSa"
++RerouteAudio="Kōntroluj audio bez Penguin Studioa"
+ Error.Title="Niy idzie zaladować zajty!"
+ Error.Description="Dej pozōr, eli adresa je dobro, iże zajta tyż funguje dobrze."
+ Error.Retry="Kliknij, coby sprōbować zaś"
 --- a/data/locale/ta-IN.ini
 +++ b/data/locale/ta-IN.ini
 @@ -7,6 +7,6 @@
@@ -1228,12 +1259,12 @@
  RefreshNoCache="Geçerli sayfanın önbelleğini yenile"
  BrowserSource="Tarayıcı"
  CustomFrameRate="Özel kare hızı kullan"
--RerouteAudio="OBS ile sesi kontrol etme"
-+RerouteAudio="Penguin Studio ile sesi kontrol etme"
- Inspect="Denetle"
- DevTools="'%1' Tarayıcı Yuvasını Denetle"
+-RerouteAudio="OBS ile sesi denetle"
++RerouteAudio="Penguin Studio ile sesi denetle"
+ Inspect="İncele"
+ DevTools="'%1' Tarayıcı Yuvasını İncele"
  CopyUrl="Geçerli adresi kopyala"
- WebpageControlLevel="Sayfa İzinleri"
+ WebpageControlLevel="Sayfa izinleri"
 -WebpageControlLevel.Level.None="OBS'ye erişim yok"
 -WebpageControlLevel.Level.ReadObs="OBS'ye erişme durumu bilgilerini okuma"
 +WebpageControlLevel.Level.None="Penguin Studio'ye erişim yok"
@@ -1276,7 +1307,7 @@
  Dialog.Prompt="JavaScript ئەسكەرتىش"
 --- a/data/locale/uk-UA.ini
 +++ b/data/locale/uk-UA.ini
-@@ -8,17 +8,17 @@
+@@ -9,17 +9,17 @@
  RefreshNoCache="Оновити кеш поточної сторінки"
  BrowserSource="Браузер"
  CustomFrameRate="Використовувати власну частоту кадрів"
@@ -1302,12 +1333,15 @@
  Dialog.Prompt="Запит JavaScript"
 --- a/data/locale/ur-PK.ini
 +++ b/data/locale/ur-PK.ini
-@@ -9,14 +9,14 @@
+@@ -9,17 +9,17 @@
  RefreshNoCache="موجودہ صفحہ کے کیشے کو تازہ کریں"
  BrowserSource="براؤزر"
  CustomFrameRate="حسب ضرورت فریم ریٹ استعمال کریں"
 -RerouteAudio="OBS کے ذریعے آڈیو کو کنٹرول کریں"
 +RerouteAudio="Penguin Studio کے ذریعے آڈیو کو کنٹرول کریں"
+ Inspect="معائنہ کرنا"
+ DevTools="براؤزر ڈاک '%1' کا ​​معائنہ کریں"
+ CopyUrl="موجودہ پتہ کاپی کریں"
  WebpageControlLevel="صفحہ کی اجازت"
 -WebpageControlLevel.Level.None="OBS تک رسائی نہیں ہے"
 -WebpageControlLevel.Level.ReadObs="OBS کی حیثیت کی معلومات تک رسائی پڑھیں"
