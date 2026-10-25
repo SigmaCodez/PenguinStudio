@@ -459,7 +459,7 @@ OBSBasic::OBSBasic(QWidget *parent) : OBSMainWindow(parent), undo_s(ui), ui(new 
 	installEventFilter(shortcutFilter);
 
 	stringstream name;
-	name << "Penguin Studio " PENGUIN_VERSION " (OBS " << App()->GetVersionString() << ")";
+	name << "Penguin Studio " PENGUIN_VERSION;
 	blog(LOG_INFO, "%s", name.str().c_str());
 	blog(LOG_INFO, "---------------------------------");
 
@@ -2151,7 +2151,7 @@ void OBSBasic::UpdateTitleBar()
 	const char *profile = config_get_string(App()->GetUserConfig(), "Basic", "Profile");
 	const char *sceneCollection = config_get_string(App()->GetUserConfig(), "Basic", "SceneCollection");
 
-	name << "Penguin Studio " PENGUIN_VERSION " (OBS " << App()->GetVersionString(false) << ")";
+	name << "Penguin Studio " PENGUIN_VERSION;
 	if (previewProgramMode) {
 		name << " [" << Str("Basic.TogglePreviewProgramMode") << "]";
 	}

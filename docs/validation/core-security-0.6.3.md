@@ -2,8 +2,8 @@
 
 Status: the complete candidate at commit 205c06b passed all eight Linux package
 builds and functional regression checks. Real YouTube authorization, saved
-provider sessions and Facecam movement acceptance have been verified. Final
-publication and installation follow the release workflow. See the
+provider sessions and Facecam movement acceptance have been verified. The complete release was subsequently published and installed; see the
+[final package evidence](release-0.6.3.json). See the
 [complete package results](camera-gpu-0.6.3.md#complete-candidate-package--commit-205c06b)
 for measured performance and the remaining sporadic updater focus warning.
 

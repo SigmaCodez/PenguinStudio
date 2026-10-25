@@ -1,0 +1,87 @@
+{
+  "version": "0.6.3",
+  "candidate_commit": "205c06b78b9c482784ae86297a1e390fa9ecdcfa",
+  "candidate_workflow": "https://github.com/SigmaCodez/PenguinStudio/actions/runs/40201246032",
+  "packages": [
+    {
+      "name": "penguin-studio_0.6.3-1+ubuntu26.04_amd64.deb",
+      "sha256": "81b81d94cdad104efcf5c71addbb9abcf3cdb1e62d84cc41193783411c1423eb",
+      "bytes": 217126520
+    },
+    {
+      "name": "penguin-studio-camera-amd-gfx1201_0.6.3-1+ubuntu26.04_amd64.deb",
+      "sha256": "f001baf7ed3220c2100f4c6f91a680b36ff97fb65dcefb5dead9007ac2e7c08e",
+      "bytes": 556861956
+    }
+  ],
+  "platform": "Ubuntu 26.04.1 / GNOME Wayland",
+  "camera_gpu": "AMD RX 9070 XT (gfx1201)",
+  "workspace_checks": 211,
+  "shutdown_scenarios": 9,
+  "camera_processing_controls": [
+    "Automatic",
+    "GPU",
+    "CPU"
+  ],
+  "legacy_cpu_choice_preserved": true,
+  "accounts": {
+    "main_window": true,
+    "twitch_connected": true,
+    "twitch_minecraft_search": true,
+    "youtube_connected": true,
+    "youtube_gaming_category": true
+  },
+  "updater": {
+    "release_query_passed": true,
+    "sporadic_opening_focus_warning": true
+  },
+  "gpu_recording": {
+    "frames": 1498,
+    "reported_render_or_encoding_losses": 0,
+    "full_decode": true,
+    "clean_exit": true,
+    "fallback": false
+  },
+  "cpu_reference_recording": {
+    "frames": 1501,
+    "reported_render_or_encoding_losses": 0,
+    "full_decode": true,
+    "clean_exit": true
+  },
+  "limitations": [
+    "Workspace smoke recording reported two render-lag frames (1.5%).",
+    "Qt Wayland updater opening focus warning remains sporadic.",
+    "Local RTMP harness logged a temporary-services-directory warning.",
+    "Hardware and distribution coverage is limited to the documented tests."
+  ],
+  "private_media_published": false,
+  "release_commit": "cafca81e4f751945ac50b96188de7b3727b1962a",
+  "release_workflow": "https://github.com/SigmaCodez/PenguinStudio/actions/runs/40204646693",
+  "installed_packages": [
+    {
+      "file": "penguin-studio_0.6.3-1+ubuntu26.04_amd64.deb",
+      "sha256": "3d0b39cd57c8c8ce7f791ecec969fcc35cda23df6736545db930bbac9a08c6f9",
+      "bytes": 217126612
+    },
+    {
+      "file": "penguin-studio-camera-amd-gfx1201_0.6.3-1+ubuntu26.04_amd64.deb",
+      "sha256": "f2f95869e8f8fa677afe600cad70d807e6fbe199b2db8e30f929a8f0056936b4",
+      "bytes": 556862112
+    }
+  ],
+  "installation": {
+    "version": "0.6.3-1+ubuntu26.04",
+    "packages_verified": true,
+    "apt_removed_packages": 0
+  },
+  "installed_gpu_recording": {
+    "frames": 1513,
+    "gpu_active": true,
+    "reported_render_or_encoding_losses": 0,
+    "full_decode": true,
+    "clean_exit": true,
+    "warning_error_diagnostics": 0,
+    "reported_memory_leaks": 0
+  },
+  "environment_followup": "An initial installed run fell back to CPU when LLVM hit the temporary-filesystem quota. Archiving private test files to SSD freed space; the ordinary installed launch then selected the GPU and passed recording. No runtime source workaround was applied."
+}

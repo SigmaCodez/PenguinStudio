@@ -153,3 +153,19 @@ These diagnostics are retained in private logs.
 All three public previews were recaptured from the actual candidate package using
 an isolated English profile and synthetic media, visually reviewed, and hashed in
 the current manifest. Private camera test recordings remain outside the repository.
+
+## Published and installed package — 2026-10-25
+
+[Release build 40204646693](https://github.com/SigmaCodez/PenguinStudio/actions/runs/40204646693)
+passed every package job and published all eight downloads. Both Ubuntu DEBs were
+checked against the published SHA256SUMS and installed: one application upgrade,
+one optional GPU runtime addition, no package removals. `dpkg --verify` passed.
+
+The ordinary installed launch initially hit the temporary filesystem quota while
+LLVM compiled the GPU model; the application correctly continued on CPU. Moving
+private test artifacts to SSD freed temporary space. A fresh launch with ordinary
+system settings then selected the RX 9070 XT in Automatic mode. Its 1,513-frame
+recording reported no rendering/encoding losses, decoded fully and shut down with
+exit status zero, no warning/error diagnostics and zero reported memory leaks.
+See [sanitized package evidence](release-0.6.3.json). The separate sporadic updater
+focus warning remains unresolved.
