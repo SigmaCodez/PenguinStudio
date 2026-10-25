@@ -227,7 +227,9 @@ sudo apt install ./penguin-studio_0.6.3-1+ubuntu26.04_amd64.deb ./penguin-studio
 
 Verify both downloads against the release SHA256SUMS first. The add-on does not
 replace the system graphics driver. Select Automatic or GPU in Camera appearance;
-the application shows preparation, GPU processing or CPU fallback. First use
+the application shows preparation, GPU processing or CPU fallback. Existing scenes
+that explicitly stored CPU processing keep that setting; select Automatic or GPU
+once to enable acceleration for those scenes. First use
 compiles and caches the model while CPU processing remains available. Primary
 matting runs on GPU; hand recovery runs concurrently on CPU to preserve the tested
 image quality. GPU failure returns to the prepared CPU session.

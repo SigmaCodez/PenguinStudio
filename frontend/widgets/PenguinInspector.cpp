@@ -525,7 +525,14 @@ void PenguinInspector::RefreshSelection()
 	cameraImage->setToolTip(cameraImagePath);
 	cameraImage->setProperty("backgroundPath", cameraImagePath);
 	auto *cameraProcessing = findChild<QComboBox *>("cameraProcessing");
-	const auto device = std::string(obs_data_get_string(cameraSettings, "inference_device"));
+	auto matting = CameraMatting(source);
+	auto device = std::string(obs_data_get_string(cameraSettings, "inference_device"));
+	if (!obs_data_has_user_value(cameraSettings, "inference_device") && matting) {
+		// Older scenes stored the device only on the managed matting filter.
+		// Reflect that choice without silently changing an existing CPU setup.
+		OBSDataAutoRelease modelSettings = obs_source_get_settings(matting);
+		device = obs_data_get_string(modelSettings, "useGPU");
+	}
 	if (changed || !Editing(cameraProcessing)) {
 		cameraProcessing->setCurrentIndex(device == "cpu" ? 2 : device == "gpu" ? 1 : 0);
 	}
@@ -539,7 +546,6 @@ void PenguinInspector::RefreshSelection()
 	cameraSimilarity->setVisible((cameraBackground->currentIndex() == 2 || cameraBackground->currentIndex() == 3));
 	calldata_t status;
 	calldata_init(&status);
-	auto matting = CameraMatting(source);
 	const bool usesRvm = std::strcmp(obs_data_get_string(cameraSettings, "automatic_backend"), "rvm") == 0;
 	auto *statusSource = usesRvm ? matting.Get() : camera.Get();
 	int aiStatus = 3;

@@ -406,6 +406,20 @@ void Start()
 			report["processing_controls"] = processing->isEnabled() && processing->isVisible();
 		});
 	}
+	At(22750, [] {
+		auto appearance = PenguinCamera::CameraFilter(source);
+		auto matting = PenguinCamera::CameraMatting(source);
+		OBSDataAutoRelease settings = obs_source_get_settings(appearance);
+		obs_data_unset_user_value(settings, "inference_device");
+		obs_source_update(appearance, settings);
+		OBSDataAutoRelease modelSettings = obs_source_get_settings(matting);
+		obs_data_set_string(modelSettings, "useGPU", "cpu");
+		obs_source_update(matting, modelSettings);
+	});
+	At(23250, [] {
+		auto *processing = mainWindow->findChild<QComboBox *>("cameraProcessing");
+		report["legacy_cpu_reflected"] = processing && processing->currentIndex() == 2;
+	});
 	At(23500, [] {
 		auto matting = PenguinCamera::CameraMatting(source);
 		OBSDataAutoRelease settings = matting ? obs_source_get_settings(matting) : obs_data_create();
