@@ -10,7 +10,7 @@
 #include "amf.h"
 #include "log.h"
 
-static void av1(const uint8_t *data, size_t size)
+static void nal(const uint8_t *data, size_t size)
 {
 	const uint8_t *expected = data + size;
 	for (size_t i = 0; i + 2 < size; i++) {
@@ -20,6 +20,10 @@ static void av1(const uint8_t *data, size_t size)
 		}
 	}
 	assert(obs_nal_find_startcode(data, data + size) == expected);
+}
+static void av1(const uint8_t *data, size_t size)
+{
+	nal(data, size);
 	uint8_t *avc_header = NULL;
 	(void)obs_parse_avc_header(&avc_header, data, size);
 	bfree(avc_header);
@@ -51,6 +55,21 @@ static void amf(const uint8_t *data, int size)
 int main(void)
 {
 	RTMP_LogSetLevel(RTMP_LOGCRIT);
+	/* Exhaustively check short start-code inputs at every word alignment. */
+	unsigned int combinations = 1;
+	for (size_t size = 0; size <= 9; size++) {
+		for (unsigned int code = 0; code < combinations; code++) {
+			for (size_t offset = 0; offset < 4; offset++) {
+				uint8_t *allocation = malloc(size + offset + 1);
+				uint8_t *data = allocation + offset;
+				unsigned int digits = code;
+				for (size_t i = 0; i < size; i++) { data[i] = digits % 3; digits /= 3; }
+				nal(data, size);
+				free(allocation);
+			}
+		}
+		combinations *= 3;
+	}
 	const uint8_t frame[] = {0x32, 1, 0};
 	assert(obs_av1_keyframe(frame, sizeof(frame)));
 	const uint8_t extension[] = {0x34, 0, 0};

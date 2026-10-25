@@ -23,16 +23,20 @@
  * we'll just use the code from FFmpeg - http://www.ffmpeg.org/ */
 static const uint8_t *ff_avc_find_startcode_internal(const uint8_t *p, const uint8_t *end)
 {
-	const size_t alignment = (4 - ((uintptr_t)p & 3)) & 3;
 	const size_t length = (size_t)(end - p);
-	const uint8_t *a = p + (alignment < length ? alignment : length);
+	if (length < 3)
+		return end;
+	const uint8_t *last = end - 3;
+	const size_t alignment = (4 - ((uintptr_t)p & 3)) & 3;
+	const uint8_t *a = p + alignment;
 
-	for (; p < a && end - p >= 3; p++) {
+	for (; p < a && p <= last; p++) {
 		if (p[0] == 0 && p[1] == 0 && p[2] == 1)
 			return p;
 	}
 
-	for (; end - p >= 6; p += 4) {
+	const uint8_t *word_end = length >= 6 ? end - 6 : p;
+	for (; length >= 6 && p <= word_end; p += 4) {
 		uint32_t x;
 		memcpy(&x, p, sizeof(x));
 
@@ -53,7 +57,7 @@ static const uint8_t *ff_avc_find_startcode_internal(const uint8_t *p, const uin
 		}
 	}
 
-	for (; end - p >= 3; p++) {
+	for (; p <= last; p++) {
 		if (p[0] == 0 && p[1] == 0 && p[2] == 1)
 			return p;
 	}

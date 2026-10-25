@@ -1105,7 +1105,7 @@ AMF3_DecodeDepth(AMFObject *obj, const char *pBuffer, int nSize, int bAMFData, u
 {
     int original = nSize;
     int32_t ref;
-    AMF3ClassDef cd = {{0, 0}};
+    AMF3ClassDef cd = {0};
     obj->o_num = 0;
     obj->o_props = NULL;
     if (!pBuffer || nSize <= 0 || depth > AMF_MAX_DECODE_DEPTH)

@@ -391,8 +391,11 @@ bool _alsa_open(struct alsa_data *data)
 	pthread_attr_init(&attr);
 	pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
 
+	/* Publish the running state before the worker can race with shutdown. */
+	os_atomic_set_bool(&data->listen, true);
 	err = pthread_create(&data->listen_thread, &attr, _alsa_listen, data);
 	if (err) {
+		os_atomic_set_bool(&data->listen, false);
 		pthread_attr_destroy(&attr);
 		blog(LOG_ERROR, "Failed to create capture thread for device '%s'.", data->device);
 		goto cleanup;
@@ -554,9 +557,7 @@ void *_alsa_listen(void *attr)
 	out.speakers = _alsa_channels_to_obs_speakers(data->channels);
 	out.samples_per_sec = data->rate;
 
-	os_atomic_set_bool(&data->listen, true);
-
-	do {
+	while (os_atomic_load_bool(&data->listen)) {
 		snd_pcm_sframes_t frames = snd_pcm_readi(data->handle, data->buffer, data->period_size);
 
 		if (!os_atomic_load_bool(&data->listen))
@@ -578,7 +579,7 @@ void *_alsa_listen(void *attr)
 
 		if (out.timestamp > data->first_ts)
 			obs_source_output_audio(data->source, &out);
-	} while (os_atomic_load_bool(&data->listen));
+	}
 
 	blog(LOG_DEBUG, "Capture thread is about to exit.");
 

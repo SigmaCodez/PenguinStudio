@@ -27,7 +27,7 @@ Penguin Studio 0.6.3, captured from the Linux release package in English with lo
 
 ## Get started
 
-**Current release: [Penguin Studio 0.6.3](https://github.com/SigmaCodez/PenguinStudio/releases/tag/penguin-v0.6.3)** — optional moving-hand preservation for automatic camera effects, plus native Twitch/YouTube chat, moderation and saved browser sign-in.
+**Current release: [Penguin Studio 0.6.3](https://github.com/SigmaCodez/PenguinStudio/releases/tag/penguin-v0.6.3)** — media and RTMP parser hardening, updated browser runtime and Linux lifecycle fixes, with native Twitch/YouTube chat and camera effects.
 
 **[Download Linux packages](https://github.com/SigmaCodez/PenguinStudio/releases)** — Ubuntu DEB, Fedora RPM, Flatpak, Snap, AppImage and an Arch/AUR recipe, with SHA-256 checksums.
 
