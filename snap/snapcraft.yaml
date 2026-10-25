@@ -148,6 +148,7 @@ parts:
       - libqt6xml6
       - libqt6dbus6
       - libqt6svg6
+      - qt6-svg-plugins
       - qt6-wayland
       - qt6-image-formats-plugins
       - libpipewire-0.3-0t64

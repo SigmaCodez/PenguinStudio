@@ -35,7 +35,7 @@ if(OS_LINUX)
   set(CPACK_DEBIAN_PACKAGE_MAINTAINER "SigmaCodez")
   set(CPACK_DEBIAN_FILE_NAME DEB-DEFAULT)
   set(CPACK_DEBIAN_PACKAGE_SECTION "video")
-  set(CPACK_DEBIAN_PACKAGE_DEPENDS "qt6-wayland, pkexec")
+  set(CPACK_DEBIAN_PACKAGE_DEPENDS "qt6-wayland, qt6-svg-plugins, pkexec")
   set(CPACK_DEBIAN_PACKAGE_RECOMMENDS "pipewire, xdg-desktop-portal, mesa-va-drivers")
   # Penguin Studio retains libobs ABI and install paths. A native OBS install owns these files.
   set(CPACK_DEBIAN_PACKAGE_CONFLICTS "obs-studio, obs-studio-common, obs-plugins, libobs0, libobs0t64, libobs-dev")

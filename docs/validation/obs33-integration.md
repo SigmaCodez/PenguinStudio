@@ -64,3 +64,5 @@ Qt 6.11.1 reproduced the null-surface text-input leave diagnostic on dialog tear
 ## Main-package-only update compatibility
 
 The in-app updater installs the main package, so an existing 0.6.x AMD runtime add-on may remain installed in its previous private directory. The new module first prefers the OBS 33 layout and then accepts that legacy private runtime location; its worker executable still comes from the new main package. The currently shipped old/new runtimes both use ONNX Runtime 1.23.2. This preserves GPU processing across a main-package-only upgrade; runtime initialization failures still fall back to CPU. Packaged validation of this migration is pending.
+
+- The next clean AppImage runner exposed Ubuntu's separate `qt6-svg-plugins` package, which was already installed on the developer host but missing from the runner using `--no-install-recommends`. AppImage build dependencies now include it explicitly; native DEB dependencies and Snap staging also require it so SVG icons do not rely on incidental host packages. The AppImage packager checks the Wayland and SVG plugin files before deployment.

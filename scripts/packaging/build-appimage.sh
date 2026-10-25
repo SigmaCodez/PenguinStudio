@@ -33,6 +33,10 @@ while IFS= read -r -d '' lib; do libraries+=(--library "$lib"); done \
   < <(find "$appdir/usr/lib" -type f -name '*.so*' -print0)
 export APPIMAGE_EXTRACT_AND_RUN=1
 export QMAKE=/usr/bin/qmake6
+qt_plugins=$($QMAKE -query QT_INSTALL_PLUGINS)
+for plugin in platforms/libqwayland.so iconengines/libqsvgicon.so imageformats/libqsvg.so; do
+  [[ -f "$qt_plugins/$plugin" ]] || { echo "Missing Qt runtime plugin: $plugin" >&2; exit 1; }
+done
 # Qt 6.10 consolidates the former Wayland EGL/generic platform plugins.
 export EXTRA_PLATFORM_PLUGINS='libqwayland.so'
 export EXTRA_QT_MODULES='svg;waylandclient'
@@ -45,7 +49,6 @@ export NO_STRIP=1
   --icon-file "$appdir/usr/share/icons/hicolor/scalable/apps/io.github.SigmaCodez.PenguinStudio.svg"
 # Qt's platform plugins also need the Wayland shell/graphics integrations.
 # The Qt deploy plugin does not currently copy these Qt 6 subdirectories.
-qt_plugins=$($QMAKE -query QT_INSTALL_PLUGINS)
 for integration in wayland-decoration-client wayland-graphics-integration-client wayland-shell-integration; do
   cp -a "$qt_plugins/$integration" "$appdir/usr/plugins/"
 done

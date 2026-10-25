@@ -331,7 +331,7 @@ jobs:
       - name: Install packaging dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends qt6-base-dev qt6-svg-dev qt6-wayland patchelf file desktop-file-utils xvfb xauth libgl1-mesa-dri
+          sudo apt-get install -y --no-install-recommends qt6-base-dev qt6-svg-dev qt6-svg-plugins qt6-wayland patchelf file desktop-file-utils xvfb xauth libgl1-mesa-dri
           sudo apt-get install -y --no-remove ./deb-artifact/*.deb
       - name: Bundle and verify AppImage
         run: bash scripts/packaging/build-appimage.sh deb-artifact/*.deb
