@@ -9,3 +9,9 @@ A 40.021-second replay of the private Facecam movement reference used automatic 
 The earlier live prototype test was accepted by the user but logged one render-lag frame and one encoder-skipped frame in 70 seconds. That limitation remains documented; this package replay does not establish zero-loss live performance. The optional feature is off by default and adds CPU work.
 
 All public screenshots were separately captured from this real package using synthetic media in an isolated English profile. Private camera recordings and frames remain local. See [machine-readable results](hand-preservation-0.6.2.json) and [historical prototype evidence](../experiments/hand-preservation/results.json).
+
+## Final release package validation — 2026-10-25
+
+The final Ubuntu 26.04 package from release commit `7ef39b2befb4fe4205c0df135d79ce4426089c3d` passed checksum, dependency preflight and the complete native Wayland camera GUI regression. Its SHA-256 is `882a821b5f55a0db2f1fdfa8dd646f1bd21307e2ce7c1c723514f411484cf1f9`.
+
+A second 40.021-second motion-reference replay with hand preservation, a custom background and rounded corners decoded completely and closed without warning/error diagnostics or reported memory leaks. It logged **one render-lag frame and one encoder-skipped frame**, with zero output-drop events. Both moving hands remained visible in the inspected frame, with soft edges. This final result supersedes any inference that the candidate's zero-event run guarantees lossless performance. The feature remains optional and off by default. The package was tested in an isolated overlay, not installed system-wide as part of this check.

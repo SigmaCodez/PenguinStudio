@@ -65,5 +65,18 @@
     ],
     "observations": "Both hands retained in the moving-hands sample; soft edges remain. Other samples retain the head. Sample inspection does not prove absence of all temporal flicker."
   },
-  "privacy": "No private recordings, frames, account identities or credentials published."
+  "privacy": "No private recordings, frames, account identities or credentials published.",
+  "final_release_package": {
+    "source_commit": "7ef39b2befb4fe4205c0df135d79ce4426089c3d",
+    "sha256": "882a821b5f55a0db2f1fdfa8dd646f1bd21307e2ce7c1c723514f411484cf1f9",
+    "camera_gui_passed": true,
+    "motion_replay_seconds": 40.021,
+    "full_decode_exit_code": 0,
+    "reported_render_lag_frames": 1,
+    "reported_encoder_skipped_frames": 1,
+    "reported_output_drops": 0,
+    "warning_error_diagnostics": 0,
+    "reported_memory_leaks": 0,
+    "installed_system_wide": false
+  }
 }
