@@ -8,7 +8,7 @@ Penguin Studio brings a redesigned production workspace, native multi-destinatio
 
 ![Penguin Studio modern workspace with searchable layers and scenes, audio channel strips and an integrated inspector](docs/images/current/workspace-en.png)
 
-Penguin Studio 0.7.0, captured from the Linux release package in English with local demo media. See the [workspace guide](docs/WORKSPACE.md) for the controls and layout.
+Previous-release English previews are shown while the OBS 33 integration candidate is tested; they must be replaced with verified candidate captures before publication. See the [workspace guide](docs/WORKSPACE.md) for the controls and layout.
 
 > Development preview. See [verification status](docs/VERIFICATION.md) for completed checks and remaining release tests, and [packaging](docs/PACKAGING.md) for development downloads and supported build targets. Validate your devices and streaming accounts before relying on this build for a live show.
 

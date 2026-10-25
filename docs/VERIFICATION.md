@@ -5,7 +5,7 @@
 > product previews. For the current English GUI, see the [workspace guide](WORKSPACE.md)
 > and [preview provenance](images/current/manifest.json).
 
-This is a development preview based on OBS Studio 32.2.2. The new Penguin code must not be described as fully production-tested until the checks below have real recorded results.
+The current candidate is based on OBS Studio 33.0.0. Its [integration checks](validation/obs33-integration.md) are pending; the historical results below do not validate this major update. The new Penguin code must not be described as fully production-tested until the checks below have real recorded results.
 
 ## Security and camera GPU processing 0.6.3 — 2026-10-25
 

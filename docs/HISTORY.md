@@ -52,13 +52,13 @@ OBS release tags into the local Penguin tag namespace. A fresh recursive clone
 is the simplest way to start working with the new history; preserve any local
 work before replacing an older checkout.
 
-Package recipes explicitly set `OBS_VERSION_OVERRIDE=32.2.2` for the engine.
+Package recipes explicitly set `OBS_VERSION_OVERRIDE=33.0.0` for the engine.
 Penguin Studio's application version is maintained separately in
 `packaging/version.txt`; deleting or creating Git tags does not release or
 rename an existing package.
 
 Direct CMake configuration also falls back to the pinned engine version
-`32.2.2` when Git returns a commit hash or a Penguin release tag. The reset
+`33.0.0` when Git returns a commit hash or a Penguin release tag. The reset
 includes that compatibility fix. Run `python3 test/penguin-version-config.py`
 to verify the nine isolated cases covering tagless checkouts, OBS and Penguin
 tags, explicit overrides, prereleases and source archives. All nine passed

@@ -8,8 +8,8 @@ The project does not yet have an AUR maintainer account configured.
 
 ## AppImage
 
-The AppImage bundles the tested Ubuntu 24.04 application, Qt and application
-libraries. It requires an x86_64 Linux host with glibc 2.39 or newer, compatible
+The AppImage bundles the tested Ubuntu 26.04 application, Qt and application
+libraries. It requires an x86_64 Linux host with glibc 2.43 or newer, compatible
 GPU drivers, the host VA-API runtime, common desktop/font/audio libraries and a
 working desktop session. It does not bundle a kernel, graphics
 drivers or a desktop portal. Older distributions should use Flatpak instead.
@@ -80,7 +80,7 @@ private SSH keys or account passwords to this repository.
 
 ## Build provenance
 
-`scripts/packaging/build-appimage.sh` uses the Ubuntu 24.04 DEB from the same CI
+`scripts/packaging/build-appimage.sh` uses the Ubuntu 26.04 DEB from the same CI
 run, discovers dependencies of OBS plugins as well as the main executable, and
 bundles Qt's Wayland platform, shell and graphics-integration plugins. VA-API
 libraries remain host-provided so they match the installed graphics driver. AppImage tooling is pinned by SHA-256 in
