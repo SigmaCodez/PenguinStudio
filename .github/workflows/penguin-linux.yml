@@ -74,6 +74,7 @@ jobs:
           bash test/security/run-packet-parsers.sh
           python3 test/security/task-queues.py
           python3 test/security/alsa-shutdown.py
+          python3 test/penguin-frontend-tools-shutdown.py
       - name: Check delayed audio encoder shutdown
         run: |
           sudo apt-get update
@@ -211,6 +212,7 @@ jobs:
         with:
           name: penguin-camera-debug-ubuntu-${{ matrix.ubuntu }}
           path: |
+            build_penguin_deb/*.deb
             /tmp/penguin-camera-test/application.log
             /tmp/penguin-camera-test/result.json
             /tmp/penguin-camera-test/source.json

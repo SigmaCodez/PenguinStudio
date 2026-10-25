@@ -18,6 +18,7 @@ void FreeOutputTimer();
 #if defined(ENABLE_SCRIPTING)
 void InitScripts();
 void FreeScripts();
+static bool scripts_initialized;
 #endif
 
 bool obs_module_load(void)
@@ -32,6 +33,7 @@ bool obs_module_load(void)
 		blog(LOG_WARNING, "Scripting is disabled in Safe Mode");
 	} else {
 		InitScripts();
+		scripts_initialized = true;
 	}
 #endif
 	return true;
@@ -45,7 +47,11 @@ void obs_module_unload(void)
 	FreeSceneSwitcher();
 	FreeOutputTimer();
 #if defined(ENABLE_SCRIPTING)
-	if (!obs_frontend_is_safe_mode_enabled())
+	// Frontend callbacks may already be gone when core modules are unloaded.
+	// Release only the scripting state this module actually initialized.
+	if (scripts_initialized) {
 		FreeScripts();
+		scripts_initialized = false;
+	}
 #endif
 }
