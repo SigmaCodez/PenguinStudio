@@ -101,6 +101,9 @@ int main(int argc, char **argv)
 	}
 	const QDir prefix(QString::fromLocal8Bit(argv[1]));
 	const QDir results(QString::fromLocal8Bit(argv[2]));
+	const QDir libraries(prefix.filePath(QFileInfo::exists(prefix.filePath("lib/libobs-opengl.so"))
+					   ? "lib"
+					   : "lib/x86_64-linux-gnu"));
 	Check(QDir().mkpath(results.absolutePath()), "cannot create results directory");
 	Display *display = nullptr;
 #ifdef ENABLE_WAYLAND
@@ -129,7 +132,7 @@ int main(int argc, char **argv)
 		initialized = obs_startup("en-US", nullptr, nullptr);
 		Check(initialized, "obs_startup failed");
 		obs_video_info video{};
-		const QByteArray graphics = prefix.filePath(QStringLiteral("lib/libobs-opengl.so")).toUtf8();
+		const QByteArray graphics = libraries.filePath(QStringLiteral("libobs-opengl.so")).toUtf8();
 		video.graphics_module = graphics.constData();
 		video.fps_num = 30;
 		video.fps_den = 1;
@@ -145,14 +148,16 @@ int main(int argc, char **argv)
 		Check(obs_reset_audio(&audio), "audio initialization failed");
 		for (const char *name : {"obs-x264", "obs-ffmpeg", "obs-outputs", "rtmp-services", "image-source"}) {
 			obs_module_t *module = nullptr;
-			const QByteArray binary = prefix.filePath(QStringLiteral("lib/obs-plugins/%1.so").arg(name)).toUtf8();
-			const QByteArray data = prefix.filePath(QStringLiteral("share/obs/obs-plugins/%1").arg(name)).toUtf8();
+			const QByteArray binary =
+				libraries.filePath(QStringLiteral("obs-modules/core/%1.so").arg(name)).toUtf8();
+			const QByteArray data =
+				prefix.filePath(QStringLiteral("share/obs/obs-modules/core/%1").arg(name)).toUtf8();
 			Check(obs_open_module(&module, binary.constData(), data.constData()) == MODULE_SUCCESS,
 			      "could not open required OBS module");
 			Check(obs_init_module(module), "could not initialize required OBS module");
 		}
 		const QByteArray locale =
-			prefix.filePath(QStringLiteral("share/obs/obs-plugins/penguin-outputs/locale/en-US.ini")).toUtf8();
+			prefix.filePath(QStringLiteral("share/obs/obs-modules/core/penguin-outputs/locale/en-US.ini")).toUtf8();
 		obs_module_lookup = text_lookup_create(locale.constData());
 		{
 			ConnectionWizard preview(nullptr, true);

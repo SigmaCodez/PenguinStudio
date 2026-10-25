@@ -7,11 +7,16 @@ and offers newer versions. The app also checks after startup, at most once per
 outputs and modal dialogs have finished and Penguin is active. Automatic checks
 and development-preview releases can be disabled in the update dialog.
 
-**Download and install update** chooses the matching x86_64 Ubuntu 24.04/26.04
+**Download and install update** chooses the matching x86_64 Ubuntu 26.04
 DEB, Fedora 44 RPM, or Flatpak bundle. It verifies the exact asset name, release
 URL, byte count and GitHub-provided SHA-256 digest before invoking a package
 manager. Missing or invalid digests disable installation. Verification relies
 on HTTPS and the project's GitHub release metadata, not a separate signing key.
+Starting with the OBS 33-based release, no native Ubuntu 24.04 DEB is published.
+The updater must find a package for the installed distribution; it will not install
+an Ubuntu 26.04 package on Ubuntu 24.04. Use a compatible Flatpak or Snap runtime
+when a native package is unavailable.
+
 All streaming outputs (including custom multistream outputs), recording, replay
 buffers and the virtual camera must be stopped before installation.
 

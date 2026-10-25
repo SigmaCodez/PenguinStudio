@@ -34,4 +34,4 @@ cmake --build build --target penguin-local-stream
 QT_QPA_PLATFORM=offscreen build/plugins/penguin-outputs/penguin-local-stream /app /tmp/penguin-stream-results
 ```
 
-Replace `/app` with the installed build's prefix. The harness currently expects plugins in the prefix's `lib/obs-plugins` directory, as in the Flatpak build. It prefers native Wayland rendering and reports any fallback to X11. Passing this check does not establish portal screen-capture compatibility, platform OAuth behavior or real platform acceptance.
+Replace `/app` with the installed build's prefix. The harness uses the OBS 33 `obs-modules/core` layout and accepts both `lib` and Ubuntu's `lib/x86_64-linux-gnu` library directory. It prefers native Wayland rendering and reports any fallback to X11. Passing this check does not establish portal screen-capture compatibility, platform OAuth behavior or real platform acceptance.

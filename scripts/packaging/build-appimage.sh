@@ -33,7 +33,8 @@ while IFS= read -r -d '' lib; do libraries+=(--library "$lib"); done \
   < <(find "$appdir/usr/lib" -type f -name '*.so*' -print0)
 export APPIMAGE_EXTRACT_AND_RUN=1
 export QMAKE=/usr/bin/qmake6
-export EXTRA_PLATFORM_PLUGINS='libqwayland-egl.so;libqwayland-generic.so'
+# Qt 6.10 consolidates the former Wayland EGL/generic platform plugins.
+export EXTRA_PLATFORM_PLUGINS='libqwayland.so'
 export EXTRA_QT_MODULES='svg;waylandclient'
 export LD_LIBRARY_PATH="$appdir/usr/lib/x86_64-linux-gnu${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
 export NO_STRIP=1

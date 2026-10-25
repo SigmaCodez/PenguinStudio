@@ -8,7 +8,7 @@ Penguin Studio brings a redesigned production workspace, native multi-destinatio
 
 ![Penguin Studio modern workspace with searchable layers and scenes, audio channel strips and an integrated inspector](docs/images/current/workspace-en.png)
 
-Previous-release English previews are shown while the OBS 33 integration candidate is tested; they must be replaced with verified candidate captures before publication. See the [workspace guide](docs/WORKSPACE.md) for the controls and layout.
+The previews show the real Penguin Studio 0.7.0 interface with an isolated English demo profile and synthetic media. See the [workspace guide](docs/WORKSPACE.md) for the controls and layout.
 
 > Development preview. See [verification status](docs/VERIFICATION.md) for completed checks and remaining release tests, and [packaging](docs/PACKAGING.md) for development downloads and supported build targets. Validate your devices and streaming accounts before relying on this build for a live show.
 
@@ -27,7 +27,7 @@ Previous-release English previews are shown while the OBS 33 integration candida
 
 ## Get started
 
-**Current release: [Penguin Studio 0.7.0](https://github.com/SigmaCodez/PenguinStudio/releases/tag/penguin-v0.7.0)** — a Penguin-only window title, with the security, camera GPU processing and native Twitch/YouTube features introduced in the previous release.
+**Current release: [Penguin Studio 0.7.0](https://github.com/SigmaCodez/PenguinStudio/releases/tag/penguin-v0.7.0)** — updated to the OBS 33.0.0 engine, with the Penguin workspace, camera GPU processing, native Twitch/YouTube docks and Penguin-only window title retained.
 
 Camera processing offers **Automatic**, **GPU** and **CPU**, with automatic CPU fallback. The optional Ubuntu 26.04 AMD runtime add-on enables primary GPU matting on the tested RX 9070 XT; hand preservation stays on CPU. Other package/hardware combinations retain CPU processing unless a compatible runtime is provided. See [camera GPU setup](docs/PACKAGING.md#optional-amd-camera-gpu-runtime).
 

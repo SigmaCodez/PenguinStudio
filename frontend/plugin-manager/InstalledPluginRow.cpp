@@ -22,7 +22,8 @@
 
 #include <Idian/InlineButton.hpp>
 
-constexpr std::string_view kLegacyPluginInfoLink{"https://github.com/SigmaCodez/PenguinStudio/blob/main/docs/PLUGINS.md#legacy-plugin-locations"};
+constexpr std::string_view kLegacyPluginInfoLink{
+	"https://github.com/SigmaCodez/PenguinStudio/blob/main/docs/PLUGINS.md#legacy-plugin-locations"};
 
 namespace OBS {
 InstalledPluginRow::InstalledPluginRow(QWidget *parent, const PluginManagerWindow::Entry &entry) : idian::Row(parent)

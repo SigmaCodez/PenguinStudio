@@ -29,3 +29,22 @@ The new third-party plugin loader uses PenguinStudio user directories, preservin
 ## Local reference runs (installed 0.6.4, not candidate approval)
 
 Native Wayland: camera pixel/inspector regression including transparent backgrounds passed with clean teardown. Workspace regression passed 210 checks and produced a decodable video/audio recording. A separate 30-second synthetic GPU camera recording with the existing model cache reported active GPU processing, 901 output frames, no reported render/encoding losses and zero OBS leaks; 900 video frames decoded successfully. A cold-cache probe ended at its 110-second test deadline while the GPU worker was still compiling; the UI remained responsive and shutdown was clean. It is not recorded as a completed cold-cache GPU test.
+
+## Native Ubuntu 26.04.1 Wayland candidate checks
+
+Candidate source `b68bf4340b732ffd7a46a6024503fb8253559078`, Ubuntu package SHA-256
+`2066215b067c04a080c1886f0d704411108cd7aaa027c9bdb0197f7ffd7965c0`, extracted with the optional AMD runtime rather than installed over the user's current version. A private mount namespace hides installed legacy core modules to avoid testing a mixture of two engines. Profiles, media and output files are isolated and synthetic.
+
+- Workspace: 210 assertions passed, including Inspector/undo, scene operations, output controls and a real H.264/AAC recording. The 3.233-second file fully decoded (97 video frames, 150 audio frames).
+- Camera pixel and Inspector checks passed: shapes, green/blue key, local inference, disabling/serialization, blur, image backgrounds, missing-image fallback, contour cleanup, transparent image alpha, hand recovery and all processing choices.
+- RX 9070 XT GPU recording with a pre-existing model cache: GPU active, no CPU fallback, 30.100 seconds, 900 decoded video frames and 1,405 audio frames; 901 OBS output frames, no reported rendering/encoding losses.
+- Runtime-unavailable recording: the private AMD runtime was hidden inside the test namespace, GPU selection fell back to CPU, and the 30.100-second H.264/AAC recording fully decoded with no reported rendering/encoding losses.
+- All ten shutdown scenarios passed: normal, multi-instance, initial wizard open, connection-wizard cancellation, focused wizard field during shutdown, auto-configuration cancellation, statistics, updater open/focus/close, same-profile restart and SIGTERM. All reported zero startup/shutdown warnings/errors, zero late frontend unregisters and zero OBS leaks. No Qt focus diagnostic was emitted, including at debug level.
+
+These are synthetic regression checks, not a new live Facecam movement acceptance or an account-provider authorization test. The first private fallback harness mistakenly hid the runtime before mounting the root filesystem, leaving the GPU runtime visible; that cold-initialization run was discarded. Its interruption also revealed held references in the private recording helper, which now releases its fixture on frontend exit. Neither failed harness run is counted as successful candidate validation.
+
+- Offline browser-source run: all 211 workspace assertions passed, the recording fully decoded and a decoded frame visibly contained the HTML fixture. The only additional diagnostic was `WARNING: radv is not a conformant Vulkan implementation, testing use only.` The same warning reproduced with the installed 0.6.4 browser-source run on this host; it is retained as a graphics-driver limitation, not hidden or counted as a warning-free run.
+- Local output integration used the OBS 33 core-module layout and native Wayland EGL. Simultaneous 1280×720/1080×1920 H.264/AAC, portrait crop/fit, stop/restart, reconnect, active-output destruction and unreachable-server cleanup passed. All five output files fully decoded. No account or public stream was used.
+- Current English previews were captured from package source `011eb6811ebcec260a1975a96615e30c70a7da8b`, SHA-256 `fa81df0186944c74000ecba1dd4779b7498a8c362875afae22e380057e868a9a`, and all three images were visually reviewed. The package differs from the tested b68 candidate only in subsequent documentation, the Arch minimum-glibc declaration and Plugin Manager help URL.
+
+- AppImage packaging detected another Qt 6.10 migration: the old `libqwayland-egl.so` and `libqwayland-generic.so` platform files have become `libqwayland.so`. The packaging list now targets the installed Qt 6.10 platform plugin; full AppImage/Arch validation is being rerun.
