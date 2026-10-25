@@ -51,6 +51,7 @@ struct alsa_data {
 	os_event_t *abort_event;
 	volatile bool listen;
 	volatile bool reopen;
+	volatile bool shutdown;
 
 	/* alsa */
 	snd_pcm_t *handle;
@@ -121,6 +122,7 @@ void *alsa_create(obs_data_t *settings, obs_source_t *source)
 	data->handle = NULL;
 	data->listen = false;
 	data->reopen = false;
+	data->shutdown = false;
 	data->listen_thread = 0;
 	data->reopen_thread = 0;
 
@@ -154,8 +156,9 @@ void alsa_destroy(void *vptr)
 {
 	struct alsa_data *data = vptr;
 
-	if (data->handle)
-		_alsa_close(data);
+	os_atomic_set_bool(&data->shutdown, true);
+	_alsa_stop_reopen(data);
+	_alsa_close(data);
 
 	os_event_destroy(data->abort_event);
 	bfree(data->device);
@@ -342,6 +345,9 @@ bool _alsa_try_open(struct alsa_data *data)
 {
 	_alsa_stop_reopen(data);
 
+	if (os_atomic_load_bool(&data->shutdown))
+		return false;
+
 	if (_alsa_open(data))
 		return true;
 
@@ -352,6 +358,9 @@ bool _alsa_try_open(struct alsa_data *data)
 
 bool _alsa_open(struct alsa_data *data)
 {
+	if (os_atomic_load_bool(&data->shutdown))
+		return false;
+
 	pthread_attr_t attr;
 	int err;
 
@@ -501,6 +510,9 @@ bool _alsa_configure(struct alsa_data *data)
 
 void _alsa_start_reopen(struct alsa_data *data)
 {
+	if (os_atomic_load_bool(&data->shutdown))
+		return;
+
 	pthread_attr_t attr;
 	int err;
 
@@ -520,10 +532,9 @@ void _alsa_start_reopen(struct alsa_data *data)
 
 void _alsa_stop_reopen(struct alsa_data *data)
 {
-	if (os_atomic_load_bool(&data->reopen))
-		os_event_signal(data->abort_event);
-
 	if (data->reopen_thread) {
+		/* Signal even if the new thread has not set its running flag yet. */
+		os_event_signal(data->abort_event);
 		pthread_join(data->reopen_thread, NULL);
 		data->reopen_thread = 0;
 	}

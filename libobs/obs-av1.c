@@ -6,24 +6,17 @@
 
 #include "obs.h"
 
-static inline uint64_t leb128(const uint8_t *buf, size_t size, size_t *len)
+static bool leb128(const uint8_t *buf, size_t size, size_t *len, uint64_t *value)
 {
-	uint64_t value = 0;
-	uint8_t leb128_byte;
-
+	*value = 0;
 	*len = 0;
-
-	for (int i = 0; i < 8; i++) {
-		if (size-- < 1)
-			break;
-		(*len)++;
-		leb128_byte = buf[i];
-		value |= (leb128_byte & 0x7f) << (i * 7);
-		if (!(leb128_byte & 0x80))
-			break;
+	for (size_t i = 0; i < 8 && i < size; i++) {
+		*value |= (uint64_t)(buf[i] & 0x7f) << (i * 7);
+		*len = i + 1;
+		if (!(buf[i] & 0x80))
+			return true;
 	}
-
-	return value;
+	return false;
 }
 
 static inline unsigned int get_bits(uint8_t val, unsigned int n, unsigned int count)
@@ -31,33 +24,30 @@ static inline unsigned int get_bits(uint8_t val, unsigned int n, unsigned int co
 	return (val >> (8 - n - count)) & ((1 << (count - 1)) * 2 - 1);
 }
 
-static void parse_obu_header(const uint8_t *buf, size_t size, size_t *obu_start, size_t *obu_size, int *obu_type)
+static bool parse_obu_header(const uint8_t *buf, size_t size, size_t *obu_start, size_t *obu_size,
+			     int *obu_type)
 {
-	int extension_flag, has_size_field;
-	size_t size_len = 0;
-
-	*obu_start = 0;
-	*obu_size = 0;
-	*obu_type = 0;
-
-	if (size < 1)
-		return;
+	if (!buf || !size)
+		return false;
 
 	*obu_type = get_bits(*buf, 1, 4);
-	extension_flag = get_bits(*buf, 5, 1);
-	has_size_field = get_bits(*buf, 6, 1);
+	*obu_start = 1 + get_bits(*buf, 5, 1);
+	if (*obu_start > size)
+		return false;
 
-	if (extension_flag)
-		(*obu_start)++;
-
-	(*obu_start)++;
-
-	if (has_size_field)
-		*obu_size = (size_t)leb128(buf + *obu_start, size - *obu_start, &size_len);
-	else
-		*obu_size = size - 1;
-
-	*obu_start += size_len;
+	if (get_bits(*buf, 6, 1)) {
+		size_t len;
+		uint64_t payload_size;
+		if (!leb128(buf + *obu_start, size - *obu_start, &len, &payload_size))
+			return false;
+		*obu_start += len;
+		if (payload_size > size - *obu_start)
+			return false;
+		*obu_size = (size_t)payload_size;
+	} else {
+		*obu_size = size - *obu_start;
+	}
+	return true;
 }
 
 // Pass a static 10 byte buffer in. The max size for a leb128.
@@ -125,7 +115,11 @@ void metadata_obu(const uint8_t *source_buffer, size_t source_bufsize, uint8_t *
 	 * 	trailing_bits( obu_size * 8 - payloadBits )
 	 */
 
-	int64_t size_field = 1 + source_bufsize + 1;
+	*out_buffer = NULL;
+	*outbuf_size = 0;
+	if (source_bufsize > SIZE_MAX - 13 || (!source_buffer && source_bufsize))
+		return;
+	uint64_t size_field = source_bufsize + 2;
 	uint8_t size_buf[10];
 	size_t size_buf_size = 0;
 	encode_uleb128(size_field, size_buf, &size_buf_size);
@@ -139,7 +133,8 @@ void metadata_obu(const uint8_t *source_buffer, size_t source_bufsize, uint8_t *
 	offset += size_buf_size;
 	(*out_buffer)[offset] = metadata_type;
 	++offset;
-	memcpy((*out_buffer) + offset, source_buffer, source_bufsize);
+	if (source_bufsize)
+		memcpy((*out_buffer) + offset, source_buffer, source_bufsize);
 	offset += source_bufsize;
 
 	/* From AV1 spec: 6.2.1 General OBU semantics
@@ -156,12 +151,15 @@ void metadata_obu(const uint8_t *source_buffer, size_t source_bufsize, uint8_t *
 
 bool obs_av1_keyframe(const uint8_t *data, size_t size)
 {
+	if (!data || !size)
+		return false;
 	const uint8_t *start = data, *end = data + size;
 
 	while (start < end) {
 		size_t obu_start, obu_size;
 		int obu_type;
-		parse_obu_header(start, end - start, &obu_start, &obu_size, &obu_type);
+		if (!parse_obu_header(start, end - start, &obu_start, &obu_size, &obu_type))
+			return false;
 
 		if (obu_size) {
 			if (obu_type == OBS_OBU_FRAME || obu_type == OBS_OBU_FRAME_HEADER) {
@@ -183,6 +181,12 @@ void obs_extract_av1_headers(const uint8_t *packet, size_t size, uint8_t **new_p
 {
 	DARRAY(uint8_t) new_packet;
 	DARRAY(uint8_t) header;
+	*new_packet_data = NULL;
+	*new_packet_size = 0;
+	*header_data = NULL;
+	*header_size = 0;
+	if (!packet || !size)
+		return;
 	const uint8_t *start = packet, *end = packet + size;
 
 	da_init(new_packet);
@@ -191,7 +195,11 @@ void obs_extract_av1_headers(const uint8_t *packet, size_t size, uint8_t **new_p
 	while (start < end) {
 		size_t obu_start, obu_size;
 		int obu_type;
-		parse_obu_header(start, end - start, &obu_start, &obu_size, &obu_type);
+		if (!parse_obu_header(start, end - start, &obu_start, &obu_size, &obu_type)) {
+			da_free(new_packet);
+			da_free(header);
+			return;
+		}
 
 		if (obu_type == OBS_OBU_METADATA || obu_type == OBS_OBU_SEQUENCE_HEADER) {
 			da_push_back_array(header, start, obu_start + obu_size);

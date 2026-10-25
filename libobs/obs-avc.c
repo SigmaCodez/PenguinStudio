@@ -167,10 +167,13 @@ static void get_sps_pps(const uint8_t *data, size_t size, const uint8_t **sps, s
 static inline uint8_t get_ue_golomb(struct bitstream_reader *gb)
 {
 	int i = 0;
-	while (i < 32 && !bitstream_reader_read_bits(gb, 1))
+	while (i < 8 && !bitstream_reader_read_bits(gb, 1))
 		i++;
 
-	return bitstream_reader_read_bits(gb, i) + (1 << i) - 1;
+	/* These SPS fields fit in eight bits. Reject oversized/truncated codes. */
+	if (i == 8)
+		return 0;
+	return bitstream_reader_read_bits(gb, i) + (1U << i) - 1;
 }
 
 static void get_sps_high_params(const uint8_t *sps, size_t size, uint8_t *chroma_format_idc, uint8_t *bit_depth_luma,

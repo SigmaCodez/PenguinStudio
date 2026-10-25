@@ -16,21 +16,25 @@
 ******************************************************************************/
 
 #include "obs-nal.h"
+#include <string.h>
 
 /* NOTE: I noticed that FFmpeg does some unusual special handling of certain
  * scenarios that I was unaware of, so instead of just searching for {0, 0, 1}
  * we'll just use the code from FFmpeg - http://www.ffmpeg.org/ */
 static const uint8_t *ff_avc_find_startcode_internal(const uint8_t *p, const uint8_t *end)
 {
-	const uint8_t *a = p + 4 - ((intptr_t)p & 3);
+	const size_t alignment = (4 - ((uintptr_t)p & 3)) & 3;
+	const size_t length = (size_t)(end - p);
+	const uint8_t *a = p + (alignment < length ? alignment : length);
 
-	for (end -= 3; p < a && p < end; p++) {
+	for (; p < a && end - p >= 3; p++) {
 		if (p[0] == 0 && p[1] == 0 && p[2] == 1)
 			return p;
 	}
 
-	for (end -= 3; p < end; p += 4) {
-		uint32_t x = *(const uint32_t *)p;
+	for (; end - p >= 6; p += 4) {
+		uint32_t x;
+		memcpy(&x, p, sizeof(x));
 
 		if ((x - 0x01010101) & (~x) & 0x80808080) {
 			if (p[1] == 0) {
@@ -49,12 +53,12 @@ static const uint8_t *ff_avc_find_startcode_internal(const uint8_t *p, const uin
 		}
 	}
 
-	for (end += 3; p < end; p++) {
+	for (; end - p >= 3; p++) {
 		if (p[0] == 0 && p[1] == 0 && p[2] == 1)
 			return p;
 	}
 
-	return end + 3;
+	return end;
 }
 
 const uint8_t *obs_nal_find_startcode(const uint8_t *p, const uint8_t *end)

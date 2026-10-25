@@ -47,7 +47,7 @@ See `plugins/penguin-backgroundremoval/PROVENANCE.md` for the RVM plugin,
 model licenses and exact upstream revision. The legacy model retains its notices
 in `plugins/penguin-camera/data/MODEL-NOTICE.txt`.
 
-Current English interface, captured from Penguin Studio 0.6.2. The sample artwork demonstrates rounded corners; it is not a webcam or an AI-removal quality demonstration.
+Current English interface, captured from Penguin Studio 0.6.3. The sample artwork demonstrates rounded corners; it is not a webcam or an AI-removal quality demonstration.
 
 ## Validation
 

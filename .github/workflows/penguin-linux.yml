@@ -67,6 +67,12 @@ jobs:
         run: |
           cc -std=c11 -Wall -Wextra -Werror -I. test/penguin-v4l2-timeout.c -o /tmp/penguin-v4l2-timeout
           /tmp/penguin-v4l2-timeout
+      - name: Check packet decoders with memory and undefined-behavior sanitizers
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libobs-dev libsimde-dev
+          bash test/security/run-packet-parsers.sh
+          python3 test/security/task-queues.py
       - name: Check delayed audio encoder shutdown
         run: |
           sudo apt-get update
