@@ -292,9 +292,10 @@ jobs:
         if: failure()
         run: |
           mkdir -p snap-debug
-          sudo cp /root/.local/state/snapcraft/log/*.log snap-debug/ || true
+          sudo bash -c 'cp /root/.local/state/snapcraft/log/*.log "$1"/' _ "$PWD/snap-debug" || true
           sudo chown -R "$(id -u):$(id -g)" snap-debug
           apt-cache policy libxcb-composite0 libswscale9 > snap-debug/packages.txt
+          apt-config dump > snap-debug/apt-config.txt
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         if: failure()
         with:
