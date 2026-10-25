@@ -154,3 +154,24 @@ without sufficient primary person-mask support while never reducing that primary
 mask. Synthetic regression tests pass. A real-program replay with the corrected
 filter decoded fully; live acceptance and final packaged verification remain open.
 Private camera recordings and account data are excluded from public artifacts.
+
+The user accepted the corrected live Facecam result as noticeably better and
+usable. That short run recorded 751 output frames, two rendering-lag frames
+(0.3%), no encoding-skip counter and zero OBS allocation leaks. The short helper
+started recording one second after enabling inference, unlike the earlier
+20-second startup schedule. A controlled same-input comparison with equal warmup
+is therefore recorded separately; the two-frame observation is retained.
+
+The Ubuntu package from `5b685601fd24adadb663682ee2751f57bebcc803` passed the new
+updater focus-and-close scenario in isolation, with no startup/shutdown warnings,
+Qt focus diagnostics or OBS leaks. An earlier attempt overlapped another test
+instance and was rejected by the test's existing multiple-instance warning check.
+All seven package jobs for this source succeeded; the camera correction is being
+rebuilt in run `40189055379`.
+
+The controlled reference replay with equal warmup produced 1,501 frames in both
+runs. The packaged baseline reported no rendering-lag frames; the local corrected
+filter build reported one (0.1%). Both decoded fully, reported no encoding skips,
+and closed without warnings/errors or OBS allocation leaks. The local filter
+uses temporary distribution OpenCV libraries; final-package results must be
+reported separately rather than presenting this as an exact package benchmark.

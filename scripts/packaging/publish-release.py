@@ -20,6 +20,8 @@ def collect_packages(root, version):
         'Flatpak (x86_64)': rf'penguin-studio-{re.escape(version)}-x86_64\.flatpak',
         'Snap core24 (amd64)': rf'penguin-studio_{re.escape(version)}_amd64\.snap',
     }
+    if tuple(map(int, version.split('.'))) >= (0, 6, 3):
+        patterns['Optional RX 9070 camera GPU runtime (Ubuntu 26.04)'] = rf'penguin-studio-camera-amd-gfx1201_{re.escape(version)}-\d+\+ubuntu26\.04_amd64\.deb'
     packages = [p for p in root.rglob('*') if p.suffix in ('.deb', '.rpm', '.flatpak', '.snap', '.AppImage') or p.name.endswith('-aur.tar.gz')]
     selected = {}
     for target, pattern in patterns.items():

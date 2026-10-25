@@ -19,5 +19,7 @@
       "file": "stream-details-en.png",
       "sha256": "5e1e2a1c7dcda9264d6cff7490241d0f8f08ecacd47161366f4b065f1da5b2e9"
     }
-  ]
+  ],
+  "pending_version": "0.6.3",
+  "pending_reason": "Recapture the final package with Automatic/GPU/CPU camera controls before publication."
 }

@@ -267,6 +267,8 @@ PenguinInspector::PenguinInspector(OBSBasic *mainWindow, QWidget *parent)
 	cameraBackground = addChoice("Penguin.Camera.Background", "cameraBackground",
 				     {"Penguin.Camera.Off", "Penguin.Camera.Automatic", "Penguin.Camera.Green",
 				      "Penguin.Camera.Blue", "Penguin.Camera.Blur", "Penguin.Camera.Image"});
+	addChoice("Penguin.Camera.Processing", "cameraProcessing",
+		  {"Penguin.Camera.DeviceAutomatic", "Penguin.Camera.DeviceGPU", "Penguin.Camera.DeviceCPU"});
 	auto *cameraHands = new QCheckBox(QTStr("Penguin.Camera.PreserveHands"), cameraCard);
 	cameraHands->setObjectName("cameraPreserveHands");
 	cameraHands->setToolTip(QTStr("Penguin.Camera.PreserveHandsHint"));
@@ -522,6 +524,12 @@ void PenguinInspector::RefreshSelection()
 						       : QFileInfo(cameraImagePath).fileName());
 	cameraImage->setToolTip(cameraImagePath);
 	cameraImage->setProperty("backgroundPath", cameraImagePath);
+	auto *cameraProcessing = findChild<QComboBox *>("cameraProcessing");
+	const auto device = std::string(obs_data_get_string(cameraSettings, "inference_device"));
+	if (changed || !Editing(cameraProcessing)) {
+		cameraProcessing->setCurrentIndex(device == "cpu" ? 2 : device == "gpu" ? 1 : 0);
+	}
+	cameraProcessing->setVisible(cameraBackground->currentIndex() == 1 || cameraBackground->currentIndex() >= 4);
 	auto *cameraHands = findChild<QCheckBox *>("cameraPreserveHands");
 	cameraHands->setChecked(obs_data_get_bool(cameraSettings, "preserve_hands"));
 	cameraHands->setVisible(cameraBackground->currentIndex() == 1 || cameraBackground->currentIndex() >= 4);
@@ -539,13 +547,19 @@ void PenguinInspector::RefreshSelection()
 	    proc_handler_call(obs_source_get_proc_handler(statusSource), "camera_status", &status)) {
 		aiStatus = int(calldata_int(&status, "status"));
 	}
+	const bool activeGPU = calldata_bool(&status, "gpu");
+	const bool cpuFallback = calldata_bool(&status, "fallback");
+	const bool gpuPreparing = calldata_bool(&status, "preparing");
 	calldata_free(&status);
 	const char *statusKey = "Penguin.Camera.Privacy";
 	if (camera && !obs_source_enabled(camera)) {
 		statusKey = "Penguin.Camera.Disabled";
 	} else if ((cameraBackground->currentIndex() == 1 || cameraBackground->currentIndex() >= 4)) {
 		statusKey = aiStatus == 3   ? "Penguin.Camera.Error"
-			    : aiStatus == 2 ? "Penguin.Camera.Ready"
+			    : aiStatus == 2 ? (gpuPreparing  ? "Penguin.Camera.PreparingGPU"
+					       : activeGPU   ? "Penguin.Camera.ReadyGPU"
+					       : cpuFallback ? "Penguin.Camera.ReadyFallback"
+							     : "Penguin.Camera.ReadyCPU")
 					    : "Penguin.Camera.Loading";
 	}
 	if (cameraBackground->currentIndex() == 5 &&
@@ -745,7 +759,10 @@ void PenguinInspector::ChangeCamera()
 	if (!PenguinCamera::Apply(source, QT_TO_UTF8(QTStr("Penguin.Camera.Title")), cameraShape->currentIndex(),
 				  cameraBackground->currentIndex(), cameraRadius->value(), cameraSimilarity->value(),
 				  cameraBlur->value(), QT_TO_UTF8(cameraImagePath),
-				  findChild<QCheckBox *>("cameraPreserveHands")->isChecked())) {
+				  findChild<QCheckBox *>("cameraPreserveHands")->isChecked(),
+				  findChild<QComboBox *>("cameraProcessing")->currentIndex() == 2   ? "cpu"
+				  : findChild<QComboBox *>("cameraProcessing")->currentIndex() == 1 ? "gpu"
+												    : "auto")) {
 		cameraStatus->setText(QTStr("Penguin.Camera.Error"));
 		return;
 	}

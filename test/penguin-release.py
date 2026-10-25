@@ -87,6 +87,23 @@ class Releases(unittest.TestCase):
                 finally:
                     os.chdir(previous)
 
+    def test_gpu_addon_required_for_new_release(self):
+        names = ['penguin-studio_0.6.3-1+ubuntu24.04_amd64.deb',
+                 'penguin-studio_0.6.3-1+ubuntu26.04_amd64.deb',
+                 'penguin-studio-0.6.3-1.x86_64.rpm',
+                 'penguin-studio-0.6.3-x86_64.flatpak',
+                 'penguin-studio_0.6.3_amd64.snap',
+                 'penguin-studio-0.6.3-x86_64.AppImage',
+                 'penguin-studio-0.6.3-aur.tar.gz']
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            for name in names:
+                (root / name).write_bytes(b'test artifact')
+            with self.assertRaises(ValueError):
+                publish.collect_packages(root, '0.6.3')
+            (root / 'penguin-studio-camera-amd-gfx1201_0.6.3-1+ubuntu26.04_amd64.deb').write_bytes(b'runtime')
+            self.assertEqual(len(publish.collect_packages(root, '0.6.3')), 8)
+
     def test_complete_package_set(self):
         names = ['penguin-studio_0.2.0-6+ubuntu24.04_amd64.deb',
                  'penguin-studio_0.2.0-6+ubuntu26.04_amd64.deb',

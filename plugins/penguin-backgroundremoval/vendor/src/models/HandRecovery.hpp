@@ -13,6 +13,7 @@
 #include <onnxruntime_cxx_api.h>
 #include <opencv2/imgproc.hpp>
 #include "HandRecoveryMask.hpp"
+#include "../ort-utils/InferenceSession.hpp"
 
 class HandRecovery {
 	Ort::Env env{ORT_LOGGING_LEVEL_ERROR, "Penguin hand recovery"};
@@ -20,24 +21,28 @@ class HandRecovery {
 	std::vector<float> input;
 	std::vector<float> output;
 	cv::Mat mask;
+	std::string filename;
+	int threads;
+	PenguinInference::DeviceState device;
 
 public:
-	explicit HandRecovery(int threads)
+	explicit HandRecovery(int threads, const std::string &mode, const std::string &modelPath = {},
+			      const std::string &cache = {})
+		: threads(threads)
 	{
 		env.DisableTelemetryEvents();
-		char *path = obs_module_file("models/selfie_multiclass_256x256.with_runtime_opt.ort");
-		if (!path)
-			throw std::runtime_error("Hand recovery model missing");
-		std::string filename(path);
-		bfree(path);
+		if (modelPath.empty()) {
+			char *path = obs_module_file("models/selfie_multiclass_256x256.with_runtime_opt.ort");
+			if (!path) {
+				throw std::runtime_error("Hand recovery model missing");
+			}
+			filename = path;
+			bfree(path);
+		} else {
+			filename = modelPath;
+		}
 
-		Ort::SessionOptions options;
-		options.SetIntraOpNumThreads(threads);
-		options.SetInterOpNumThreads(1);
-		options.SetGraphOptimizationLevel(ORT_ENABLE_ALL);
-		options.AddConfigEntry("session.intra_op.allow_spinning", "0");
-		options.AddConfigEntry("session.inter_op.allow_spinning", "0");
-		session = std::make_unique<Ort::Session>(env, filename.c_str(), options);
+		session = PenguinInference::CreateSession(env, filename.c_str(), mode, threads, device, nullptr, cache);
 		input.resize(256 * 256 * 3);
 		output.resize(256 * 256 * 6);
 	}
@@ -63,7 +68,17 @@ public:
 		auto outputName = session->GetOutputNameAllocated(0, allocator);
 		const char *inputs[] = {inputName.get()};
 		const char *outputs[] = {outputName.get()};
-		session->Run(Ort::RunOptions{nullptr}, inputs, &in, 1, outputs, &out, 1);
+		try {
+			session->Run(Ort::RunOptions{nullptr}, inputs, &in, 1, outputs, &out, 1);
+		} catch (const Ort::Exception &) {
+			if (!device.gpu) {
+				throw;
+			}
+			session = PenguinInference::CreateSession(env, filename.c_str(), "cpu", threads, device);
+			device.fallback = true;
+			blog(LOG_INFO, "[Penguin camera] Hand inference switched to CPU; retrying the same frame.");
+			session->Run(Ort::RunOptions{nullptr}, inputs, &in, 1, outputs, &out, 1);
+		}
 
 		cv::Mat small(height, width, CV_32FC1);
 		for (int y = 0; y < height; ++y) {
@@ -72,8 +87,9 @@ public:
 				const float *values = output.data() + (y * 256 + x) * 6;
 				const float maximum = *std::max_element(values, values + 6);
 				float sum = 0;
-				for (int channel = 0; channel < 6; ++channel)
+				for (int channel = 0; channel < 6; ++channel) {
 					sum += std::exp(values[channel] - maximum);
+				}
 				const float skin = std::exp(values[2] - maximum) / sum;
 				const float alpha = std::clamp((skin - .2f) / .45f, 0.f, 1.f);
 				small.at<float>(y, x) = alpha * alpha * (3 - 2 * alpha);

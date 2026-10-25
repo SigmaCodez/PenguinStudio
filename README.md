@@ -27,7 +27,9 @@ Penguin Studio 0.6.3, captured from the Linux release package in English with lo
 
 ## Get started
 
-**Current release: [Penguin Studio 0.6.3](https://github.com/SigmaCodez/PenguinStudio/releases/tag/penguin-v0.6.3)** — media and RTMP parser hardening, updated browser runtime and Linux lifecycle fixes, with native Twitch/YouTube chat and camera effects.
+**Current release: [Penguin Studio 0.6.3](https://github.com/SigmaCodez/PenguinStudio/releases/tag/penguin-v0.6.3)** — media and RTMP parser hardening, Linux lifecycle fixes and Automatic/GPU/CPU camera processing, with native Twitch/YouTube chat and camera effects.
+
+Camera processing offers **Automatic**, **GPU** and **CPU**, with automatic CPU fallback. The optional Ubuntu 26.04 AMD runtime add-on enables primary GPU matting on the tested RX 9070 XT; hand preservation stays on CPU. Other package/hardware combinations retain CPU processing unless a compatible runtime is provided. See [camera GPU setup](docs/PACKAGING.md#optional-amd-camera-gpu-runtime).
 
 **[Download Linux packages](https://github.com/SigmaCodez/PenguinStudio/releases)** — Ubuntu DEB, Fedora RPM, Flatpak, Snap, AppImage and an Arch/AUR recipe, with SHA-256 checksums.
 

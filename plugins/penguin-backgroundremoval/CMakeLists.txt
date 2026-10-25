@@ -105,3 +105,28 @@ file(SHA256 "${CMAKE_CURRENT_SOURCE_DIR}/vendor/data/models/selfie_multiclass_25
 if(NOT hand_model_hash STREQUAL "317054e916e36f47457a85afa3ef6a6cc8f5d35f3cb22e5358fd1a3e6cfb8eed")
   message(FATAL_ERROR "The bundled hand-detail model does not match its reviewed checksum")
 endif()
+
+file(SHA256 "${CMAKE_CURRENT_SOURCE_DIR}/vendor/data/models/rvm_mobilenetv3_gpu.onnx" rvm_gpu_hash)
+if(NOT rvm_gpu_hash STREQUAL "41377570179d331c11486ae9d9ccf10ef806fa66cf34a6ca3caaeeba0c3a871c")
+  message(FATAL_ERROR "The fixed-shape RVM model does not match its reviewed checksum")
+endif()
+
+# The GPU driver lives outside the Qt/render process. A failed or slow worker
+# leaves CPU matting available and is terminated when its filter is destroyed.
+add_executable(penguin-gpu-worker gpu-worker.cpp vendor/src/plugin-support.c)
+target_compile_features(penguin-gpu-worker PRIVATE cxx_std_20)
+target_compile_definitions(penguin-gpu-worker PRIVATE ORT_API_MANUAL_INIT)
+target_include_directories(penguin-gpu-worker PRIVATE
+  "${penguin_ort_SOURCE_DIR}/include" "${penguin_cv_SOURCE_DIR}/modules/core/include"
+  "${penguin_cv_SOURCE_DIR}/modules/imgproc/include" "${penguin_cv_BINARY_DIR}")
+target_link_libraries(penguin-gpu-worker PRIVATE OBS::libobs opencv_core opencv_imgproc ${CMAKE_DL_LIBS})
+set_property(TARGET penguin-gpu-worker PROPERTY COMPILE_WARNING_AS_ERROR OFF)
+install(TARGETS penguin-gpu-worker RUNTIME DESTINATION "${OBS_PLUGIN_DESTINATION}/penguin-camera" COMPONENT Runtime)
+
+set(PENGUIN_CAMERA_GPU_RUNTIME_DIR "" CACHE PATH "Optional verified private GPU runtime bundle")
+if(PENGUIN_CAMERA_GPU_RUNTIME_DIR)
+  if(NOT EXISTS "${PENGUIN_CAMERA_GPU_RUNTIME_DIR}/libonnxruntime.so.1")
+    message(FATAL_ERROR "The optional camera GPU runtime is incomplete")
+  endif()
+  install(DIRECTORY "${PENGUIN_CAMERA_GPU_RUNTIME_DIR}/" DESTINATION "${OBS_PLUGIN_DESTINATION}/penguin-camera-gpu" COMPONENT Runtime)
+endif()

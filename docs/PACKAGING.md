@@ -211,3 +211,32 @@ The commands in this guide are the Penguin Studio build instructions. Optional
 Tool references:
 [Flatpak builder documentation](https://docs.flatpak.org/en/latest/flatpak-builder.html),
 and [Snapcraft CMake plugin](https://documentation.ubuntu.com/snapcraft/stable/common/craft-parts/reference/plugins/cmake_plugin/).
+
+
+## Optional AMD camera GPU runtime
+
+Penguin Studio 0.6.3 provides Automatic, GPU and CPU preferences for automatic
+camera background effects. The additional
+`penguin-studio-camera-amd-gfx1201_0.6.3-1+ubuntu26.04_amd64.deb` contains private
+AMD ROCm/MIGraphX libraries for the tested Radeon RX 9070 XT (gfx1201) on Ubuntu
+26.04.1. Install it alongside the matching main Ubuntu 26.04 package:
+
+```sh
+sudo apt install ./penguin-studio_0.6.3-1+ubuntu26.04_amd64.deb ./penguin-studio-camera-amd-gfx1201_0.6.3-1+ubuntu26.04_amd64.deb
+```
+
+Verify both downloads against the release SHA256SUMS first. The add-on does not
+replace the system graphics driver. Select Automatic or GPU in Camera appearance;
+the application shows preparation, GPU processing or CPU fallback. First use
+compiles and caches the model while CPU processing remains available. Primary
+matting runs on GPU; hand recovery runs concurrently on CPU to preserve the tested
+image quality. GPU failure returns to the prepared CPU session.
+
+The add-on is optional and is not installed by the ordinary main-package updater.
+It is specific to native Ubuntu 26.04 packages and gfx1201. It is not injected into
+Snap, Flatpak, AppImage or RPM installations. Those packages retain CPU processing
+unless built with a compatible private GPU runtime. NVIDIA and other AMD families
+have not been validated for this camera path. Hardware video encoding is a
+separate feature and is unaffected. Subsequent add-on changes are published as
+versioned downloads; install an updated add-on explicitly when release notes
+require it.
