@@ -28,6 +28,10 @@ bool closeRequested = false;
 bool wizardVisibleAtClose = false;
 bool sentinelObserved = false;
 bool statsOpened = false;
+bool updaterOpened = false;
+bool updaterFocused = false;
+bool updaterClosed = false;
+QPointer<QDialog> testedUpdater;
 bool connectionWizardOpened = false;
 bool autoConfigOpened = false;
 bool startupAutoConfigObserved = false;
@@ -132,6 +136,27 @@ void Tick()
 				    .filePath("PenguinStudio/.sentinel"));
 		sentinelObserved = !sentinel.entryList({"run_*"}, QDir::Files).isEmpty();
 	}
+	if (mode == "updater") {
+		if (ticks == 14)
+			if (auto *action = mainWindow->findChild<QAction *>("actionCheckForUpdates"))
+				QTimer::singleShot(0, action, &QAction::trigger);
+		if (ticks == 16) {
+			testedUpdater = mainWindow->findChild<QDialog *>("penguinLinuxUpdater");
+			updaterOpened = testedUpdater && testedUpdater->isVisible();
+			if (updaterOpened) {
+				testedUpdater->activateWindow();
+				if (auto *button = testedUpdater->findChild<QAbstractButton *>())
+					button->setFocus(Qt::OtherFocusReason);
+			}
+		}
+		if (ticks == 18 && testedUpdater)
+			updaterFocused = testedUpdater->isActiveWindow() && QApplication::focusWidget() &&
+					 testedUpdater->isAncestorOf(QApplication::focusWidget());
+		if (ticks == 20 && testedUpdater)
+			testedUpdater->reject();
+		if (ticks == 22)
+			updaterClosed = testedUpdater && !testedUpdater->isVisible();
+	}
 	if (mode == "stats") {
 		if (ticks == 14)
 			if (auto *action = mainWindow->findChild<QAction *>("stats"))
@@ -184,14 +209,15 @@ __attribute__((destructor)) void SaveReport()
 			"\"lateUnregisterCalls\":%d,\"closeRequested\":%s,\"sentinelObserved\":%s,"
 			"\"wizardVisibleAtClose\":%s,\"statsOpened\":%s,\"connectionWizardOpened\":%s,"
 			"\"autoConfigOpened\":%s,\"wizardInputFocused\":%s,\"wizardInputFocusedAtClose\":%s,"
-			"\"wizardCancelRequested\":%s,\"wizardClosedBeforeShutdown\":%s,\"startupAutoConfigObserved\":%s}\n",
+			"\"wizardCancelRequested\":%s,\"wizardClosedBeforeShutdown\":%s,\"startupAutoConfigObserved\":%s,\"updaterOpened\":%s,\"updaterFocused\":%s,\"updaterClosed\":%s}\n",
 			apiInitialized ? "true" : "false", apiDestroyed ? "true" : "false", unregisterCalls,
 			lateUnregisterCalls, closeRequested ? "true" : "false", sentinelObserved ? "true" : "false",
 			wizardVisibleAtClose ? "true" : "false", statsOpened ? "true" : "false",
 			connectionWizardOpened ? "true" : "false", autoConfigOpened ? "true" : "false",
 			wizardInputFocused ? "true" : "false", wizardInputFocusedAtClose ? "true" : "false",
 			wizardCancelRequested ? "true" : "false", wizardClosedBeforeShutdown ? "true" : "false",
-			startupAutoConfigObserved ? "true" : "false");
+			startupAutoConfigObserved ? "true" : "false", updaterOpened ? "true" : "false",
+			updaterFocused ? "true" : "false", updaterClosed ? "true" : "false");
 		std::fclose(file);
 	}
 }

@@ -254,6 +254,12 @@ protected:
 			if (downloading && reply) {
 				reply->abort();
 			}
+			// Release this dialog's focus while its Wayland surface still exists.
+			// Otherwise Qt may disable text input after focus has returned to the parent.
+			if (auto *focused = QApplication::focusWidget();
+			    focused && (focused == this || isAncestorOf(focused))) {
+				focused->clearFocus();
+			}
 			QDialog::reject();
 		}
 	}

@@ -1,6 +1,7 @@
 # Core security and reliability maintenance — 0.6.3
 
-Status: candidate; all Linux package builds passed. Real YouTube consent and
+Status: candidate; all Linux package builds passed before an additional updater
+focus correction. Rebuilt packages, real YouTube consent and
 Facecam movement validation remain pending before publication and installation.
 
 ## Scope
@@ -119,3 +120,17 @@ in-app updater reached GitHub and correctly reported no newer published release
 (the public version is still 0.6.2); a real installation upgrade is still pending.
 All three current English previews were captured from this package, visually
 reviewed, and checked with `python3 scripts/check-publication.py`.
+
+## Additional updater-dialog regression
+
+The real update check exposed a non-null Qt Wayland focus mismatch when closing
+the updater. Releasing focus owned by the dialog before rejecting it removed the
+warning in a native Wayland test of the actual corrected updater implementation.
+The test closed the dialog and main window separately, retained diagnostics,
+and reported zero OBS allocation leaks. Updater HTTP/checksum/size/output tests
+also passed after the correction. The shutdown suite now includes an explicit
+updater focus-and-close scenario; rebuilt-package verification is required.
+
+An earlier update-only test also reached the microphone buffering limit while
+using auto-detected personal audio devices. The isolated update test now disables
+capture channels; that result does not establish live microphone performance.
