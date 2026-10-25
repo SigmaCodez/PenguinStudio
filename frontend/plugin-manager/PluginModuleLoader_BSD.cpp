@@ -39,8 +39,8 @@
 //     * Data: <System Root Path>/share/obs/obs-modules/plugins/<Plugin>
 //
 // * User Root Path: /home/<User>/.config
-//     * Binary: <User Root Path>/obs-studio/plugins/<Plugin>/<Plugin>.so
-//     * Data: <User Root Path>/obs-studio/plugins/<Plugin>/data
+//     * Binary: <User Root Path>/PenguinStudio/plugins/<Plugin>/<Plugin>.so
+//     * Data: <User Root Path>/PenguinStudio/plugins/<Plugin>/data
 //
 // * Legacy User Path: <Environment Variable> + <Environment Data Variable>
 //     * Binary: <Environment Variable>/<Plugin>.so
@@ -51,8 +51,8 @@
 //     * Data: <Legacy System Root Path>/share/obs/obs-plugins/<Plugin>
 //
 // * Legacy User Root Path: /home/<User>/.config
-//     * Binary: <Legacy User Root Path>/obs-studio/plugins/<Plugin>/bin/64bit/<Plugin>.so
-//     * Data: <Legacy User Root Path>/obs-studio/plugins/<Plugin>/data
+//     * Binary: <Legacy User Root Path>/PenguinStudio/plugins/<Plugin>/bin/64bit/<Plugin>.so
+//     * Data: <Legacy User Root Path>/PenguinStudio/plugins/<Plugin>/data
 //
 // * Legacy Fallback Path: <OBS Binary Location>
 //     * Binary: <Legacy Fallback Path>/../../obs-plugins/64bit/<Plugin>.so
@@ -66,11 +66,11 @@ namespace Constants = OBS::Constants;
 
 constexpr std::string_view kModulePathSuffix{"/%module%/"};
 constexpr std::string_view kModuleDataPathSuffix{"/%module%/data/"};
-constexpr std::string_view kConfigBinaryPath{"/obs-studio/plugins/%module%/"};
-constexpr std::string_view kConfigDataPath{"/obs-studio/plugins/%module%/data/"};
+constexpr std::string_view kConfigBinaryPath{"/PenguinStudio/plugins/%module%/"};
+constexpr std::string_view kConfigDataPath{"/PenguinStudio/plugins/%module%/data/"};
 
-constexpr std::string_view kLegacyConfigBinaryPath{"/obs-studio/plugins/%module%/bin/64bit"};
-constexpr std::string_view kLegacyConfigDataPath{"/obs-studio/plugins/%module%/data"};
+constexpr std::string_view kLegacyConfigBinaryPath{"/PenguinStudio/plugins/%module%/bin/64bit"};
+constexpr std::string_view kLegacyConfigDataPath{"/PenguinStudio/plugins/%module%/data"};
 
 constexpr bool hasSystemPluginPath = !Constants::kPlatformPluginModulePath.empty() &&
 				     !Constants::kPlatformPluginDataPath.empty();

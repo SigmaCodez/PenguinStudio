@@ -33,28 +33,28 @@
 //     * Data:                  <Environment Variable>/<Plugin>.plugin/Contents/Resources
 //
 // * Root Path:                 <User>/Library/Application Support
-//     * Binary:                <Root Path>/obs-studio/plugins/<Plugin>.plugin/Contents/MacOS/<Plugin>
-//     * Data:                  <Root Path>/obs-studio/plugins/<Plugin>.plugin/Contents/Resources
+//     * Binary:                <Root Path>/PenguinStudio/plugins/<Plugin>.plugin/Contents/MacOS/<Plugin>
+//     * Data:                  <Root Path>/PenguinStudio/plugins/<Plugin>.plugin/Contents/Resources
 //
 // * Legacy User Path:          <Environment Variable> + <Data Environment Variable>
 //     * Binary:                <Environment Variable>/<Plugin>.plugin/Contents/MacOS/<Plugin>
 //     * Data:                  <Data Environment Variable>/<Plugin>.plugin/Contents/Resources
 //
 // * Legacy System Root Path:   /Library/Application Support
-//     * Legacy binary:         <Legacy System Root Path>/obs-studio/plugins/<Plugin>/bin/<Plugin>.so
-//     * Legacy data:           <Legacy System Root Path>/obs-studio/plugins/<Plugin>/data
+//     * Legacy binary:         <Legacy System Root Path>/PenguinStudio/plugins/<Plugin>/bin/<Plugin>.so
+//     * Legacy data:           <Legacy System Root Path>/PenguinStudio/plugins/<Plugin>/data
 //
 // * Legacy User Root Path:     <User>/Library/Application Support
-//     * Legacy binary:         <Legacy User Root Path>/obs-studio/plugins/<Plugin>/bin/<Plugin>.so
-//     * Legacy data:           <Legacy User Root Path>/obs-studio/plugins/<Plugin>/data
+//     * Legacy binary:         <Legacy User Root Path>/PenguinStudio/plugins/<Plugin>/bin/<Plugin>.so
+//     * Legacy data:           <Legacy User Root Path>/PenguinStudio/plugins/<Plugin>/data
 //
 
 using State = OBS::PluginManager::State;
 using ModuleType = obs_runtime_module_type;
 
-constexpr std::string_view kPluginPathSuffix {"obs-studio/plugins/%module%.plugin"};
+constexpr std::string_view kPluginPathSuffix {"PenguinStudio/plugins/%module%.plugin"};
 constexpr std::string_view kUserPluginPathSuffix {"/%module%.plugin"};
-constexpr std::string_view kLegacyPluginPathSuffix {"obs-studio/plugins/%module%"};
+constexpr std::string_view kLegacyPluginPathSuffix {"PenguinStudio/plugins/%module%"};
 
 #ifdef __aarch64__
 constexpr bool kIsAppleSilicon = true;

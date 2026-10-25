@@ -39,8 +39,8 @@
 //     * Data: <Environment Variable>/<Plugin>/data
 //
 // * Root Path: C:/ProgramData
-//     * Binary: <Root Path>/obs-studio/plugins/<Plugin>/<Plugin>.dll
-//     * Data: <Root Path>/obs-studio/plugins/<Plugin>/data
+//     * Binary: <Root Path>/PenguinStudio/plugins/<Plugin>/<Plugin>.dll
+//     * Data: <Root Path>/PenguinStudio/plugins/<Plugin>/data
 //
 // * Portable Root Path: <OBS Binary Location>
 //     * Binary: <Portable Root Path>/../../plugins/<Plugin>/<Plugin>.dll
@@ -59,14 +59,14 @@
 //     * Data: <Legacy Root Path>/../../data/obs-plugins/<Plugin>
 //
 // * Legacy System Path: C:/ProgramData
-//     * Binary: <Legacy System Path>/obs-studio/plugins/<Plugin>/bin/<Plugin>.dll
-//     * Data: <Legacy System Path>/obs-studio/plugins/<Plugin>/data
+//     * Binary: <Legacy System Path>/PenguinStudio/plugins/<Plugin>/bin/<Plugin>.dll
+//     * Data: <Legacy System Path>/PenguinStudio/plugins/<Plugin>/data
 //
 
 using State = OBS::PluginManager::State;
 using ModuleType = obs_runtime_module_type;
 
-constexpr std::string_view kPluginPathSuffix{"obs-studio/plugins/%module%"};
+constexpr std::string_view kPluginPathSuffix{"PenguinStudio/plugins/%module%"};
 constexpr std::string_view kUserPluginPathSuffix{"/%module%"};
 constexpr std::string_view kPortablePluginPath{"../../plugins/%module%"};
 

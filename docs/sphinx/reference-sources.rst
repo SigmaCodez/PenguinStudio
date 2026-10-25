@@ -224,7 +224,7 @@ Source Definition Structure (obs_source_info)
             obs_properties_t *(*obs_source_info.get_properties2)(void *data, void *type_data)
 
    Gets the property information of this source.
-   
+
    :param  data:  The implementation data associated with this source.
                   This value can be null (e.g., when
                   :c:func:`obs_get_source_properties()` is called on the
@@ -1225,7 +1225,7 @@ General Source Functions
 
 .. function:: void obs_source_set_monitoring_enabled(obs_source_t *source, bool enable)
               bool obs_source_get_monitoring_enabled(const obs_source_t *source)
-              
+
 
    Sets/gets the audio monitoring enabled state for the source.
 

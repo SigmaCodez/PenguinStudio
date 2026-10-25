@@ -15,3 +15,5 @@ Upstream baseline changes from `ba2f32bdf791005443988a4955e963663e16b1ed` (32.2.
 ## Preliminary checks
 
 Branding (77 locales), Penguin locale completeness, release-set selection, nine version-configuration cases and nested task queue regression checks passed. The local ALSA test could not compile because the host lacks SIMDe development headers; it must run in the configured build environment. Complete builds, runtime regression, real current English previews, package verification and publication remain pending. No claim of zero errors or performance improvement is made.
+
+The new third-party plugin loader uses PenguinStudio user directories, preserving application isolation instead of scanning OBS user plugins implicitly. Shared system ABI paths retain their OBS names.

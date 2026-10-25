@@ -1805,7 +1805,7 @@ VolumeMeter {
     color: var(--grey3);
     font-size: 6pt;
     font-weight: bold;
-    
+
     qproperty-backgroundNominalColor: var(--green5);
     qproperty-backgroundWarningColor: var(--yellow5);
     qproperty-backgroundErrorColor: var(--red5);
@@ -2811,7 +2811,7 @@ idian--Row idian--InlineButton {
     border-radius: var(--border_radius);
     padding: var(--padding_base);
     margin: 0 var(--spacing_base);
-    
+
     border: var(--highlight_width) solid transparent;
 }
 
@@ -2863,7 +2863,7 @@ AlignmentSelector:checked:hover {
 
 AlignmentSelector::indicator {
     margin: 0px;
-    background: transparent;    
+    background: transparent;
 }
 
 AlignmentSelector::indicator:checked {

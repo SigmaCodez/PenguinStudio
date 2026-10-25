@@ -39,22 +39,22 @@
 //     * Data: <Legacy Flatpak Root Path>/share/obs/obs-plugins/<Plugin>
 //
 // * XDG Data Home Path:
-//     * Binary: <XDG Data Home Path>/obs-studio/plugins/<Plugin>/<Plugin>.so
-//     * Data: <XDG Data Home Path>/obs-studio/plugins/<Plugin>/data
+//     * Binary: <XDG Data Home Path>/PenguinStudio/plugins/<Plugin>/<Plugin>.so
+//     * Data: <XDG Data Home Path>/PenguinStudio/plugins/<Plugin>/data
 //
 // * XDG Config Home Path:
-//     * Binary: <Legacy User Root Path>/obs-studio/plugins/<Plugin>/bin/64bit/<Plugin>.so
-//     * Data: <Legacy User Root Path>/obs-studio/plugins/<Plugin>/data
+//     * Binary: <Legacy User Root Path>/PenguinStudio/plugins/<Plugin>/bin/64bit/<Plugin>.so
+//     * Data: <Legacy User Root Path>/PenguinStudio/plugins/<Plugin>/data
 
 using State = OBS::PluginManager::State;
 using ModuleType = obs_runtime_module_type;
 
 namespace Constants = OBS::Constants;
 
-constexpr std::string_view kConfigBinaryPath{"/obs-studio/plugins/%module%/"};
-constexpr std::string_view kConfigDataPath{"/obs-studio/plugins/%module%/data/"};
-constexpr std::string_view kLegacyConfigBinaryPath{"/obs-studio/plugins/%module%/bin/64bit"};
-constexpr std::string_view kLegacyConfigDataPath{"/obs-studio/plugins/%module%/data"};
+constexpr std::string_view kConfigBinaryPath{"/PenguinStudio/plugins/%module%/"};
+constexpr std::string_view kConfigDataPath{"/PenguinStudio/plugins/%module%/data/"};
+constexpr std::string_view kLegacyConfigBinaryPath{"/PenguinStudio/plugins/%module%/bin/64bit"};
+constexpr std::string_view kLegacyConfigDataPath{"/PenguinStudio/plugins/%module%/data"};
 constexpr std::string_view kFlatpakBasePath{"/app/plugins/"};
 
 namespace {

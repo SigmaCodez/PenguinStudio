@@ -39,8 +39,8 @@
 //     * Data: <System Root Path>/share/obs/obs-modules/plugins/<Plugin>
 //
 // * User Root Path: $XDG_DATA_HOME
-//     * Binary: <User Root Path>/obs-studio/plugins/<Plugin>/<Plugin>.so
-//     * Data: <User Root Path>/obs-studio/plugins/<Plugin>/data
+//     * Binary: <User Root Path>/PenguinStudio/plugins/<Plugin>/<Plugin>.so
+//     * Data: <User Root Path>/PenguinStudio/plugins/<Plugin>/data
 //
 // * Legacy User Path: <Environment Variable> + <Environment Data Variable>
 //     * Binary: <Environment Variable>/<Plugin>.so
@@ -51,8 +51,8 @@
 //     * Data: <Legacy System Root Path>/share/obs/obs-plugins/<Plugin>
 //
 // * Legacy User Root Path: $XDG_CONFIG_HOME
-//     * Binary: <Legacy User Root Path>/obs-studio/plugins/<Plugin>/bin/64bit/<Plugin>.so
-//     * Data: <Legacy User Root Path>/obs-studio/plugins/<Plugin>/data
+//     * Binary: <Legacy User Root Path>/PenguinStudio/plugins/<Plugin>/bin/64bit/<Plugin>.so
+//     * Data: <Legacy User Root Path>/PenguinStudio/plugins/<Plugin>/data
 //
 // * Legacy Fallback Path: <OBS Binary Location>
 //     * Binary: <Legacy Fallback Path>/../../obs-plugins/64bit/<Plugin>.so
@@ -65,11 +65,11 @@ namespace Constants = OBS::Constants;
 
 constexpr std::string_view kModulePathSuffix{"/%module%/"};
 constexpr std::string_view kModuleDataPathSuffix{"/%module%/data/"};
-constexpr std::string_view kXdgBinaryPath{"/obs-studio/plugins/%module%/"};
-constexpr std::string_view kXdgDataPath{"/obs-studio/plugins/%module%/data/"};
+constexpr std::string_view kXdgBinaryPath{"/PenguinStudio/plugins/%module%/"};
+constexpr std::string_view kXdgDataPath{"/PenguinStudio/plugins/%module%/data/"};
 
-constexpr std::string_view kLegacyXdgBinaryPath{"/obs-studio/plugins/%module%/bin/64bit"};
-constexpr std::string_view kLegacyXdgDataPath{"/obs-studio/plugins/%module%/data"};
+constexpr std::string_view kLegacyXdgBinaryPath{"/PenguinStudio/plugins/%module%/bin/64bit"};
+constexpr std::string_view kLegacyXdgDataPath{"/PenguinStudio/plugins/%module%/data"};
 
 constexpr bool hasSystemPluginPath = !Constants::kPlatformPluginModulePath.empty() &&
 				     !Constants::kPlatformPluginDataPath.empty();
