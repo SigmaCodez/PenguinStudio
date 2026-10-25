@@ -235,11 +235,17 @@ PenguinInspector::PenguinInspector(OBSBasic *mainWindow, QWidget *parent)
 	cameraCard = Card(content, contents, QTStr("Penguin.Camera.Title"));
 	auto *cameraLayout = static_cast<QVBoxLayout *>(cameraCard->layout());
 	auto addChoice = [&](const char *key, const char *name, const std::initializer_list<const char *> &choices) {
-		cameraLayout->addWidget(Label(QTStr(key), cameraCard, "inspectorFieldLabel"));
+		auto *label = Label(QTStr(key), cameraCard, "inspectorFieldLabel");
+		cameraLayout->addWidget(label);
 		auto *box = new QComboBox(cameraCard);
+		label->setBuddy(box);
 		box->setObjectName(QString::fromUtf8(name));
 		box->setAccessibleName(QTStr(key));
 		box->setMinimumHeight(32);
+		// Long translated options belong in the popup, not in the dock's minimum width.
+		box->setSizeAdjustPolicy(QComboBox::AdjustToMinimumContentsLengthWithIcon);
+		box->setMinimumContentsLength(12);
+		box->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 		for (const auto *choice : choices) {
 			box->addItem(QTStr(choice));
 		}
@@ -536,7 +542,12 @@ void PenguinInspector::RefreshSelection()
 	if (changed || !Editing(cameraProcessing)) {
 		cameraProcessing->setCurrentIndex(device == "cpu" ? 2 : device == "gpu" ? 1 : 0);
 	}
-	cameraProcessing->setVisible(cameraBackground->currentIndex() == 1 || cameraBackground->currentIndex() >= 4);
+	const bool automaticBackground = cameraBackground->currentIndex() == 1 || cameraBackground->currentIndex() >= 4;
+	cameraProcessing->setVisible(automaticBackground);
+	for (auto *label : cameraCard->findChildren<QLabel *>()) {
+		if (label->buddy() == cameraProcessing)
+			label->setVisible(automaticBackground);
+	}
 	auto *cameraHands = findChild<QCheckBox *>("cameraPreserveHands");
 	cameraHands->setChecked(obs_data_get_bool(cameraSettings, "preserve_hands"));
 	cameraHands->setVisible(cameraBackground->currentIndex() == 1 || cameraBackground->currentIndex() >= 4);

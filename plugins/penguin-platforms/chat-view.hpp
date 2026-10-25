@@ -87,9 +87,11 @@ inline void Style(QWidget *widget, QListWidget *history)
 	history->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	history->setContextMenuPolicy(Qt::CustomContextMenu);
 	history->setAccessibleName("Chat messages — select a message for moderation");
-	widget->setStyleSheet("QListWidget#penguinChatHistory { border: 0; border-radius: 10px; padding: 6px; }"
-			      "QListWidget#penguinChatHistory::item { padding: 10px; border-radius: 6px; }"
-			      "QLineEdit { padding: 8px; border-radius: 6px; } QPushButton { min-height: 28px; }");
+	widget->setProperty("penguinChatPanel", true);
+	if (auto *layout = widget->layout()) {
+		layout->setContentsMargins(12, 12, 12, 12);
+		layout->setSpacing(8);
+	}
 }
 inline void Participants(QWidget *parent, const QString &title, const QString &explanation, const QStringList &names)
 {

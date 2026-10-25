@@ -2,9 +2,9 @@
 
 Penguin Studio organizes the native Qt application around a large canvas, searchable layers and scenes, audio channel strips, and an integrated production sidebar.
 
-![Penguin Studio 0.7.0 workspace in English](images/current/workspace-en.png)
+![Penguin Studio 0.7.1 workspace in English](images/current/workspace-en.png)
 
-Captured from the 0.7.0 Linux release package with local demo media.
+These English previews were captured from the validated 0.7.1 Ubuntu package using an isolated demo profile and synthetic media.
 
 ## Compose and inspect
 

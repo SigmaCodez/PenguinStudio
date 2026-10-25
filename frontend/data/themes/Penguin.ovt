@@ -38,8 +38,8 @@
     --padding_menu: 10px;
     --padding_menubar: 7px;
     --padding_wide: 12px;
-    --spacing_input: 3px;
-    --input_height_base: max(30, calc(var(--font_base_value) * 3));
+    --spacing_input: 0px;
+    --input_height_base: max(32, calc(var(--font_base_value) * 3));
     --input_padding: 5px;
     --input_text_padding: 8px;
     --input_bg: #111214;
@@ -170,15 +170,15 @@ QStatusBar::item {
 }
 #penguinToolbarButton, #penguinDestinationsButton, #penguinRecordButton,
 #penguinClipButton, #penguinLiveButton, #penguinWorkspaceTab {
-    min-height: 20px;
-    padding: 6px 12px;
+    min-height: var(--input_height);
+    padding: var(--input_padding) 12px;
     margin: 0px;
     border: 1px solid #3B3C42;
     border-radius: 6px;
     background: #18191C;
     color: #EDEDF0;
     font-weight: bold;
-    icon-size: 17px;
+    icon-size: 18px;
 }
 #penguinToolbarButton:hover, #penguinDestinationsButton:hover,
 #penguinRecordButton:hover, #penguinClipButton:hover, #penguinWorkspaceTab:hover {
@@ -221,9 +221,37 @@ QStatusBar::item {
     color: #696A72;
     border-color: #303137;
 }
+/* Reserve the split-menu area in the box model, not over the label. */
+#penguinLiveButton, #penguinRecordButton {
+    padding-right: 34px;
+}
 #penguinLiveButton::menu-button, #penguinRecordButton::menu-button {
-    width: 15px;
+    subcontrol-origin: padding;
+    subcontrol-position: center right;
+    width: 22px;
+    border: none;
     border-left: 1px solid #515258;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+#penguinLiveButton::menu-arrow, #penguinRecordButton::menu-arrow {
+    image: url(theme:Dark/collapse.svg);
+    width: 10px;
+    height: 10px;
+}
+#penguinToolbarButton::menu-indicator, #penguinPanelAction::menu-indicator {
+    image: none;
+}
+#penguinBrand {
+    padding-right: 20px;
+}
+#penguinBrand::menu-indicator {
+    subcontrol-origin: padding;
+    subcontrol-position: center right;
+    right: 6px;
+    width: 10px;
+    height: 10px;
+    image: url(theme:Dark/collapse.svg);
 }
 
 /* Flat panel boundaries and clear, compact section headings. */
@@ -353,7 +381,7 @@ SourceTreeItem {
 SourceTreeItem QLabel {
     color: #D6D6DE;
 }
-SourceTree::item:selected, QTreeView::item:selected, QTableView::item:selected {
+SourceTree::item:selected, QListView::item:selected, QTreeView::item:selected, QTableView::item:selected {
     background: #302B41;
     color: #F6F3FF;
 }
@@ -392,8 +420,27 @@ QComboBox::drop-down {
     border-left: 1px solid #34353C;
 }
 QPushButton {
+    min-height: var(--input_height);
+    /* Yami caps the content height; allow translated / larger labels to grow. */
+    max-height: 16777215px;
+    margin: 0px;
+    padding: var(--input_padding) 12px;
+    text-align: center;
     font-weight: normal;
-    border-radius: 5px;
+    border-radius: 6px;
+}
+QSpinBox, QDoubleSpinBox {
+    max-height: 16777215px;
+}
+QCheckBox, QRadioButton {
+    spacing: 8px;
+    padding: 3px 0px;
+}
+QDialogButtonBox QPushButton {
+    min-width: 72px;
+}
+QLabel[penguinHint="true"], #penguinInspectorEmpty {
+    padding: 0px;
 }
 QPushButton:default {
     background: #795CFF;
@@ -434,13 +481,20 @@ QTabWidget::pane {
     border-radius: 5px;
     background: #18191C;
 }
+QTabBar {
+    font-size: var(--font_base);
+}
+QTabBar::tab:top, QTabBar::tab:bottom {
+    border-radius: 0px;
+}
 QTabBar::tab {
     background: #18191C;
     color: #A1A1AA;
     border: none;
     border-bottom: 2px solid transparent;
     border-radius: 0px;
-    padding: 10px 14px;
+    padding: 8px 14px;
+    min-height: 18px;
     margin: 0px;
 }
 QTabBar::tab:hover {
@@ -450,7 +504,13 @@ QTabBar::tab:hover {
 QTabBar::tab:selected {
     color: #F6F3FF;
     background: #202125;
-    border-bottom-color: #9278FF;
+    border: none;
+    border-bottom: 2px solid #9278FF;
+}
+QTabBar::tab:focus {
+    background: #302B41;
+    border: none;
+    border-bottom: 2px solid #AC98FF;
 }
 
 /* Settings use the same navigation rail as the production workspace. */
@@ -564,15 +624,15 @@ QWizard QFrame {
     font-size: var(--font_small);
 }
 #inspectorAction, QPushButton.inspector-action, QPushButton.inspector-arrange {
-    min-height: 20px;
+    min-height: var(--input_height);
     background: #25262B;
     border: 1px solid #3B3C42;
     color: #E1E1E7;
-    padding: 6px 8px;
-    border-radius: 5px;
+    padding: var(--input_padding) 10px;
+    border-radius: 6px;
 }
 QPushButton.inspector-arrange {
-    padding: 6px;
+    padding: var(--input_padding);
     icon-size: 18px;
 }
 #inspectorAction:hover, QPushButton.inspector-action:hover, QPushButton.inspector-arrange:hover {
@@ -585,7 +645,7 @@ QPushButton.inspector-action:disabled, QPushButton.inspector-arrange:disabled {
     background: #202125;
 }
 #inspectorVisible, #inspectorLocked {
-    min-height: 20px;
+    min-height: var(--input_height);
     background: #18191C;
     color: #A1A1AA;
     border: 1px solid #3B3C42;
@@ -765,7 +825,7 @@ QPushButton[penguinPrimary="true"] {
     color: #FFFFFF;
     border: 1px solid #9278FF;
     border-radius: 6px;
-    padding: 7px 10px;
+    padding: var(--input_padding) 12px;
     font-weight: bold;
 }
 QPushButton[penguinPrimary="true"]:hover {
@@ -797,8 +857,9 @@ VolumeControl[penguinChannelStrip="true"] {
     margin: 4px 3px;
 }
 #penguinDetailsButton, #penguinSettingsButton, #penguinInspectorButton {
-    min-height: 20px;
-    padding: 6px;
+    min-height: var(--input_height);
+    min-width: var(--input_height);
+    padding: var(--input_padding);
     margin: 0px;
     background: transparent;
     color: #A1A1AA;
@@ -826,4 +887,26 @@ VolumeControl[penguinChannelStrip="true"] {
     border: 1px solid #3B3C42;
     border-radius: 6px;
     padding: 8px 10px;
+}
+
+/* Icon-only production actions use the same square hit area. */
+#penguinToolbarButton[toolButtonStyle="0"],
+#penguinDestinationsButton[toolButtonStyle="0"] {
+    min-width: var(--input_height);
+    padding: var(--input_padding);
+}
+
+/* Chat shares the application control metrics instead of local overrides. */
+QWidget[penguinChatPanel="true"] {
+    background: #18191C;
+}
+QListWidget#penguinChatHistory {
+    background: #111214;
+    border: 1px solid #303137;
+    border-radius: 6px;
+    padding: 6px;
+}
+QListWidget#penguinChatHistory::item {
+    padding: 0px;
+    border: none;
 }

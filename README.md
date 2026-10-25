@@ -2,13 +2,22 @@
 
 # Penguin Studio
 
+<p>
+  <a href="https://github.com/SigmaCodez/PenguinStudio/releases"><img src="https://img.shields.io/github/v/release/SigmaCodez/PenguinStudio?include_prereleases&amp;filter=penguin-v*&amp;sort=date&amp;label=release" alt="Latest Penguin Studio release"></a>
+  <a href="https://github.com/SigmaCodez/PenguinStudio/actions/workflows/penguin-linux.yml"><img src="https://img.shields.io/github/actions/workflow/status/SigmaCodez/PenguinStudio/penguin-linux.yml?branch=main&amp;label=Tests%20and%20Linux%20packages&amp;logo=github" alt="Tests and Linux packages status on main"></a>
+  <a href="docs/ARCHITECTURE.md"><img src="https://img.shields.io/static/v1?label=core&amp;message=C%2FC%2B%2B&amp;color=blue" alt="Core: C/C++"></a>
+  <a href="docs/WORKSPACE.md"><img src="https://img.shields.io/static/v1?label=UI&amp;message=Qt%20Widgets&amp;color=41CD52&amp;logo=qt&amp;logoColor=white" alt="UI: Qt Widgets"></a>
+  <a href="docs/PACKAGING.md"><img src="https://img.shields.io/static/v1?label=platform&amp;message=Linux&amp;color=0078D6" alt="Platform: Linux"></a>
+  <a href="COPYING"><img src="https://img.shields.io/static/v1?label=license&amp;message=GPL-2.0-or-later&amp;color=blue" alt="License: GPL-2.0-or-later"></a>
+</p>
+
 **Your studio, every screen.** An independent Linux broadcasting application by SigmaCodez, built on OBS Studio.
 
 Penguin Studio brings a redesigned production workspace, native multi-destination output controls, portrait output and platform connections to the OBS production engine. See the [architecture documentation](docs/ARCHITECTURE.md) for the engine baseline and technical details.
 
 ![Penguin Studio modern workspace with searchable layers and scenes, audio channel strips and an integrated inspector](docs/images/current/workspace-en.png)
 
-The previews show the real Penguin Studio 0.7.0 interface with an isolated English demo profile and synthetic media. See the [workspace guide](docs/WORKSPACE.md) for the controls and layout.
+These English previews show the real 0.7.1 interface with synthetic demo media. See the [workspace guide](docs/WORKSPACE.md) for the controls and layout.
 
 > Development preview. See [verification status](docs/VERIFICATION.md) for completed checks and remaining release tests, and [packaging](docs/PACKAGING.md) for development downloads and supported build targets. Validate your devices and streaming accounts before relying on this build for a live show.
 
@@ -27,7 +36,7 @@ The previews show the real Penguin Studio 0.7.0 interface with an isolated Engli
 
 ## Get started
 
-**Current release: [Penguin Studio 0.7.0](https://github.com/SigmaCodez/PenguinStudio/releases/tag/penguin-v0.7.0)** — updated to the OBS 33.0.0 engine, with the Penguin workspace, camera GPU processing, native Twitch/YouTube docks and Penguin-only window title retained.
+**Current release: [Penguin Studio 0.7.1](https://github.com/SigmaCodez/PenguinStudio/releases/tag/penguin-v0.7.1)** — a consistent interface across the workspace, Inspector, dialogs and chat, with clearer split-button menus, balanced control spacing and improved large-text layouts, on the OBS 33.0.0 engine.
 
 Camera processing offers **Automatic**, **GPU** and **CPU**, with automatic CPU fallback. The optional Ubuntu 26.04 AMD runtime add-on enables primary GPU matting on the tested RX 9070 XT; hand preservation stays on CPU. Other package/hardware combinations retain CPU processing unless a compatible runtime is provided. See [camera GPU setup](docs/PACKAGING.md#optional-amd-camera-gpu-runtime).
 
