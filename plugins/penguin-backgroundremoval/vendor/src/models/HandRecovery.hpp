@@ -12,6 +12,7 @@
 #include <obs-module.h>
 #include <onnxruntime_cxx_api.h>
 #include <opencv2/imgproc.hpp>
+#include "HandRecoveryMask.hpp"
 
 class HandRecovery {
 	Ort::Env env{ORT_LOGGING_LEVEL_ERROR, "Penguin hand recovery"};
@@ -81,5 +82,5 @@ public:
 		cv::resize(small, mask, cv::Size(rgb.cols, rgb.rows));
 	}
 
-	void merge(cv::Mat &alpha) { cv::max(alpha, mask, alpha); }
+	void merge(cv::Mat &alpha) { MergeSupportedHandRecovery(alpha, mask); }
 };

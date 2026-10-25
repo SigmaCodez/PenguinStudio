@@ -48,3 +48,12 @@ redistributions. Personal camera recordings and test images are not distributed.
 The MediaPipe Selfie Multiclass model from the same upstream distribution is Apache-2.0 licensed; its adjacent notice retains the Google, Katsuya Hyodo, Roy Shilkrot and Kaito Udagawa credits. Its reviewed SHA-256 is `317054e916e36f47457a85afa3ef6a6cc8f5d35f3cb22e5358fd1a3e6cfb8eed`.
 
 Penguin's optional adapter applies stable softmax to the model logits and supplements the RVM alpha with its body-skin class. Both models process the same frame concurrently, and compositing waits for both results. Each session uses at most three intra-op threads, with busy-wait spinning disabled. The option is off by default; independent filters and existing scenes remain unchanged unless explicitly enabled. Model failures remain visible errors through the existing camera status path.
+
+### Supported recovery components (0.6.3)
+
+Penguin's adapter limits additional skin recovery to connected components with
+primary person-mask support. This reduces isolated background objects mistakenly
+classified as skin. The original RVM mask is never reduced. Completely missed
+hands without primary-mask support may still require better lighting or another
+capture angle; this is not a guarantee of perfect segmentation. The regression
+check is `test/penguin-hand-recovery.cpp`.

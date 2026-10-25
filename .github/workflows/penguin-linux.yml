@@ -80,6 +80,11 @@ jobs:
           sudo apt-get install -y --no-install-recommends libavcodec-dev libavutil-dev
           cc -std=c11 -Wall -Wextra -Werror -I. test/penguin-audio-drain.c $(pkg-config --cflags --libs libavcodec libavutil) -o /tmp/penguin-audio-drain
           /tmp/penguin-audio-drain
+      - name: Check supported hand recovery
+        run: |
+          sudo apt-get install -y --no-install-recommends libopencv-core-dev libopencv-imgproc-dev
+          c++ -std=c++17 -Wall -Wextra -Werror -I/usr/include/opencv4 test/penguin-hand-recovery.cpp -lopencv_imgproc -lopencv_core -o /tmp/penguin-hand-recovery
+          /tmp/penguin-hand-recovery
       - name: Compile and run configuration isolation checks
         run: |
           c++ -std=c++17 -Wall -Wextra -Werror -I. test/penguin-config-paths.cpp -o /tmp/penguin-config-paths-test

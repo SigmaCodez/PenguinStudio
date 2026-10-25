@@ -134,3 +134,23 @@ updater focus-and-close scenario; rebuilt-package verification is required.
 An earlier update-only test also reached the microphone buffering limit while
 using auto-detected personal audio devices. The isolated update test now disables
 capture channels; that result does not establish live microphone performance.
+
+## Real-account and Facecam follow-up
+
+Real Google consent succeeded after reopening the expired test session. The
+Wayland client loaded 15 YouTube categories, including Gaming. After normal
+shutdown and restart, both YouTube and Twitch reconnected without renewed
+consent, and Twitch category search succeeded. No messages were sent or stream
+metadata changed. The browser connection-refused page was an expired local test
+listener, not a rejected Google application.
+
+A 50-second Elgato Facecam recording exercised image replacement, blur, removal
+and rounded corners. It emitted 1,501 frames, decoded fully, and reported no
+rendering-lag or encoding-skip counters, shutdown errors or OBS allocation leaks.
+The user nevertheless reported visible background remnants in image mode.
+A private same-input comparison isolated false skin detections from the optional
+hand-recovery model. A candidate support check rejects isolated skin components
+without sufficient primary person-mask support while never reducing that primary
+mask. Synthetic regression tests pass. A real-program replay with the corrected
+filter decoded fully; live acceptance and final packaged verification remain open.
+Private camera recordings and account data are excluded from public artifacts.
