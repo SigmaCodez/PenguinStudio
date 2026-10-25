@@ -1,5 +1,5 @@
 /******************************************************************************
-    Copyright (C) 2023 by Dennis Sädtler <dennis@obsproject.com>
+    Copyright (C) 2026 by Warchamp7 <warchamp7@obsproject.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -15,43 +15,14 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
-#pragma once
+#include "InfoChip.hpp"
 
-#include <Idian/Utils.hpp>
+InfoChip::InfoChip(QWidget *parent) : QLabel(parent)
+{
+	setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+}
 
-#include <QFrame>
-#include <QLayout>
-#include <QWidget>
-
-namespace idian {
-class GenericRow;
-
-class PropertiesList : public QFrame {
-	Q_OBJECT
-
-public:
-	PropertiesList(QWidget *parent = nullptr);
-
-	void addRow(GenericRow *row);
-	void clear();
-
-	QList<GenericRow *> rows() const { return rowsList; }
-
-private:
-	GenericRow *first = nullptr;
-	GenericRow *last = nullptr;
-
-	QVBoxLayout *layout;
-	QList<GenericRow *> rowsList;
-};
-
-// Spacer with only cosmetic functionality
-class PropertiesListSpacer : public QFrame {
-	Q_OBJECT
-public:
-	PropertiesListSpacer(QWidget *parent = nullptr) : QFrame(parent)
-	{
-		setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-	}
-};
-} // namespace idian
+InfoChip::InfoChip(const QString &text, QWidget *parent) : InfoChip(parent)
+{
+	setText(text);
+}

@@ -1,5 +1,5 @@
 /******************************************************************************
-    Copyright (C) 2023 by Dennis Sädtler <dennis@obsproject.com>
+    Copyright (C) 2026 by FiniteSingularity <finitesingularityttv@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,26 +17,14 @@
 
 #pragma once
 
-#include <QFrame>
-#include <QLayout>
-#include <QPushButton>
-#include <QSpinBox>
+#include <string_view>
 
-namespace idian {
-
-class SpinBox : public QFrame {
-	Q_OBJECT;
-
-public:
-	SpinBox(QWidget *parent = nullptr);
-
-	QSpinBox *spinBox() const { return sbox; }
-
-private:
-	QHBoxLayout *layout;
-	QPushButton *decr;
-	QPushButton *incr;
-	QSpinBox *sbox;
-};
-
-} // namespace idian
+namespace OBS::Constants {
+inline constexpr std::string_view kPlatformInstallPath{"@OBS_PLATFORM_INSTALL_PATH@"};
+inline constexpr std::string_view kPlatformLibraryPath{"@OBS_PLATFORM_LIBRARY_PATH@"};
+inline constexpr std::string_view kPlatformDataPath{"@OBS_PLATFORM_DATA_PATH@"};
+inline constexpr std::string_view kPlatformPluginModulePath{"@OBS_PLATFORM_PLUGIN_MODULE_PATH@"};
+inline constexpr std::string_view kPlatformPluginDataPath{"@OBS_PLATFORM_PLUGIN_DATA_PATH@"};
+inline constexpr std::string_view kXDGConfigHomeVariable{"XDG_CONFIG_HOME"};
+inline constexpr std::string_view kXDGDataHomeVariable{"XDG_DATA_HOME"};
+} // namespace OBS::Constants

@@ -7,7 +7,7 @@ Penguin implementation, the inherited OBS source, author attribution, license
 notices and pinned submodules. It changes the repository's history, not the
 origin or licensing of the source.
 
-The upstream baseline is OBS Studio 32.2.2, commit
+The original upstream baseline was OBS Studio 32.2.2, commit
 [`ba2f32bdf791005443988a4955e963663e16b1ed`](https://github.com/obsproject/obs-studio/commit/ba2f32bdf791005443988a4955e963663e16b1ed).
 Keep [AUTHORS](../AUTHORS), [COPYING](../COPYING), the original
 [OBS README](../README.rst), source copyright headers and third-party notices
@@ -64,3 +64,7 @@ to verify the nine isolated cases covering tagless checkouts, OBS and Penguin
 tags, explicit overrides, prereleases and source archives. All nine passed
 when preparing this snapshot; this is a version-configuration check, not a
 new full application or package test.
+
+## OBS 33 integration
+
+The 0.7.0 candidate imports OBS Studio 33.0.0 (`72e86655715d9a25d69ce446aa4dd44ba58e10d2`) without adding OBS Git ancestry to the public branch. See [integration evidence](validation/obs33-integration.md) for compatibility changes and pending tests.

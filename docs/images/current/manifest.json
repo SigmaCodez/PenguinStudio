@@ -19,5 +19,7 @@
       "file": "stream-details-en.png",
       "sha256": "704cbcd0ab2bc6f4ecd5ea0985a4da695911d07ed6350c0df44b50c04f410403"
     }
-  ]
+  ],
+  "pending_version": "0.7.0",
+  "pending_reason": "OBS 33 integration: replace with verified English captures of the finished 0.7.0 candidate before publication."
 }

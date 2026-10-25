@@ -31,14 +31,14 @@ def main():
         raise RuntimeError("Cannot locate the production bootstrap version default.")
 
     cases = [
-        ("tagless-root", None, None, "32.2.2", "32.2.2", 0, 0),
-        ("obs-release-tag", "32.2.2", None, "32.2.2", "32.2.2", 0, 0),
-        ("penguin-release-tag", "penguin-v0.2.0", None, "32.2.2", "32.2.2", 0, 0),
+        ("tagless-root", None, None, "33.0.0", "33.0.0", 0, 0),
+        ("obs-release-tag", "33.0.0", None, "33.0.0", "33.0.0", 0, 0),
+        ("penguin-release-tag", "penguin-v0.2.0", None, "33.0.0", "33.0.0", 0, 0),
         ("explicit-override", None, "33.1.4", "33.1.4", "33.1.4", 0, 0),
-        ("override-wins-over-tag", "32.2.2", "33.1.4-rc2", "33.1.4-rc2", "33.1.4", 2, 0),
-        ("obs-release-candidate", "32.2.2-rc3", None, "32.2.2-rc3", "32.2.2", 3, 0),
-        ("obs-beta", "32.2.2-beta2", None, "32.2.2-beta2", "32.2.2", 0, 2),
-        ("source-archive", None, None, "32.2.2", "32.2.2", 0, 0),
+        ("override-wins-over-tag", "33.0.0", "33.1.4-rc2", "33.1.4-rc2", "33.1.4", 2, 0),
+        ("obs-release-candidate", "33.0.0-rc3", None, "33.0.0-rc3", "33.0.0", 3, 0),
+        ("obs-beta", "33.0.0-beta2", None, "33.0.0-beta2", "33.0.0", 0, 2),
+        ("source-archive", None, None, "33.0.0", "33.0.0", 0, 0),
     ]
 
     with tempfile.TemporaryDirectory(prefix="penguin-version-test-") as temporary:

@@ -50,9 +50,7 @@
 #include <nlohmann/json.hpp>
 #include <QDesktopServices>
 
-#ifdef _WIN32
 #include <sstream>
-#endif
 
 extern bool restart;
 extern bool restart_safe;
@@ -491,7 +489,7 @@ void OBSBasic::on_actionAlwaysOnTop_triggered()
 	CloseDialogs();
 #endif
 
-	QMetaObject::invokeMethod(this, "ToggleAlwaysOnTop", Qt::QueuedConnection);
+	QMetaObject::invokeMethod(this, &OBSBasic::ToggleAlwaysOnTop, Qt::QueuedConnection);
 }
 
 void OBSBasic::ToggleAlwaysOnTop()
@@ -669,10 +667,11 @@ void OBSBasic::on_stats_triggered()
 void OBSBasic::on_idianPlayground_triggered()
 {
 #ifdef ENABLE_IDIAN_PLAYGROUND
-	OBSIdianPlayground playground(this);
-	playground.setModal(true);
-	playground.show();
-	playground.exec();
+	if (!playground) {
+		playground = new OBSIdianPlayground(this);
+		playground->setAttribute(Qt::WA_DeleteOnClose);
+		playground->show();
+	}
 #endif
 }
 

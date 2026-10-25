@@ -49,7 +49,7 @@ set(OBS_LEGAL_COPYRIGHT "(C) Lain Bailey")
 set(OBS_CMAKE_VERSION 3.0.0)
 
 # Configure default version strings
-set(_obs_default_version "32" "2" "2")
+set(_obs_default_version "33" "0" "0")
 set(_obs_release_candidate 0)
 set(_obs_beta 0)
 

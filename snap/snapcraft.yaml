@@ -6,7 +6,7 @@ summary: A Linux streaming studio with horizontal and vertical outputs
 description: |
   Penguin Studio is an independent application by SigmaCodez based on OBS Studio.
   Record, compose scenes, and stream with native Wayland capture support.
-base: core24
+base: core26
 grade: devel
 confinement: strict
 license: GPL-2.0+
@@ -21,7 +21,7 @@ apps:
     environment:
       QT_PLUGIN_PATH: $SNAP/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/qt6/plugins
       QT_QPA_PLATFORM_PLUGIN_PATH: $SNAP/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/qt6/plugins/platforms
-      LD_LIBRARY_PATH: $SNAP/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR:$SNAP/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/obs-plugins:$SNAP/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/pulseaudio
+      LD_LIBRARY_PATH: $SNAP/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR:$SNAP/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/obs-modules/core:$SNAP/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/pulseaudio
     plugs:
       - audio-playback
       - audio-record
@@ -46,7 +46,7 @@ parts:
       - -DCMAKE_INSTALL_PREFIX=/usr
       - -DCMAKE_INSTALL_LIBDIR=lib/x86_64-linux-gnu
       - -DENABLE_RELOCATABLE=ON
-      - -DOBS_VERSION_OVERRIDE=32.2.2
+      - -DOBS_VERSION_OVERRIDE=33.0.0
       - -DENABLE_NVENC=ON
       - -DENABLE_WAYLAND=ON
       - -DENABLE_BROWSER=ON
@@ -132,15 +132,15 @@ parts:
       - libffmpeg-nvenc-dev
     stage-packages:
       - libxcb-composite0
-      - libavdevice60
-      - libavfilter9
-      - libswscale7
+      - libavdevice62
+      - libavfilter11
+      - libswscale9
       - libx264-164
       - libcurl4t64
-      - libmbedtls14t64
+      - libmbedtls21
       - libjansson4
       - libluajit-5.1-2
-      - libpython3.12t64
+      - libpython3.14
       - libqt6widgets6t64
       - libqt6network6t64
       - libqt6keychain1

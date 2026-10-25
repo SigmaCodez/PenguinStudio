@@ -89,8 +89,8 @@ target_include_directories(
 target_link_libraries(obs-backgroundremoval PRIVATE OBS::libobs opencv_core opencv_imgproc "${penguin_ort_SOURCE_DIR}/lib/libonnxruntime.so")
 target_link_options(obs-backgroundremoval PRIVATE "-Wl,--version-script,${CMAKE_CURRENT_SOURCE_DIR}/vendor/src/exported_symbols_linux.map" "-Wl,-Bsymbolic")
 set_target_properties_obs(obs-backgroundremoval PROPERTIES FOLDER plugins PREFIX "")
-set_property(TARGET obs-backgroundremoval APPEND PROPERTY INSTALL_RPATH "$ORIGIN/penguin-camera")
-install(DIRECTORY vendor/data/ DESTINATION "${OBS_DATA_DESTINATION}/obs-plugins/obs-backgroundremoval" COMPONENT Runtime)
+set_property(TARGET obs-backgroundremoval APPEND PROPERTY INSTALL_RPATH "$ORIGIN/../penguin-camera")
+install(DIRECTORY vendor/data/ DESTINATION "${OBS_DATA_DESTINATION}/obs-modules/core/obs-backgroundremoval" COMPONENT Runtime)
 install(FILES vendor/LICENSE PROVENANCE.md DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/licenses/penguin-studio/obs-backgroundremoval" COMPONENT Runtime)
 
 install(FILES "${penguin_cv_SOURCE_DIR}/LICENSE" DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/licenses/penguin-studio/opencv" COMPONENT Runtime)

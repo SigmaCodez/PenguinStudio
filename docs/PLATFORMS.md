@@ -1,8 +1,8 @@
 # Platform connections and Wayland
 
-![English stream details dock in Penguin Studio 0.6.4](images/current/stream-details-en.png)
+![English stream details dock in Penguin Studio 0.7.0](images/current/stream-details-en.png)
 
-Current 0.6.4 interface before sign-in. This preview contains no account information.
+Current 0.7.0 interface before sign-in. This preview contains no account information.
 
 ## Twitch
 

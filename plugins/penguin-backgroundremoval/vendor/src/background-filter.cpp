@@ -353,8 +353,8 @@ void background_filter_update(void *data, obs_data_t *settings)
 		if (tf->useGPU != "cpu" && tf->modelSelection == MODEL_RVM) {
 			const auto module =
 				std::filesystem::path(obs_get_module_binary_path(obs_current_module())).parent_path();
-			const auto runtime = module / "penguin-camera-gpu/libonnxruntime.so.1";
-			const auto executable = module / "penguin-camera/penguin-gpu-worker";
+			const auto runtime = module.parent_path() / "penguin-camera-gpu/libonnxruntime.so.1";
+			const auto executable = module.parent_path() / "penguin-camera/penguin-gpu-worker";
 			if (std::filesystem::is_regular_file(runtime) && std::filesystem::is_regular_file(executable)) {
 				char *models = obs_module_file("models");
 				char *cache = obs_module_config_path("gpu-cache/onnxruntime-1.23.2");

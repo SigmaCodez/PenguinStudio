@@ -65,6 +65,8 @@ enum obs_frontend_event {
 
 	OBS_FRONTEND_EVENT_CANVAS_ADDED,
 	OBS_FRONTEND_EVENT_CANVAS_REMOVED,
+
+	OBS_FRONTEND_EVENT_REPLAY_BUFFER_SAVING,
 };
 
 /* ------------------------------------------------------------------------- */
@@ -259,6 +261,8 @@ EXPORT bool obs_frontend_remove_canvas(obs_canvas_t *canvas);
 EXPORT void obs_frontend_copy_sceneitem(obs_sceneitem_t *item);
 EXPORT bool obs_frontend_can_paste_sceneitem(bool duplicate);
 EXPORT void obs_frontend_paste_sceneitem(obs_scene_t *scene, bool duplicate);
+
+EXPORT bool obs_frontend_is_safe_mode_enabled(void);
 
 /* ------------------------------------------------------------------------- */
 

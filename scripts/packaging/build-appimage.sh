@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
-# Package the tested Ubuntu 24.04 binaries; run on that distribution after build-native.sh.
+# Package the tested Ubuntu 26.04 binaries; run on that distribution after build-native.sh.
 set -euo pipefail
 root=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/../.." && pwd)
-deb=$(realpath "${1:?Usage: build-appimage.sh ubuntu24.04.deb [output-directory]}")
+deb=$(realpath "${1:?Usage: build-appimage.sh ubuntu26.04.deb [output-directory]}")
 out=$(realpath -m "${2:-$root/build_penguin_appimage}")
 version=$(cat "$root/packaging/version.txt")
 source /etc/os-release
-[[ "$ID" == ubuntu && "$VERSION_ID" == 24.04 && $(uname -m) == x86_64 ]]
+[[ "$ID" == ubuntu && "$VERSION_ID" == 26.04 && $(uname -m) == x86_64 ]]
 [[ $(dpkg-deb -f "$deb" Package) == penguin-studio ]]
-[[ $(dpkg-deb -f "$deb" Version) == "$version"-*+ubuntu24.04 ]]
+[[ $(dpkg-deb -f "$deb" Version) == "$version"-*+ubuntu26.04 ]]
 mkdir -p "$out/tools"
 appdir="$out/AppDir"
 [[ ! -e "$appdir" ]] || { echo 'Use a fresh AppImage output directory' >&2; exit 1; }
@@ -24,7 +24,8 @@ for tool in json.loads(pathlib.Path(sys.argv[1]).read_text()):
 PY
 # OBS initializes Python at startup. Shipping libpython without its matching
 # standard library would abort on hosts with a different Python version.
-cp -aL /usr/lib/python3.12 "$appdir/usr/lib/"
+python_stdlib=$(python3 -c 'import sysconfig; print(sysconfig.get_path("stdlib"))')
+cp -aL "$python_stdlib" "$appdir/usr/lib/"
 install -m755 "$root/packaging/appimage/penguin-studio" "$appdir/usr/bin/penguin-studio"
 # linuxdeploy cannot discover dlopen-loaded OBS modules from the executable alone.
 libraries=()

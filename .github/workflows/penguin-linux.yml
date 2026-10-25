@@ -123,7 +123,7 @@ jobs:
     if: github.event_name != 'workflow_dispatch' || inputs.packages == 'all' || inputs.packages == 'flatpak'
     runs-on: ubuntu-24.04
     container:
-      image: ghcr.io/flathub-infra/flatpak-github-actions:freedesktop-25.08
+      image: ghcr.io/flathub-infra/flatpak-github-actions:freedesktop-26.08
       options: --privileged
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -162,7 +162,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ubuntu: ${{ fromJSON(inputs.packages == 'deb-26.04' && '["26.04"]' || (inputs.packages == 'appimage' || inputs.packages == 'aur') && '["24.04"]' || '["24.04", "26.04"]') }}
+        ubuntu: ["26.04"]
     runs-on: ubuntu-${{ matrix.ubuntu }}
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -263,9 +263,9 @@ jobs:
           if-no-files-found: error
   snap:
     needs: [version, checks]
-    name: Snap core24 (amd64, development)
+    name: Snap core26 (amd64, development)
     if: github.event_name != 'workflow_dispatch' || inputs.packages == 'all' || inputs.packages == 'snap'
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
@@ -296,19 +296,19 @@ jobs:
           snap run penguin-studio --version
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: penguin-studio-core24-amd64
+          name: penguin-studio-core26-amd64
           path: '*.snap'
           if-no-files-found: error
   appimage:
     needs: [version, checks, deb]
-    name: AppImage (x86_64, Ubuntu 24.04 baseline)
+    name: AppImage (x86_64, Ubuntu 26.04 baseline)
     if: github.event_name != 'workflow_dispatch' || inputs.packages == 'all' || inputs.packages == 'appimage' || inputs.packages == 'aur'
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5
         with:
-          name: penguin-studio-ubuntu-24.04-amd64
+          name: penguin-studio-ubuntu-26.04-amd64
           path: deb-artifact
       - name: Configure Ubuntu package downloads
         run: sudo --preserve-env=GITHUB_ACTIONS bash scripts/packaging/configure-ci-apt.sh
