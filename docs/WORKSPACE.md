@@ -4,7 +4,7 @@ Penguin Studio organizes the native Qt application around a large canvas, search
 
 ![Penguin Studio 0.7.1 workspace in English](images/current/workspace-en.png)
 
-Previous-release captures are shown temporarily while the 0.7.1 package is validated. They will be replaced before publication.
+These English previews were captured from the validated 0.7.1 Ubuntu package using an isolated demo profile and synthetic media.
 
 ## Compose and inspect
 
