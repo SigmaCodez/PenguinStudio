@@ -1,1 +1,14 @@
-<RCC><qresource prefix="/penguin"><file>Navigation.qml</file></qresource></RCC>
+<RCC>
+  <qresource prefix="/penguin">
+    <file>Navigation.qml</file>
+    <file>WorkspaceButton.qml</file>
+    <file>icons/inspector.svg</file>
+    <file>icons/sources.svg</file>
+    <file>icons/audio.svg</file>
+    <file>icons/outputs.svg</file>
+    <file>icons/details.svg</file>
+    <file>icons/chat.svg</file>
+    <file>icons/scene.svg</file>
+    <file>icons/search.svg</file>
+  </qresource>
+</RCC>

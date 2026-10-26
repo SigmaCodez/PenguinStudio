@@ -15,6 +15,7 @@
 #include <QFile>
 #include <QKeyEvent>
 #include <QFocusEvent>
+#include <QMenu>
 #include <obs.h>
 #include <obs-frontend-api.h>
 namespace {
@@ -34,6 +35,9 @@ void tick(){
   auto *dock=main->findChild<QDockWidget*>("penguinQuickWorkspace");if(qEnvironmentVariableIsSet("PENGUIN_EXPECT_HIDDEN")){check("hidden_state_restored",dock&&!dock->isVisible());dock->show();}
   for (const char *name : {"Starting soon", "Main stage"}) { auto *existing=obs_get_source_by_name(name); if(!existing) {auto *scene=obs_scene_create(name);obs_scene_release(scene);} obs_source_release(existing); }
  }
+ if(ticks==45 && view){auto *search=view->rootObject()->findChild<QObject*>("sceneSearch");check("scene_search_found",search);if(search)search->setProperty("text","main");}
+ if(ticks==50 && view){auto *list=view->rootObject()->findChild<QObject*>("quickSceneList");check("scene_search_case_insensitive",list&&list->property("count").toInt()==1);if(auto *search=view->rootObject()->findChild<QObject*>("sceneSearch"))search->setProperty("text","no-matching-scene-123");}
+ if(ticks==54 && view){auto *list=view->rootObject()->findChild<QObject*>("quickSceneList");check("scene_search_empty_result",list&&list->property("count").toInt()==0);if(auto *search=view->rootObject()->findChild<QObject*>("sceneSearch"))search->setProperty("text","");}
  if(ticks==55 && view){
   QObject *bridge=view->rootContext()->contextProperty("bridge").value<QObject*>();
   auto items=bridge->property("scenes").toList();check("scene_model_populated",items.size()>=3);
@@ -46,9 +50,18 @@ void tick(){
   QObject *bridge=view->rootContext()->contextProperty("bridge").value<QObject*>();
   auto *source=obs_frontend_get_current_scene();check("scene_selection_synced",source&&bridge->property("currentScene").toString()==QString::fromUtf8(obs_source_get_uuid(source)));obs_source_release(source);
   auto *chat=main->findChild<QDockWidget*>("penguinTwitchChat");check("keyboard_opens_chat",chat&&chat->isVisible());
-  for(auto pair:{qMakePair("navInspector","penguinInspectorDock"),qMakePair("navOutputs","penguin-broadcast-destinations"),qMakePair("navDetails","penguin-stream-details")}){
-   auto *button=view->rootObject()->findChild<QObject*>(pair.first);if(button)QMetaObject::invokeMethod(button,"triggered");auto *dock=main->findChild<QDockWidget*>(pair.second);check(pair.first,dock&&dock->isVisible());
+  for(auto pair:{qMakePair("navManageScenes","scenesDock"),qMakePair("navSources","sourcesDock"),qMakePair("navAudio","mixerDock"),qMakePair("navInspector","penguinInspectorDock"),qMakePair("navOutputs","penguin-broadcast-destinations"),qMakePair("navDetails","penguin-stream-details")}){
+   auto *button=view->rootObject()->findChild<QObject*>(pair.first);if(button)QMetaObject::invokeMethod(button,"triggered");auto *dock=main->findChild<QDockWidget*>(pair.second);check(pair.first,dock&&dock->isVisible());if(dock)dock->grab().save(qEnvironmentVariable("PENGUIN_SMOKE_DIR")+"/"+pair.first+".png");if(dock&&QString::fromLatin1(pair.second)=="scenesDock")dock->hide();
   }
+ }
+ if(ticks==70 && view){
+  QObject *bridge=view->rootContext()->contextProperty("bridge").value<QObject*>();
+  // Native Wayland popups require real input serials. Exercise the same restore
+  // operation directly without creating a synthetic grabbing popup.
+  QMetaObject::invokeMethod(bridge,"restorePreviousLayout");
+  auto *restoredSources=main->findChild<QDockWidget*>("sourcesDock");check("previous_layout_restored",restoredSources&&main->dockWidgetArea(restoredSources)==Qt::LeftDockWidgetArea);
+  QMetaObject::invokeMethod(bridge,"arrangeWorkspace");
+  auto *sources=main->findChild<QDockWidget*>("sourcesDock");check("new_layout_reapplied",sources&&main->dockWidgetArea(sources)==Qt::BottomDockWidgetArea);
  }
  if(ticks==75&&view){auto *dock=main->findChild<QDockWidget*>("penguinQuickWorkspace");dock->hide();check("classic_fallback",!dock->isVisible()&&main->findChild<QWidget*>("penguinTopBar"));dock->show();}
  if(ticks==85&&view){

@@ -52,8 +52,11 @@ activation of an automated test window is not guaranteed under Wayland. This is
 an event-handling test, not proof of every physical keyboard/compositor interaction.
 Automated runs were intermittent when the window did not receive active focus,
 including a post-install run. Keep these failures in the evidence; do not count
-them as successful keyboard checks. Physical keyboard verification is requested
-separately before treating keyboard acceptance as complete.
+them as successful keyboard checks. On 2026-10-26, the user confirmed physical
+keyboard operation on the installed local6 build under Wayland: after clicking
+Inspector, Tab navigation showed the focus indicator and Enter opened Live chat.
+This closes the manual keyboard acceptance check for that navigation path. It is
+user-observed evidence, separate from the intermittent automated focus results.
 
 Both normal and enlarged text (FontScale 10 and 14) were inspected using real QML
 framebuffer captures. The existing workspace suite passed all 242 checks, including

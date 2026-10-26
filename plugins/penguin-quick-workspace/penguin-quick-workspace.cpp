@@ -5,9 +5,12 @@
 #include <QApplication>
 #include <QDockWidget>
 #include <QMainWindow>
+#include <QMenu>
 #include <QPointer>
 #include <QQmlContext>
 #include <QQuickWidget>
+#include <QQuickWindow>
+#include <QSGRendererInterface>
 #include <QTimer>
 #include <QVariantList>
 #include <util/config-file.h>
@@ -74,11 +77,61 @@ public:
     Q_INVOKABLE void openPanel(const QString &id)
     {
         static const QStringList allowed{"penguinInspectorDock", "penguin-broadcast-destinations",
-                                         "penguin-stream-details", "penguinTwitchChat"};
+                                         "penguin-stream-details", "penguinTwitchChat", "sourcesDock", "mixerDock", "scenesDock"};
         if (!allowed.contains(id)) return;
         auto *main = static_cast<QMainWindow *>(obs_frontend_get_main_window());
         if (auto *dock = main->findChild<QDockWidget *>(id)) { dock->show(); dock->raise(); }
     }
+    Q_INVOKABLE void arrangeWorkspace()
+    {
+        auto *main = static_cast<QMainWindow *>(obs_frontend_get_main_window());
+        auto *config = obs_frontend_get_user_config();
+        if (!main || !config) return;
+        auto *navigation = main->findChild<QDockWidget *>("penguinQuickWorkspace");
+        auto *sources = main->findChild<QDockWidget *>("sourcesDock");
+        auto *mixer = main->findChild<QDockWidget *>("mixerDock");
+        auto *scenes = main->findChild<QDockWidget *>("scenesDock");
+        if (!navigation || !sources || !mixer || !scenes) return;
+        if (!config_has_user_value(config, "PenguinQuickPreview", "PreviousLayout")) {
+            const auto previous = main->saveState().toBase64();
+            config_set_string(config, "PenguinQuickPreview", "PreviousLayout", previous.constData());
+        }
+        main->setCorner(Qt::BottomLeftCorner, Qt::LeftDockWidgetArea);
+        navigation->setFloating(false);
+        main->addDockWidget(Qt::LeftDockWidgetArea, navigation);
+        navigation->show();
+        scenes->hide();
+        sources->setFloating(false);
+        mixer->setFloating(false);
+        main->addDockWidget(Qt::BottomDockWidgetArea, sources);
+        main->splitDockWidget(sources, mixer, Qt::Horizontal);
+        sources->show();
+        mixer->show();
+        main->resizeDocks({navigation}, {int(240 * textScale)}, Qt::Horizontal);
+        main->resizeDocks({sources, mixer}, {280, 400}, Qt::Horizontal);
+        config_set_int(config, "PenguinQuickPreview", "DesignLayout", 1);
+    }
+    Q_INVOKABLE void restorePreviousLayout()
+    {
+        auto *main = static_cast<QMainWindow *>(obs_frontend_get_main_window());
+        auto *config = obs_frontend_get_user_config();
+        if (!main || !config) return;
+        const char *saved = config_get_string(config, "PenguinQuickPreview", "PreviousLayout");
+        if (saved && *saved) main->restoreState(QByteArray::fromBase64(saved));
+    }
+    Q_INVOKABLE void showLayoutMenu()
+    {
+        auto *main = static_cast<QMainWindow *>(obs_frontend_get_main_window());
+        if (!main) return;
+        auto *menu = new QMenu(main);
+        menu->addAction("Arrange workspace", this, &WorkspaceBridge::arrangeWorkspace);
+        auto *restore = menu->addAction("Restore previous layout", this, &WorkspaceBridge::restorePreviousLayout);
+        restore->setEnabled(config_has_user_value(obs_frontend_get_user_config(), "PenguinQuickPreview", "PreviousLayout"));
+        QObject::connect(menu, &QMenu::aboutToHide, menu, &QObject::deleteLater);
+        auto *view = qobject_cast<QWidget *>(parent());
+        menu->popup(view ? view->mapToGlobal(QPoint(16, view->height() - 40)) : main->mapToGlobal(QPoint(20, 60)));
+    }
+
 signals:
     void scenesChanged();
     void selectionChanged();
@@ -94,6 +147,11 @@ static void createWorkspace()
     if (bridge || exiting) return;
     auto *main = static_cast<QMainWindow *>(obs_frontend_get_main_window());
     if (!main) return;
+    // This static navigation must not share Qt Quick OpenGL framebuffer handling
+    // with OBS native video surfaces on Wayland (Qt 6.10 FBO recursion on resize).
+    // OBS rendering, encoders and camera inference keep their own GPU backends.
+    if (QGuiApplication::platformName() == "wayland")
+        QQuickWindow::setGraphicsApi(QSGRendererInterface::Software);
     auto *view = new QQuickWidget;
     view->setObjectName("penguinQuickView");
     view->setMinimumSize(228, 420);
@@ -133,7 +191,10 @@ static void event(obs_frontend_event type, void *)
             if (!bridge || exiting) return;
             bridge->refresh();
             auto *config = obs_frontend_get_user_config();
-            if (config_get_bool(config, "PenguinQuickPreview", "Placed")) return;
+            if (config_get_bool(config, "PenguinQuickPreview", "Placed")) {
+                if (!config_get_int(config, "PenguinQuickPreview", "DesignLayout")) bridge->arrangeWorkspace();
+                return;
+            }
             auto *main = static_cast<QMainWindow *>(obs_frontend_get_main_window());
             if (auto *dock = main->findChild<QDockWidget *>(DockId)) {
                 dock->setFloating(false);
@@ -141,6 +202,7 @@ static void event(obs_frontend_event type, void *)
                 dock->show();
                 main->resizeDocks({dock}, {240}, Qt::Horizontal);
                 config_set_bool(config, "PenguinQuickPreview", "Placed", true);
+                if (!config_get_int(config, "PenguinQuickPreview", "DesignLayout")) bridge->arrangeWorkspace();
             }
         });
         return;

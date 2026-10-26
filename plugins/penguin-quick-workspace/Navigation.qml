@@ -11,45 +11,12 @@ Rectangle {
     property real uiScale: bridge.uiScale
     property color muted: "#929aaf"
 
-    component NavButton: FocusScope {
-        id: button
-        property string label: ""
-        property string symbol: ""
-        property bool selected: false
-        signal triggered()
-        implicitHeight: 42 * root.uiScale
-        implicitWidth: 200
-        activeFocusOnTab: true
-        Accessible.role: Accessible.Button
-        Accessible.name: label
-        Accessible.onPressAction: triggered()
-        Keys.onReturnPressed: triggered()
-        Keys.onEnterPressed: triggered()
-        Keys.onSpacePressed: triggered()
-        Rectangle {
-            anchors.fill: parent
-            radius: 9
-            color: button.selected ? "#343052" : mouse.containsMouse ? "#242936" : "transparent"
-            border.width: button.activeFocus ? 2 : 1
-            border.color: button.activeFocus ? "#b7a7ff" : button.selected ? "#615087" : "transparent"
-        }
-        RowLayout {
-            anchors.fill: parent
-            anchors.leftMargin: 13
-            anchors.rightMargin: 13
-            spacing: 12
-            Text { text: button.symbol; color: button.selected ? "#c5b9ff" : root.muted; font.pixelSize: 14 * root.uiScale; Layout.preferredWidth: 18 * root.uiScale; horizontalAlignment: Text.AlignHCenter }
-            Text { text: button.label; textFormat: Text.PlainText; color: "#f0f2fa"; font.pixelSize: 13 * root.uiScale; font.weight: button.selected ? Font.DemiBold : Font.Normal; elide: Text.ElideRight; Layout.fillWidth: true }
-        }
-        MouseArea { id: mouse; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: { button.forceActiveFocus(); button.triggered(); } }
-    }
-
     Flickable {
         id: scroll
         objectName: "navigationScroll"
         anchors.fill: parent
         contentWidth: width
-        contentHeight: Math.max(height, 420 * root.uiScale + 200)
+        contentHeight: Math.max(height, 660 * root.uiScale + 180)
         clip: true
         boundsBehavior: Flickable.StopAtBounds
     ColumnLayout {
@@ -70,15 +37,59 @@ Rectangle {
             }
         }
         Text { text: "WORKSPACE"; color: root.muted; font.pixelSize: 10 * root.uiScale; font.letterSpacing: 1.4; Layout.leftMargin: 12; Layout.bottomMargin: 3 }
-        NavButton { objectName: "navInspector"; label: "Inspector"; symbol: "I"; Layout.fillWidth: true; onTriggered: bridge.openPanel("penguinInspectorDock") }
-        NavButton { objectName: "navOutputs"; label: "Destinations"; symbol: "↗"; Layout.fillWidth: true; onTriggered: bridge.openPanel("penguin-broadcast-destinations") }
-        NavButton { objectName: "navDetails"; label: "Stream details"; symbol: "≡"; Layout.fillWidth: true; onTriggered: bridge.openPanel("penguin-stream-details") }
-        NavButton { objectName: "navChat"; label: "Live chat"; symbol: "••"; Layout.fillWidth: true; onTriggered: bridge.openPanel("penguinTwitchChat") }
+        WorkspaceButton { uiScale: root.uiScale; scrollTarget: scroll; objectName: "navSources"; label: "Sources"; iconSource: "icons/sources.svg"; Layout.fillWidth: true; onTriggered: bridge.openPanel("sourcesDock") }
+        WorkspaceButton { uiScale: root.uiScale; scrollTarget: scroll; objectName: "navAudio"; label: "Audio mixer"; iconSource: "icons/audio.svg"; Layout.fillWidth: true; onTriggered: bridge.openPanel("mixerDock") }
+        WorkspaceButton {
+                uiScale: root.uiScale; scrollTarget: scroll; objectName: "navInspector"; label: "Inspector"; iconSource: "icons/inspector.svg"; Layout.fillWidth: true; onTriggered: bridge.openPanel("penguinInspectorDock") }
+        WorkspaceButton {
+                uiScale: root.uiScale; scrollTarget: scroll; objectName: "navOutputs"; label: "Destinations"; iconSource: "icons/outputs.svg"; Layout.fillWidth: true; onTriggered: bridge.openPanel("penguin-broadcast-destinations") }
+        WorkspaceButton {
+                uiScale: root.uiScale; scrollTarget: scroll; objectName: "navDetails"; label: "Stream details"; iconSource: "icons/details.svg"; Layout.fillWidth: true; onTriggered: bridge.openPanel("penguin-stream-details") }
+        WorkspaceButton {
+                uiScale: root.uiScale; scrollTarget: scroll; objectName: "navChat"; label: "Live chat"; iconSource: "icons/chat.svg"; Layout.fillWidth: true; onTriggered: bridge.openPanel("penguinTwitchChat") }
         Rectangle { color: "#292e3a"; Layout.fillWidth: true; height: 1; Layout.topMargin: 12; Layout.bottomMargin: 12 }
         RowLayout {
             Layout.fillWidth: true; Layout.leftMargin: 12; Layout.rightMargin: 10
             Text { text: "SCENES"; color: root.muted; font.pixelSize: 10 * root.uiScale; font.letterSpacing: 1.4; Layout.fillWidth: true }
             Text { text: bridge.scenes.length; color: root.muted; font.pixelSize: 11 * root.uiScale }
+            WorkspaceButton {
+                objectName: "navManageScenes"
+                uiScale: root.uiScale
+                scrollTarget: scroll
+                label: "Edit"
+                Accessible.name: "Manage scenes"
+                iconSource: "icons/scene.svg"
+                Layout.preferredWidth: 100 * root.uiScale
+                onTriggered: bridge.openPanel("scenesDock")
+            }
+        }
+        Rectangle {
+            Layout.fillWidth: true
+            implicitHeight: 38 * root.uiScale
+            radius: 8
+            color: "#1c222d"
+            border.color: sceneSearch.activeFocus ? "#b7a7ff" : "#343d50"
+            RowLayout {
+                anchors.fill: parent
+                anchors.margins: 10
+                spacing: 8
+                Image { source: "icons/search.svg"; sourceSize: Qt.size(16, 16); Layout.preferredWidth: 16; Layout.preferredHeight: 16 }
+                TextInput {
+                    id: sceneSearch
+                    objectName: "sceneSearch"
+                    Layout.fillWidth: true
+                    font.pixelSize: 12 * root.uiScale
+                    color: "#f0f2fa"
+                    selectionColor: "#7155db"
+                    selectedTextColor: "white"
+                    clip: true
+                    selectByMouse: true
+                    activeFocusOnTab: true
+                    Accessible.name: "Search scenes"
+                    Keys.onEscapePressed: text = ""
+                    Text { anchors.fill: parent; visible: !sceneSearch.text; text: "Search scenes"; color: "#929aaf"; font: sceneSearch.font }
+                }
+            }
         }
         ListView {
             id: scenes
@@ -88,16 +99,17 @@ Rectangle {
             Layout.minimumHeight: 80
             clip: true
             spacing: 4
-            model: bridge.scenes
-            delegate: NavButton {
+            model: bridge.scenes.filter(function(scene) { return scene.name.toLocaleLowerCase().indexOf(sceneSearch.text.toLocaleLowerCase()) !== -1; })
+            delegate: WorkspaceButton {
+                uiScale: root.uiScale; scrollTarget: scroll;
                 required property var modelData
                 width: scenes.width
                 label: modelData.name
-                symbol: "◉"
+                iconSource: "icons/scene.svg"
                 selected: bridge.currentScene === modelData.id
                 onTriggered: bridge.selectScene(modelData.id)
             }
-            Text { anchors.centerIn: parent; visible: scenes.count === 0; text: "Add a scene to begin"; color: root.muted; font.pixelSize: 12 * root.uiScale }
+            Text { anchors.centerIn: parent; visible: scenes.count === 0; text: sceneSearch.text ? "No matching scenes" : "Add a scene to begin"; color: root.muted; font.pixelSize: 12 * root.uiScale }
         }
         Rectangle {
             Layout.fillWidth: true
@@ -112,7 +124,19 @@ Rectangle {
                 }
             }
         }
-        Text { text: "QML workspace preview"; color: "#707a91"; font.pixelSize: 10 * root.uiScale; Layout.alignment: Qt.AlignHCenter; Layout.topMargin: 6 }
+        WorkspaceButton { uiScale: root.uiScale; scrollTarget: scroll; objectName: "navLayout"; label: "Workspace layout"; iconSource: "icons/inspector.svg"; Layout.fillWidth: true; onTriggered: bridge.showLayoutMenu() }
+        Text { text: "Local design preview"; color: "#707a91"; font.pixelSize: 10 * root.uiScale; Layout.alignment: Qt.AlignHCenter; Layout.topMargin: 6 }
     }
 }
+    Rectangle {
+        // Keep overflow discoverable at large text sizes and short window heights.
+        anchors.right: parent.right
+        anchors.rightMargin: 2
+        width: 3
+        radius: 1.5
+        color: "#59657b"
+        visible: scroll.contentHeight > scroll.height
+        height: Math.max(24, scroll.height * scroll.visibleArea.heightRatio)
+        y: Math.min(parent.height - height, scroll.visibleArea.yPosition * scroll.height)
+    }
 }

@@ -266,10 +266,21 @@ void CheckWorkspaceLayout(const QString &size, int requestedWidth, int requested
 		return;
 	Check(mainWindow->width() <= requestedWidth && mainWindow->height() <= requestedHeight,
 	      QStringLiteral("workspace-fits-requested-size-%1").arg(size));
-	Check(mainWindow->dockWidgetArea(layers) == Qt::LeftDockWidgetArea &&
-	      mainWindow->dockWidgetArea(scenes) == Qt::LeftDockWidgetArea &&
-	      BoundsInWindow(layers).bottom() < BoundsInWindow(scenes).top(),
-	      QStringLiteral("layers-above-scenes-%1").arg(size));
+	const bool quickLayout = mainWindow->findChild<QWidget *>("penguinQuickView") &&
+        config_get_int(obs_frontend_get_user_config(), "PenguinQuickPreview", "DesignLayout") == 1;
+    if (quickLayout) {
+        auto *navigation = mainWindow->findChild<QDockWidget *>("penguinQuickWorkspace");
+        Check(navigation && navigation->isVisible() &&
+              mainWindow->dockWidgetArea(navigation) == Qt::LeftDockWidgetArea &&
+              mainWindow->dockWidgetArea(layers) == Qt::BottomDockWidgetArea &&
+              BoundsInWindow(navigation).right() < BoundsInWindow(canvas).left(),
+              QStringLiteral("quick-navigation-and-bottom-sources-%1").arg(size));
+    } else {
+        Check(mainWindow->dockWidgetArea(layers) == Qt::LeftDockWidgetArea &&
+              mainWindow->dockWidgetArea(scenes) == Qt::LeftDockWidgetArea &&
+              BoundsInWindow(layers).bottom() < BoundsInWindow(scenes).top(),
+              QStringLiteral("layers-above-scenes-%1").arg(size));
+    }
 	Check(mainWindow->dockWidgetArea(mixer) == Qt::BottomDockWidgetArea &&
 	      BoundsInWindow(mixer).top() > BoundsInWindow(canvas).top() && mixer->height() >= 90,
 	      QStringLiteral("mixer-below-canvas-%1").arg(size));
@@ -313,7 +324,7 @@ void CheckWorkspaceLayout(const QString &size, int requestedWidth, int requested
 		QStyleOptionFrame option;
 		option.initFrom(search);
 		const QRect content = search->style()->subElementRect(QStyle::SE_LineEditContents, &option, search);
-		Check(search->isVisible() && !search->placeholderText().isEmpty() &&
+		Check((search->isVisible() || (quickLayout && scenes->isHidden() && QString::fromLatin1(name) == "penguinSceneSearch")) && !search->placeholderText().isEmpty() &&
 		      !search->accessibleName().isEmpty() && content.height() >= search->fontMetrics().height(),
 		      QStringLiteral("search-field-readable-%1-%2").arg(size, QString::fromLatin1(name)));
 	}
@@ -750,8 +761,12 @@ void Tick()
 		Capture(QStringLiteral("workspace-1440.png"));
 		CheckWorkspaceLayout(QStringLiteral("large"), 1440, 900);
 		CheckInspectorWidth(QStringLiteral("large"));
-		TestWorkspaceSearch();
-		TestSceneRename();
+        auto *sceneDock = mainWindow->findChild<QDockWidget *>("scenesDock");
+        const bool hiddenSceneDock = sceneDock && sceneDock->isHidden();
+        if (hiddenSceneDock) sceneDock->show();
+        TestWorkspaceSearch();
+        TestSceneRename();
+        if (hiddenSceneDock) sceneDock->hide();
 		TestRightSidebar();
 		CheckSidebarTabText(QStringLiteral("large"));
 	}
