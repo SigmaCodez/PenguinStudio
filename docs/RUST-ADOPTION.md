@@ -116,6 +116,7 @@ Logs reported clean shutdown, no warnings/errors and zero OBS memory leaks.
 Installation is a separate step and must be verified after it completes.
 
 The user's workflow is local installation after validation, then user review,
-then a public release only after explicit approval. See
-[restricted local updates](../scripts/local-update/README.md) for the prepared
-password-free installer scope; it is not a general unattended package manager.
+then a public release only after explicit approval. The user chose system-wide
+DEB installation with normal Ubuntu administrator confirmation and declined both
+per-user installation and enabling a passwordless installer. No permanent
+administrator authorization is part of this local candidate.

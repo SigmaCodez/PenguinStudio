@@ -14,4 +14,4 @@
 - Do not create or publish a GitHub release, push a release tag, or increment the product version until the user explicitly approves that release after local review.
 - After approval, use a small version increment appropriate to the approved change and complete the publication checks above.
 
-- Keep system-wide DEB installation for local builds. The user declined a per-user installation. Any passwordless helper must be explicitly approved, narrowly scoped and must not store passwords. Never expand its approved payload scope silently.
+- Keep system-wide DEB installation for local builds and use the normal Ubuntu administrator confirmation. The user declined both per-user installation and enabling passwordless authorization. Do not configure passwordless sudo/polkit rules or store administrator passwords.
