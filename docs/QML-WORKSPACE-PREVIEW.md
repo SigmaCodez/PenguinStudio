@@ -12,7 +12,7 @@ frontend migration. The public product version remains 0.7.1.
 - Text follows the configured interface font scale. The navigation scrolls when
   its content exceeds the available height.
 - Keyboard focus has a visible outline; Return, Enter and Space activate items.
-- Closing **Workspace preview** restores the classic workspace. The normal Docks
+- Closing **Workspace preview** hides the navigation dock. The normal Docks
   menu can reopen it. Visibility is retained across restart.
 
 The OBS renderer, preview, encoders, authentication, camera processing and native
@@ -84,3 +84,11 @@ Reference: https://doc.qt.io/qt-6/qquickwidget.html#performance-considerations
 No release, tag, public version change or GitHub publication is authorized by this
 local experiment. Keep the system-wide DEB installation and normal Ubuntu
 administrator confirmation for local review.
+
+## Local8 follow-up
+
+See [the local8 review](LOCAL8-DESIGN-REVIEW.md) for the searchable QML Settings
+sidebar, Command center, native-action protections and camera scheduling changes.
+The native settings page model remains authoritative. Closing the navigation dock
+only hides that dock; it does not disable the Settings or Command center surfaces.
+No public package flag or product version has changed.

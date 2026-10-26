@@ -305,7 +305,9 @@ void background_filter_update(void *data, obs_data_t *settings)
 	penguin_configure_managed_threads(settings, os_get_physical_cores());
 	const bool preserveHands = obs_data_get_bool(settings, "penguin_preserve_hands") && newModel == MODEL_RVM;
 	const uint32_t configuredThreads = (uint32_t)obs_data_get_int(settings, "numThreads");
-	const uint32_t newNumThreads = preserveHands ? std::clamp(configuredThreads, 1u, 3u) : configuredThreads;
+	// Keep the configured CPU budget: the old hand-mode cap silently reduced
+	// managed four-thread sessions to three, increasing same-frame latency.
+	const uint32_t newNumThreads = std::clamp(configuredThreads, 1u, 8u);
 
 	if (!tf->model || tf->modelSelection.empty() || tf->modelSelection != newModel || tf->useGPU != newUseGpu ||
 	    tf->numThreads != newNumThreads || tf->preserveHands != preserveHands) {
@@ -650,7 +652,9 @@ static void background_filter_process_current_frame(void *data)
 			// No data to process
 			return;
 		}
-		imageBGRA = tf->inputBGRA.clone();
+		// Staging publishes a new owned Mat, never mutates the previous one.
+		// Retain that immutable snapshot instead of copying the full frame again.
+		imageBGRA = tf->inputBGRA;
 	}
 
 	if (tf->enableImageSimilarity) {

@@ -6,6 +6,14 @@
 #include <QDockWidget>
 #include <QMainWindow>
 #include <QMenu>
+#include <QListWidget>
+#include <QDialog>
+#include <QVBoxLayout>
+#include <QLabel>
+#include <QEvent>
+#include <QToolButton>
+#include <QAction>
+#include <functional>
 #include <QPointer>
 #include <QQmlContext>
 #include <QQuickWidget>
@@ -17,6 +25,153 @@
 
 OBS_DECLARE_MODULE()
 MODULE_EXPORT const char *obs_module_description(void) { return "Optional Penguin Studio QML navigation preview"; }
+
+// Keep native settings state and validation authoritative; replace presentation only.
+class SettingsNavigation final : public QObject {
+    Q_OBJECT
+    Q_PROPERTY(QVariantList pages READ pages CONSTANT)
+    Q_PROPERTY(int currentPage READ currentPage NOTIFY currentPageChanged)
+    Q_PROPERTY(qreal uiScale READ uiScale CONSTANT)
+    QPointer<QListWidget> list;
+    QVariantList entries;
+public:
+    SettingsNavigation(QListWidget *source, QObject *parent) : QObject(parent), list(source)
+    {
+        const QStringList icons{"inspector", "scene", "outputs", "sources", "audio", "scene", "details", "inspector", "details"};
+        for (int i = 0; i < source->count(); ++i) {
+            entries.append(QVariantMap{{"index", i}, {"title", source->item(i)->text()},
+                                      {"icon", icons.value(i, "details")}});
+        }
+        connect(source, &QListWidget::currentRowChanged, this, &SettingsNavigation::currentPageChanged);
+    }
+    QVariantList pages() const { return entries; }
+    int currentPage() const { return list ? list->currentRow() : -1; }
+    qreal uiScale() const {
+        const auto value = config_get_int(obs_frontend_get_user_config(), "Appearance", "FontScale");
+        return std::clamp(value > 0 ? value / 10.0 : 1.0, 0.8, 2.0);
+    }
+    Q_INVOKABLE void selectPage(int index) {
+        if (list && index >= 0 && index < list->count() && !list->item(index)->isHidden()
+            && (list->item(index)->flags() & Qt::ItemIsEnabled))
+            list->setCurrentRow(index);
+    }
+signals:
+    void currentPageChanged();
+};
+
+class CommandCenter final : public QObject {
+    Q_OBJECT
+    Q_PROPERTY(QVariantList commands READ commands CONSTANT)
+    Q_PROPERTY(qreal uiScale READ uiScale CONSTANT)
+    QPointer<QDialog> dialog;
+    QList<QPointer<QAction>> actions;
+    QList<QList<QPointer<QAction>>> ancestors;
+    QVariantList entries;
+public:
+    CommandCenter(QMenu *menu, QDialog *window, QObject *parent) : QObject(parent), dialog(window) {
+        std::function<void(QMenu *, const QString &, QList<QPointer<QAction>>)> collect =
+            [&](QMenu *current, const QString &path, QList<QPointer<QAction>> parents) {
+            for (auto *action : current->actions()) {
+                if (action->isSeparator() || !action->isVisible()) continue;
+                QString title = action->text();
+                title.replace("&&", "\x01"); title.remove('&'); title.replace("\x01", "&");
+                if (action->menu()) { auto next = parents; next.append(action);
+                    collect(action->menu(), path.isEmpty() ? title : path + " / " + title, next); continue; }
+                const int index = actions.size();
+                actions.append(action);
+                ancestors.append(parents);
+                const bool parentEnabled = std::all_of(parents.cbegin(), parents.cend(),
+                    [](const auto &parent) { return parent && parent->isEnabled() && parent->isVisible(); });
+                entries.append(QVariantMap{{"index", index}, {"title", title}, {"group", path},
+                    {"enabled", action->isEnabled() && parentEnabled}, {"checked", action->isCheckable() && action->isChecked()},
+                    {"shortcut", action->shortcut().toString(QKeySequence::NativeText)}});
+            }
+        };
+        collect(menu, {}, {});
+    }
+    QVariantList commands() const { return entries; }
+    qreal uiScale() const {
+        const auto value = config_get_int(obs_frontend_get_user_config(), "Appearance", "FontScale");
+        return std::clamp(value > 0 ? value / 10.0 : 1.0, 0.8, 2.0);
+    }
+    Q_INVOKABLE void dismiss() { if (dialog) dialog->reject(); }
+    Q_INVOKABLE void activate(int index) {
+        if (index < 0 || index >= actions.size()) return;
+        QPointer<QAction> action = actions[index];
+        if (!action || !action->isEnabled() || !action->isVisible()) return;
+        const auto parents = ancestors[index];
+        if (!std::all_of(parents.cbegin(), parents.cend(),
+            [](const auto &parent) { return parent && parent->isEnabled() && parent->isVisible(); })) return;
+        if (dialog) dialog->accept();
+        // Trigger after the palette has closed; keep native confirmations and state checks.
+        QTimer::singleShot(0, action, [action, parents] {
+            if (action && action->isEnabled() && action->isVisible() &&
+                std::all_of(parents.cbegin(), parents.cend(),
+                    [](const auto &parent) { return parent && parent->isEnabled() && parent->isVisible(); }))
+                action->trigger();
+        });
+    }
+};
+
+class DialogDesigner final : public QObject {
+public:
+    explicit DialogDesigner(QObject *parent) : QObject(parent) { qApp->installEventFilter(this); }
+    void installCommandCenter(QMainWindow *main) {
+        auto *brand = main ? main->findChild<QToolButton *>("penguinBrand") : nullptr;
+        if (!brand || !brand->menu() || brand->property("penguinCommandCenter").toBool()) return;
+        brand->setProperty("penguinCommandCenter", true);
+        brand->setPopupMode(QToolButton::DelayedPopup);
+        brand->setToolTip("Open command center. Hold for all menus.");
+        connect(brand, &QToolButton::clicked, this, [brand, main] {
+            if (!brand->menu()) return;
+            auto *dialog = new QDialog(main);
+            dialog->setObjectName("penguinCommandCenter");
+            dialog->setWindowTitle("Penguin Studio — Command center");
+            dialog->setAttribute(Qt::WA_DeleteOnClose);
+            dialog->resize(640, 620);
+            auto *layout = new QVBoxLayout(dialog);
+            layout->setContentsMargins(0, 0, 0, 0);
+            auto *view = new QQuickWidget(dialog);
+            view->setObjectName("penguinCommandView");
+            view->setResizeMode(QQuickWidget::SizeRootObjectToView);
+            view->setClearColor(QColor("#11141b"));
+            auto *commands = new CommandCenter(brand->menu(), dialog, view);
+            view->rootContext()->setContextProperty("commandBridge", commands);
+            view->setSource(QUrl("qrc:/penguin/CommandCenter.qml"));
+            if (view->status() == QQuickWidget::Error) { delete dialog; return; }
+            layout->addWidget(view);
+            dialog->open();
+        });
+    }
+    bool eventFilter(QObject *object, QEvent *event) override {
+        if (event->type() != QEvent::Show || QByteArray(object->metaObject()->className()) != "OBSBasicSettings")
+            return false;
+        auto *dialog = qobject_cast<QDialog *>(object);
+        if (!dialog || dialog->property("penguinSettingsNavigation").toBool()) return false;
+        dialog->setProperty("penguinSettingsNavigation", true);
+        QTimer::singleShot(0, dialog, [dialog] {
+            auto *list = dialog->findChild<QListWidget *>("listWidget");
+            if (!list || !dialog->layout()) return;
+            auto *view = new QQuickWidget(dialog);
+            view->setObjectName("penguinSettingsNavigation");
+            view->setResizeMode(QQuickWidget::SizeRootObjectToView);
+            view->setClearColor(QColor("#11141b"));
+            auto *navigation = new SettingsNavigation(list, view);
+            view->setFixedWidth(int(224 * navigation->uiScale()));
+            view->setMinimumHeight(240);
+            view->rootContext()->setContextProperty("settingsBridge", navigation);
+            view->setSource(QUrl("qrc:/penguin/SettingsNavigation.qml"));
+            if (view->status() == QQuickWidget::Error) { delete view; return; }
+            auto *old = dialog->layout()->replaceWidget(list, view);
+            if (!old) { delete view; return; }
+            delete old;
+            list->hide();
+            view->show();
+        });
+        return false;
+    }
+};
+static QPointer<DialogDesigner> dialogDesigner;
 
 class WorkspaceBridge final : public QObject {
     Q_OBJECT
@@ -182,6 +337,7 @@ static void event(obs_frontend_event type, void *)
 {
     if (type == OBS_FRONTEND_EVENT_EXIT) {
         exiting = true;
+        delete dialogDesigner.data();
         obs_frontend_remove_dock(DockId);
         return;
     }
@@ -190,6 +346,7 @@ static void event(obs_frontend_event type, void *)
         QTimer::singleShot(0, bridge.data(), [] {
             if (!bridge || exiting) return;
             bridge->refresh();
+            if (dialogDesigner) dialogDesigner->installCommandCenter(static_cast<QMainWindow *>(obs_frontend_get_main_window()));
             auto *config = obs_frontend_get_user_config();
             if (config_get_bool(config, "PenguinQuickPreview", "Placed")) {
                 if (!config_get_int(config, "PenguinQuickPreview", "DesignLayout")) bridge->arrangeWorkspace();
@@ -219,10 +376,12 @@ bool obs_module_load(void)
 void obs_module_post_load(void)
 {
     createWorkspace();
+    if (!dialogDesigner) dialogDesigner = new DialogDesigner(static_cast<QObject *>(static_cast<QMainWindow *>(obs_frontend_get_main_window())));
 }
 void obs_module_unload(void)
 {
     if (exiting) return; // Frontend callbacks are gone after EXIT.
+    delete dialogDesigner.data();
     obs_frontend_remove_event_callback(event, nullptr);
     if (bridge) obs_frontend_remove_dock(DockId);
 }

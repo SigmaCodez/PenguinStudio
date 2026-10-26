@@ -8,6 +8,7 @@
 
 #include "Model.hpp"
 #include <future>
+#include "../../../single-task-worker.hpp"
 #include "HandRecovery.hpp"
 #ifdef PENGUIN_RUST_PREPROCESS
 #include "preprocess.h"
@@ -21,6 +22,8 @@ private:
 	std::string handPath, cachePath;
 	std::unique_ptr<HandRecovery> handRecovery;
 	std::future<void> handTask;
+	// Declared last so the worker joins before the model and buffers are destroyed.
+	std::unique_ptr<PenguinSingleTaskWorker> handWorker;
 
 public:
 	explicit ModelRVM(bool preserve = false, int threads = 3, std::string mode = "cpu", std::string hand = {},
@@ -47,8 +50,8 @@ public:
 			if (!handRecovery) {
 				handRecovery = std::make_unique<HandRecovery>(handThreads, "cpu", handPath, cachePath);
 			}
-			handTask = std::async(std::launch::async,
-					      [this, frame = image.clone()] { handRecovery->infer(frame); });
+			if (!handWorker) handWorker = std::make_unique<PenguinSingleTaskWorker>();
+			handTask = handWorker->submit([this, frame = image.clone()] { handRecovery->infer(frame); });
 		}
 	}
 

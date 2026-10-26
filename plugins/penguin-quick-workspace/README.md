@@ -1,7 +1,7 @@
 # QML workspace preview
 
-Optional local navigation experiment, not a replacement for OBS rendering or
-Qt Widgets dialogs. Build with `PENGUIN_QUICK_WORKSPACE_PREVIEW=ON` on Linux.
+Optional local QML presentation experiment. OBS rendering and the native
+Qt Widgets settings logic remain authoritative. Build with `PENGUIN_QUICK_WORKSPACE_PREVIEW=ON` on Linux.
 The option is off by default and must not be enabled in public packages without
 local design approval and normal publication checks.
 
@@ -16,8 +16,16 @@ Original vector icons and the shared WorkspaceButton component use GPL-2.0-or-la
 
 Existing controls, native plugin dialogs, the
 OBS video preview and output actions retain their current implementations.
-Close **Workspace preview** to return to the classic workspace; reopen it through
-the normal Docks menu. It does not initiate streaming, recording or authentication.
+Close **Workspace preview** to hide navigation; reopen it through the Docks menu.
+Navigation does not initiate streaming, recording or authentication.
+
+Local8 also gives Settings a searchable QML sidebar while preserving the native
+page selection, validation, Apply and Cancel behavior. Clicking **Penguin Studio**
+opens a searchable Command center. Arrow keys and Enter select existing application
+actions; their normal confirmations still apply. Hold the brand button to access
+the complete native menus, including dynamically populated submenus. Disabled
+actions and disabled parent menus remain protected. QML load errors retain native
+settings; the original menu remains available.
 
 Runtime dependencies: Qt Quick Widgets and the QtQuick, QtQuick.Layouts,
 QtQml, QtQml.Models and QtQml.WorkerScript QML modules matching the application's
@@ -29,7 +37,7 @@ Scene names are plain text, and navigation resolves current scene UUIDs.
 
 Qt documents an additional offscreen rendering pass for QQuickWidget:
 https://doc.qt.io/qt-6/qquickwidget.html#performance-considerations
-This prototype uses one small QML surface and no continuous animations. Do not
+This prototype uses small QML surfaces without continuous animations. Do not
 infer a performance improvement from the choice of UI technology.
 
 On Wayland, the module selects Qt Quick's software backend before creating its

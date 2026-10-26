@@ -10,4 +10,6 @@ install(FILES README.md DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/obs/obs-module
 if(PENGUIN_BUILD_TESTS)
   add_library(penguin-quick-smoke MODULE tests/smoke.cpp)
   target_link_libraries(penguin-quick-smoke PRIVATE OBS::libobs OBS::frontend-api Qt6::Widgets Qt6::QuickWidgets Qt6::Qml)
+  add_library(penguin-quick-dialog-smoke MODULE tests/dialogs.cpp)
+  target_link_libraries(penguin-quick-dialog-smoke PRIVATE OBS::libobs OBS::frontend-api Qt6::Widgets Qt6::QuickWidgets Qt6::Qml)
 endif()

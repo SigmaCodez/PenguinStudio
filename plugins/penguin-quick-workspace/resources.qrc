@@ -1,6 +1,8 @@
 <RCC>
   <qresource prefix="/penguin">
     <file>Navigation.qml</file>
+    <file>SettingsNavigation.qml</file>
+    <file>CommandCenter.qml</file>
     <file>WorkspaceButton.qml</file>
     <file>icons/inspector.svg</file>
     <file>icons/sources.svg</file>
