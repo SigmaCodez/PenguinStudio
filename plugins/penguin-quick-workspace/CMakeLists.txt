@@ -1,0 +1,13 @@
+cmake_minimum_required(VERSION 3.28...3.30)
+find_package(Qt6 REQUIRED COMPONENTS Widgets QuickWidgets Qml)
+add_library(penguin-quick-workspace MODULE)
+target_sources(penguin-quick-workspace PRIVATE penguin-quick-workspace.cpp resources.qrc)
+set_target_properties(penguin-quick-workspace PROPERTIES AUTOMOC ON AUTORCC ON PREFIX "")
+target_link_libraries(penguin-quick-workspace PRIVATE OBS::libobs OBS::frontend-api Qt6::Widgets Qt6::QuickWidgets Qt6::Qml)
+install(TARGETS penguin-quick-workspace LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}/obs-modules/plugins")
+install(FILES README.md DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/obs/obs-modules/plugins/penguin-quick-workspace")
+
+if(PENGUIN_BUILD_TESTS)
+  add_library(penguin-quick-smoke MODULE tests/smoke.cpp)
+  target_link_libraries(penguin-quick-smoke PRIVATE OBS::libobs OBS::frontend-api Qt6::Widgets Qt6::QuickWidgets Qt6::Qml)
+endif()
