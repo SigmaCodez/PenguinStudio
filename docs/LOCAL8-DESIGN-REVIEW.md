@@ -84,8 +84,25 @@ Isolated English profiles and synthetic media only. Diagnostic artifacts are und
   frames, no reported losses. A single baseline and candidate run cannot establish
   a CPU regression or improvement; local8's two CPU stalls are not marked resolved.
 
-Physical Wayland keyboard acceptance remains pending.
-No installed-version or manual-input success is claimed until those checks finish.
+## Installed validation and user review
+
+System-wide installation of `0.7.1-1+ubuntu26.04.local8` completed successfully
+(installer exit 0). `dpkg-query` confirmed the version and `dpkg -V penguin-studio`
+reported no modified package files. No additional package was installed or removed.
+
+`local8-installed-dialogs` passed all 22 navigation checks under native Wayland at
+FontScale 14. The installed application started and closed normally, with no
+warning/error or QML error entries and zero OBS-reported memory leaks.
+
+The user subsequently confirmed visible keyboard focus and both requested page
+transitions: search Settings and Enter, then find Audio, Tab and Enter. This is
+user-reported acceptance; the earlier automated key-event monitor did not capture
+those inputs. Escape and reverse-Tab were not explicitly confirmed by the user.
+No further duplicate manual test was required for the two confirmed transitions.
+
+The two isolated CPU-mode stalls above remain unresolved evidence. Installation
+and keyboard acceptance do not convert them into a zero-loss claim. Nothing was
+pushed or published to GitHub.
 
 Package SHA-256:
 `586f4f569910d12d1678443eb007334e8b4cb022fa1e4b33d24503f4643d38ad`.
