@@ -50,6 +50,10 @@ activation, dock hiding/restoration and QML rendering. Keyboard dispatch explici
 focuses the embedded Qt Quick content and item before sending the key: compositor
 activation of an automated test window is not guaranteed under Wayland. This is
 an event-handling test, not proof of every physical keyboard/compositor interaction.
+Automated runs were intermittent when the window did not receive active focus,
+including a post-install run. Keep these failures in the evidence; do not count
+them as successful keyboard checks. Physical keyboard verification is requested
+separately before treating keyboard acceptance as complete.
 
 Both normal and enlarged text (FontScale 10 and 14) were inspected using real QML
 framebuffer captures. The existing workspace suite passed all 242 checks, including
