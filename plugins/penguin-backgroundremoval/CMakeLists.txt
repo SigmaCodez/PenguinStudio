@@ -120,6 +120,13 @@ target_include_directories(penguin-gpu-worker PRIVATE
   "${penguin_ort_SOURCE_DIR}/include" "${penguin_cv_SOURCE_DIR}/modules/core/include"
   "${penguin_cv_SOURCE_DIR}/modules/imgproc/include" "${penguin_cv_BINARY_DIR}" "${CMAKE_BINARY_DIR}")
 target_link_libraries(penguin-gpu-worker PRIVATE OBS::libobs opencv_core opencv_imgproc ${CMAKE_DL_LIBS})
+# Staged opt-in until all Linux package builders have a verified Rust toolchain.
+option(PENGUIN_RUST_PREPROCESS "Use fused Rust GPU camera preprocessing" OFF)
+if(PENGUIN_RUST_PREPROCESS)
+  add_subdirectory(rust-preprocess)
+  target_link_libraries(penguin-gpu-worker PRIVATE penguin-rust-preprocess)
+  target_compile_definitions(penguin-gpu-worker PRIVATE PENGUIN_RUST_PREPROCESS=1)
+endif()
 set_property(TARGET penguin-gpu-worker PROPERTY COMPILE_WARNING_AS_ERROR OFF)
 install(TARGETS penguin-gpu-worker RUNTIME DESTINATION "${OBS_PLUGIN_DESTINATION}/penguin-camera" COMPONENT Runtime)
 

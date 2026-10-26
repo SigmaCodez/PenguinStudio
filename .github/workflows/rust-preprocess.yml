@@ -1,0 +1,24 @@
+name: Rust camera preprocessing
+on:
+  push:
+    branches: [main]
+    paths: ['plugins/penguin-backgroundremoval/rust-preprocess/**', 'plugins/penguin-backgroundremoval/gpu-worker.cpp', 'plugins/penguin-backgroundremoval/CMakeLists.txt', '.github/workflows/rust-preprocess.yml']
+  pull_request:
+    paths: ['plugins/penguin-backgroundremoval/rust-preprocess/**', 'plugins/penguin-backgroundremoval/gpu-worker.cpp', 'plugins/penguin-backgroundremoval/CMakeLists.txt', '.github/workflows/rust-preprocess.yml']
+permissions:
+  contents: read
+jobs:
+  equivalence:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      - name: Install test toolchain
+        run: sudo apt-get update && sudo apt-get install --yes cargo rustc cmake ninja-build libopencv-core-dev libopencv-imgproc-dev
+      - name: Configure and build offline
+        run: |
+          cmake -S plugins/penguin-backgroundremoval/rust-preprocess -B build-rust -G Ninja -DCMAKE_BUILD_TYPE=Release
+          cmake --build build-rust
+      - name: Check FFI and numerical equivalence
+        run: ctest --test-dir build-rust --output-on-failure
+      - name: Record informational benchmark
+        run: build-rust/penguin-rust-preprocess-test --benchmark
