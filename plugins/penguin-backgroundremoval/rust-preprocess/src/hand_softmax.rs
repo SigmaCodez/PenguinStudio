@@ -27,6 +27,61 @@ fn lengths(
     Some((input, output))
 }
 
+// Keep uncertain contours on the original branchless loop, allowing the
+// compiler to optimize adjacent pixels together instead of interleaving
+// exponential work with the saturation tests.
+#[inline(never)]
+fn convert_exact(input: &[f32], output: &mut [MaybeUninit<f32>]) {
+    for (values, result) in input.chunks_exact(6).zip(output) {
+        // Match std::max_element for initial and subsequent NaNs.
+        let mut maximum = values[0];
+        for &value in &values[1..] {
+            if maximum < value {
+                maximum = value;
+            }
+        }
+        let mut sum = 0.0;
+        let mut skin = 0.0;
+        for (channel, &value) in values.iter().enumerate() {
+            let probability = (value - maximum).exp();
+            sum += probability;
+            if channel == 2 {
+                skin = probability;
+            }
+        }
+        let alpha = ((skin / sum - 0.2) / 0.45).clamp(0.0, 1.0);
+        result.write(alpha * alpha * (3.0 - 2.0 * alpha));
+    }
+}
+
+fn saturated(values: &[f32]) -> Option<f32> {
+    let mut maximum = values[0];
+    for &value in &values[1..] {
+        if maximum < value {
+            maximum = value;
+        }
+    }
+    // Conservative gaps leave a large margin from the existing probability
+    // thresholds, including float rounding. Nonfinite logits always retain the
+    // original exponential path. Scan finiteness only for shortcut candidates.
+    if maximum - values[2] >= 2.0 && values.iter().all(|value| value.is_finite()) {
+        // p(skin) <= exp(-2) < 0.136 < 0.2: clamped alpha is exactly zero.
+        return Some(0.0);
+    }
+    let skin = values[2];
+    if skin - values[0] >= 3.0
+        && skin - values[1] >= 3.0
+        && skin - values[3] >= 3.0
+        && skin - values[4] >= 3.0
+        && skin - values[5] >= 3.0
+        && values.iter().all(|value| value.is_finite())
+    {
+        // p(skin) >= 1 / (1 + 5*exp(-3)) > 0.8 > 0.65: alpha is exactly one.
+        return Some(1.0);
+    }
+    None
+}
+
 fn convert(
     input: &[f32],
     output: &mut [MaybeUninit<f32>],
@@ -35,29 +90,29 @@ fn convert(
     input_stride: usize,
     output_stride: usize,
 ) {
+    const BLOCK: usize = 64;
     for y in 0..height {
         let source = &input[y * input_stride..y * input_stride + width * 6];
         let target = &mut output[y * output_stride..y * output_stride + width];
-        for (values, result) in source.chunks_exact(6).zip(target) {
-            // Match std::max_element: an initial NaN remains the maximum and
-            // later NaNs do not replace it. f32::max would behave differently.
-            let mut maximum = values[0];
-            for &value in &values[1..] {
-                if maximum < value {
-                    maximum = value;
+        for (pixels, results) in source.chunks(BLOCK * 6).zip(target.chunks_mut(BLOCK)) {
+            let count = results.len();
+            // Sampling chooses an implementation, never an output approximation.
+            // Uncertain blocks retain the original branchless conversion; all
+            // pixels in a candidate block are still checked independently.
+            if [0, count / 2, count - 1]
+                .iter()
+                .any(|&i| saturated(&pixels[i * 6..i * 6 + 6]).is_none())
+            {
+                convert_exact(pixels, results);
+                continue;
+            }
+            for (values, result) in pixels.chunks_exact(6).zip(results) {
+                if let Some(alpha) = saturated(values) {
+                    result.write(alpha);
+                } else {
+                    convert_exact(values, std::slice::from_mut(result));
                 }
             }
-            let mut sum = 0.0;
-            let mut skin = 0.0;
-            for (channel, &value) in values.iter().enumerate() {
-                let probability = (value - maximum).exp();
-                sum += probability;
-                if channel == 2 {
-                    skin = probability;
-                }
-            }
-            let alpha = ((skin / sum - 0.2) / 0.45).clamp(0.0, 1.0);
-            result.write(alpha * alpha * (3.0 - 2.0 * alpha));
         }
     }
 }
@@ -184,6 +239,43 @@ mod tests {
             // sole element. The test deliberately starts with fresh storage.
             let actual = unsafe { out[0].assume_init() };
             assert!(actual.to_bits() == expected.to_bits() || actual.is_nan() && expected.is_nan());
+        }
+    }
+    #[test]
+    fn saturation_boundaries_and_finite_bit_patterns_match_reference() {
+        let check = |values: [f32; 6]| {
+            let mut out = [MaybeUninit::uninit()];
+            convert(&values, &mut out, 1, 1, 6, 1);
+            // SAFETY: conversion initialized this single logical output pixel.
+            let actual = unsafe { out[0].assume_init() };
+            assert_eq!(actual.to_bits(), reference(&values).to_bits(), "{values:?}");
+        };
+        for base in [-1000.0, -32.0, 0.0, 32.0, 1000.0, 1.0e20] {
+            for competitor in [0, 1, 3, 4, 5] {
+                for threshold in [2.0_f32, 3.0_f32] {
+                    for offset in -64_i32..=64 {
+                        let gap =
+                            f32::from_bits((threshold.to_bits() as i64 + offset as i64) as u32);
+                        let mut background = [base - 5.0; 6];
+                        background[2] = base;
+                        background[competitor] = base + gap;
+                        check(background);
+                        let mut skin = [base; 6];
+                        skin[2] = base + gap;
+                        check(skin);
+                    }
+                }
+            }
+        }
+        let mut state = 319_u32;
+        for _ in 0..100_000 {
+            let mut values = [0.0; 6];
+            for value in &mut values {
+                state = state.wrapping_mul(1664525).wrapping_add(1013904223);
+                // Preserve sign and mantissa, restricting exponent to finite.
+                *value = f32::from_bits(state & 0xff7f_ffff);
+            }
+            check(values);
         }
     }
     #[test]

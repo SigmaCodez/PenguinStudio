@@ -43,6 +43,7 @@
 #include "../../managed-threads.hpp"
 #include "../../gpu-worker-client.hpp"
 #include <filesystem>
+#include <cstring>
 #include <util/platform.h>
 // Penguin Studio manages component updates.
 
@@ -73,6 +74,9 @@ struct background_removal_filter : public filter_data, public std::enable_shared
 
 	gs_effect_t *effect;
 	gs_effect_t *kawaseBlurEffect;
+	// Graphics-thread-owned scratch textures survive frames of the same size.
+	gs_texture_t *alphaTexture = nullptr;
+	gs_texrender_t *blurPasses[2] = {nullptr, nullptr};
 
 	std::mutex modelMutex;
 	std::atomic<int> penguinStatus{1};
@@ -511,6 +515,10 @@ void background_filter_destroy(void *data)
 			}
 			gs_effect_destroy((*ptr)->effect);
 			gs_effect_destroy((*ptr)->kawaseBlurEffect);
+			gs_texture_destroy((*ptr)->alphaTexture);
+			for (auto *pass : (*ptr)->blurPasses) {
+				gs_texrender_destroy(pass);
+			}
 			obs_leave_graphics();
 		}
 		// Delete the pointer to shared_ptr
@@ -772,14 +780,49 @@ static void background_filter_process_current_frame(void *data)
 	}
 }
 
+static gs_texture_t *reuse_texture(gs_texture_t *&texture, uint32_t width, uint32_t height,
+				  gs_color_format format, uint32_t flags)
+{
+	if (texture && (gs_texture_get_width(texture) != width || gs_texture_get_height(texture) != height)) {
+		gs_texture_destroy(texture);
+		texture = nullptr;
+	}
+	if (!texture) {
+		texture = gs_texture_create(width, height, format, 1, nullptr, flags);
+	}
+	return texture;
+}
+
+static bool upload_alpha_texture(gs_texture_t *texture, const cv::Mat &mask)
+{
+	uint8_t *pixels = nullptr;
+	uint32_t pitch = 0;
+	if (!gs_texture_map(texture, &pixels, &pitch)) {
+		return false;
+	}
+	if (!pixels || pitch < uint32_t(mask.cols)) {
+		gs_texture_unmap(texture);
+		return false;
+	}
+	// Copy only logical pixels. Both OpenCV and graphics backends may pad rows.
+	for (int y = 0; y < mask.rows; ++y) {
+		std::memcpy(pixels + size_t(y) * pitch, mask.ptr<uint8_t>(y), size_t(mask.cols));
+	}
+	gs_texture_unmap(texture);
+	return true;
+}
+
 static gs_texture_t *blur_background(std::shared_ptr<background_removal_filter> tf, uint32_t width, uint32_t height,
 				     gs_texture_t *alphaTexture)
 {
 	if (tf->blurBackground == 0 || !tf->kawaseBlurEffect) {
+		for (auto *&pass : tf->blurPasses) {
+			gs_texrender_destroy(pass);
+			pass = nullptr;
+		}
 		return nullptr;
 	}
-	gs_texture_t *blurredTexture = gs_texture_create(width, height, GS_BGRA, 1, nullptr, 0);
-	gs_copy_texture(blurredTexture, gs_texrender_get_texture(tf->texrender));
+	gs_texture_t *blurredTexture = gs_texrender_get_texture(tf->texrender);
 	gs_eparam_t *image = gs_effect_get_param_by_name(tf->kawaseBlurEffect, "image");
 	gs_eparam_t *focalmask = gs_effect_get_param_by_name(tf->kawaseBlurEffect, "focalmask");
 	gs_eparam_t *xOffset = gs_effect_get_param_by_name(tf->kawaseBlurEffect, "xOffset");
@@ -790,8 +833,18 @@ static gs_texture_t *blur_background(std::shared_ptr<background_removal_filter> 
 	gs_eparam_t *blurFocusDepthParam = gs_effect_get_param_by_name(tf->kawaseBlurEffect, "blurFocusDepth");
 
 	for (int i = 0; i < (int)tf->blurBackground; i++) {
-		gs_texrender_reset(tf->texrender);
-		if (!gs_texrender_begin(tf->texrender, width, height)) {
+		// Alternate render targets so the previous pass is sampled directly.
+		// This avoids the initial full-frame copy and a copy after each iteration.
+		auto *&pass = tf->blurPasses[i % 2];
+		if (!pass) {
+			pass = gs_texrender_create(GS_BGRA, GS_ZS_NONE);
+		}
+		if (!pass) {
+			obs_log(LOG_INFO, "Could not create background blur texrender!");
+			return blurredTexture;
+		}
+		gs_texrender_reset(pass);
+		if (!gs_texrender_begin(pass, width, height)) {
 			obs_log(LOG_INFO, "Could not open background blur texrender!");
 			return blurredTexture;
 		}
@@ -818,8 +871,8 @@ static gs_texture_t *blur_background(std::shared_ptr<background_removal_filter> 
 			gs_draw_sprite(blurredTexture, 0, width, height);
 		}
 		gs_blend_state_pop();
-		gs_texrender_end(tf->texrender);
-		gs_copy_texture(blurredTexture, gs_texrender_get_texture(tf->texrender));
+		gs_texrender_end(pass);
+		blurredTexture = gs_texrender_get_texture(pass);
 	}
 	return blurredTexture;
 }
@@ -885,8 +938,8 @@ void background_filter_video_render(void *data, gs_effect_t *_effect)
 			return;
 		}
 
-		alphaTexture = gs_texture_create(tf->backgroundMask.cols, tf->backgroundMask.rows, GS_R8, 1,
-						 (const uint8_t **)&tf->backgroundMask.data, 0);
+		alphaTexture = reuse_texture(tf->alphaTexture, tf->backgroundMask.cols, tf->backgroundMask.rows,
+					     GS_R8, GS_DYNAMIC);
 
 		if (!alphaTexture) {
 			obs_log(LOG_ERROR, "Failed to create alpha texture");
@@ -895,17 +948,27 @@ void background_filter_video_render(void *data, gs_effect_t *_effect)
 			}
 			return;
 		}
+		if (!upload_alpha_texture(alphaTexture, tf->backgroundMask)) {
+			// Never display a previous frame's mask after an upload failure.
+			gs_texture_destroy(tf->alphaTexture);
+			tf->alphaTexture = nullptr;
+			obs_log(LOG_ERROR, "Failed to upload alpha texture; preserving the input");
+			obs_source_skip_video_filter(tf->source);
+			return;
+		}
 	}
 
 	// Output the masked image
 	gs_texture_t *blurredTexture = blur_background(tf, width, height, alphaTexture);
+	if (tf->blurBackground > 0 && !blurredTexture) {
+		obs_source_skip_video_filter(tf->source);
+		return;
+	}
 
 	if (!obs_source_process_filter_begin(tf->source, GS_RGBA, OBS_ALLOW_DIRECT_RENDERING)) {
 		if (tf->source) {
 			obs_source_skip_video_filter(tf->source);
 		}
-		gs_texture_destroy(alphaTexture);
-		gs_texture_destroy(blurredTexture);
 		return;
 	}
 
@@ -936,6 +999,4 @@ void background_filter_video_render(void *data, gs_effect_t *_effect)
 
 	gs_blend_state_pop();
 
-	gs_texture_destroy(alphaTexture);
-	gs_texture_destroy(blurredTexture);
 }

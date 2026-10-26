@@ -300,3 +300,85 @@ in `/var/tmp/penguin-rust-local3`. User settings and accounts were not used by t
 Tooling note: preparing the isolated minimum-version check also updated the local
 rustup manager to 1.29.2. The active rustc/cargo toolchain remains 1.98.0; the
 prepared CI installation explicitly disables rustup self-updates.
+
+## Fourth local candidate: exact shortcuts and GPU resource reuse
+
+Local4 keeps the public 0.7.1 version. It reduces work in the existing Rust
+hand-mask converter and in the existing OBS graphics path, without changing the
+models, shaders, mask thresholds, frame rate or inference resolution.
+
+The Rust converter uses conservative finite-logit bounds to return the same
+clamped alpha of exactly zero or one without evaluating six exponentials.
+A non-skin maximum at least 2 above the skin logit implies a skin probability
+below 0.136, safely below the existing 0.2 threshold. Skin at least 3 above every
+other logit implies probability above 0.8, safely above the existing 0.65 upper
+threshold. Nonfinite values retain the original path. Fixed 64-pixel blocks choose
+an implementation using samples; every pixel still receives its own exact result.
+Uncertain blocks retain the previous branchless loop. No new unsafe code, C ABI,
+allocation or persistent classifier state is introduced.
+
+A direct per-pixel shortcut prototype was rejected for making ambiguous contours
+about 44% slower. The final block dispatch measured approximately 281 µs for mixed
+logits, 333 µs for ambiguous logits, 43 µs for confident background and 65 µs for
+confident skin, versus about 331 µs for local3. These are workload-dependent
+320×192-camera hand-mask microbenchmarks (256×154 crop), not whole-app CPU savings.
+Eight Rust tests pass on current Rust and 1.74. The comparisons include 100,000
+finite bit patterns, 15,600 independent C++ boundary cases, strided/nonfinite
+inputs, guard pages and mixed-block cases. An additional RGB SIMD conversion
+was rejected: about 3.7 µs saving did not justify another unsafe SIMD kernel.
+
+The graphics changes stay in C++ because OBS owns the graphics context/resources:
+
+- Reuse the alpha texture with checked map/copy/unmap, correct row pitches and
+  resizing. A failed upload preserves the source instead of showing a stale mask.
+- Alternate two cached blur render targets and sample each preceding pass directly.
+  This removes the initial full-frame copy and one copy after each blur iteration.
+- Release resources in the graphics context; disabling blur releases its targets.
+  Multi-pass blur can retain one additional BGRA scratch frame compared with the
+  previous path. This trades bounded VRAM for fewer allocations and image copies.
+
+Native RX 9070 XT/Wayland comparisons passed 100 alpha-upload cases and 72 blur
+cases, including odd/padded dimensions, resizing, standard/focal blur and 1–8
+passes. Maximum output-byte difference was zero. Reproducible native graphics
+checks and instructions are under `plugins/penguin-backgroundremoval/tests/`.
+These results establish eliminated GPU copies, not a measured system-wide GPU
+utilization or power reduction.
+
+Package A/B comparison against installed local3 used the same synthetic fixture,
+RX 9070 XT, native Wayland session and isolated English profiles. Each image and
+blur recording decoded 30.100 seconds, 900 video frames and 1,405 audio frames,
+without reported loss events, warning/error entries or OBS leaks at shutdown.
+The decoded RGBA frame at 20 seconds was byte-identical in both modes.
+
+Plugin-call instrumentation over each entire application run (about 1,203 render
+calls, including startup/shutdown) measured:
+
+| Work | local3 | local4 |
+| --- | ---: | ---: |
+| Alpha texture creates | 1,203 | 1 |
+| Extra full-frame copies, eight-pass blur | 10,827 | 0 |
+
+All tracked resources were released. The new blur uses persistent render targets;
+zero direct BGRA texture-create calls does not mean zero GPU storage allocation.
+Alpha-hash sets matched, but their sequence/frequency varied slightly, so full
+inference-sequence identity is not claimed. Direct graphics checks had zero byte
+difference across all 172 cases. Comparison reports are privately retained under
+`/var/tmp/penguin-obs33/rust-local4-candidate-{image,blur}/comparison.json`.
+
+The final package lifecycle check switched image → blur → image → blur and
+resized the synthetic input from 1254×1254 to 640×360 and then 960×540, retaining
+the matting instance. All nine phase/dimension checks passed. The subsequent
+30.100-second recording decoded 900 video and 1,405 audio frames, without
+reported losses, warnings/errors or OBS leaks. All five render targets and the
+alpha texture were released; no additional texture-copy calls occurred.
+
+The CPU package recording also decoded 900 video and 1,405 audio frames without
+reported losses or shutdown errors. All 242 native Wayland workspace checks
+passed. These are isolated synthetic-media regressions, not a new live Facecam
+movement assessment.
+
+The local4 DEB changes only the background-removal module and GPU worker payloads
+relative to local3. Other files, including author/license notices, are identical.
+APT's simulation upgrades only Penguin Studio, adding/removing no packages.
+Package SHA-256:
+`8991ae5794c6fb3c6d6c97236ae7c167046d90d75c4c2d9efa4136d42f6cd841`.

@@ -7,6 +7,7 @@
 #include <limits>
 #include <random>
 #include <stdexcept>
+#include <string>
 #include <vector>
 #ifdef __linux__
 #include <sys/mman.h>
@@ -118,15 +119,86 @@ static void checkGuardPages()
 #endif
 }
 
+static void checkSaturationBoundaries()
+{
+	for (float base : {-1000.f, -32.f, 0.f, 32.f, 1000.f, 1.e20f}) {
+		for (int competitor : {0, 1, 3, 4, 5}) {
+			for (float threshold : {2.f, 3.f}) {
+				for (int direction : {-1, 1}) {
+					float gap = threshold;
+					for (int step = 0; step <= 64; ++step) {
+						float values[6], result;
+						std::fill(values, values + 6, base - 5.f);
+						values[2] = base;
+						values[competitor] = base + gap;
+						require(penguin_logits6_to_skin_mask(values, 6, 1, 1, 6, &result, 1, 1) == 1,
+							"Background saturation case rejected");
+						same(result, reference(values));
+						std::fill(values, values + 6, base);
+						values[2] = base + gap;
+						require(penguin_logits6_to_skin_mask(values, 6, 1, 1, 6, &result, 1, 1) == 1,
+							"Skin saturation case rejected");
+						same(result, reference(values));
+						gap = std::nextafter(gap, direction < 0 ? 0.f : 10.f);
+					}
+				}
+			}
+		}
+	}
+	std::cout << "15,600 saturation-boundary cases match the original C++ calculation\n";
+}
+
+static void checkBlockDispatch()
+{
+	for (size_t width : {1, 7, 63, 64, 65, 127, 128, 129, 256}) {
+		for (int pattern = 0; pattern < 4; ++pattern) {
+			std::vector<float> input(width * 6, 0.f), output(width);
+			for (size_t x = 0; x < width; ++x) {
+				// Saturated samples must never cause the interior of a block to
+				// be approximated, including uncertain or nonfinite interior pixels.
+				input[x * 6 + 2] = pattern == 0 || x % 64 == 0 || x % 64 == 32 || x % 64 == 63
+							  ? -8.f : 0.5f;
+				if (pattern == 2 && x % 2)
+					input[x * 6 + 1] = std::numeric_limits<float>::quiet_NaN();
+				if (pattern == 3 && x % 2)
+					input[x * 6 + 2] = 8.f;
+			}
+			require(penguin_logits6_to_skin_mask(input.data(), input.size(), width, 1, width * 6,
+						    output.data(), output.size(), width) == 1,
+				"Block dispatch case rejected");
+			for (size_t x = 0; x < width; ++x)
+				same(output[x], reference(input.data() + x * 6));
+		}
+	}
+	std::cout << "36 mixed block-boundary cases preserve every pixel\n";
+}
+
 static volatile float sink;
-static void benchmark()
+static void benchmark(const char *distribution)
 {
 	// Actual hand-model crop for the GPU worker's 320x192 frame: round(192*256/320)=154.
 	constexpr size_t width = 256, height = 154, pixels = width * height;
 	std::mt19937 rng(29);
 	std::vector<float> input(pixels * 6), output(pixels);
-	for (float &value : input)
-		value = (int(rng() % 1601) - 800) / 100.f;
+	for (size_t pixel = 0; pixel < pixels; ++pixel) {
+		for (size_t channel = 0; channel < 6; ++channel) {
+			float value = (int(rng() % 1601) - 800) / 100.f;
+			if (std::string(distribution) == "ambiguous")
+				value *= 0.1f;
+			else if (std::string(distribution) == "background")
+				value = channel == 2 ? -8.f : value * 0.1f;
+			else if (std::string(distribution) == "skin")
+				value = channel == 2 ? 8.f : value * 0.1f;
+			input[pixel * 6 + channel] = value;
+		}
+	}
+	// Check all benchmark pixels, including distributions taking the exact
+	// saturation paths, against the original before measuring any timing.
+	require(penguin_logits6_to_skin_mask(input.data(), input.size(), width, height,
+					    width * 6, output.data(), output.size(), width) == 1,
+		"Benchmark verification conversion failed");
+	for (size_t pixel = 0; pixel < pixels; ++pixel)
+		same(output[pixel], reference(input.data() + pixel * 6));
 	std::vector<double> times[3];
 	for (int trial = 0; trial < 9; ++trial) {
 		for (int step = 0; step < 3; ++step) {
@@ -149,7 +221,7 @@ static void benchmark()
 	}
 	for (auto &values : times)
 		std::sort(values.begin(), values.end());
-	std::cout << "Median microseconds/frame (256x154, 9x100): C++=" << times[0][4]
+	std::cout << "Median microseconds/frame (256x154, 9x100, " << distribution << "): C++=" << times[0][4]
 		  << " Rust=" << times[1][4] << " C++-cached-exp=" << times[2][4] << '\n';
 }
 
@@ -158,8 +230,11 @@ int main(int argc, char **)
 	try {
 		checkLayouts();
 		checkGuardPages();
+		checkSaturationBoundaries();
+		checkBlockDispatch();
 		if (argc > 1)
-			benchmark();
+			for (const char *distribution : {"mixed", "ambiguous", "background", "skin"})
+				benchmark(distribution);
 	} catch (const std::exception &error) {
 		std::cerr << error.what() << '\n';
 		return 1;
