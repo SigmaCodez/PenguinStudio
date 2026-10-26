@@ -8,7 +8,7 @@
 #include <thread>
 
 // One reusable companion thread, with an explicit completion future per frame.
-// The caller joins each result before submitting another; frames are never dropped.
+// The caller consumes each result before submitting another and owns frame admission.
 class PenguinSingleTaskWorker {
 	std::mutex mutex;
 	std::condition_variable wake;

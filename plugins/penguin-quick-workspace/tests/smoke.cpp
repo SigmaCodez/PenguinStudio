@@ -16,6 +16,7 @@
 #include <QKeyEvent>
 #include <QFocusEvent>
 #include <QMenu>
+#include <QToolButton>
 #include <obs.h>
 #include <obs-frontend-api.h>
 namespace {
@@ -31,6 +32,14 @@ void tick(){
  if(ticks==40){
   check("qml_ready",view&&view->status()==QQuickWidget::Ready);
   check("native_wayland",QGuiApplication::platformName()=="wayland");
+  check("simple_workspace_active",main->property("penguinSimpleWorkspace").toBool());
+  for (const char *name : {"penguinDestinationsButton", "penguinDetailsButton", "penguinInspectorButton", "penguinClipButton", "penguinCanvasMode"}) {
+   auto *shortcut=main->findChild<QWidget*>(name); report[QString("duplicate_hidden_%1").arg(name)]=shortcut && !shortcut->isVisible();
+  }
+  auto *live=main->findChild<QToolButton*>("penguinLiveButton");check("one_live_button_no_split_menu",live && !live->menu() && live->popupMode()!=QToolButton::MenuButtonPopup);
+  auto *advanced=main->findChild<QToolButton*>("penguinToolbarButton");check("advanced_tools_labeled",advanced && advanced->text()=="Advanced" && advanced->toolButtonStyle()==Qt::ToolButtonTextBesideIcon);
+  check("advanced_clip_preserved",main->findChild<QAction*>("penguinClipButtonAdvancedAction"));
+  check("advanced_studio_preserved",main->findChild<QAction*>("penguinCanvasModeAdvancedAction"));
   if(!view){finish();return;}
   auto *dock=main->findChild<QDockWidget*>("penguinQuickWorkspace");if(qEnvironmentVariableIsSet("PENGUIN_EXPECT_HIDDEN")){check("hidden_state_restored",dock&&!dock->isVisible());dock->show();}
   for (const char *name : {"Starting soon", "Main stage"}) { auto *existing=obs_get_source_by_name(name); if(!existing) {auto *scene=obs_scene_create(name);obs_scene_release(scene);} obs_source_release(existing); }
@@ -50,7 +59,7 @@ void tick(){
   QObject *bridge=view->rootContext()->contextProperty("bridge").value<QObject*>();
   auto *source=obs_frontend_get_current_scene();check("scene_selection_synced",source&&bridge->property("currentScene").toString()==QString::fromUtf8(obs_source_get_uuid(source)));obs_source_release(source);
   auto *chat=main->findChild<QDockWidget*>("penguinTwitchChat");check("keyboard_opens_chat",chat&&chat->isVisible());
-  for(auto pair:{qMakePair("navManageScenes","scenesDock"),qMakePair("navSources","sourcesDock"),qMakePair("navAudio","mixerDock"),qMakePair("navInspector","penguinInspectorDock"),qMakePair("navOutputs","penguin-broadcast-destinations"),qMakePair("navDetails","penguin-stream-details")}){
+  for(auto pair:{qMakePair("navManageScenes","scenesDock"),qMakePair("navInspector","penguinInspectorDock"),qMakePair("navOutputs","penguin-broadcast-destinations"),qMakePair("navDetails","penguin-stream-details")}){
    auto *button=view->rootObject()->findChild<QObject*>(pair.first);if(button)QMetaObject::invokeMethod(button,"triggered");auto *dock=main->findChild<QDockWidget*>(pair.second);check(pair.first,dock&&dock->isVisible());if(dock)dock->grab().save(qEnvironmentVariable("PENGUIN_SMOKE_DIR")+"/"+pair.first+".png");if(dock&&QString::fromLatin1(pair.second)=="scenesDock")dock->hide();
   }
  }
@@ -63,7 +72,10 @@ void tick(){
   QMetaObject::invokeMethod(bridge,"arrangeWorkspace");
   auto *sources=main->findChild<QDockWidget*>("sourcesDock");check("new_layout_reapplied",sources&&main->dockWidgetArea(sources)==Qt::BottomDockWidgetArea);
  }
- if(ticks==75&&view){auto *dock=main->findChild<QDockWidget*>("penguinQuickWorkspace");dock->hide();check("classic_fallback",!dock->isVisible()&&main->findChild<QWidget*>("penguinTopBar"));dock->show();}
+ if(ticks==75&&view){auto *dock=main->findChild<QDockWidget*>("penguinQuickWorkspace");dock->hide();check("classic_fallback",!dock->isVisible()&&main->findChild<QWidget*>("penguinTopBar"));
+  check("fallback_restores_shortcut",main->findChild<QWidget*>("penguinDestinationsButton")->isVisible());
+  auto *advanced=main->findChild<QToolButton*>("penguinToolbarButton");check("fallback_restores_more_label",advanced && advanced->text()!="Advanced");
+  dock->show();check("simple_mode_returns",main->property("penguinSimpleWorkspace").toBool());}
  if(ticks==85&&view){
   auto image=view->grabFramebuffer();check("qml_capture",!image.isNull());image.save(qEnvironmentVariable("PENGUIN_SMOKE_DIR")+"/navigation.png");main->grab().save(qEnvironmentVariable("PENGUIN_SMOKE_DIR")+"/workspace.png");auto *dock=main->findChild<QDockWidget*>("penguinQuickWorkspace"); check("docked",dock && !dock->isFloating()); check("visible",dock && dock->isVisible()); report["dock_x"]=dock->x(); report["dock_y"]=dock->y(); check("usable_width",view->width()>=228);if(qEnvironmentVariableIsSet("PENGUIN_HIDE_FINAL"))dock->hide();finish();
  }

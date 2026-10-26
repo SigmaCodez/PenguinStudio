@@ -62,6 +62,9 @@ class PenguinGPUWorker {
 	}
 
 public:
+	// This watchdog is for off-render-thread transactions, not a frame deadline.
+	// A single scheduling delay must not permanently disable an otherwise healthy GPU.
+	static constexpr int BackgroundFrameBudgetMs = 250;
 	PenguinGPUWorker(const std::string &executable, const std::string &runtime, const std::string &models,
 			 const std::string &cache, int threads, bool hands, int transferBudgetMs = 40)
 		: budgetMs(transferBudgetMs)

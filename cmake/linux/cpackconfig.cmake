@@ -35,14 +35,14 @@ if(OS_LINUX)
   set(CPACK_DEBIAN_PACKAGE_MAINTAINER "SigmaCodez")
   set(CPACK_DEBIAN_FILE_NAME DEB-DEFAULT)
   set(CPACK_DEBIAN_PACKAGE_SECTION "video")
-  set(CPACK_DEBIAN_PACKAGE_DEPENDS "qt6-wayland, qt6-svg-plugins, pkexec")
-  set(CPACK_DEBIAN_PACKAGE_RECOMMENDS "pipewire, xdg-desktop-portal, mesa-va-drivers")
+  set(CPACK_DEBIAN_PACKAGE_DEPENDS "qt6-wayland, qt6-svg-plugins, pkexec, qml6-module-qtquick, qml6-module-qtquick-layouts, qml6-module-qtqml, qml6-module-qtqml-models, qml6-module-qtqml-workerscript")
+  set(CPACK_DEBIAN_PACKAGE_RECOMMENDS "pipewire, xdg-desktop-portal, mesa-va-drivers, adwaita-icon-theme")
   # Penguin Studio retains libobs ABI and install paths. A native OBS install owns these files.
   set(CPACK_DEBIAN_PACKAGE_CONFLICTS "obs-studio, obs-studio-common, obs-plugins, libobs0, libobs0t64, libobs-dev")
   set(CPACK_RPM_FILE_NAME RPM-DEFAULT)
   set(CPACK_RPM_PACKAGE_LICENSE "GPL-2.0-or-later")
   set(CPACK_RPM_PACKAGE_GROUP "Applications/Multimedia")
-  set(CPACK_RPM_PACKAGE_REQUIRES "qt6-qtwayland, polkit")
+  set(CPACK_RPM_PACKAGE_REQUIRES "qt6-qtwayland, qt6-qtdeclarative, polkit")
   set(CPACK_RPM_PACKAGE_SUGGESTS "pipewire, xdg-desktop-portal")
   set(
     CPACK_RPM_PACKAGE_CONFLICTS

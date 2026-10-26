@@ -17,6 +17,9 @@
  ******************************************************************************/
 
 #include <utility/PenguinHardwareEncoder.hpp>
+#ifdef __linux__
+#include <utility/PenguinLinuxUpdater.hpp>
+#endif
 #include "OBSBasicSettings.hpp"
 #include "OBSHotkeyLabel.hpp"
 #include "OBSHotkeyWidget.hpp"
@@ -594,7 +597,14 @@ OBSBasicSettings::OBSBasicSettings(QWidget *parent)
 	ui->advOutFFVBitrate->setSuffix(" Kbps");
 	ui->advOutFFABitrate->setSuffix(" Kbps");
 
-#if !defined(_WIN32) && !defined(ENABLE_SPARKLE_UPDATER)
+#if defined(__linux__)
+	ui->updateChannelLabel->hide();
+	ui->updateChannelBox->hide();
+	auto *checkUpdates = new QPushButton(QTStr("Penguin.Update.Check"), ui->updateSettingsGroupBox);
+	checkUpdates->setObjectName("penguinSettingsCheckUpdates");
+	ui->formLayout_20->addRow(checkUpdates);
+	connect(checkUpdates, &QPushButton::clicked, this, [this] { CheckPenguinLinuxUpdates(main, true); });
+#elif !defined(_WIN32) && !defined(ENABLE_SPARKLE_UPDATER)
 	delete ui->updateSettingsGroupBox;
 	ui->updateSettingsGroupBox = nullptr;
 	ui->updateChannelLabel = nullptr;
@@ -1280,7 +1290,7 @@ void OBSBasicSettings::LoadGeneralSettings()
 
 	LoadLanguageList();
 
-#if defined(_WIN32) || defined(ENABLE_SPARKLE_UPDATER)
+#if defined(_WIN32) || defined(ENABLE_SPARKLE_UPDATER) || defined(__linux__)
 	bool enableAutoUpdates = config_get_bool(App()->GetAppConfig(), "General", "EnableAutoUpdates");
 	ui->enableAutoUpdates->setChecked(enableAutoUpdates);
 
@@ -3046,11 +3056,13 @@ void OBSBasicSettings::SaveGeneralSettings()
 		config_set_string(App()->GetUserConfig(), "General", "Language", language.c_str());
 	}
 
-#if defined(_WIN32) || defined(ENABLE_SPARKLE_UPDATER)
+#if defined(_WIN32) || defined(ENABLE_SPARKLE_UPDATER) || defined(__linux__)
 	if (WidgetChanged(ui->enableAutoUpdates)) {
 		config_set_bool(App()->GetAppConfig(), "General", "EnableAutoUpdates",
 				ui->enableAutoUpdates->isChecked());
 	}
+#endif
+#if defined(_WIN32) || defined(ENABLE_SPARKLE_UPDATER)
 	int branchIdx = ui->updateChannelBox->currentIndex();
 	QString branchName = ui->updateChannelBox->itemData(branchIdx).toString();
 

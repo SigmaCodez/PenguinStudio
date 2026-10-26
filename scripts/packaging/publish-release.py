@@ -26,6 +26,8 @@ def collect_packages(root, version):
         del patterns['Ubuntu 24.04 (amd64)']
         patterns['AppImage (x86_64, glibc 2.43+)'] = patterns.pop('AppImage (x86_64, glibc 2.39+)')
         patterns['Snap core26 (amd64)'] = patterns.pop('Snap core24 (amd64)')
+    if tuple(map(int, version.split('.'))) >= (0, 7, 2):
+        patterns['Ubuntu 26.10 (amd64)'] = rf'penguin-studio_{re.escape(version)}-\d+\+ubuntu26\.10_amd64\.deb'
     packages = [p for p in root.rglob('*') if p.suffix in ('.deb', '.rpm', '.flatpak', '.snap', '.AppImage') or p.name.endswith('-aur.tar.gz')]
     selected = {}
     for target, pattern in patterns.items():
@@ -75,7 +77,7 @@ hardware and cross-desktop testing is still incomplete; see docs/VERIFICATION.md
 | Target | Download |
 | --- | --- |
 ''' + ''.join(f"| {a['target']} | [{a['file']}](https://github.com/{repo}/releases/download/{tag}/{a['file']}) |\n" for a in assets) + f'''
-The native Ubuntu DEB targets Ubuntu 26.04/26.04.1. Older hosts should use Flatpak or Snap.
+Native Ubuntu DEBs target Ubuntu 26.04/26.04.1 and Ubuntu 26.10. Choose the package matching your Ubuntu version. Older hosts should use Flatpak or Snap.
 The RPM targets Fedora 44. Flatpak requires the Freedesktop 26.08 runtime
 from Flathub. Snap requires snapd and local installation with --dangerous;
 it is a development build, not a Snap Store publication.

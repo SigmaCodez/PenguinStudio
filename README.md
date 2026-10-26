@@ -5,8 +5,8 @@
 <p>
   <a href="https://github.com/SigmaCodez/PenguinStudio/releases"><img src="https://img.shields.io/github/v/release/SigmaCodez/PenguinStudio?include_prereleases&amp;filter=penguin-v*&amp;sort=date&amp;label=release" alt="Latest Penguin Studio release"></a>
   <a href="https://github.com/SigmaCodez/PenguinStudio/actions/workflows/penguin-linux.yml"><img src="https://img.shields.io/github/actions/workflow/status/SigmaCodez/PenguinStudio/penguin-linux.yml?branch=main&amp;label=Tests%20and%20Linux%20packages&amp;logo=github" alt="Tests and Linux packages status on main"></a>
-  <a href="docs/ARCHITECTURE.md"><img src="https://img.shields.io/static/v1?label=core&amp;message=C%2FC%2B%2B&amp;color=blue" alt="Core: C/C++"></a>
-  <a href="docs/WORKSPACE.md"><img src="https://img.shields.io/static/v1?label=UI&amp;message=Qt%20Widgets&amp;color=41CD52&amp;logo=qt&amp;logoColor=white" alt="UI: Qt Widgets"></a>
+  <a href="docs/ARCHITECTURE.md"><img src="https://img.shields.io/static/v1?label=core&amp;message=C%2FC%2B%2B%20%2B%20Rust&amp;color=blue" alt="Core: C/C++ and Rust"></a>
+  <a href="docs/WORKSPACE.md"><img src="https://img.shields.io/static/v1?label=UI&amp;message=Qt%20Quick%20%2B%20Widgets&amp;color=41CD52&amp;logo=qt&amp;logoColor=white" alt="UI: Qt Quick and Widgets"></a>
   <a href="docs/PACKAGING.md"><img src="https://img.shields.io/static/v1?label=platform&amp;message=Linux&amp;color=0078D6" alt="Platform: Linux"></a>
   <a href="COPYING"><img src="https://img.shields.io/static/v1?label=license&amp;message=GPL-2.0-or-later&amp;color=blue" alt="License: GPL-2.0-or-later"></a>
 </p>
@@ -17,7 +17,7 @@ Penguin Studio brings a redesigned production workspace, native multi-destinatio
 
 ![Penguin Studio modern workspace with searchable layers and scenes, audio channel strips and an integrated inspector](docs/images/current/workspace-en.png)
 
-These English previews show the real 0.7.1 interface with synthetic demo media. See the [workspace guide](docs/WORKSPACE.md) for the controls and layout.
+These English previews show the previous 0.7.1 interface. Reviewed 0.7.2 captures are pending before publication. See the [workspace guide](docs/WORKSPACE.md) for the controls and layout.
 
 > Development preview. See [verification status](docs/VERIFICATION.md) for completed checks and remaining release tests, and [packaging](docs/PACKAGING.md) for development downloads and supported build targets. Validate your devices and streaming accounts before relying on this build for a live show.
 
@@ -36,14 +36,13 @@ These English previews show the real 0.7.1 interface with synthetic demo media. 
 
 ## Get started
 
-**Current release: [Penguin Studio 0.7.1](https://github.com/SigmaCodez/PenguinStudio/releases/tag/penguin-v0.7.1)** — a consistent interface across the workspace, Inspector, dialogs and chat, with clearer split-button menus, balanced control spacing and improved large-text layouts, on the OBS 33.0.0 engine.
+**Current release: [Penguin Studio 0.7.2](https://github.com/SigmaCodez/PenguinStudio/releases/tag/penguin-v0.7.2)** — simpler Qt Quick navigation, a redesigned CPU/GPU status bar, Settings update checks, asynchronous camera processing and native Ubuntu 26.10 packages, on the OBS 33.0.0 engine.
 
 Camera processing offers **Automatic**, **GPU** and **CPU**, with automatic CPU fallback. The optional Ubuntu 26.04 AMD runtime add-on enables primary GPU matting on the tested RX 9070 XT; hand preservation stays on CPU. Other package/hardware combinations retain CPU processing unless a compatible runtime is provided. See [camera GPU setup](docs/PACKAGING.md#optional-amd-camera-gpu-runtime).
 
 **[Download Linux packages](https://github.com/SigmaCodez/PenguinStudio/releases)** — Ubuntu DEB, Fedora RPM, Flatpak, Snap, AppImage and an Arch/AUR recipe, with SHA-256 checksums.
 
-**Ubuntu 26.04 / 26.04.1:** use a DEB built specifically for Ubuntu 26.04 or the
-Flatpak bundle. Choose the package matching your distribution release. See [installation and troubleshooting](docs/PACKAGING.md#ubuntu-2604--26041-installation).
+**Ubuntu 26.04 / 26.04.1 and Ubuntu 26.10:** use the DEB built specifically for your Ubuntu release or the Flatpak bundle. Choose the package matching your distribution release. See [installation and troubleshooting](docs/PACKAGING.md#ubuntu-2604--26041-installation).
 
 1. Install the Penguin Studio package for your system following the [installation guide](docs/PACKAGING.md).
 2. Launch `penguin-studio`. Finish the hardware configuration and destination assistants. Twitch and YouTube sign-in is optional during setup.

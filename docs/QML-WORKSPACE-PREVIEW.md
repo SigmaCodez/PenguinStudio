@@ -92,3 +92,10 @@ sidebar, Command center, native-action protections and camera scheduling changes
 The native settings page model remains authoritative. Closing the navigation dock
 only hides that dock; it does not disable the Settings or Command center surfaces.
 No public package flag or product version has changed.
+
+## Local9 simplified presentation
+
+See [the local9 review](LOCAL9-CPU-AND-WORKSPACE-REVIEW.md) for the scene-first
+Workspace, removal of redundant toolbar shortcuts, single context panel and
+Advanced tools. Native actions and the complete menu remain available. This is
+still a local-review build; public previews and product version are unchanged.

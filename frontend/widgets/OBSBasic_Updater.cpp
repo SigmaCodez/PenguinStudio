@@ -184,7 +184,7 @@ void OBSBasic::TimedCheckForUpdates()
 	}
 
 #if defined(__linux__)
-	QTimer::singleShot(30000, this, [this]() {
+	QTimer::singleShot(5000, this, [this]() {
 		if (!isClosing() && !App()->IsUpdaterDisabled()) {
 			CheckPenguinLinuxUpdates(this, false);
 		}

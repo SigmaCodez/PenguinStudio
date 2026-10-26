@@ -21,6 +21,22 @@ int main()
 				++calls;
 			}).get();
 		}
+		// A render tick must be able to inspect an unfinished job without waiting.
+		// Completion publishes the frame identity and its corresponding result together.
+		std::promise<void> entered, release;
+		auto gate = release.get_future();
+		int frame = 0, mask = 0;
+		auto pending = worker.submit([&] {
+			entered.set_value();
+			gate.wait();
+			frame = 71;
+			mask = 71;
+		});
+		entered.get_future().wait();
+		require(pending.wait_for(std::chrono::seconds(0)) == std::future_status::timeout);
+		release.set_value();
+		pending.get();
+		require(frame == 71 && mask == frame);
 		bool caught = false;
 		try { worker.submit([] { throw std::runtime_error("Expected test failure"); }).get(); }
 		catch (const std::runtime_error &) { caught = true; }

@@ -26,6 +26,7 @@ cmake -S "$project_root" -B "$build_dir" -G Ninja \
   -DOBS_VERSION_OVERRIDE=33.0.0 -DENABLE_WAYLAND=ON -DENABLE_BROWSER=ON -DENABLE_NVENC=ON \
   -DCEF_ROOT_DIR="$cef_dir" -DENABLE_AJA=OFF -DENABLE_VLC=ON \
   -DENABLE_WEBRTC=OFF -DENABLE_LIBFDK=OFF -DPENGUIN_BUILD_TESTS=ON \
+  -DPENGUIN_RUST_PREPROCESS=ON -DPENGUIN_QUICK_WORKSPACE_PREVIEW=ON \
   -DOBS_COMPILE_DEPRECATION_AS_WARNING=ON "${package_options[@]}"
 cmake -DPACKAGE_CONFIG="$build_dir/CPackConfig.cmake" -DPACKAGE_BUILD_DIR="$(realpath "$build_dir")" \
   -DPACKAGE_VERSION="$(cat "$project_root/packaging/version.txt")" \

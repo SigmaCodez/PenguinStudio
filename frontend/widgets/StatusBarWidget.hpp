@@ -13,6 +13,9 @@ class StatusBarWidget : public QWidget {
 private:
 	std::unique_ptr<Ui_StatusBarWidget> ui;
 
+protected:
+	void changeEvent(QEvent *event) override;
+
 public:
 	StatusBarWidget(QWidget *parent = nullptr);
 	~StatusBarWidget();

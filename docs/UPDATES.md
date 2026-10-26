@@ -2,8 +2,8 @@
 
 On Linux, **Help → Check for updates** opens Penguin Studio's updater. It checks
 only releases in `SigmaCodez/PenguinStudio`, compares numeric Penguin versions,
-and offers newer versions. The app also checks after startup, at most once per
-24 hours after a successful check. Automatic notifications wait until active
+and offers newer versions. The app also checks five seconds after every startup when automatic checks are
+enabled. A successful check earlier that day does not suppress a new startup check. Automatic notifications wait until active
 outputs and modal dialogs have finished and Penguin is active. Automatic checks
 and development-preview releases can be disabled in the update dialog.
 

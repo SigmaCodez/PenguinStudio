@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "../plugins/penguin-backgroundremoval/gpu-worker-client.hpp"
 #include <array>
+#ifdef NDEBUG
+#undef NDEBUG
+#endif
 #include <cassert>
 #include <filesystem>
 #include <iostream>
@@ -45,6 +48,8 @@ int main(int argc, char **argv)
 			sleep(30);
 			return 0;
 		}
+		if (scenario == "delayed")
+			usleep(80000);
 		std::array<unsigned char, 320 * 192> mask;
 		mask.fill(128);
 		send(3, mask.data(), mask.size(), MSG_NOSIGNAL);
@@ -62,8 +67,8 @@ int main(int argc, char **argv)
 		worker.Stop();
 		assert(std::chrono::steady_clock::now() - start < std::chrono::milliseconds(200));
 	}
-	for (const char *scenario : {"ready", "missing", "crash", "stall"}) {
-		PenguinGPUWorker worker(executable, scenario, "", "", 3, true, 100);
+	for (const char *scenario : {"ready", "delayed", "missing", "crash", "stall"}) {
+		PenguinGPUWorker worker(executable, scenario, "", "", 3, true, PenguinGPUWorker::BackgroundFrameBudgetMs);
 		bool success = false;
 		const auto start = std::chrono::steady_clock::now();
 		while (worker.Preparing() && std::chrono::steady_clock::now() - start < std::chrono::seconds(2)) {
@@ -73,12 +78,13 @@ int main(int argc, char **argv)
 			}
 			std::this_thread::sleep_for(std::chrono::milliseconds(2));
 		}
-		if (std::string(scenario) == "ready") {
+		assert(std::chrono::steady_clock::now() - start < std::chrono::seconds(2));
+		if (std::string(scenario) == "ready" || std::string(scenario) == "delayed") {
 			assert(success && !worker.Failed());
 			assert(result.rows == 192 && result.cols == 320 && result.at<unsigned char>(0, 0) == 128);
 		} else {
 			assert(!success && worker.Failed());
 		}
 	}
-	std::cout << "GPU worker: readiness, IPC, initialization cancellation, crash and timeout fallback passed\n";
+	std::cout << "GPU worker: readiness, delayed response, IPC, initialization cancellation, crash and bounded timeout fallback passed\n";
 }

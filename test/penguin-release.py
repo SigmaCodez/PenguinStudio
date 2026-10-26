@@ -122,6 +122,23 @@ class Releases(unittest.TestCase):
             with self.assertRaises(ValueError):
                 publish.collect_packages(root, '0.7.0')
 
+    def test_ubuntu_2610_required_for_new_release(self):
+        names = ['penguin-studio_0.7.2-1+ubuntu26.04_amd64.deb',
+                 'penguin-studio-camera-amd-gfx1201_0.7.2-1+ubuntu26.04_amd64.deb',
+                 'penguin-studio-0.7.2-1.x86_64.rpm',
+                 'penguin-studio-0.7.2-x86_64.flatpak',
+                 'penguin-studio_0.7.2_amd64.snap',
+                 'penguin-studio-0.7.2-x86_64.AppImage',
+                 'penguin-studio-0.7.2-aur.tar.gz']
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            for name in names:
+                (root / name).write_bytes(b'artifact')
+            with self.assertRaises(ValueError):
+                publish.collect_packages(root, '0.7.2')
+            (root / 'penguin-studio_0.7.2-1+ubuntu26.10_amd64.deb').write_bytes(b'interim artifact')
+            self.assertEqual(len(publish.collect_packages(root, '0.7.2')), 8)
+
     def test_complete_package_set(self):
         names = ['penguin-studio_0.2.0-6+ubuntu24.04_amd64.deb',
                  'penguin-studio_0.2.0-6+ubuntu26.04_amd64.deb',

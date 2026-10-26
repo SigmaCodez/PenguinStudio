@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 #include <algorithm>
+#include "SimpleWorkspace.hpp"
 #include <obs-module.h>
 #include <obs-frontend-api.h>
 #include <QApplication>
@@ -15,6 +16,7 @@
 #include <QAction>
 #include <functional>
 #include <QPointer>
+#include <QScopedValueRollback>
 #include <QQmlContext>
 #include <QQuickWidget>
 #include <QQuickWindow>
@@ -172,6 +174,7 @@ public:
     }
 };
 static QPointer<DialogDesigner> dialogDesigner;
+static QPointer<SimpleWorkspace> simpleWorkspace;
 
 class WorkspaceBridge final : public QObject {
     Q_OBJECT
@@ -180,7 +183,10 @@ class WorkspaceBridge final : public QObject {
     Q_PROPERTY(bool live READ live NOTIFY statusChanged)
     Q_PROPERTY(bool recording READ recording NOTIFY statusChanged)
     Q_PROPERTY(qreal uiScale READ uiScale NOTIFY scaleChanged)
+    Q_PROPERTY(QString activePanel READ activePanel NOTIFY panelChanged)
     qreal textScale = 1.0;
+    QString selectedPanel = "penguinInspectorDock";
+    bool switchingPanel = false, trackingPanels = false;
     QVariantList items;
     QString selected;
     bool streaming = false, capturing = false;
@@ -191,6 +197,7 @@ public:
     bool live() const { return streaming; }
     bool recording() const { return capturing; }
     qreal uiScale() const { return textScale; }
+    QString activePanel() const { return selectedPanel; }
     void refresh()
     {
         QVariantList next;
@@ -229,16 +236,42 @@ public:
         }
         obs_frontend_source_list_free(&list);
     }
+    void trackPanels()
+    {
+        if (trackingPanels) return;
+        trackingPanels = true;
+        auto *main = static_cast<QMainWindow *>(obs_frontend_get_main_window());
+        for (const char *name : {"penguinInspectorDock", "penguin-broadcast-destinations", "penguin-stream-details", "penguinTwitchChat"}) {
+            if (auto *panel = main->findChild<QDockWidget *>(name)) {
+                const QString id = QString::fromLatin1(name);
+                connect(panel, &QDockWidget::visibilityChanged, this, [this, main, id](bool visible) {
+                    if (visible && !switchingPanel && main->property("penguinSimpleWorkspace").toBool()) openPanel(id);
+                });
+            }
+        }
+    }
     Q_INVOKABLE void openPanel(const QString &id)
     {
+        if (switchingPanel) return;
+        QScopedValueRollback<bool> guard(switchingPanel, true);
         static const QStringList allowed{"penguinInspectorDock", "penguin-broadcast-destinations",
                                          "penguin-stream-details", "penguinTwitchChat", "sourcesDock", "mixerDock", "scenesDock"};
         if (!allowed.contains(id)) return;
         auto *main = static_cast<QMainWindow *>(obs_frontend_get_main_window());
-        if (auto *dock = main->findChild<QDockWidget *>(id)) { dock->show(); dock->raise(); }
+        if (!main) return;
+        if (auto *dock = main->findChild<QDockWidget *>(id)) {
+            const QStringList panels{"penguinInspectorDock", "penguin-broadcast-destinations", "penguin-stream-details", "penguinTwitchChat"};
+            if (panels.contains(id)) {
+                for (const auto &other : panels) if (other != id)
+                    if (auto *panel = main->findChild<QDockWidget *>(other)) panel->hide();
+                if (selectedPanel != id) { selectedPanel = id; emit panelChanged(); }
+            }
+            dock->show(); dock->raise();
+        }
     }
     Q_INVOKABLE void arrangeWorkspace()
     {
+        QScopedValueRollback<bool> guard(switchingPanel, true);
         auto *main = static_cast<QMainWindow *>(obs_frontend_get_main_window());
         auto *config = obs_frontend_get_user_config();
         if (!main || !config) return;
@@ -250,6 +283,11 @@ public:
         if (!config_has_user_value(config, "PenguinQuickPreview", "PreviousLayout")) {
             const auto previous = main->saveState().toBase64();
             config_set_string(config, "PenguinQuickPreview", "PreviousLayout", previous.constData());
+        }
+        if (config_get_int(config, "PenguinQuickPreview", "DesignLayout") < 2 &&
+            !config_has_user_value(config, "PenguinQuickPreview", "BeforeSimpleLayout")) {
+            const auto previous = main->saveState().toBase64();
+            config_set_string(config, "PenguinQuickPreview", "BeforeSimpleLayout", previous.constData());
         }
         main->setCorner(Qt::BottomLeftCorner, Qt::LeftDockWidgetArea);
         navigation->setFloating(false);
@@ -264,14 +302,30 @@ public:
         mixer->show();
         main->resizeDocks({navigation}, {int(240 * textScale)}, Qt::Horizontal);
         main->resizeDocks({sources, mixer}, {280, 400}, Qt::Horizontal);
-        config_set_int(config, "PenguinQuickPreview", "DesignLayout", 1);
+        if (auto *inspector = main->findChild<QDockWidget *>("penguinInspectorDock")) {
+            inspector->setFloating(false);
+            main->addDockWidget(Qt::RightDockWidgetArea, inspector);
+            for (const char *name : {"penguin-broadcast-destinations", "penguin-stream-details", "penguinTwitchChat"}) {
+                if (auto *panel = main->findChild<QDockWidget *>(name)) {
+                    panel->setFloating(false);
+                    main->addDockWidget(Qt::RightDockWidgetArea, panel);
+                    main->tabifyDockWidget(inspector, panel);
+                    panel->hide();
+                }
+            }
+            inspector->show(); inspector->raise();
+        }
+        selectedPanel = "penguinInspectorDock"; emit panelChanged();
+        config_set_int(config, "PenguinQuickPreview", "DesignLayout", 2);
     }
     Q_INVOKABLE void restorePreviousLayout()
     {
+        QScopedValueRollback<bool> guard(switchingPanel, true);
         auto *main = static_cast<QMainWindow *>(obs_frontend_get_main_window());
         auto *config = obs_frontend_get_user_config();
         if (!main || !config) return;
-        const char *saved = config_get_string(config, "PenguinQuickPreview", "PreviousLayout");
+        const char *key = config_has_user_value(config, "PenguinQuickPreview", "BeforeSimpleLayout") ? "BeforeSimpleLayout" : "PreviousLayout";
+        const char *saved = config_get_string(config, "PenguinQuickPreview", key);
         if (saved && *saved) main->restoreState(QByteArray::fromBase64(saved));
     }
     Q_INVOKABLE void showLayoutMenu()
@@ -292,6 +346,7 @@ signals:
     void selectionChanged();
     void statusChanged();
     void scaleChanged();
+    void panelChanged();
 };
 
 static QPointer<WorkspaceBridge> bridge;
@@ -313,6 +368,7 @@ static void createWorkspace()
     view->setResizeMode(QQuickWidget::SizeRootObjectToView);
     view->setClearColor(QColor("#11141b"));
     bridge = new WorkspaceBridge(view);
+    bridge->setObjectName("penguinWorkspaceBridge");
     bridge->refresh();
     auto resizeMinimum = [view] {
         if (bridge) view->setMinimumSize(int(228 * bridge->uiScale()), int(420 * bridge->uiScale()));
@@ -326,7 +382,7 @@ static void createWorkspace()
         delete view;
         return;
     }
-    if (!obs_frontend_add_dock_by_id(DockId, "Workspace preview", view)) { delete view; return; }
+    if (!obs_frontend_add_dock_by_id(DockId, "Workspace", view)) { delete view; return; }
     if (auto *dock = main->findChild<QDockWidget *>(DockId)) {
         dock->setFloating(false);
         main->addDockWidget(Qt::LeftDockWidgetArea, dock, Qt::Horizontal);
@@ -347,9 +403,20 @@ static void event(obs_frontend_event type, void *)
             if (!bridge || exiting) return;
             bridge->refresh();
             if (dialogDesigner) dialogDesigner->installCommandCenter(static_cast<QMainWindow *>(obs_frontend_get_main_window()));
+            auto *mainWindow = static_cast<QMainWindow *>(obs_frontend_get_main_window());
+            if (!simpleWorkspace) {
+                simpleWorkspace = new SimpleWorkspace(mainWindow, dialogDesigner);
+                if (auto *navigation = mainWindow->findChild<QDockWidget *>(DockId)) {
+                    QObject::connect(navigation, &QDockWidget::visibilityChanged, simpleWorkspace, [window = QPointer<QMainWindow>(mainWindow)](bool visible) {
+                        if (simpleWorkspace && !exiting && window && window->isVisible()) simpleWorkspace->setActive(visible);
+                    });
+                    simpleWorkspace->setActive(navigation->isVisible());
+                    bridge->trackPanels();
+                }
+            }
             auto *config = obs_frontend_get_user_config();
             if (config_get_bool(config, "PenguinQuickPreview", "Placed")) {
-                if (!config_get_int(config, "PenguinQuickPreview", "DesignLayout")) bridge->arrangeWorkspace();
+                if (config_get_int(config, "PenguinQuickPreview", "DesignLayout") < 2) bridge->arrangeWorkspace();
                 return;
             }
             auto *main = static_cast<QMainWindow *>(obs_frontend_get_main_window());
@@ -359,7 +426,7 @@ static void event(obs_frontend_event type, void *)
                 dock->show();
                 main->resizeDocks({dock}, {240}, Qt::Horizontal);
                 config_set_bool(config, "PenguinQuickPreview", "Placed", true);
-                if (!config_get_int(config, "PenguinQuickPreview", "DesignLayout")) bridge->arrangeWorkspace();
+                if (config_get_int(config, "PenguinQuickPreview", "DesignLayout") < 2) bridge->arrangeWorkspace();
             }
         });
         return;
@@ -381,6 +448,7 @@ void obs_module_post_load(void)
 void obs_module_unload(void)
 {
     if (exiting) return; // Frontend callbacks are gone after EXIT.
+    if (simpleWorkspace) simpleWorkspace->setActive(false);
     delete dialogDesigner.data();
     obs_frontend_remove_event_callback(event, nullptr);
     if (bridge) obs_frontend_remove_dock(DockId);

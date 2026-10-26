@@ -36,6 +36,19 @@ int main()
 	Require(Select({encodedRelease}, "0.2.1", "ubuntu26.04", true).name == name,
 		"GitHub's percent-encoded package URL rejected");
 	Require(Select({release}, "0.2.1", "ubuntu24.04", true).name.isEmpty(), "wrong distro accepted");
+	Require(Select({release}, "0.2.1", "ubuntu26.10", true).name.isEmpty(), "26.04 package offered on 26.10");
+	const auto interimName = PackageName("0.3.0", "ubuntu26.10");
+	Require(interimName == "penguin-studio_0.3.0-1+ubuntu26.10_amd64.deb", "26.10 package name incorrect");
+	auto interimAsset = asset;
+	interimAsset["name"] = interimName;
+	interimAsset["browser_download_url"] =
+		"https://github.com/SigmaCodez/PenguinStudio/releases/download/penguin-v0.3.0/" + interimName;
+	auto multiDistroRelease = release;
+	multiDistroRelease["assets"] = QJsonArray{asset, interimAsset};
+	Require(Select({multiDistroRelease}, "0.2.1", "ubuntu26.10", true).name == interimName,
+		"26.10 update not selected from mixed distribution assets");
+	Require(Select({multiDistroRelease}, "0.2.1", "ubuntu26.04", true).name == name,
+		"26.10 asset changed 26.04 update selection");
 	Require(Select({release}, "0.2.1", "", true).name.isEmpty(), "unknown installation offered native update");
 	Require(Select({release}, "0.2.1", "ubuntu26.04", false).version.isEmpty(),
 		"preview ignored channel preference");

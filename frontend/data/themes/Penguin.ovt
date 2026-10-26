@@ -938,3 +938,39 @@ QScrollBar::handle { border-radius: 4px; }
 }
 QListWidget#penguinChatHistory { border-radius: 12px; padding: 10px; }
 #penguinQuickWorkspace::title { background: #11141B; }
+
+/* Quiet status capsules match the workspace cards; idle output clocks stay hidden. */
+StatusBarWidget > QFrame {
+    border: none;
+    padding: 0px;
+    background: transparent;
+}
+StatusBarWidget QFrame#networkFrame,
+StatusBarWidget QFrame#cpuFrame,
+StatusBarWidget QFrame#gpuFrame,
+StatusBarWidget QFrame#fpsFrame {
+    background: #1C222D;
+    border: 1px solid #292E3A;
+    border-radius: 9px;
+}
+StatusBarWidget QFrame#recordFrame {
+    background: #2D1D2A;
+    border: 1px solid #573247;
+    border-radius: 9px;
+}
+StatusBarWidget QFrame#streamFrame {
+    background: #25213C;
+    border: 1px solid #463A68;
+    border-radius: 9px;
+}
+StatusBarWidget QLabel {
+    border: none;
+    padding: 0px;
+    background: transparent;
+    color: #CCD3E2;
+}
+StatusBarWidget QLabel#recordTime { color: #FFD5DE; }
+StatusBarWidget QLabel#streamTime { color: #E5DDFF; }
+StatusBarWidget QLabel#message,
+StatusBarWidget QLabel#delayInfo,
+StatusBarWidget QLabel#droppedFrames { color: #F0F2FA; }

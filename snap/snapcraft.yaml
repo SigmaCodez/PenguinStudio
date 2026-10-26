@@ -47,6 +47,8 @@ parts:
       - -DCMAKE_INSTALL_LIBDIR=lib/x86_64-linux-gnu
       - -DENABLE_RELOCATABLE=ON
       - -DOBS_VERSION_OVERRIDE=33.0.0
+      - -DPENGUIN_RUST_PREPROCESS=ON
+      - -DPENGUIN_QUICK_WORKSPACE_PREVIEW=ON
       - -DENABLE_NVENC=ON
       - -DENABLE_WAYLAND=ON
       - -DENABLE_BROWSER=ON
@@ -63,6 +65,9 @@ parts:
       # Snapcraft resolves this installed icon and rewrites the desktop launcher.
       sed -i 's|^Icon=.*|Icon=/usr/share/icons/hicolor/scalable/apps/io.github.SigmaCodez.PenguinStudio.svg|' "$CRAFT_PART_INSTALL/usr/share/applications/io.github.SigmaCodez.PenguinStudio.desktop"
     build-packages:
+      - cargo
+      - rustc
+      - qt6-declarative-dev
       - build-essential
       - cmake
       - ninja-build
@@ -141,6 +146,12 @@ parts:
       - libjansson4
       - libluajit-5.1-2
       - libpython3.14
+      - libqt6quickwidgets6
+      - qml6-module-qtquick
+      - qml6-module-qtquick-layouts
+      - qml6-module-qtqml
+      - qml6-module-qtqml-models
+      - qml6-module-qtqml-workerscript
       - libqt6widgets6
       - libqt6network6
       - libqt6keychain1
