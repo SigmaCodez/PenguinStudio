@@ -9,6 +9,9 @@
 
 ## Local review before release
 
-- Implement and validate improvements locally first, then let the user review them.
+- Implement and validate improvements locally first, then install the latest validated local build so the user can review it. Keep local build identifiers distinct from public release versions.
+- Local installation is authorized after successful checks; GitHub publication still requires explicit release approval. Never request or store the user's administrator password.
 - Do not create or publish a GitHub release, push a release tag, or increment the product version until the user explicitly approves that release after local review.
 - After approval, use a small version increment appropriate to the approved change and complete the publication checks above.
+
+- Keep system-wide DEB installation for local builds. The user declined a per-user installation. Any passwordless helper must be explicitly approved, narrowly scoped and must not store passwords. Never expand its approved payload scope silently.

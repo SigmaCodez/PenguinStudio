@@ -96,3 +96,26 @@ user, evaluate the modest absolute saving against toolchain complexity and the
 faster fused C++ alternative, validate the release's static OpenCV build and all
 package builders, repeat relevant camera/recording tests, and obtain explicit
 release approval. This experimental module alone does not justify a broad rewrite.
+
+## Local DEB candidate
+
+The local review package is `0.7.1-1+ubuntu26.04.local1`; the public product
+version remains 0.7.1. It is derived from the checksum-verified public DEB and
+replaces only `penguin-gpu-worker`, with Rust preprocessing enabled and OpenCV
+4.10.0 core/imgproc linked statically using the existing project feature flags.
+No temporary-library paths or additional runtime dependencies are required.
+The AMD add-on remains the installed 0.7.1 package.
+
+This static build passed the same ten tensor comparisons (maximum difference 0).
+Its benchmark measured 163.724 us/frame for the previous OpenCV preprocessing,
+35.582 us/frame for Rust and 17.345 us/frame for the fused C++ control. Its isolated
+Wayland GPU recording fully decoded (30.100 seconds, 900 video frames, 1,405 audio
+frames), without CPU fallback or reported render/encoder losses. The extracted
+package also passed all 242 workspace checks and its recording decoded fully.
+Logs reported clean shutdown, no warnings/errors and zero OBS memory leaks.
+Installation is a separate step and must be verified after it completes.
+
+The user's workflow is local installation after validation, then user review,
+then a public release only after explicit approval. See
+[restricted local updates](../scripts/local-update/README.md) for the prepared
+password-free installer scope; it is not a general unattended package manager.
