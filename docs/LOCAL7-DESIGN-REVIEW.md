@@ -65,6 +65,9 @@ Evidence remains local under `/var/tmp/penguin-obs33/design-local7-*`.
   frames and GPU inference active. OBS reported 3 rendering stalls (0.3%). Shutdown
   was clean, with no warning/error log entries and zero OBS-reported memory leaks.
   The nonzero stall counts remain an explicit limitation of the test results.
+- `installed`: system-wide local7 passed package verification, navigation/search,
+  layout restoration and clean Wayland shutdown in an isolated profile. Automated
+  keyboard focus was not acquired; it remains explicitly unverified for local7.
 - `chat`: both disconnected platform panels captured and visually reviewed; no
   new live account authorization, chat send or moderation test is claimed.
 
