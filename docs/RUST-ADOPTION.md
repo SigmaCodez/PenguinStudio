@@ -113,7 +113,20 @@ Wayland GPU recording fully decoded (30.100 seconds, 900 video frames, 1,405 aud
 frames), without CPU fallback or reported render/encoder losses. The extracted
 package also passed all 242 workspace checks and its recording decoded fully.
 Logs reported clean shutdown, no warnings/errors and zero OBS memory leaks.
-Installation is a separate step and must be verified after it completes.
+The local DEB was subsequently installed through the normal Ubuntu administrator
+dialog. `dpkg-query` reports `0.7.1-1+ubuntu26.04.local1`; `dpkg --verify` passed,
+and the installed GPU worker SHA-256 matches the tested binary. The installed
+application repeated the native Wayland GPU recording successfully (30.100
+seconds, 900 decoded video frames, 1,405 audio frames), with GPU active, no CPU
+fallback, no reported render/encoder losses, no warning/error entries and zero
+reported OBS memory leaks on exit. No live Facecam movement test was performed.
+
+Local DEB SHA-256:
+`fe94d347b734016d2fd3692dff724547908e83d288b6b3e3c3105fc0f64cc46f`.
+Installed GPU worker SHA-256:
+`da683af842057b983a41016522c697f84bbf6275f80a45a3a6b258062a00e3f2`.
+No permanent administrator authorization was installed and nothing was published
+to GitHub.
 
 The user's workflow is local installation after validation, then user review,
 then a public release only after explicit approval. The user chose system-wide
