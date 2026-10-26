@@ -382,3 +382,13 @@ relative to local3. Other files, including author/license notices, are identical
 APT's simulation upgrades only Penguin Studio, adding/removing no packages.
 Package SHA-256:
 `8991ae5794c6fb3c6d6c97236ae7c167046d90d75c4c2d9efa4136d42f6cd841`.
+
+System-wide installation of `0.7.1-1+ubuntu26.04.local4` completed through the
+normal Ubuntu administrator confirmation. `dpkg --verify` passed and both
+installed module/worker SHA-256 hashes matched the tested build. The installed
+RX 9070 XT/native Wayland GPU-blur test decoded 30.100 seconds (900 video and
+1,405 audio frames), with GPU processing active and no CPU fallback, reported
+loss events, warning/error entries or OBS leaks. Instrumentation confirmed one
+alpha texture, zero extra texture-copy calls and all three render targets freed.
+Evidence: `/var/tmp/penguin-obs33/rust-local4-installed-blur/`.
+No GitHub release, release tag or public version change was made.
