@@ -175,7 +175,12 @@ public:
 			ready = true;
 		}
 		cv::Mat input;
-		cv::resize(frame, input, cv::Size(320, 192));
+		// IPC sends packed rows. Borrow an already resized contiguous frame;
+		// padded views and other dimensions retain the copy/resize path.
+		if (frame.type() == CV_8UC4 && frame.size() == cv::Size(320, 192) && frame.isContinuous())
+			input = frame;
+		else
+			cv::resize(frame, input, cv::Size(320, 192));
 		mask.create(192, 320, CV_8UC1);
 		const auto deadline = std::chrono::steady_clock::now() + std::chrono::milliseconds(budgetMs);
 		if (!Transfer(input.data, 320 * 192 * 4, true, deadline) ||

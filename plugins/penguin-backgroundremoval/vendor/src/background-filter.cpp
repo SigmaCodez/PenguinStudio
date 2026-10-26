@@ -532,14 +532,19 @@ static void processImageForBackground(struct background_removal_filter *tf, cons
 {
 	cv::Mat outputImage;
 	auto *rvm = tf->modelSelection == MODEL_RVM ? static_cast<ModelRVM *>(tf->model.get()) : nullptr;
+	// RVM and its hand companion share the same 320x192 frame. Resize once,
+	// before RGB conversion, instead of independently for CPU/GPU/hand paths.
+	cv::Mat resized;
+	if (rvm && imageBGRA.size() != cv::Size(320, 192))
+		cv::resize(imageBGRA, resized, cv::Size(320, 192));
+	const cv::Mat &frame = resized.empty() ? imageBGRA : resized;
 	bool handStarted = false;
 	auto startHand = [&] {
 		if (!rvm || !tf->preserveHands) {
 			return;
 		}
-		cv::Mat small, rgb, input;
-		cv::resize(imageBGRA, small, cv::Size(320, 192));
-		cv::cvtColor(small, rgb, cv::COLOR_BGRA2RGB);
+		cv::Mat rgb, input;
+		cv::cvtColor(frame, rgb, cv::COLOR_BGRA2RGB);
 		rgb.convertTo(input, CV_32F);
 		rvm->StartHandRecovery(input);
 		handStarted = true;
@@ -547,7 +552,7 @@ static void processImageForBackground(struct background_removal_filter *tf, cons
 	if (tf->gpuWorker && !tf->gpuWorker->Preparing() && !tf->gpuWorker->Failed()) {
 		startHand();
 	}
-	const bool gpu = tf->gpuWorker && tf->gpuWorker->Infer(imageBGRA, outputImage);
+	const bool gpu = tf->gpuWorker && tf->gpuWorker->Infer(frame, outputImage);
 	if (gpu && tf->preserveHands) {
 		if (!handStarted) {
 			startHand();
@@ -573,7 +578,7 @@ static void processImageForBackground(struct background_removal_filter *tf, cons
 		tf->activeGPU = false;
 		tf->gpuPreparing = tf->gpuWorker && tf->gpuWorker->Preparing();
 		tf->cpuFallback = tf->useGPU != "cpu" && !tf->gpuPreparing;
-		if (!runFilterModelInference(tf, imageBGRA, outputImage)) {
+		if (!runFilterModelInference(tf, frame, outputImage)) {
 			return;
 		}
 	} else {

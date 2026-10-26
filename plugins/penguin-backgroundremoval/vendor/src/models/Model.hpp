@@ -95,6 +95,15 @@ public:
 
 	const char *name;
 
+	// Models opt into writing their already allocated tensor directly. Returning
+	// false preserves the original preprocessing path for other models/builds.
+	virtual bool prepareBGRAInput(const cv::Mat &, uint32_t, uint32_t,
+				      std::vector<std::vector<float>> &)
+	{
+		return false;
+	}
+
+
 #if _WIN32
 	const std::wstring
 #else

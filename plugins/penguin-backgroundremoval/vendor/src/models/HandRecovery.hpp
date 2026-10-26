@@ -24,6 +24,9 @@ class HandRecovery {
 	std::vector<float> input;
 	std::vector<float> output;
 	cv::Mat mask;
+	cv::Mat resized, small;
+	std::string inputName, outputName;
+	int previousWidth = 0, previousHeight = 0;
 	std::string filename;
 	int threads;
 	PenguinInference::DeviceState device;
@@ -46,6 +49,9 @@ public:
 		}
 
 		session = PenguinInference::CreateSession(env, filename.c_str(), mode, threads, device, nullptr, cache);
+		Ort::AllocatorWithDefaultOptions allocator;
+		inputName = session->GetInputNameAllocated(0, allocator).get();
+		outputName = session->GetOutputNameAllocated(0, allocator).get();
 		input.resize(256 * 256 * 3);
 		output.resize(256 * 256 * 6);
 	}
@@ -56,8 +62,13 @@ public:
 		const int width = std::max(1, int(std::round(rgb.cols * scale)));
 		const int height = std::max(1, int(std::round(rgb.rows * scale)));
 		cv::Mat padded(256, 256, CV_32FC3, input.data());
-		padded.setTo(0);
-		cv::Mat resized;
+		// The active rectangle is overwritten below. Padding stays zero until
+		// dimensions change, avoiding a redundant full-tensor clear each frame.
+		if (width != previousWidth || height != previousHeight) {
+			padded.setTo(0);
+			previousWidth = width;
+			previousHeight = height;
+		}
 		cv::resize(rgb, resized, cv::Size(width, height), 0, 0, cv::INTER_AREA);
 		resized.convertTo(padded(cv::Rect(0, 0, width, height)), CV_32FC3, 1. / 255.);
 
@@ -66,11 +77,8 @@ public:
 		auto memory = Ort::MemoryInfo::CreateCpu(OrtArenaAllocator, OrtMemTypeDefault);
 		auto in = Ort::Value::CreateTensor<float>(memory, input.data(), input.size(), inputDims.data(), 4);
 		auto out = Ort::Value::CreateTensor<float>(memory, output.data(), output.size(), outputDims.data(), 4);
-		Ort::AllocatorWithDefaultOptions allocator;
-		auto inputName = session->GetInputNameAllocated(0, allocator);
-		auto outputName = session->GetOutputNameAllocated(0, allocator);
-		const char *inputs[] = {inputName.get()};
-		const char *outputs[] = {outputName.get()};
+		const char *inputs[] = {inputName.c_str()};
+		const char *outputs[] = {outputName.c_str()};
 		try {
 			session->Run(Ort::RunOptions{nullptr}, inputs, &in, 1, outputs, &out, 1);
 		} catch (const Ort::Exception &) {
@@ -83,7 +91,7 @@ public:
 			session->Run(Ort::RunOptions{nullptr}, inputs, &in, 1, outputs, &out, 1);
 		}
 
-		cv::Mat small(height, width, CV_32FC1);
+		small.create(height, width, CV_32FC1);
 		bool converted = false;
 #ifdef PENGUIN_RUST_PREPROCESS
 		converted = penguin_logits6_to_skin_mask(

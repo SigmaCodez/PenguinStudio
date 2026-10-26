@@ -38,3 +38,21 @@ Wayland session was advertised. A skip is not evidence of a successful GPU test.
 This checks pixel equivalence, not overall CPU/GPU utilization, allocation-failure
 recovery, or complete filter lifecycle behavior. Application-level recording,
 mode-switching, resize and shutdown tests remain necessary before installation.
+
+
+## CPU RVM and hand-buffer regression checks
+
+Enable `PENGUIN_CAMERA_POSTPROCESS_TESTS` in the Rust preprocessing test project
+with OBS and ONNX Runtime headers/libraries available. CTest then includes:
+
+- `penguin-rvm-preprocess-equivalence`: 96 bitwise comparisons of the complete
+  CPU tensor preprocessing path and hand-model RGB input, including padded views,
+  odd sizes, 1080p, degenerate dimensions and rejected tensor layouts. Informational
+  alternating-run benchmarks report preprocessing time, not whole-app CPU usage.
+- `penguin-hand-buffers-equivalence`: real CPU inference with the bundled hand
+  model, comparing persistent buffers and cached names against independent
+  per-frame buffers across repeated and changing dimensions. The fixture is
+  synthetic, with no camera or account access.
+
+These tests require the private OpenCV configuration used by the camera module.
+The RVM optimization keeps non-RVM and Rust-disabled preprocessing available.

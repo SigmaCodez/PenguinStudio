@@ -9,6 +9,9 @@
 #include "Model.hpp"
 #include <future>
 #include "HandRecovery.hpp"
+#ifdef PENGUIN_RUST_PREPROCESS
+#include "preprocess.h"
+#endif
 
 class ModelRVM : public ModelBCHW {
 private:
@@ -47,6 +50,31 @@ public:
 			handTask = std::async(std::launch::async,
 					      [this, frame = image.clone()] { handRecovery->infer(frame); });
 		}
+	}
+
+	bool prepareBGRAInput(const cv::Mat &image, uint32_t width, uint32_t height,
+			      std::vector<std::vector<float>> &tensors) override
+	{
+#ifdef PENGUIN_RUST_PREPROCESS
+		if (image.type() != CV_8UC4 || image.cols != int(width) || image.rows != int(height) ||
+		    tensors.size() < 6 || tensors[5].empty())
+			return false;
+		const size_t bytes = image.step[0] * size_t(image.rows - 1) + size_t(image.cols) * 4;
+		if (penguin_bgra_to_rgb_chw(image.data, bytes, width, height, image.step[0],
+					  tensors[0].data(), tensors[0].size()) != 1)
+			return false;
+		// Hand recovery needs interleaved, unnormalized RGB from the same frame.
+		if (preserveHands) {
+			cv::Mat rgb, input;
+			cv::cvtColor(image, rgb, cv::COLOR_BGRA2RGB);
+			rgb.convertTo(input, CV_32F);
+			StartHandRecovery(input);
+		}
+		tensors[5][0] = 1.0f;
+		return true;
+#else
+		return false;
+#endif
 	}
 
 	virtual void prepareInputToNetwork(cv::Mat &image, cv::Mat &prepared) override

@@ -75,5 +75,30 @@ if(PENGUIN_RUST_PREPROCESS_TESTS)
       "${PENGUIN_POSTPROCESS_OBS_INCLUDE_DIR}" "${PENGUIN_POSTPROCESS_ORT_INCLUDE_DIR}")
     target_link_libraries(penguin-camera-postprocess-test PRIVATE ${OPENCV_CORE} ${OPENCV_IMGPROC})
     add_test(NAME penguin-camera-postprocess-equivalence COMMAND penguin-camera-postprocess-test)
+    add_executable(penguin-rvm-preprocess-test ../tests/rvm-preprocess.cpp)
+    target_compile_features(penguin-rvm-preprocess-test PRIVATE cxx_std_20)
+    target_compile_definitions(penguin-rvm-preprocess-test PRIVATE ORT_API_MANUAL_INIT NDEBUG PENGUIN_RUST_PREPROCESS=1)
+    target_include_directories(penguin-rvm-preprocess-test PRIVATE ${OPENCV_INCLUDE_DIR}
+      "${PENGUIN_POSTPROCESS_OBS_INCLUDE_DIR}" "${PENGUIN_POSTPROCESS_ORT_INCLUDE_DIR}")
+    if(TARGET OBS::libobs)
+      set(PENGUIN_TEST_OBS OBS::libobs)
+    else()
+      find_library(PENGUIN_TEST_OBS obs REQUIRED)
+    endif()
+    target_link_libraries(penguin-rvm-preprocess-test PRIVATE penguin-rust-preprocess
+      ${OPENCV_CORE} ${OPENCV_IMGPROC} ${PENGUIN_TEST_OBS})
+    add_test(NAME penguin-rvm-preprocess-equivalence COMMAND penguin-rvm-preprocess-test)
+    find_library(PENGUIN_TEST_ORT onnxruntime HINTS "${PENGUIN_POSTPROCESS_ORT_INCLUDE_DIR}/../lib" REQUIRED)
+    add_executable(penguin-hand-buffers-test ../tests/hand-buffers.cpp)
+    target_compile_features(penguin-hand-buffers-test PRIVATE cxx_std_20)
+    target_compile_definitions(penguin-hand-buffers-test PRIVATE ORT_API_MANUAL_INIT NDEBUG PENGUIN_RUST_PREPROCESS=1)
+    target_include_directories(penguin-hand-buffers-test PRIVATE ${OPENCV_INCLUDE_DIR}
+      "${PENGUIN_POSTPROCESS_OBS_INCLUDE_DIR}" "${PENGUIN_POSTPROCESS_ORT_INCLUDE_DIR}")
+    target_link_libraries(penguin-hand-buffers-test PRIVATE penguin-rust-preprocess
+      ${OPENCV_CORE} ${OPENCV_IMGPROC} ${PENGUIN_TEST_OBS} ${PENGUIN_TEST_ORT})
+    add_test(NAME penguin-hand-buffers-equivalence COMMAND penguin-hand-buffers-test
+      "${CMAKE_CURRENT_SOURCE_DIR}/../vendor/data/models/selfie_multiclass_256x256.with_runtime_opt.ort")
+
+
   endif()
 endif()

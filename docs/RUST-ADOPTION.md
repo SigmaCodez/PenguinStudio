@@ -392,3 +392,76 @@ loss events, warning/error entries or OBS leaks. Instrumentation confirmed one
 alpha texture, zero extra texture-copy calls and all three render targets freed.
 Evidence: `/var/tmp/penguin-obs33/rust-local4-installed-blur/`.
 No GitHub release, release tag or public version change was made.
+
+
+## Fifth local candidate: extend Rust to CPU inference
+
+The public version stays 0.7.1; this candidate is packaged as local5. The existing
+bounded Rust BGRA-to-planar-RGB converter now also writes directly into the CPU
+RVM input tensor, including CPU fallback. The hand companion still receives the
+same interleaved RGB values. Other models and Rust-disabled builds retain their
+original preprocessing implementation. No new unsafe Rust or FFI is introduced.
+
+RVM's 320×192 input is resized once before color conversion and shared by the
+CPU, GPU-worker and hand paths. The worker IPC borrows only correctly typed,
+contiguous frames of the required size; padded views retain the packed resize
+path. This removes the full-resolution RGB intermediate and duplicate resizing
+when GPU matting and hand recovery run together. Hand-model image buffers and
+input/output names are retained; padding is reset whenever dimensions change.
+Inference, model weights, resolution, thresholds and scheduling are unchanged.
+
+A broader Rust rewrite of component-supported hand merging was prototyped and
+rejected: it preserved all 120 tested outputs but took about 112.5 µs compared
+with 98.1 µs for the existing OpenCV/C++ path. That prototype is not shipped.
+Language migration is therefore limited to work with a demonstrated benefit.
+
+| Area examined | Decision |
+| --- | --- |
+| GPU and CPU RVM tensor preprocessing | Shared bounded Rust conversion; eliminate intermediates |
+| Hand logits | Keep previously validated Rust conversion and exact shortcuts |
+| Hand component labeling and blur | Keep OpenCV; rejected slower Rust prototype |
+| Hand inference buffer preparation | Reuse buffers/names and avoid redundant clears in the existing owner |
+| Camera GPU shaders and render targets | Keep OBS graphics ownership and the validated local4 texture reuse |
+| Video encoding and ONNX execution | Keep the native codec/runtime backends; no performance evidence for replacing them |
+| Qt interface, OAuth and updater | Keep their existing event-driven implementations; not established CPU/GPU bottlenecks |
+
+This is an incremental performance change, not a complete Rust rewrite or a
+claim that every subsystem has been profiled. General OBS/Qt/plugin ABI replacement
+would add interoperability work without a demonstrated performance benefit.
+
+The native RVM test passes 96 bitwise tensor and hand-input comparisons, including
+padded views, degenerate/odd dimensions, 320×192 and 1080p. Rejected input layouts
+retain the legacy path. Nine alternating benchmark trials measured median input
+preparation at 158.5 → 6.2 µs for 320×192 and 352.9 → 80.1 µs for 1080p. These
+measure this preprocessing stage, not full inference or whole-app CPU utilization.
+Six real hand-model inference comparisons across repeated/changing sizes match
+the independent per-frame-buffer reference exactly. All nine CTest targets pass,
+including scalar/AVX2 dispatch, FFI guards and existing postprocessing tests.
+
+
+The native AddressSanitizer/UndefinedBehaviorSanitizer/LeakSanitizer RVM test also
+passed; the sandboxed attempt could not run LeakSanitizer's thread inspection,
+so the same executable was rerun outside that sandbox. Sanitized benchmark
+numbers are not used for performance claims. CPU, RX 9070 XT GPU-blur and forced
+CPU-fallback package recordings each decoded 30.100 seconds, 900 video and 1,405
+audio frames without reported losses, warning/error entries or OBS leaks.
+GPU resource instrumentation retained one alpha texture and zero extra texture
+copies, releasing all three render targets. The first fallback harness launch
+needed a missing test-only mount directory; the application had not started.
+The corrected isolated fallback test confirmed GPU=false and fallback=true.
+
+Local5 DEB SHA-256:
+`6736d0241dd977b0539881bfc6c3f10c71be57fc40ed17ca0dc78936f85b1546`.
+APT simulation upgrades only Penguin Studio, with no added/removed packages.
+All application tests use isolated English profiles and synthetic fixtures;
+a new live Facecam motion evaluation is not implied.
+
+The final package passed all 242 Wayland workspace assertions. Package-content
+comparison against local4 confirmed that only the background-removal module and
+GPU worker changed; other payloads and author/license notices are identical.
+System-wide installation of `0.7.1-1+ubuntu26.04.local5` completed through normal
+Ubuntu authorization. `dpkg --verify` and installed module/worker hashes match the
+tested build. Its post-install CPU-effects recording also decoded 30.100 seconds,
+900 video and 1,405 audio frames, with no reported losses, warning/error entries
+or OBS leaks. Evidence is retained under `/var/tmp/penguin-obs33/rust-local5-*`.
+No GitHub release, tag, push or public version increment was performed.
