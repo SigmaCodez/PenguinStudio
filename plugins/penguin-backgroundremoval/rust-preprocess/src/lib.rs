@@ -18,7 +18,7 @@ fn layout(width: usize, height: usize, stride: usize) -> Option<(usize, usize)> 
     Some((input, output))
 }
 
-fn convert(input: &[u8], output: &mut [f32], width: usize, height: usize, stride: usize) {
+fn convert_scalar(input: &[u8], output: &mut [f32], width: usize, height: usize, stride: usize) {
     let plane = width * height;
     let (red, rest) = output.split_at_mut(plane);
     let (green, blue) = rest.split_at_mut(plane);
@@ -36,6 +36,70 @@ fn convert(input: &[u8], output: &mut [f32], width: usize, height: usize, stride
             *b = bgra[0] as f32 * (1.0 / 255.0);
         }
     }
+}
+
+#[cfg(target_arch = "x86_64")]
+#[target_feature(enable = "avx2")]
+unsafe fn convert_avx2(
+    input: &[u8],
+    output: &mut [f32],
+    width: usize,
+    height: usize,
+    stride: usize,
+) {
+    use std::arch::x86_64::*;
+    let plane = width * height;
+    let (red, rest) = output.split_at_mut(plane);
+    let (green, blue) = rest.split_at_mut(plane);
+    let mask = _mm256_set1_epi32(255);
+    let scale = _mm256_set1_ps(1.0 / 255.0);
+    for y in 0..height {
+        let row = &input[y * stride..y * stride + width * 4];
+        let offset = y * width;
+        let r = &mut red[offset..offset + width];
+        let g = &mut green[offset..offset + width];
+        let b = &mut blue[offset..offset + width];
+        let end = width - width % 8;
+        for x in (0..end).step_by(8) {
+            // SAFETY: each iteration has eight complete BGRA pixels and eight
+            // floats in each disjoint plane. Unaligned loads/stores are allowed.
+            // x86_64 is little-endian; the caller checks AVX2 support at runtime.
+            unsafe {
+                let pixels = _mm256_loadu_si256(row.as_ptr().add(x * 4).cast());
+                let rv = _mm256_and_si256(_mm256_srli_epi32::<16>(pixels), mask);
+                let gv = _mm256_and_si256(_mm256_srli_epi32::<8>(pixels), mask);
+                let bv = _mm256_and_si256(pixels, mask);
+                _mm256_storeu_ps(
+                    r.as_mut_ptr().add(x),
+                    _mm256_mul_ps(_mm256_cvtepi32_ps(rv), scale),
+                );
+                _mm256_storeu_ps(
+                    g.as_mut_ptr().add(x),
+                    _mm256_mul_ps(_mm256_cvtepi32_ps(gv), scale),
+                );
+                _mm256_storeu_ps(
+                    b.as_mut_ptr().add(x),
+                    _mm256_mul_ps(_mm256_cvtepi32_ps(bv), scale),
+                );
+            }
+        }
+        for x in end..width {
+            r[x] = row[x * 4 + 2] as f32 * (1.0 / 255.0);
+            g[x] = row[x * 4 + 1] as f32 * (1.0 / 255.0);
+            b[x] = row[x * 4] as f32 * (1.0 / 255.0);
+        }
+    }
+}
+
+fn convert(input: &[u8], output: &mut [f32], width: usize, height: usize, stride: usize) {
+    #[cfg(target_arch = "x86_64")]
+    if std::is_x86_feature_detected!("avx2") {
+        // SAFETY: the feature check guards this call; layout was validated before
+        // constructing the slices. The scalar path remains available on all CPUs.
+        unsafe { convert_avx2(input, output, width, height, stride) };
+        return;
+    }
+    convert_scalar(input, output, width, height, stride);
 }
 
 /// Convert a strided BGRA frame directly into an existing planar RGB tensor.
@@ -90,6 +154,28 @@ pub unsafe extern "C" fn penguin_bgra_to_rgb_chw(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn vector_boundaries_padding_and_unaligned_storage() {
+        for width in 1..=65 {
+            for padding in [0, 1, 7, 31] {
+                for shift in 0..32 {
+                    let height = 3;
+                    let stride = width * 4 + padding;
+                    let (bytes, floats) = layout(width, height, stride).unwrap();
+                    let source: Vec<u8> = (0..bytes + shift).map(|i| (i * 73) as u8).collect();
+                    let input = &source[shift..];
+                    let mut expected = vec![0.0; floats];
+                    convert_scalar(input, &mut expected, width, height, stride);
+                    let mut guarded = vec![-42.0; floats + 2];
+                    convert(input, &mut guarded[1..floats + 1], width, height, stride);
+                    assert_eq!(&guarded[1..floats + 1], expected);
+                    assert_eq!(guarded[0], -42.0);
+                    assert_eq!(guarded[floats + 1], -42.0);
+                }
+            }
+        }
+    }
 
     #[test]
     fn channels_padding_and_alpha() {

@@ -88,7 +88,8 @@ int main(int argc, char **argv)
 			setenv(variable, directory.c_str(), 1);
 		}
 		const int threads = std::clamp(std::stoi(argv[4]), 1, 3);
-		ModelRVM model(std::string(argv[5]) == "1", threads, "gpu",
+		const bool preserveHands = std::string(argv[5]) == "1";
+		ModelRVM model(preserveHands, threads, "gpu",
 			       (models / "selfie_multiclass_256x256.with_runtime_opt.ort").string(), argv[3]);
 		ORTModelData data;
 		data.env = std::make_unique<Ort::Env>(ORT_LOGGING_LEVEL_ERROR, "Penguin GPU worker");
@@ -110,9 +111,10 @@ int main(int argc, char **argv)
 		auto infer = [&] {
 #ifdef PENGUIN_RUST_PREPROCESS
 			// Write into the already allocated ORT input tensor. Preserve the
-			// original path on validation failure; model state is unchanged.
+			// original path on validation failure or worker-side hand recovery,
+			// which also starts work in prepareInputToNetwork.
 			auto &tensor = data.inputTensorValues[0];
-			const bool converted = penguin_bgra_to_rgb_chw(
+			const bool converted = !preserveHands && penguin_bgra_to_rgb_chw(
 				input.data, input.step[0] * size_t(input.rows), size_t(input.cols),
 				size_t(input.rows), input.step[0], tensor.data(), tensor.size()) == 1;
 			if (converted) {

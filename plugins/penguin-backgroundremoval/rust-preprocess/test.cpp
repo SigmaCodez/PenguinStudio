@@ -7,6 +7,10 @@
 #include <iostream>
 #include <stdexcept>
 #include <vector>
+#ifdef __linux__
+#include <sys/mman.h>
+#include <unistd.h>
+#endif
 
 static void require(bool ok, const char *message)
 {
@@ -53,6 +57,49 @@ static void fusedCpp(const cv::Mat &input, std::vector<float> &tensor)
 }
 
 static volatile float sink;
+
+// End the smallest legal buffers immediately before inaccessible memory. This
+// detects SIMD overreads/overwrites even when the Rust library is uninstrumented.
+static void checkGuardPages()
+{
+#ifdef __linux__
+	const auto page = size_t(sysconf(_SC_PAGESIZE));
+	struct Mapping {
+		unsigned char *data;
+		size_t size;
+		~Mapping() { munmap(data, size); }
+	};
+	auto allocate = [page]() {
+		auto *data = static_cast<unsigned char *>(mmap(nullptr, page * 2, PROT_READ | PROT_WRITE,
+							     MAP_PRIVATE | MAP_ANONYMOUS, -1, 0));
+		require(data != MAP_FAILED, "Guard allocation failed");
+		if (mprotect(data + page, page, PROT_NONE) != 0) {
+			munmap(data, page * 2);
+			throw std::runtime_error("Guard protection failed");
+		}
+		return Mapping{data, page * 2};
+	};
+	auto source = allocate();
+	auto target = allocate();
+	for (size_t width = 1; width <= 65; ++width) {
+		const size_t bytes = width * 4, count = width * 3;
+		auto *input = source.data + page - bytes;
+		auto *output = reinterpret_cast<float *>(target.data + page - count * sizeof(float));
+		for (size_t i = 0; i < bytes; ++i)
+			input[i] = static_cast<unsigned char>(i * 73);
+		require(penguin_bgra_to_rgb_chw(input, bytes, width, 1, bytes, output, count) == 1,
+			"Guarded conversion failed");
+		for (size_t x = 0; x < width; ++x) {
+			require(output[x] == input[x * 4 + 2] * (1.0f / 255.0f) &&
+				output[width + x] == input[x * 4 + 1] * (1.0f / 255.0f) &&
+				output[2 * width + x] == input[x * 4] * (1.0f / 255.0f),
+				"Guarded tensor mismatch");
+		}
+	}
+	std::cout << "65 guarded SIMD boundary cases passed\n";
+#endif
+}
+
 static double measure(void (*fn)(const cv::Mat &, std::vector<float> &), const cv::Mat &input,
 		      std::vector<float> &tensor)
 {
@@ -69,6 +116,7 @@ static double measure(void (*fn)(const cv::Mat &, std::vector<float> &), const c
 int main(int argc, char **)
 {
 	try {
+		checkGuardPages();
 		cv::setNumThreads(1);
 		cv::RNG rng(12345);
 		float maxError = 0;
