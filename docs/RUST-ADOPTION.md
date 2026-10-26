@@ -202,3 +202,101 @@ Private synthetic test evidence is retained under
 `/var/tmp/penguin-obs33/rust-local2-installed-gpu` and
 `/var/tmp/penguin-obs33/rust-local2-installed-gpu-repeat`.
 The package and installation log are in `/var/tmp/penguin-rust-local2`.
+
+## Third local candidate: hand-mask processing and avoided copies
+
+The next local review build keeps public version 0.7.1. Work was split into
+independent performance and portability checks, then integrated locally.
+
+The dependency-free Rust library now also converts six-class hand-model logits
+into the skin-alpha mask. It caches the skin-class exponential already computed
+for the denominator instead of computing it twice, writes directly into the
+existing output mask and validates dimensions, strides, alignment, address
+arithmetic and nonoverlap at its C ABI boundary. Cropped rows and output padding
+are supported without allocation. The original C++ implementation remains the
+fallback if input validation fails or the experimental build option is disabled.
+The main camera plugin and the isolated worker link the same Rust static library.
+
+Two complementary optimizations stay in C++ where a rewrite offers no advantage:
+single-channel CHW/HWC output skips a redundant temporary allocation and two
+copies, and supported hand-component eligibility is calculated once per component
+rather than once per pixel. Model behavior, thresholds, Gaussian blur and the
+rule that hand recovery must never reduce the primary person mask are retained.
+A direct Rust port of the component loops was measured and rejected because it
+was slower; an optimized lookup port offered no consistent advantage over C++.
+
+The Rust dispatch suite now runs the real C ABI under emulated Nehalem (no AVX2)
+and Haswell (AVX2), in addition to native execution. The declared Rust 1.74 minimum
+is checked separately. These are local checks and prepared CI changes; no GitHub
+workflow has been published or run for this development candidate.
+
+Focused results on the Ryzen 7 9800X3D:
+
+- Six-class mask conversion at the production 256×154 crop: medians over nine
+  alternating 100-frame trials were 619.806 µs for the previous C++ loop,
+  329.685 µs for Rust and 559.809 µs for a C++ control caching the exponential.
+  This saves about 0.29 ms per hand-model frame versus the previous loop; it is
+  not a claim about total inference time or application FPS.
+- Thirty strided layouts produced exactly equal finite mask values, with zero
+  maximum difference. Thirty-six extreme/nonfinite variants retained NaN behavior
+  (NaN payload equality is not promised). Sixty-five guard-page boundary cases
+  passed. Rust tests also reject partial overlap and address arithmetic overflow.
+- Single-channel output avoids about 3.2 µs of copying per 320×192 frame. Twelve
+  single/multichannel comparisons and padded/special-value cases pass unchanged.
+- Thirty-two hand-component merge comparisons preserve the previous result,
+  leave the skin input unchanged and never reduce the primary matte. The focused
+  loop prototype showed a workload-dependent gain from component lookup; this is
+  kept in C++ and is not attributed to Rust.
+
+Independent review caught an uninitialized-output contract issue before local
+installation: OpenCV allocates the destination without initializing its floats.
+The final Rust implementation therefore writes through `MaybeUninit<f32>` rather
+than constructing initialized float references. This adds no zero-fill work and
+also allows untouched output padding to remain uninitialized. The corrected
+source passes seven Rust tests on 1.74, Clippy with warnings denied and all seven
+CMake/CTest groups, including native/emulated dispatch and hand-softmax guards.
+
+The local3 package is derived from the verified local2 package and changes only
+the background-removal plugin and GPU worker. The experimental option remains
+OFF by default for public package recipes. No additional runtime dependency or
+AMD add-on update is required. Installation and package evidence follows below.
+
+Local3 package validation:
+
+- Corrected C ABI harness passes AddressSanitizer, UndefinedBehaviorSanitizer and
+  LeakSanitizer; the Rust static library itself is not sanitizer-instrumented.
+- Native Wayland GPU and CPU runs each decoded fully: 30.100 seconds, 900 video
+  frames and 1,405 audio frames. GPU run had GPU active without CPU fallback;
+  CPU run used the explicitly selected CPU path. Neither reported loss events,
+  warning/error entries or OBS memory leaks on exit.
+- The package passed all 242 workspace checks and decoded the short UI-test
+  recording (97 video frames, 150 audio frames), with clean shutdown.
+- Package comparison against local2 confirms only `obs-backgroundremoval.so`
+  and `penguin-gpu-worker` changed. Dependency simulation upgrades only Penguin
+  Studio, adding/removing no packages. Author/license files remain byte-identical.
+
+These recording tests use synthetic media and isolated English profiles; they are
+not a live Facecam motion evaluation. Evidence is stored privately under
+`/var/tmp/penguin-obs33/rust-local3-package-{gpu,cpu,workspace}`. No GitHub release,
+release tag or product version bump was created.
+
+Local3 DEB SHA-256:
+`21af541f07d27e22e89348e958d8cd72cb3a5826b509b32dda2d796b05c06b06`.
+
+The corrected `0.7.1-1+ubuntu26.04.local3` DEB was installed through normal Ubuntu
+administrator authorization. Package verification passes; the AMD add-on remains
+0.7.1. The installed application's final GPU recording decoded fully (29.966
+seconds, 899 video frames, 1,403 audio frames), with GPU active, no CPU fallback,
+no reported loss events, no warning/error entries and zero reported OBS memory
+leaks at shutdown. Evidence: `/var/tmp/penguin-obs33/rust-local3-installed-gpu`.
+
+Installed plugin SHA-256:
+`396172dbbb660fe5cfc5f87da793db9501d9f495dc67a4307f84c60d8d02fb84`.
+Installed worker SHA-256:
+`c315e06622b030a4f1fe9cde1cfdee3c2714c583a23fa245ba8f3deff40282a8`.
+Both match the tested build. The local package and installation log are retained
+in `/var/tmp/penguin-rust-local3`. User settings and accounts were not used by tests.
+
+Tooling note: preparing the isolated minimum-version check also updated the local
+rustup manager to 1.29.2. The active rustc/cargo toolchain remains 1.98.0; the
+prepared CI installation explicitly disables rustup self-updates.

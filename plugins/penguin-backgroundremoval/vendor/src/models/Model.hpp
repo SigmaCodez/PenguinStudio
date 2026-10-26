@@ -300,6 +300,12 @@ public:
 
 	virtual void postprocessOutput(cv::Mat &output)
 	{
+		// A single-channel tensor already has the same CHW and HWC layout.
+		// Keep the original storage instead of allocating and copying the alpha
+		// plane twice. ModelRVM still runs hand recovery after this base method.
+		if (output.channels() == 1) {
+			return;
+		}
 		cv::Mat outputTransposed;
 		chw_to_hwc_32f(output, outputTransposed);
 		outputTransposed.copyTo(output);

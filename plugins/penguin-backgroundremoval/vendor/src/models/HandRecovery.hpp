@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Same-frame skin recovery for the optional moving-hand detail mode.
 #pragma once
+#ifdef PENGUIN_RUST_PREPROCESS
+#include "hand-softmax.h"
+#endif
 
 #include <algorithm>
 #include <array>
@@ -81,18 +84,26 @@ public:
 		}
 
 		cv::Mat small(height, width, CV_32FC1);
-		for (int y = 0; y < height; ++y) {
-			for (int x = 0; x < width; ++x) {
-				// The model returns logits, not normalized class probabilities.
-				const float *values = output.data() + (y * 256 + x) * 6;
-				const float maximum = *std::max_element(values, values + 6);
-				float sum = 0;
-				for (int channel = 0; channel < 6; ++channel) {
-					sum += std::exp(values[channel] - maximum);
+		bool converted = false;
+#ifdef PENGUIN_RUST_PREPROCESS
+		converted = penguin_logits6_to_skin_mask(
+			output.data(), output.size(), size_t(width), size_t(height), 256 * 6,
+			small.ptr<float>(), small.total(), small.step[0] / sizeof(float)) == 1;
+#endif
+		if (!converted) {
+			for (int y = 0; y < height; ++y) {
+				for (int x = 0; x < width; ++x) {
+					// The model returns logits, not normalized class probabilities.
+					const float *values = output.data() + (y * 256 + x) * 6;
+					const float maximum = *std::max_element(values, values + 6);
+					float sum = 0;
+					for (int channel = 0; channel < 6; ++channel) {
+						sum += std::exp(values[channel] - maximum);
+					}
+					const float skin = std::exp(values[2] - maximum) / sum;
+					const float alpha = std::clamp((skin - .2f) / .45f, 0.f, 1.f);
+					small.at<float>(y, x) = alpha * alpha * (3 - 2 * alpha);
 				}
-				const float skin = std::exp(values[2] - maximum) / sum;
-				const float alpha = std::clamp((skin - .2f) / .45f, 0.f, 1.f);
-				small.at<float>(y, x) = alpha * alpha * (3 - 2 * alpha);
 			}
 		}
 		cv::resize(small, mask, cv::Size(rgb.cols, rgb.rows));

@@ -2,6 +2,8 @@
 //! Allocation-free BGRA8 to planar RGB32F preprocessing for the RVM worker.
 use std::{mem, panic::catch_unwind, slice};
 
+mod hand_softmax;
+
 fn layout(width: usize, height: usize, stride: usize) -> Option<(usize, usize)> {
     if width == 0 || height == 0 {
         return None;

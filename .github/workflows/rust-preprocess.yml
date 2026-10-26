@@ -13,7 +13,7 @@ jobs:
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
       - name: Install test toolchain
-        run: sudo apt-get update && sudo apt-get install --yes cargo rustc cmake ninja-build libopencv-core-dev libopencv-imgproc-dev
+        run: sudo apt-get update && sudo apt-get install --yes cargo rustc cmake ninja-build libopencv-core-dev libopencv-imgproc-dev qemu-user
       - name: Configure and build offline
         run: |
           cmake -S plugins/penguin-backgroundremoval/rust-preprocess -B build-rust -G Ninja -DCMAKE_BUILD_TYPE=Release
@@ -21,4 +21,16 @@ jobs:
       - name: Check FFI and numerical equivalence
         run: ctest --test-dir build-rust --output-on-failure
       - name: Record informational benchmark
-        run: build-rust/penguin-rust-preprocess-test --benchmark
+        run: |
+          build-rust/penguin-rust-preprocess-test --benchmark
+          build-rust/penguin-rust-hand-softmax-test --benchmark
+  minimum-rust-version:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      - name: Install declared minimum toolchain
+        run: rustup toolchain install 1.74.0 --profile minimal --no-self-update
+      - name: Check minimum supported Rust version offline
+        run: |
+          rustup run 1.74.0 cargo test --release --locked --offline \
+            --manifest-path plugins/penguin-backgroundremoval/rust-preprocess/Cargo.toml
