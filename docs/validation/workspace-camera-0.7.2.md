@@ -46,7 +46,7 @@ losses, no additional busy inference ticks and clean shutdown. Ten status-bar
 checks also passed. This uses the host's kernel and Wayland compositor with
 26.10 userspace; it is not a separately booted 26.10 desktop certification.
 The local user-namespace installation could not complete system-account ownership
-changes; clean package installation remains a CI release gate.
+changes; the subsequent clean CI package installation and camera pixel tests passed.
 
 ## Public previews
 
@@ -71,3 +71,75 @@ matching color/mask pair is ready; actual inference failures still preserve inpu
 All camera pixel checks then passed, including the first-frame assertion, shapes,
 keys, blur/image composition, alpha edges, hand mode, Undo/Redo and persistence.
 The corrected test exited without warning/error entries or reported leaks.
+
+After this correction, fresh native Wayland recordings passed full decode and
+clean shutdown: CPU 90.966 seconds / 2,727 video frames, GPU 90.033 seconds /
+2,699 video frames. Neither reported render/encoder losses. The CPU interval
+contained three busy inference ticks and the GPU interval eight; these reused
+the last matched pair. The GPU run stayed on GPU without fallback.
+
+The first post-correction fallback run also contained a Firefox launch failure
+inside the read-only test namespace. Its strict clean-log gate failed; it is
+retained separately and is not counted as a clean run. A controlled repeat was
+performed below without changing browser permissions or hiding warnings.
+
+The controlled fallback repeat passed: 94.100 seconds, 2,823 decoded video frames,
+confirmed CPU fallback, five busy inference ticks, no reported render/encoder
+losses, no warning/error entries and zero reported memory leaks on shutdown.
+
+## Native Ubuntu 26.10 CI package
+
+The exact `0.7.2-1+ubuntu26.10` DEB from candidate run
+[40428246369](https://github.com/SigmaCodez/PenguinStudio/actions/runs/40428246369)
+passed clean installation, launcher and camera pixel checks in CI. Its SHA-256
+is `eb7593a4945c0cbc9098d799c50a4c34bd86648324bb31e2229158835446a566`.
+Together with the matching CI AMD add-on, the extracted package then recorded
+90.033 seconds / 2,700 decoded video frames under native Wayland with 26.10
+userspace. GPU stayed active without fallback; one inference tick reused a pair.
+There were no reported render/encoder losses, warning/error entries or leaks,
+and shutdown was clean. The host kernel/compositor limitation above still applies.
+
+## Native Ubuntu 26.04 CI package
+
+The `0.7.2-1+ubuntu26.04` DEB from the same candidate run has SHA-256
+`5d84a42434a2037f1d5f6901a7e58c72717d44810e722df897ec409156a85994`.
+It passed clean installation and camera pixel tests in CI. The actual extracted
+package passed 232 local Wayland workspace checks, a fully decoded short
+recording and clean shutdown. With its matching CI AMD add-on, a 90.033-second
+GPU recording decoded 2,700 video frames with no fallback, no additional busy
+inference ticks, no reported render/encoder losses and clean shutdown.
+The host APT preflight upgrades only Penguin Studio and its existing AMD add-on;
+it installs no additional packages and removes none.
+
+The same Ubuntu 26.04 CI package passed a CPU recording: 90.033 seconds /
+2,700 fully decoded video frames, one busy inference tick, no reported
+render/encoder losses and clean shutdown. Settings update checks found the
+button, displayed the updater above settings, received the current-version
+response and restored the settings dialog, with no warning/error entries.
+
+The CI AppImage passed 232 Wayland workspace assertions, a fully decoded
+3.233-second recording and clean shutdown, with no reported render/encoder
+losses. Its bundled Qt Quick/QML import directories were present.
+
+AppImage camera pixel checks also passed under Wayland: first-frame masking,
+shapes, green/blue key, local inference, blur, custom/transparent images,
+alpha-edge cleanup, hand mode, Undo/Redo and persisted settings. The process
+exited cleanly without warning/error entries or reported memory leaks.
+
+## Flatpak candidate regression
+
+Candidate run 40428246369 completed all Linux builds successfully. The Flatpak
+bundle (SHA-256 `befe88b534e07cbf5338358edf3234105a856fe7fae5d85020670e87fb0f0d0d`)
+passed 241 legacy workspace assertions, a fully decoded short recording and camera
+pixel tests, but visual inspection exposed a missing Qt Quick workspace module:
+it was installed outside Flatpak's scanned bundled-module directory. These
+checks therefore do not constitute acceptance of the new Flatpak interface.
+The module now installs in the bundled core directory for Flatpak only; other
+formats retain their tested location. CI additionally checks that exact installed
+file. A rebuilt Flatpak and a fresh visual/runtime check are required.
+
+The first launch was also blocked by the host document portal's missing FUSE
+mount. Restarting the normal user portal service restored it without changing
+application permissions. Four known absent-AJA-device diagnostics were present
+in the successful Flatpak runs; no other warning/error entries or memory leaks
+were reported.

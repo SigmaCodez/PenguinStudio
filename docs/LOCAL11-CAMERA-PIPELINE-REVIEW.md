@@ -77,3 +77,12 @@ English labels, pause, idle output visibility, centered/unclipped timer and metr
 text, and return to idle. Actual Qt captures were visually inspected (recording,
 paused and compact widths). Local preview files are in `images/local-review/local11/`,
 separate from public release previews. No private camera image appears in them.
+
+## Release-candidate follow-up — 0.7.2
+
+The user subsequently authorized publication. The complete follow-up, including
+CPU/GPU/fallback recording counts, the first-frame regression caught and fixed
+before publication, Ubuntu 26.10 userspace validation, status-bar GPU utilization,
+Settings update checks and English DEB captures, is recorded in
+[the 0.7.2 validation record](validation/workspace-camera-0.7.2.md).
+Earlier observations above retain their original local-build scope.

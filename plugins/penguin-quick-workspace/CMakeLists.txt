@@ -4,8 +4,15 @@ add_library(penguin-quick-workspace MODULE)
 target_sources(penguin-quick-workspace PRIVATE penguin-quick-workspace.cpp resources.qrc)
 set_target_properties(penguin-quick-workspace PROPERTIES AUTOMOC ON AUTORCC ON PREFIX "")
 target_link_libraries(penguin-quick-workspace PRIVATE OBS::libobs OBS::frontend-api Qt6::Widgets Qt6::QuickWidgets Qt6::Qml)
-install(TARGETS penguin-quick-workspace LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}/obs-modules/plugins")
-install(FILES README.md DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/obs/obs-modules/plugins/penguin-quick-workspace")
+# Flatpak scans bundled modules in core; its plugins directory belongs to the
+# separate /app/plugins extension mount, not /app/lib/obs-modules/plugins.
+if(OS_FLATPAK)
+  set(workspace_module_group core)
+else()
+  set(workspace_module_group plugins)
+endif()
+install(TARGETS penguin-quick-workspace LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}/obs-modules/${workspace_module_group}")
+install(FILES README.md DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/obs/obs-modules/${workspace_module_group}/penguin-quick-workspace")
 
 if(PENGUIN_BUILD_TESTS)
   add_library(penguin-quick-smoke MODULE tests/smoke.cpp)

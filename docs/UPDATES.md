@@ -1,6 +1,6 @@
 # Updates inside Penguin Studio
 
-On Linux, **Settings → General → Check for updates** (also available through **Help → Check for updates**) opens Penguin Studio's updater. It checks
+On Linux, **Settings → General → Check for updates** opens Penguin Studio's updater. It checks
 only releases in `SigmaCodez/PenguinStudio`, compares numeric Penguin versions,
 and offers newer versions. The app also checks five seconds after every startup when automatic checks are
 enabled. A successful check earlier that day does not suppress a new startup check. Automatic notifications wait until active

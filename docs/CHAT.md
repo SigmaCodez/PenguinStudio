@@ -2,7 +2,7 @@
 
 Penguin Studio provides native Twitch and YouTube chat tabs. They
 work under Wayland without an embedded browser. Connect the corresponding account
-in **Stream details**, then open **Docks → Stream chat**.
+in **Title & category**, then open **Live chat** in the workspace navigation.
 
 Messages are rendered as plain text with role labels and bounded history. The
 view follows new messages while you are at the bottom; scrolling up keeps your

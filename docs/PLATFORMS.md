@@ -6,10 +6,10 @@ Current 0.7.2 interface before sign-in. This preview contains no account informa
 
 ## Twitch
 
-1. Open **Docks → Stream details → Twitch** and select **Connect with Twitch**.
+1. Open **Title & category → Twitch** and select **Connect with Twitch**.
 2. Penguin opens the official Twitch activation page in your system browser. Enter the displayed device code and authorize the application. No Twitch password is entered into Penguin Studio.
 3. Use **Load current stream details** to retrieve the current title and category name, or enter a title and select an optional category from the searchable game list, then select **Update stream details**.
-4. Open **Docks → Stream chat → Twitch**. The native dock reads and sends messages in the connected account's channel on Wayland as well as X11. It follows chat deletion/clear events and reconnects after connection loss. Right-click messages for moderation, open Chat settings for chat modes, or use Chat participants for connected/recent chatters and session bans. The implementation displays plain text, including emote names; it does not embed Twitch's web dashboard or render third-party emote extensions.
+4. Open **Live chat → Twitch**. The native dock reads and sends messages in the connected account's channel on Wayland as well as X11. It follows chat deletion/clear events and reconnects after connection loss. Right-click messages for moderation, open Chat settings for chat modes, or use Chat participants for connected/recent chatters and session bans. The implementation displays plain text, including emote names; it does not embed Twitch's web dashboard or render third-party emote extensions.
 
 The maintainer's public Twitch application ID is bundled with Penguin Studio. The application must remain registered with client type **Public**; no client secret is embedded. Device authorization requests `channel:manage:broadcast`, `user:read:chat`, `user:write:chat`, `moderator:read:chatters`, `moderator:manage:chat_messages`, `moderator:manage:banned_users` and `moderator:manage:chat_settings`. Existing accounts should reconnect once to grant the new moderation permissions. The module validates tokens after connection and periodically while connected, and refreshes them before expiration. Access tokens and chat history remain in memory. Refresh tokens are saved in the system keyring and exchanged for a new access token on startup. Rotated refresh tokens replace the saved value. Disconnect disables automatic sign-in and deletes the saved credentials. Revoking the application itself is done in Twitch account settings.
 
@@ -19,10 +19,10 @@ References: [device grant](https://dev.twitch.tv/docs/authentication/getting-tok
 
 ## YouTube
 
-1. Open **Docks → Stream details → YouTube** and select **Connect with YouTube**.
+1. Open **Title & category → YouTube** and select **Connect with YouTube**.
 2. Complete account selection and authorization in your system browser. Penguin restores saved sign-ins from the system keyring on subsequent starts.
 3. Create or schedule a broadcast in [YouTube Studio](https://studio.youtube.com), load your broadcasts in Penguin, select one, and update its title.
-4. Open **Docks → Stream chat → YouTube** and load an active broadcast to read, send and moderate its chat. **People / moderation** shows recent chatters and bans created in this session. See the [chat guide](CHAT.md) for permissions, viewer counts, polling and platform limitations.
+4. Open **Live chat → YouTube** and load an active broadcast to read, send and moderate its chat. **People / moderation** shows recent chatters and bans created in this session. See the [chat guide](CHAT.md) for permissions, viewer counts, polling and platform limitations.
 
 Publisher-configured packages use Penguin Studio's Google Desktop app. Users do not
 need to register their own Google application or enter client credentials. Maintainers
