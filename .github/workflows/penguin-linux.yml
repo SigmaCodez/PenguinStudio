@@ -235,6 +235,7 @@ jobs:
         run: |
           apt-get update
           apt-get install -y --no-install-recommends git ca-certificates sudo dbus-bin
+          mkdir -p /var/lib/dbus
           dbus-uuidgen --ensure
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
@@ -467,17 +468,19 @@ jobs:
           if-no-files-found: error
   amd-camera:
     needs: version
-    name: Optional AMD RX 9070 camera runtime (Ubuntu 26.04)
-    if: github.event_name != 'workflow_dispatch' || inputs.packages == 'all' || inputs.packages == 'deb-26.04'
+    name: Optional AMD RX 9070 camera runtime (Ubuntu 26.04 and 26.10)
+    if: github.event_name != 'workflow_dispatch' || inputs.packages == 'all' || inputs.packages == 'deb' || inputs.packages == 'deb-26.04' || inputs.packages == 'deb-26.10'
     runs-on: ubuntu-26.04
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: Stage verified private AMD libraries
         run: python3 scripts/packaging/prepare-amd-camera-runtime.py "$RUNNER_TEMP/penguin-amd" --architecture gfx1201
       - name: Build optional runtime package
-        run: python3 scripts/packaging/build-amd-camera-addon.py "$RUNNER_TEMP/penguin-amd" amd-artifact
+        run: |
+          python3 scripts/packaging/build-amd-camera-addon.py "$RUNNER_TEMP/penguin-amd" amd-artifact --ubuntu-release 26.04
+          python3 scripts/packaging/build-amd-camera-addon.py "$RUNNER_TEMP/penguin-amd" amd-artifact --ubuntu-release 26.10
       - name: Inspect runtime package
-        run: dpkg-deb --info amd-artifact/*.deb
+        run: for package in amd-artifact/*.deb; do dpkg-deb --info "$package"; done
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: penguin-studio-amd-camera-gfx1201

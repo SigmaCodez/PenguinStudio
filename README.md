@@ -38,7 +38,7 @@ These English previews show the previous 0.7.1 interface. Reviewed 0.7.2 capture
 
 **Current release: [Penguin Studio 0.7.2](https://github.com/SigmaCodez/PenguinStudio/releases/tag/penguin-v0.7.2)** — simpler Qt Quick navigation, a redesigned CPU/GPU status bar, Settings update checks, asynchronous camera processing and native Ubuntu 26.10 packages, on the OBS 33.0.0 engine.
 
-Camera processing offers **Automatic**, **GPU** and **CPU**, with automatic CPU fallback. The optional Ubuntu 26.04 AMD runtime add-on enables primary GPU matting on the tested RX 9070 XT; hand preservation stays on CPU. Other package/hardware combinations retain CPU processing unless a compatible runtime is provided. See [camera GPU setup](docs/PACKAGING.md#optional-amd-camera-gpu-runtime).
+Camera processing offers **Automatic**, **GPU** and **CPU**, with automatic CPU fallback. The optional Ubuntu 26.04 or 26.10 AMD runtime add-on enables primary GPU matting on the tested RX 9070 XT; hand preservation stays on CPU. Other package/hardware combinations retain CPU processing unless a compatible runtime is provided. See [camera GPU setup](docs/PACKAGING.md#optional-amd-camera-gpu-runtime).
 
 **[Download Linux packages](https://github.com/SigmaCodez/PenguinStudio/releases)** — Ubuntu DEB, Fedora RPM, Flatpak, Snap, AppImage and an Arch/AUR recipe, with SHA-256 checksums.
 

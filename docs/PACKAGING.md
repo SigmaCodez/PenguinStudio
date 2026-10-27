@@ -250,4 +250,4 @@ Use the native Ubuntu 26.10 package, built against that distribution’s librari
 sudo apt install ./penguin-studio_0.7.2-1+ubuntu26.10_amd64.deb
 ```
 
-The in-app updater selects Ubuntu 26.10 assets only on Ubuntu 26.10. The optional AMD camera-runtime add-on remains validated for Ubuntu 26.04; GPU runtime support on 26.10 is not implied by the main DEB. CPU camera processing remains available.
+The in-app updater selects Ubuntu 26.10 assets only on Ubuntu 26.10. An optional AMD RX 9070 camera-runtime add-on is also provided for Ubuntu 26.10. It uses the same private runtime validated with the native 26.10 camera worker; it does not replace the system graphics driver. CPU camera processing remains available without the add-on.

@@ -33,6 +33,7 @@ cmake -DPACKAGE_CONFIG="$build_dir/CPackConfig.cmake" -DPACKAGE_BUILD_DIR="$(rea
   -P "$project_root/test/penguin-cpack.cmake"
 cmake --build "$build_dir" --parallel "${CMAKE_BUILD_PARALLEL_LEVEL:-2}"
 "$build_dir/plugins/penguin-camera/penguin-camera-model" "$project_root/plugins/penguin-camera/data/selfie_segmentation.onnx"
+cargo test --release --locked --offline --manifest-path "$project_root/plugins/penguin-backgroundremoval/rust-preprocess/Cargo.toml" --target-dir "$build_dir/rust-unit-tests"
 "$build_dir/frontend/penguin-hardware-encoder"
 QT_QPA_PLATFORM=offscreen "$build_dir/frontend/penguin-update-flow"
 "$build_dir/plugins/penguin-outputs/penguin-output-safety"

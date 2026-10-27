@@ -137,7 +137,10 @@ class Releases(unittest.TestCase):
             with self.assertRaises(ValueError):
                 publish.collect_packages(root, '0.7.2')
             (root / 'penguin-studio_0.7.2-1+ubuntu26.10_amd64.deb').write_bytes(b'interim artifact')
-            self.assertEqual(len(publish.collect_packages(root, '0.7.2')), 8)
+            with self.assertRaises(ValueError):
+                publish.collect_packages(root, '0.7.2')
+            (root / 'penguin-studio-camera-amd-gfx1201_0.7.2-1+ubuntu26.10_amd64.deb').write_bytes(b'GPU runtime')
+            self.assertEqual(len(publish.collect_packages(root, '0.7.2')), 9)
 
     def test_complete_package_set(self):
         names = ['penguin-studio_0.2.0-6+ubuntu24.04_amd64.deb',
