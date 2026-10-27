@@ -143,3 +143,17 @@ mount. Restarting the normal user portal service restored it without changing
 application permissions. Four known absent-AJA-device diagnostics were present
 in the successful Flatpak runs; no other warning/error entries or memory leaks
 were reported.
+
+A controlled path probe loaded the unchanged built Qt Quick module through the
+isolated profile's supported plugin location. The modern workspace then passed
+232 assertions and a fully decoded 3.233-second recording (97 video / 150 audio
+frames), with clean shutdown and only the known absent-AJA diagnostics. Visual
+inspection confirmed the intended simplified navigation. This isolates discovery
+as the cause; the rebuilt bundled package still needs its own acceptance run.
+
+The first rebuilt bundle (`7fada3315963984a08dfc89b97d756f0dbced2428e590f3fbc939215de73d014`)
+contained the module in core but still did not load it: bundled core modules also
+require explicit registration before libobs generates its module list. The
+acceptance check rejected this bundle. Flatpak now registers the workspace before
+that generation; CI checks both the installed module and its name in libobs.
+Other platforms retain plugin discovery and are not added to the core list.

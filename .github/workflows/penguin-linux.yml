@@ -152,7 +152,9 @@ jobs:
           build-bundle: true
           cache-key: penguin-flatpak-${{ hashFiles('build-aux/io.github.SigmaCodez.PenguinStudio.json') }}
       - name: Verify bundled workspace module
-        run: test -f flatpak_app/files/lib/obs-modules/core/penguin-quick-workspace.so
+        run: |
+          test -f flatpak_app/files/lib/obs-modules/core/penguin-quick-workspace.so
+          grep -a -q 'penguin-quick-workspace' flatpak_app/files/lib/libobs.so.30
       - name: Verify compiled YouTube configuration
         run: python3 scripts/packaging/configure-youtube.py --verify flatpak_app
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
