@@ -205,9 +205,9 @@ jobs:
         run: |
           c++ -std=c++17 -Wall -Wextra -Werror -Ilibobs test/penguin-camera-threads.cpp -lobs -o /tmp/penguin-camera-threads
           /tmp/penguin-camera-threads
-          sudo apt-get install -y --no-install-recommends xvfb xauth
+          sudo apt-get install -y --no-install-recommends xvfb xauth dbus-daemon
           c++ -std=c++17 -shared -fPIC -Wall -Wextra -Werror test/penguin-camera-gui.cpp $(pkg-config --cflags --libs Qt6Widgets) -I/usr/include/obs -lobs -lobs-frontend-api -o /tmp/penguin-camera-gui.so
-          xvfb-run -a env QT_QPA_PLATFORM=xcb LIBGL_ALWAYS_SOFTWARE=1 PENGUIN_CAMERA_HEADLESS=1 bash scripts/packaging/test-camera.sh /tmp/penguin-camera-gui.so /tmp/penguin-camera-test
+          xvfb-run -a dbus-run-session -- env QT_QPA_PLATFORM=xcb LIBGL_ALWAYS_SOFTWARE=1 PENGUIN_CAMERA_HEADLESS=1 bash scripts/packaging/test-camera.sh /tmp/penguin-camera-gui.so /tmp/penguin-camera-test
       - name: Preserve camera test diagnostics
         if: failure()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
@@ -274,9 +274,9 @@ jobs:
         run: |
           c++ -std=c++17 -Wall -Wextra -Werror -Ilibobs test/penguin-camera-threads.cpp -lobs -o /tmp/penguin-camera-threads
           /tmp/penguin-camera-threads
-          sudo apt-get install -y --no-install-recommends xvfb xauth
+          sudo apt-get install -y --no-install-recommends xvfb xauth dbus-daemon
           c++ -std=c++17 -shared -fPIC -Wall -Wextra -Werror test/penguin-camera-gui.cpp $(pkg-config --cflags --libs Qt6Widgets) -I/usr/include/obs -lobs -lobs-frontend-api -o /tmp/penguin-camera-gui.so
-          xvfb-run -a env QT_QPA_PLATFORM=xcb LIBGL_ALWAYS_SOFTWARE=1 PENGUIN_CAMERA_HEADLESS=1 bash scripts/packaging/test-camera.sh /tmp/penguin-camera-gui.so /tmp/penguin-camera-test
+          xvfb-run -a dbus-run-session -- env QT_QPA_PLATFORM=xcb LIBGL_ALWAYS_SOFTWARE=1 PENGUIN_CAMERA_HEADLESS=1 bash scripts/packaging/test-camera.sh /tmp/penguin-camera-gui.so /tmp/penguin-camera-test
       - name: Preserve camera test diagnostics
         if: failure()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
