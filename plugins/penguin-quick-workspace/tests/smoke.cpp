@@ -1,5 +1,4 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
-// SPDX-License-Identifier: GPL-2.0-or-later
 // Test-only preload helper. Explicit focus setup isolates keyboard event handling
 // from compositor activation, which Wayland need not grant to automated windows.
 #include <QApplication>
@@ -9,6 +8,7 @@
 #include <QQuickWidget>
 #include <QQuickItem>
 #include <QQuickWindow>
+#include <QSGRendererInterface>
 #include <QQmlContext>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -31,9 +31,10 @@ void tick(){
  if(!view)view=main->findChild<QQuickWidget*>("penguinQuickView");
  if(ticks==40){
   check("qml_ready",view&&view->status()==QQuickWidget::Ready);
+  check("navigation_graphics_isolated",view && view->quickWindow()->rendererInterface()->graphicsApi()==QSGRendererInterface::Software);
   check("native_wayland",QGuiApplication::platformName()=="wayland");
   check("simple_workspace_active",main->property("penguinSimpleWorkspace").toBool());
-  for (const char *name : {"penguinDestinationsButton", "penguinDetailsButton", "penguinInspectorButton", "penguinClipButton", "penguinCanvasMode"}) {
+  for (const char *name : {"penguinDestinationsButton", "penguinDetailsButton", "penguinInspectorButton", "penguinClipButton", "penguinCanvasMode", "penguinMetric"}) {
    auto *shortcut=main->findChild<QWidget*>(name); report[QString("duplicate_hidden_%1").arg(name)]=shortcut && !shortcut->isVisible();
   }
   auto *live=main->findChild<QToolButton*>("penguinLiveButton");check("one_live_button_no_split_menu",live && !live->menu() && live->popupMode()!=QToolButton::MenuButtonPopup);

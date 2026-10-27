@@ -357,11 +357,12 @@ static void createWorkspace()
     if (bridge || exiting) return;
     auto *main = static_cast<QMainWindow *>(obs_frontend_get_main_window());
     if (!main) return;
-    // This static navigation must not share Qt Quick OpenGL framebuffer handling
-    // with OBS native video surfaces on Wayland (Qt 6.10 FBO recursion on resize).
-    // OBS rendering, encoders and camera inference keep their own GPU backends.
-    if (QGuiApplication::platformName() == "wayland")
-        QQuickWindow::setGraphicsApi(QSGRendererInterface::Software);
+    // Keep static navigation independent of OBS's native graphics context on
+    // both Wayland and X11. Qt Quick GL framebuffer handling can recurse during
+    // Wayland resize and leave incompatible current contexts under XWayland.
+    // This affects only navigation; video, encoders and camera inference retain
+    // their own GPU backends.
+    QQuickWindow::setGraphicsApi(QSGRendererInterface::Software);
     auto *view = new QQuickWidget;
     view->setObjectName("penguinQuickView");
     view->setMinimumSize(228, 420);

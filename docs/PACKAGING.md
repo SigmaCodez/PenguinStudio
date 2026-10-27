@@ -15,7 +15,7 @@ See [AppImage and Arch/AUR instructions](APPIMAGE-AUR.md) for the new package fo
 | AppImage | Ubuntu 26.04 with bundled Qt | x86_64 | glibc 2.43+ hosts; graphics drivers and portals remain host-provided |
 | Arch/AUR recipe | Arch Linux makepkg; packages the AppImage | x86_64 | Arch Linux; GitHub recipe download, AUR submission pending |
 | Flatpak | Freedesktop SDK 26.08, pinned OBS dependencies | x86_64 | Linux distributions with Flatpak and working graphics/desktop portals |
-| DEB | Ubuntu 26.04 | amd64 | Install only the package matching the host Ubuntu release |
+| DEB | Ubuntu 26.04 and 26.10 | amd64 | Install only the package matching the host Ubuntu release |
 | RPM | Fedora 44 with RPM Fusion free build dependencies | x86_64 | Fedora 44; rebuild for other RPM distributions |
 | Snap | core26 / Ubuntu 26.04 | amd64 | Hosts with snapd; development grade until confinement tests pass |
 
@@ -34,7 +34,7 @@ Publication requires every package build and release check to pass. Refer to
 the release build manifest for the final source commit and checksums.
 
 [GitHub Releases](https://github.com/SigmaCodez/PenguinStudio/releases) provides
-permanent downloads of Ubuntu 26.04 DEB, Fedora 44 RPM, Flatpak,
+permanent downloads of Ubuntu 26.04 and 26.10 DEBs, Fedora 44 RPM, Flatpak,
 Snap, AppImage and an Arch recipe archive, plus `SHA256SUMS` and
 `build-manifest.json`. The Arch recipe is not yet listed on aur.archlinux.org.
 Releases are marked as prereleases while Penguin Studio remains a development preview.
@@ -141,7 +141,7 @@ To build from source, use the target distribution and start from a recursive che
 git clone --recurse-submodules --branch main https://github.com/SigmaCodez/PenguinStudio.git
 cd PenguinStudio
 sudo bash scripts/packaging/install-build-deps.sh
-bash scripts/packaging/build-native.sh DEB  # Build on the intended Ubuntu 26.04 host
+bash scripts/packaging/build-native.sh DEB  # Build on the intended Ubuntu 26.04 or 26.10 host
 # Or, inside Fedora 44:
 bash scripts/packaging/build-native.sh RPM
 ```
@@ -234,7 +234,7 @@ matting runs on GPU; hand recovery runs concurrently on CPU to preserve the test
 image quality. GPU failure returns to the prepared CPU session.
 
 The add-on is optional and is not installed by the ordinary main-package updater.
-It is specific to native Ubuntu 26.04 packages and gfx1201. It is not injected into
+It is specific to native Ubuntu 26.04/26.10 packages and gfx1201. It is not injected into
 Snap, Flatpak, AppImage or RPM installations. Those packages retain CPU processing
 unless built with a compatible private GPU runtime. NVIDIA and other AMD families
 have not been validated for this camera path. Hardware video encoding is a
@@ -248,6 +248,12 @@ Use the native Ubuntu 26.10 package, built against that distribution’s librari
 
 ```sh
 sudo apt install ./penguin-studio_0.7.2-1+ubuntu26.10_amd64.deb
+```
+
+For the tested RX 9070 XT, install both matching packages to enable primary GPU matting:
+
+```sh
+sudo apt install --no-remove ./penguin-studio_0.7.2-1+ubuntu26.10_amd64.deb ./penguin-studio-camera-amd-gfx1201_0.7.2-1+ubuntu26.10_amd64.deb
 ```
 
 The in-app updater selects Ubuntu 26.10 assets only on Ubuntu 26.10. An optional AMD RX 9070 camera-runtime add-on is also provided for Ubuntu 26.10. It uses the same private runtime validated with the native 26.10 camera worker; it does not replace the system graphics driver. CPU camera processing remains available without the add-on.

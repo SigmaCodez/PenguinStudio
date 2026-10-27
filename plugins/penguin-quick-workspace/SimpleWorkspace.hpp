@@ -59,7 +59,7 @@ public:
         holder = new QWidget(main);
         holder->hide();
         for (const char *name : {"penguinDestinationsButton", "penguinDetailsButton", "penguinInspectorButton",
-                                 "penguinClipButton", "penguinCanvasMode"}) {
+                                 "penguinClipButton", "penguinCanvasMode", "penguinMetric"}) {
             auto *widget = main->findChild<QWidget *>(name);
             auto *parent = widget ? widget->parentWidget() : nullptr;
             auto *layout = parent ? qobject_cast<QBoxLayout *>(parent->layout()) : nullptr;
