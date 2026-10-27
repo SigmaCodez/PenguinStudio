@@ -1,20 +1,20 @@
 # Updates inside Penguin Studio
 
-On Linux, **Help → Check for updates** opens Penguin Studio's updater. It checks
+On Linux, **Settings → General → Check for updates** (also available through **Help → Check for updates**) opens Penguin Studio's updater. It checks
 only releases in `SigmaCodez/PenguinStudio`, compares numeric Penguin versions,
 and offers newer versions. The app also checks five seconds after every startup when automatic checks are
 enabled. A successful check earlier that day does not suppress a new startup check. Automatic notifications wait until active
 outputs and modal dialogs have finished and Penguin is active. Automatic checks
 and development-preview releases can be disabled in the update dialog.
 
-**Download and install update** chooses the matching x86_64 Ubuntu 26.04
+**Download and install update** chooses the matching x86_64 Ubuntu 26.04 or Ubuntu 26.10
 DEB, Fedora 44 RPM, or Flatpak bundle. It verifies the exact asset name, release
 URL, byte count and GitHub-provided SHA-256 digest before invoking a package
 manager. Missing or invalid digests disable installation. Verification relies
 on HTTPS and the project's GitHub release metadata, not a separate signing key.
 Starting with the OBS 33-based release, no native Ubuntu 24.04 DEB is published.
 The updater must find a package for the installed distribution; it will not install
-an Ubuntu 26.04 package on Ubuntu 24.04. Use a compatible Flatpak or Snap runtime
+a DEB built for a different Ubuntu release. Use a compatible Flatpak or Snap runtime
 when a native package is unavailable.
 
 All streaming outputs (including custom multistream outputs), recording, replay

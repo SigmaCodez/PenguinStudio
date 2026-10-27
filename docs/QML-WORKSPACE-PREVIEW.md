@@ -1,8 +1,8 @@
-# Local Qt Quick workspace preview
+# Qt Quick workspace development
 
-This experiment extends the existing Qt Widgets application with one Qt Quick
-navigation dock. It is a local review candidate, not a public release or a full
-frontend migration. The public product version remains 0.7.1.
+The locally reviewed Qt Quick presentation layer is included in the 0.7.2 Linux
+packages. It extends the existing Qt Widgets application; it is not a replacement
+for the renderer or native settings controllers.
 
 ## Scope
 
@@ -23,7 +23,7 @@ labels. Production localization is a prerequisite for a wider UI migration.
 ## Build and packaging
 
 The optional `PENGUIN_QUICK_WORKSPACE_PREVIEW` CMake option is off by default.
-Enable it only in local Linux review builds. Qt Widgets, QuickWidgets and Qml
+Official Linux package definitions enable it after local design review. Qt Widgets, QuickWidgets and Qml
 development packages are required. `PENGUIN_BUILD_TESTS` also builds the navigation
 smoke helper; it is not installed into the production package.
 

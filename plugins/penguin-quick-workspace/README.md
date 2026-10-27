@@ -1,9 +1,9 @@
-# QML workspace preview
+# Qt Quick workspace
 
-Optional local QML presentation experiment. OBS rendering and the native
+Qt Quick presentation layer reviewed locally before inclusion in the 0.7.2 Linux packages. OBS rendering and the native
 Qt Widgets settings logic remain authoritative. Build with `PENGUIN_QUICK_WORKSPACE_PREVIEW=ON` on Linux.
-The option is off by default and must not be enabled in public packages without
-local design approval and normal publication checks.
+The option remains opt-in for source builds; official Linux package definitions enable it.
+Native controllers and publication checks remain required.
 
 The Workspace dock puts scene selection first. **Manage** opens the native scene
 manager; scene search never edits the collection. Sources and Audio mixer remain
