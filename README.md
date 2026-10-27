@@ -17,13 +17,13 @@ Penguin Studio brings a redesigned production workspace, native multi-destinatio
 
 ![Penguin Studio modern workspace with searchable layers and scenes, audio channel strips and an integrated inspector](docs/images/current/workspace-en.png)
 
-These English previews show the previous 0.7.1 interface. Reviewed 0.7.2 captures are pending before publication. See the [workspace guide](docs/WORKSPACE.md) for the controls and layout.
+These English previews show the real 0.7.2 candidate package with synthetic demo media. See the [workspace guide](docs/WORKSPACE.md) for the controls and layout.
 
 > Development preview. See [verification status](docs/VERIFICATION.md) for completed checks and remaining release tests, and [packaging](docs/PACKAGING.md) for development downloads and supported build targets. Validate your devices and streaming accounts before relying on this build for a live show.
 
 ## What is included
 
-- A native production workspace with searchable layers and numbered scenes on the left, canvas in the center, a channel-strip audio mixer below, and tabbed inspector/output/details tools on the right. The top bar brings together destinations, live output, recording and replay clips.
+- A simplified Qt Quick workspace with searchable scenes, a central canvas, sources and audio below, and direct navigation to source editing, streaming channels, title/category and live chat. The top bar keeps Go live and Record prominent; Advanced groups less frequently used tools.
 - An editable inspector for source position, size, rotation, crop, visibility and locking, with undo/redo, source properties and filters. See the [workspace guide](docs/WORKSPACE.md).
 - [Camera appearance](docs/CAMERA-EFFECTS.md): circle, oval and rounded-corner shapes, automatic local AI background removal, background blur, custom images, optional moving-hand preservation, and green/blue screen options with adjustable thresholds.
 - Original Penguin Studio logo, a complete dark control theme, English defaults and a separate `PenguinStudio` configuration directory.
@@ -47,15 +47,15 @@ Camera processing offers **Automatic**, **GPU** and **CPU**, with automatic CPU 
 1. Install the Penguin Studio package for your system following the [installation guide](docs/PACKAGING.md).
 2. Launch `penguin-studio`. Finish the hardware configuration and destination assistants. Twitch and YouTube sign-in is optional during setup.
 3. Choose a platform, copy its RTMP(S) server and stream key from its creator dashboard, and choose landscape or portrait output.
-4. Use **Destinations** to add further destinations. **Go live** starts all configured Penguin destinations; **End stream** stops them. The live button's menu also exposes OBS's separate primary stream action.
-5. Open the arrow menu beside **Go live**, then choose **Stream details** to connect Twitch or YouTube for title updates. Official packages include the application configuration for browser sign-in with both providers; you do not need to enter client IDs. Use the searchable Twitch game and YouTube category lists, and **Docks → Stream chat** for native chat and moderation. See the [chat guide](docs/CHAT.md). See [platform setup](docs/PLATFORMS.md).
+4. Use **Streaming channels** to add further destinations. **Go live** starts all configured Penguin destinations; **End stream** stops them. **Advanced** retains the separate primary-stream action.
+5. Open **Title & category** to connect Twitch or YouTube for title updates. Official packages include the application configuration for browser sign-in with both providers; you do not need to enter client IDs. Use the searchable Twitch game and YouTube category lists, and **Live chat** for native chat and moderation. See the [chat guide](docs/CHAT.md). See [platform setup](docs/PLATFORMS.md).
 6. Make a private test stream before a public broadcast. Check picture framing, sound, reconnects, CPU/GPU load, dropped frames and total upload bandwidth.
 
 Twitch and YouTube sign-ins are saved in the system keyring and restored after restart when the keyring is available. **Disconnect** removes the saved account. The **Broadcast destinations** dock keeps stream keys in memory for the current session; they must be entered again after restart. Destination names, nonsecret server URLs and encoder choices are saved locally. Never put a stream key into a saved server URL. The separate **Settings → Stream** workflow can persist stream credentials in the local profile.
 
 ## Penguin Studio updates
 
-New Penguin Studio versions are published on our [GitHub Releases page](https://github.com/SigmaCodez/PenguinStudio/releases), with release notes, Linux packages and SHA-256 checksums. Use **Help → Check for updates** to download and install a verified update on supported Ubuntu, Fedora and Flatpak installations. Automatic notifications announce newer versions. Stop all outputs before updating, confirm any system administrator prompt, then restart the app. Locally installed Snap bundles and AppImages require a manual package update. Arch installations use the updated recipe until an AUR listing is available. You can also close Penguin Studio and install the newer package for the same distribution release and format. See the [package guide](docs/PACKAGING.md) for format-specific instructions. Direct downloads do not require a source checkout.
+New Penguin Studio versions are published on our [GitHub Releases page](https://github.com/SigmaCodez/PenguinStudio/releases), with release notes, Linux packages and SHA-256 checksums. Use **Settings → General → Check for updates** to download and install a verified update on supported Ubuntu, Fedora and Flatpak installations. An automatic check at startup announces newer versions when enabled. Stop all outputs before updating, confirm any system administrator prompt, then restart the app. Locally installed Snap bundles and AppImages require a manual package update. Arch installations use the updated recipe until an AUR listing is available. You can also close Penguin Studio and install the newer package for the same distribution release and format. See the [package guide](docs/PACKAGING.md) for format-specific instructions. Direct downloads do not require a source checkout.
 
 Penguin Studio has its own version numbers and release schedule. Our GitHub Actions workflow builds and publishes the Linux packages when a new project version is released. These downloads are development previews; check the release notes and [verification status](docs/VERIFICATION.md) before updating a production setup.
 

@@ -4,7 +4,7 @@ Penguin Studio combines Qt Quick navigation with native Qt source controls, a la
 
 ![Penguin Studio workspace in English](images/current/workspace-en.png)
 
-Current previews are being refreshed for the 0.7.2 candidate before publication. All published previews use an isolated English profile and synthetic media.
+The previews show the real 0.7.2 candidate package using an isolated English profile and synthetic media.
 
 ## Start a session
 
@@ -21,7 +21,7 @@ Current previews are being refreshed for the 0.7.2 candidate before publication.
 - **Settings** opens searchable settings navigation. Forms retain their native validation and save/cancel behavior.
 - **Go live** starts configured destinations through their validated controller. With no destinations configured, it opens setup. **End stream** stops those outputs.
 - **Record** starts the recording controller. Its menu offers pause/resume when supported by the recording mode.
-- **Clip** saves the active replay buffer. Configure and start the replay buffer before saving clips.
+- **Advanced → Save replay clip** saves the active replay buffer. Configure and start the replay buffer before saving clips.
 - **Advanced** groups replay-buffer, virtual-camera, studio-mode and other advanced controls, including the separate primary-stream action. Its credentials remain separate from Penguin destinations.
 
 The bottom status bar shows active recording/live timers, CPU usage and frame rate. Supported Linux drivers also supply utilization of the GPU rendering the workspace. This is whole-device load; a dash means unavailable data, not zero utilization. Inactive timers stay hidden and recording pause is explicit.
