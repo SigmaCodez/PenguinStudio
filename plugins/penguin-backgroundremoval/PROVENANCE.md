@@ -100,3 +100,7 @@ late, the last complete pair remains visible; `camera_status` exposes completed
 frames and busy video ticks rather than hiding those repeats behind render-loss
 counters. There is no unbounded queue. Updates and destruction drain the accepted
 job before replacing or freeing model state. Model files and notices are unchanged.
+Before the first complete frame/mask pair, and after a size change, output remains
+transparent instead of flashing the unprocessed background. Actual inference
+failures retain the visible input fallback. The camera pixel regression test
+checks this first-render behavior without allowing an intervening video tick.

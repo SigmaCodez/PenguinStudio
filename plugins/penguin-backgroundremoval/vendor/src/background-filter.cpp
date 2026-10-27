@@ -1016,12 +1016,16 @@ void background_filter_video_render(void *data, gs_effect_t *_effect)
 			++tf->busyTicks;
 		}
 	}
-	if (!tf->displayReady || tf->isDisabled ||
-	    gs_texture_get_width(tf->displayTexture) != width ||
-	    gs_texture_get_height(tf->displayTexture) != height) {
+	if (tf->isDisabled) {
 		obs_source_skip_video_filter(tf->source);
 		return;
 	}
+	// Until the first matching frame/mask pair is ready, draw transparent output.
+	// Passing the input through here would briefly expose the raw background on
+	// startup or resize. An actual inference failure still preserves the input.
+	if (!tf->displayReady || gs_texture_get_width(tf->displayTexture) != width ||
+	    gs_texture_get_height(tf->displayTexture) != height)
+		return;
 	gs_texture_t *alphaTexture = tf->alphaTexture;
 
 	// Output the masked image

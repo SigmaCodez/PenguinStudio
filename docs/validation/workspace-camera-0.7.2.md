@@ -62,3 +62,12 @@ Complete all Linux package builds and their installation/runtime checks, test th
 final Ubuntu packages, publish only the complete verified set, and install the
 final Ubuntu 26.04 packages using the normal administrator confirmation. This
 record must be updated with the final CI run and installation outcome.
+
+### First-frame regression caught before publication
+
+The exact camera pixel test caught a raw-background flash before the asynchronous
+worker's first result. Startup and resize now draw transparent output until a
+matching color/mask pair is ready; actual inference failures still preserve input.
+All camera pixel checks then passed, including the first-frame assertion, shapes,
+keys, blur/image composition, alpha edges, hand mode, Undo/Redo and persistence.
+The corrected test exited without warning/error entries or reported leaks.
