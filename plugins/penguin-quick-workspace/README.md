@@ -1,3 +1,7 @@
+# Retired Qt Quick workspace experiment
+
+Not included in Penguin Studio packages. The classic Qt Widgets workspace is the product interface; this source is retained only as development history.
+
 # Qt Quick workspace
 
 Qt Quick presentation layer reviewed locally before inclusion in the 0.7.2 Linux packages. OBS rendering and the native

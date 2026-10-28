@@ -1,0 +1,14 @@
+{
+  "build": "0.7.2-0+ubuntu26.04.classic7",
+  "locale": "en-US",
+  "captured_at": "2026-10-28",
+  "source": "Real Wayland application, isolated synthetic recording profile; tested module is byte-identical to the DEB payload.",
+  "images": [
+    {
+      "file": "creator-performance.png",
+      "sha256": "4e081b80d4fd00b10eb7fe67be1ee493955bc0ddba087af67164758c61db1ead",
+      "visually_reviewed": true
+    }
+  ],
+  "package_sha256": "f3e2a69b8bbc5d3073fdbc5823398263d183321b625d99edaffd5a42c98e9ae6"
+}

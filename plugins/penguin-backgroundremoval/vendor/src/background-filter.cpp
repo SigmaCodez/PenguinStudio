@@ -47,6 +47,7 @@
 #include <cstring>
 #include <util/platform.h>
 #include <util/profiler.h>
+#include <utility>
 // Penguin Studio manages component updates.
 
 struct background_removal_filter : public filter_data, public std::enable_shared_from_this<background_removal_filter> {
@@ -79,6 +80,8 @@ struct background_removal_filter : public filter_data, public std::enable_shared
 	// Graphics-thread-owned scratch textures survive frames of the same size.
 	gs_texture_t *alphaTexture = nullptr;
 	gs_texrender_t *blurPasses[2] = {nullptr, nullptr};
+	// Borrowed from blurPasses; valid only for the currently displayed frame/mask.
+	gs_texture_t *cachedBlurTexture = nullptr;
 
 	std::mutex modelMutex;
 	std::atomic<int> penguinStatus{1};
@@ -92,6 +95,9 @@ struct background_removal_filter : public filter_data, public std::enable_shared
 	gs_texture_t *displayTexture = nullptr;
 	bool displayReady = false;
 	bool inferenceSucceeded = false;
+	// Accessed only by update after joining the task, or by the single worker.
+	bool modelNeedsInitialization = true;
+	obs_data_t *pendingSettings = nullptr;
 	std::atomic<uint64_t> completedFrames{0};
 	std::atomic<uint64_t> busyTicks{0};
 
@@ -106,11 +112,13 @@ static void finish_inference(background_removal_filter *tf)
 		tf->inferenceTask.get();
 	} catch (const std::exception &error) {
 		tf->inferenceSucceeded = false;
+		tf->gpuPreparing = false;
 		tf->penguinStatus = 3;
 		tf->isDisabled = true;
 		obs_log(LOG_ERROR, "Camera inference failed: %s; preserving the input", error.what());
 	} catch (...) {
 		tf->inferenceSucceeded = false;
+		tf->gpuPreparing = false;
 		tf->penguinStatus = 3;
 		tf->isDisabled = true;
 		obs_log(LOG_ERROR, "Camera inference failed; preserving the input");
@@ -297,6 +305,79 @@ void background_filter_defaults(obs_data_t *settings)
 	obs_data_set_default_double(settings, "blur_focus_depth", 0.0);
 }
 
+static bool initialize_model(background_removal_filter *tf)
+{
+	// Session construction and old-session destruction can take hundreds of
+	// milliseconds. Only the companion worker calls this, outside graphics locks.
+	std::unique_lock<std::mutex> lock(tf->modelMutex);
+	if (!tf->env)
+		tf->env = std::make_unique<Ort::Env>(ORT_LOGGING_LEVEL_ERROR, "background-removal-inference");
+	tf->model.reset();
+	if (tf->modelSelection == MODEL_SINET) {
+		tf->model.reset(new ModelSINET);
+	}
+	if (tf->modelSelection == MODEL_SELFIE) {
+		tf->model.reset(new ModelSelfie);
+	}
+	if (tf->modelSelection == MODEL_SELFIE_MULTICLASS) {
+		tf->model.reset(new ModelSelfieMulticlass);
+	}
+	if (tf->modelSelection == MODEL_MEDIAPIPE) {
+		tf->model.reset(new ModelMediaPipe);
+	}
+	if (tf->modelSelection == MODEL_RVM) {
+		tf->model.reset(new ModelRVM(tf->preserveHands, int(tf->numThreads), "cpu"));
+	}
+	if (tf->modelSelection == MODEL_PPHUMANSEG) {
+		tf->model.reset(new ModelPPHumanSeg);
+	}
+	if (tf->modelSelection == MODEL_DEPTH_TCMONODEPTH) {
+		tf->model.reset(new ModelTCMonoDepth);
+	}
+
+	int ortSessionResult = createOrtSession(tf);
+	if (ortSessionResult != OBS_BGREMOVAL_ORT_SESSION_SUCCESS) {
+		obs_log(LOG_ERROR, "Failed to create ONNXRuntime session. Error code: %d", ortSessionResult);
+		// disable filter
+		tf->penguinStatus = 3;
+		tf->isDisabled = true;
+		tf->model.reset();
+		tf->gpuPreparing = false;
+		return false;
+	}
+	tf->gpuWorker.reset();
+	tf->activeGPU = false;
+	tf->cpuFallback = tf->useGPU != "cpu";
+	tf->gpuPreparing = false;
+	if (tf->useGPU != "cpu" && tf->modelSelection == MODEL_RVM) {
+		const auto module =
+			std::filesystem::path(obs_get_module_binary_path(obs_current_module())).parent_path();
+		auto runtime = module.parent_path() / "penguin-camera-gpu/libonnxruntime.so.1";
+		// In-app main-package updates may leave the compatible 0.6.x GPU add-on installed.
+		// Prefer the new layout, but retain that private runtime until the add-on is updated.
+		if (!std::filesystem::is_regular_file(runtime)) {
+			runtime = module.parent_path().parent_path() /
+				  "obs-plugins/penguin-camera-gpu/libonnxruntime.so.1";
+		}
+		const auto executable = module.parent_path() / "penguin-camera/penguin-gpu-worker";
+		if (std::filesystem::is_regular_file(runtime) && std::filesystem::is_regular_file(executable)) {
+			char *models = obs_module_file("models");
+			char *cache = obs_module_config_path("gpu-cache/onnxruntime-1.23.2");
+			if (models && cache) {
+				tf->gpuWorker = std::make_unique<PenguinGPUWorker>(executable.string(),
+										   runtime.string(), models,
+										   cache, int(tf->numThreads),
+										   false, PenguinGPUWorker::BackgroundFrameBudgetMs);
+				tf->gpuPreparing = tf->gpuWorker->Preparing();
+				tf->cpuFallback = tf->gpuWorker->Failed();
+			}
+			bfree(models);
+			bfree(cache);
+		}
+	}
+	return true;
+}
+
 void background_filter_update(void *data, obs_data_t *settings)
 {
 	obs_log(LOG_INFO, "Background filter updated");
@@ -312,9 +393,23 @@ void background_filter_update(void *data, obs_data_t *settings)
 		return;
 	}
 
+	// Keep only the latest settings while model initialization/inference runs.
+	// Joining here would stall the UI/graphics lock during a quick device change.
+	if (tf->inferenceTask.valid() &&
+	    tf->inferenceTask.wait_for(std::chrono::seconds(0)) != std::future_status::ready) {
+		obs_data_addref(settings);
+		obs_data_release(tf->pendingSettings);
+		tf->pendingSettings = settings;
+		tf->displayReady = false;
+		return;
+	}
+
+	obs_data_release(std::exchange(tf->pendingSettings, nullptr));
+
 	tf->isDisabled = true;
 	finish_inference(tf.get());
 	tf->displayReady = false;
+	tf->cachedBlurTexture = nullptr;
 
 	tf->stopWhenSourceIsInactive = obs_data_get_bool(settings, "stop_when_source_is_inactive");
 	tf->enableThreshold = (float)obs_data_get_bool(settings, "enable_threshold");
@@ -345,90 +440,30 @@ void background_filter_update(void *data, obs_data_t *settings)
 
 	if (!tf->model || tf->modelSelection.empty() || tf->modelSelection != newModel || tf->useGPU != newUseGpu ||
 	    tf->numThreads != newNumThreads || tf->preserveHands != preserveHands) {
-		// lock modelMutex
-		std::unique_lock<std::mutex> lock(tf->modelMutex);
-
-		tf->penguinStatus = 1;
-		// Re-initialize model if it's not already the selected one or switching inference device
 		tf->modelSelection = newModel;
 		tf->useGPU = newUseGpu;
 		tf->numThreads = newNumThreads;
 		tf->preserveHands = preserveHands;
-
-		if (tf->modelSelection == MODEL_SINET) {
-			tf->model.reset(new ModelSINET);
-		}
-		if (tf->modelSelection == MODEL_SELFIE) {
-			tf->model.reset(new ModelSelfie);
-		}
-		if (tf->modelSelection == MODEL_SELFIE_MULTICLASS) {
-			tf->model.reset(new ModelSelfieMulticlass);
-		}
-		if (tf->modelSelection == MODEL_MEDIAPIPE) {
-			tf->model.reset(new ModelMediaPipe);
-		}
-		if (tf->modelSelection == MODEL_RVM) {
-			tf->model.reset(new ModelRVM(tf->preserveHands, int(tf->numThreads), "cpu"));
-		}
-		if (tf->modelSelection == MODEL_PPHUMANSEG) {
-			tf->model.reset(new ModelPPHumanSeg);
-		}
-		if (tf->modelSelection == MODEL_DEPTH_TCMONODEPTH) {
-			tf->model.reset(new ModelTCMonoDepth);
-		}
-
-		int ortSessionResult = createOrtSession(tf.get());
-		if (ortSessionResult != OBS_BGREMOVAL_ORT_SESSION_SUCCESS) {
-			obs_log(LOG_ERROR, "Failed to create ONNXRuntime session. Error code: %d", ortSessionResult);
-			// disable filter
-			tf->penguinStatus = 3;
-			tf->isDisabled = true;
-			tf->model.reset();
-			return;
-		}
-		tf->gpuWorker.reset();
+		tf->modelNeedsInitialization = true;
+		tf->penguinStatus = 1;
 		tf->activeGPU = false;
-		tf->cpuFallback = tf->useGPU != "cpu";
-		tf->gpuPreparing = false;
-		if (tf->useGPU != "cpu" && tf->modelSelection == MODEL_RVM) {
-			const auto module =
-				std::filesystem::path(obs_get_module_binary_path(obs_current_module())).parent_path();
-			auto runtime = module.parent_path() / "penguin-camera-gpu/libonnxruntime.so.1";
-			// In-app main-package updates may leave the compatible 0.6.x GPU add-on installed.
-			// Prefer the new layout, but retain that private runtime until the add-on is updated.
-			if (!std::filesystem::is_regular_file(runtime)) {
-				runtime = module.parent_path().parent_path() /
-					  "obs-plugins/penguin-camera-gpu/libonnxruntime.so.1";
-			}
-			const auto executable = module.parent_path() / "penguin-camera/penguin-gpu-worker";
-			if (std::filesystem::is_regular_file(runtime) && std::filesystem::is_regular_file(executable)) {
-				char *models = obs_module_file("models");
-				char *cache = obs_module_config_path("gpu-cache/onnxruntime-1.23.2");
-				if (models && cache) {
-					tf->gpuWorker = std::make_unique<PenguinGPUWorker>(executable.string(),
-											   runtime.string(), models,
-											   cache, int(tf->numThreads),
-											   false, PenguinGPUWorker::BackgroundFrameBudgetMs);
-					tf->gpuPreparing = tf->gpuWorker->Preparing();
-					tf->cpuFallback = tf->gpuWorker->Failed();
-				}
-				bfree(models);
-				bfree(cache);
-			}
-		}
+		tf->cpuFallback = false;
+		tf->gpuPreparing = true;
 	}
 
 	obs_enter_graphics();
 
-	char *effect_path = obs_module_file(EFFECT_PATH);
-	gs_effect_destroy(tf->effect);
-	tf->effect = gs_effect_create_from_file(effect_path, NULL);
-	bfree(effect_path);
-
-	char *kawaseBlurEffectPath = obs_module_file(KAWASE_BLUR_EFFECT_PATH);
-	gs_effect_destroy(tf->kawaseBlurEffect);
-	tf->kawaseBlurEffect = gs_effect_create_from_file(kawaseBlurEffectPath, NULL);
-	bfree(kawaseBlurEffectPath);
+	// Shader programs are independent of settings; retain them across updates.
+	if (!tf->effect) {
+		char *path = obs_module_file(EFFECT_PATH);
+		tf->effect = gs_effect_create_from_file(path, nullptr);
+		bfree(path);
+	}
+	if (!tf->kawaseBlurEffect) {
+		char *path = obs_module_file(KAWASE_BLUR_EFFECT_PATH);
+		tf->kawaseBlurEffect = gs_effect_create_from_file(path, nullptr);
+		bfree(path);
+	}
 
 	obs_leave_graphics();
 
@@ -504,8 +539,6 @@ void *background_filter_create(obs_data_t *settings, obs_source_t *source)
 		instance->inferenceWorker = std::make_unique<PenguinSingleTaskWorker>();
 		instance->texrender = gs_texrender_create(GS_BGRA, GS_ZS_NONE);
 
-		std::string instanceName{"background-removal-inference"};
-		instance->env.reset(new Ort::Env(OrtLoggingLevel::ORT_LOGGING_LEVEL_ERROR, instanceName.c_str()));
 
 		instance->modelSelection.clear();
 
@@ -548,6 +581,8 @@ void background_filter_destroy(void *data)
 			(*ptr)->isDisabled = true;
 			finish_inference(ptr->get());
 			(*ptr)->inferenceWorker.reset();
+			obs_data_release((*ptr)->pendingSettings);
+			(*ptr)->pendingSettings = nullptr;
 			obs_log(LOG_INFO, "Camera inference: %llu completed frames, %llu busy video ticks",
 				(unsigned long long)(*ptr)->completedFrames.load(),
 				(unsigned long long)(*ptr)->busyTicks.load());
@@ -676,6 +711,12 @@ static bool background_filter_process_current_frame(void *data)
 
 	if (!obs_source_enabled(tf->source)) {
 		return false;
+	}
+
+	if (tf->modelNeedsInitialization) {
+		tf->modelNeedsInitialization = false;
+		if (!initialize_model(tf.get()))
+			return false;
 	}
 
 	if (!tf->model) {
@@ -886,12 +927,17 @@ static gs_texture_t *blur_background(std::shared_ptr<background_removal_filter> 
 				     gs_texture_t *alphaTexture)
 {
 	if (tf->blurBackground == 0 || !tf->kawaseBlurEffect) {
+		tf->cachedBlurTexture = nullptr;
 		for (auto *&pass : tf->blurPasses) {
 			gs_texrender_destroy(pass);
 			pass = nullptr;
 		}
 		return nullptr;
 	}
+	// Preview and output can render the same completed pair more than once.
+	// Reuse its blur until a new pair is uploaded or settings change.
+	if (tf->cachedBlurTexture)
+		return tf->cachedBlurTexture;
 	gs_texture_t *blurredTexture = tf->displayTexture;
 	gs_eparam_t *image = gs_effect_get_param_by_name(tf->kawaseBlurEffect, "image");
 	gs_eparam_t *focalmask = gs_effect_get_param_by_name(tf->kawaseBlurEffect, "focalmask");
@@ -944,6 +990,7 @@ static gs_texture_t *blur_background(std::shared_ptr<background_removal_filter> 
 		gs_texrender_end(pass);
 		blurredTexture = gs_texrender_get_texture(pass);
 	}
+	tf->cachedBlurTexture = blurredTexture;
 	return blurredTexture;
 }
 
@@ -959,6 +1006,15 @@ void background_filter_video_render(void *data, gs_effect_t *_effect)
 
 	// Create a local shared_ptr
 	std::shared_ptr<background_removal_filter> tf = *ptr;
+
+	if (tf && tf->pendingSettings) {
+		if (tf->inferenceTask.valid() &&
+		    tf->inferenceTask.wait_for(std::chrono::seconds(0)) != std::future_status::ready)
+			return; // Transparent until settings and the matching frame are ready.
+		auto *settings = std::exchange(tf->pendingSettings, nullptr);
+		background_filter_update(data, settings);
+		obs_data_release(settings);
+	}
 
 	if (!tf || tf->isDisabled) {
 		if (tf && tf->source) {
@@ -984,6 +1040,7 @@ void background_filter_video_render(void *data, gs_effect_t *_effect)
 			// Settings and size changes must never pair a new frame with an old mask.
 			if (tf->inferenceSucceeded && !tf->isDisabled && !tf->backgroundMask.empty() &&
 			    frame.cols == int(width) && frame.rows == int(height)) {
+				tf->cachedBlurTexture = nullptr;
 				auto *color = reuse_texture(tf->displayTexture, width, height, GS_BGRA, GS_DYNAMIC);
 				auto *alpha = reuse_texture(tf->alphaTexture, tf->backgroundMask.cols,
 						    tf->backgroundMask.rows, GS_R8, GS_DYNAMIC);

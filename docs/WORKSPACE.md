@@ -1,39 +1,53 @@
 # Penguin Studio workspace
 
-Penguin Studio combines Qt Quick navigation with native Qt source controls, a large preview, audio meters and a context sidebar.
+Penguin Studio organizes the native Qt application around a large canvas, searchable layers and scenes, audio channel strips, and an integrated production sidebar.
 
-![Penguin Studio workspace in English](images/current/workspace-en.png)
+![Penguin Studio 0.7.2 workspace in English](images/current/workspace-en.png)
 
-The previews show the real 0.7.2 candidate package using an isolated English profile and synthetic media.
+These English previews were captured from the validated 0.7.2 Ubuntu package using an isolated demo profile and synthetic media.
 
-## Start a session
+## Compose and inspect
 
-1. Choose a scene in the left-hand **Scenes** list. Search filters the list without changing the scene collection. **Manage** opens scene management.
-2. Add a camera, image, capture or other source in **Sources** below the preview.
-3. Select **Edit selected source** to adjust its position, size, crop and effects.
-4. Check the **Audio mixer** and record a short test before going live.
+Layers sit above Scenes on the left. Numbered scene cards make scene order clear. Each list has a case-insensitive search field; filtering only changes the displayed rows, never source visibility or scene contents. Clear the field to restore the complete list. Drag reordering is disabled while a filter is active, to prevent ambiguous ordering. The **+** buttons run the existing scene and source creation actions; each panel's **More** menu retains remove, reorder and other inherited actions. Source dragging, visibility, locking and scene renaming remain available.
 
-**Streaming channels**, **Title & category** and **Live chat** open the corresponding right-hand panel. They reuse the native output and platform controllers. Duplicate toolbar shortcuts are hidden while the simplified workspace is active.
+The center shows the production canvas, the selected scene name and the configured base resolution. **Studio Mode** switches between the normal editor and preview/program operation. Media controls remain below the preview. Source properties and filters are provided by the Inspector; the legacy source toolbar can still be enabled from the View menu.
+
+The right sidebar uses **Inspector**, **Outputs**, and **Details** tabs, so production tools remain beside the canvas instead of opening as floating windows. Select one layer to edit it in the **Inspector**. Position, size, rotation, crop, visibility and locking update the source itself. Transform changes participate in the application's undo/redo. Properties and effects/filters are available at the top of the Inspector. A compact arrange strip provides fit, center and flip actions through the existing canvas operations. Crop settings expand on demand; reset and the advanced transform dialog remain accessible. Multiple selection displays a prompt to select one layer for numeric inspection.
+
+The bottom mixer presents native volume controls, meters and monitoring settings as wider vertical channel strips, ordered from source identity through meter/fader and level to mute/monitor controls. The mixer menu can switch back to horizontal controls. Docks can still be moved and resized.
 
 ## Production controls
 
-- **Penguin Studio** opens searchable application commands. The existing actions and keyboard shortcuts remain available.
-- **Settings** opens searchable settings navigation. Forms retain their native validation and save/cancel behavior.
-- **Go live** starts configured destinations through their validated controller. With no destinations configured, it opens setup. **End stream** stops those outputs.
-- **Record** starts the recording controller. Its menu offers pause/resume when supported by the recording mode.
-- **Advanced → Save replay clip** saves the active replay buffer. Configure and start the replay buffer before saving clips.
-- **Advanced** groups replay-buffer, virtual-camera, studio-mode and other advanced controls, including the separate primary-stream action. Its credentials remain separate from Penguin destinations.
+- **Penguin Studio** opens the full application menu: File, Edit, View, Docks, Profile, Scene Collection, Tools and Help. On macOS the native system menu is retained as well.
+- **Destinations** selects the integrated multi-output sidebar. Destinations appear as stacked cards with name, layout and real output status; editing, removal, individual start/stop and start/stop all remain available.
+- **Stream details** selects the scrollable Twitch/YouTube account and stream-management forms. **Settings** has its own toolbar shortcut.
+- **Go live** runs the destination panel's validated Start All action. With no destinations configured, it opens the setup assistant. While destinations are running, **End stream** runs Stop All.
+- The live button's menu exposes **Stream details** and the separate primary stream toggle inherited from OBS. The primary stream's setup and credentials are separate from Penguin destinations.
+- **Record** uses the original recording controller. Its menu offers pause/resume when the recording mode supports it.
+- **Clip** saves the active replay buffer. Enable the replay buffer in Settings → Output and start it through **More** before saving clips.
+- **Privacy** hides the program picture and silences source audio while streaming or recording continues. Open **Penguin Studio → Tools → Creator tools** for stream checks, performance help and the audio assistant. See [Creator tools](CREATOR-TOOLS.md) for scope and controls.
+- **More** contains replay-buffer and virtual-camera controls, Settings, the original Controls and Scene Transitions docks, and Reset workspace.
 
-The bottom status bar shows active recording/live timers, CPU usage and frame rate. Supported Linux drivers also supply utilization of the GPU rendering the workspace. This is whole-device load; a dash means unavailable data, not zero utilization. Inactive timers stay hidden and recording pause is explicit.
+The top FPS readout comes from the running video engine. No simulated audio levels, output states or canvas previews are shown.
 
-## Arrange the workspace
+Settings, source properties, filters, and the setup assistant use the same control theme. Settings navigation measures translated labels, and its initial window width follows the selected text size within the available screen. Long forms retain scrolling, with minimum input heights that keep their text readable.
 
-**Workspace layout** opens arrangement and restoration actions. Scene collections, profiles and sources are preserved. The previous arrangement is retained when the simplified layout is first applied; subsequent launches restore the saved layout. Docks can still be moved and resized.
+## Existing configurations
 
-The Inspector edits real source transforms and participates in undo/redo. Properties, filters and advanced transform controls remain available. Multiple selection prompts you to choose one source for numeric inspection.
+On the first launch with layout version 3, Penguin applies the new layout and vertical mixer defaults. It saves the current dock arrangement in `BasicWindow/PenguinPreV3DockState`, retains any earlier `PenguinPreviousDockState` backup, and records `PenguinWorkspaceVersion=3` in the separate Penguin configuration. Scene collections, profiles and sources are preserved. Later launches restore the user's saved arrangement instead of resetting it again.
 
-Navigation has a visible keyboard focus indicator and supports Tab, Enter and Escape. Text sizing follows the interface font setting, with scrolling for longer forms. The new navigation currently uses English labels; native dialogs and platform forms retain their existing translations.
+**More → Reset workspace** reapplies the production layout. The complete Docks menu remains available from the Penguin Studio application button.
 
 ## Scope
 
-Portrait destinations currently crop or fit the program scene; there is no independently editable second portrait scene. GPU availability, live-provider verification and device testing retain the limits documented in [VERIFICATION.md](VERIFICATION.md).
+Portrait destinations currently crop or fit the program scene. The workspace does not imply an independently editable second portrait scene. Twitch/YouTube authorization, live-provider verification, capture devices and cross-distribution release checks retain the limits documented in [VERIFICATION.md](VERIFICATION.md).
+
+The Qt Quick navigation experiment is not shipped. The classic Qt Widgets layout, menus and settings are retained. GPU usage remains available in the status bar, and Settings → General includes a manual update check.
+
+## Upload bitrate
+
+The bottom-right **Upload** indicator measures combined outgoing data from the primary stream and Penguin streaming destinations, including landscape and portrait outputs. It includes audio and video, uses elapsed monotonic time, and refreshes once per second. Values use decimal kbps/Mbps. It does not include local recordings, other applications or independently managed third-party outputs. The existing primary-stream rate remains specific to that single stream; Upload is the combined total.
+
+Offline, the indicator shows a dash. A newly started or reconnecting connection needs a fresh sampling interval; zero can also indicate a stalled transmission. The tooltip explains the scope and number of active/starting destinations. Configured encoder bitrate is not substituted for measured throughput.
+
+The output monitor sleeps when no streams are active or starting, and wakes for a new stream. Unchanged status text and tooltips are not rewritten. This reduces idle wakeups without changing video encoding, camera effects or recording behavior.

@@ -1,7 +1,7 @@
 # Camera appearance
 
 Select a camera or another video source and open **Camera appearance** in the
-source Inspector. Select **Edit selected source** in the workspace navigation to manage background removal together with camera shapes.
+source Inspector. Select **Inspector** in the workspace navigation to manage background removal together with camera shapes.
 The Filters dialog exposes the individual appearance and matting filters.
 
 ![Camera appearance controls in the source Inspector](images/current/camera-en.png)

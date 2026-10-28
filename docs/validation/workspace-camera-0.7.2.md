@@ -1,5 +1,7 @@
 # Workspace and camera validation — 0.7.2
 
+**Current status:** the user rejected the QML layout on 2026-10-27. Publication is on hold. The QML evidence below is historical candidate evidence, not acceptance of the current classic-interface candidate. Fresh rollback validation is recorded in `classic-workspace-0.7.2.md`.
+
 ## Local candidate, 2026-10-27
 
 The tested desktop is Ubuntu 26.04.1 under Wayland, with an AMD RX 9070 XT.

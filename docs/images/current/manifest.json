@@ -1,25 +1,26 @@
 {
   "version": "0.7.2",
   "language": "en-US",
-  "source_commit": "b2f4554ce1289299905ae929e6ae0f5c732182e1",
-  "package": "0.7.2-0+ubuntu26.04.candidate1",
-  "package_sha256": "1dc564c294f043da9e71c0482569e01d73af4e3d0bfbb0f9f9fa5b9bd8939be5",
-  "captured_on": "2026-10-27",
-  "capture_method": "XComposite window capture of the extracted Ubuntu 26.04 candidate DEB under XWayland, using an isolated English profile; native Wayland tested separately",
-  "content": "Synthetic local artwork and audio; no webcam footage, private desktop content or signed-in accounts",
-  "visual_review": "All three captures visually inspected: simplified Qt Quick navigation, centered production controls, bottom CPU/GPU/FPS capsules, rounded-corner Inspector and disconnected platform details. English text only. Camera shape is demonstrated with the synthetic logo source; no claim of a live camera preview.",
+  "source_commit": "dee756de22caf2c20c77c0612fd25658cc3dca0c",
+  "local_changes": "Approved classic8 source changes: classic workspace, Creator tools, recording helpers, upload status and camera processing optimizations. The recorded base commit plus these changes produced the captured package.",
+  "package": "0.7.2-0+ubuntu26.04.classic8",
+  "package_sha256": "b6c10c909d01c38a6e5e7ba0e456ab721a8e63ebe5cabfeab9dbfa97d212cdbe",
+  "captured_on": "2026-10-28",
+  "capture_method": "XComposite capture of the installed classic8 application under XWayland, isolated English synthetic profile. Native Wayland functional and recording tests run separately.",
+  "content": "Synthetic local artwork and audio only; no private webcam, desktop or connected accounts.",
+  "visual_review": "All three new captures visually inspected: English labels, real synthetic artwork, classic workspace, harmonized Privacy control, bottom-right Upload indicator, rounded camera shape and disconnected platform details. No private media or account identity.",
   "images": [
     {
       "file": "workspace-en.png",
-      "sha256": "ec6f776d0d7d954f875b99cbc0a6f1b537a9ea5613dcc696ffe149d1704441e4"
+      "sha256": "9c479951244cbd2a614c1b5048375740ba8411975b6f4b9174f0f9e9092a53c9"
     },
     {
       "file": "camera-en.png",
-      "sha256": "a1dae9d17a8562c969cc58c6094852a0a05424a51d3f2f55cfe68e36f2c5e27b"
+      "sha256": "80b2f70a663548c63d71db9d7475ae8337ec0b016875f1395777b005895fae3e"
     },
     {
       "file": "stream-details-en.png",
-      "sha256": "caf9ddfb93675eda4569f83b4dd59ac8f0f5fe6dd6a74d090c58fc0c233b59b3"
+      "sha256": "783aff434815f0abab0309ae4faccd0a0346d70a21c077ab24912448c14aca54"
     }
   ]
 }

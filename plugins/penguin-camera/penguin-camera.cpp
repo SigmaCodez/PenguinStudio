@@ -122,7 +122,8 @@ void Update(void *data, obs_data_t *settings)
 	}
 	// OBS serializes graphics updates with rendering; never replace a live texture outside this lock.
 	obs_enter_graphics();
-	const std::string imagePath = obs_data_get_string(settings, "background_image");
+	// A saved image choice must not decode/upload an unused image in blur or removal mode.
+	const std::string imagePath = background == 5 ? obs_data_get_string(settings, "background_image") : "";
 	if (imagePath != camera->imagePath) {
 		gs_image_file_ex_free(&camera->backgroundImage);
 		camera->backgroundImage = {};

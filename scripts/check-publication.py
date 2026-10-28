@@ -37,7 +37,8 @@ def validate(root: Path, candidate: bool = False) -> None:
                 raise ValueError(f"Product preview must use reviewed current images: {page}: {target}")
     if f"current source version is **{version}**" not in (root / "docs/PACKAGING.md").read_text():
         raise ValueError("Update the current source version in the package guide")
-    if f"Current release: [Penguin Studio {version}]" not in (root / "README.md").read_text():
+    if not any(f"{label}: [Penguin Studio {version}]" in (root / "README.md").read_text()
+               for label in (["Current release", "Current candidate"] if candidate else ["Current release"])):
         raise ValueError("Update the README current release")
 
 

@@ -39,8 +39,7 @@ for plugin in platforms/libqwayland.so iconengines/libqsvgicon.so imageformats/l
 done
 # Qt 6.10 consolidates the former Wayland EGL/generic platform plugins.
 export EXTRA_PLATFORM_PLUGINS='libqwayland.so'
-export EXTRA_QT_MODULES='svg;waylandclient;quick;quickwidgets;qml'
-export QML_SOURCES_PATHS="$root/plugins/penguin-quick-workspace"
+export EXTRA_QT_MODULES='svg;waylandclient'
 export LD_LIBRARY_PATH="$appdir/usr/lib/x86_64-linux-gnu${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
 export NO_STRIP=1
 "$out/tools/linuxdeploy-x86_64.AppImage" --appdir "$appdir" --exclude-library 'libva*.so*' \

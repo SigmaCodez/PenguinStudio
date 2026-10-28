@@ -36,10 +36,22 @@ void beginPhase(){
  if(!image.save(filename)){finish("fixture write failed");return;}
  OBSDataAutoRelease settings=obs_data_create();obs_data_set_string(settings,"file",filename.toUtf8().constData());obs_source_update(source,settings);
  if(!PenguinCamera::Apply(source,"Camera appearance",3,phase==2?4:phase==3?5:1,25,15,8,filename.toUtf8().constData(),true,phase==1||phase==2?"gpu":"cpu"))finish("filter apply failed");
+ if(phase==0){
+  for(int delay : {20,25,30}) QTimer::singleShot(delay,qApp,[delay]{
+   if(done||!source)return;
+   QElapsedTimer timer;timer.start();
+   const bool ok=PenguinCamera::Apply(source,"Camera appearance",3,4,25,15,9,filename.toUtf8().constData(),true,delay==20?"gpu":"cpu");
+   const double elapsed=timer.nsecsElapsed()/1000000.0;
+   report["rapid_update_max_ms"]=std::max(report["rapid_update_max_ms"].toDouble(),elapsed);
+   if(!ok)finish("rapid settings update failed");
+  });
+ }
+
 }
 void tick(){
- if(done)return;++ticks;
- if(!window)for(auto*w:QApplication::topLevelWidgets())if(w->objectName()=="OBSBasic")window=w;
+ if(done)return;
+ ++ticks;
+ if(!window)for(auto*w:QApplication::topLevelWidgets())if(QByteArray(w->metaObject()->className())=="OBSBasic")window=w;
  if(!window)return;
  if(phase<0&&ticks>=30){obs_frontend_add_event_callback(cleanup,nullptr);for(unsigned i=1;i<=6;i++)obs_set_output_source(i,nullptr);scene=obs_scene_create("Synthetic lifecycle");source=obs_source_create("image_source","Changing fixture",nullptr,nullptr);if(!scene||!source){finish("source creation failed");return;}obs_scene_add(scene,source);obs_frontend_set_current_scene(obs_scene_get_source(scene));phase=0;beginPhase();}
  if(source&&ticks>phaseTick+20){
@@ -47,6 +59,11 @@ void tick(){
   const int state=calldata_int(&s,"status");const bool preparing=calldata_bool(&s,"preparing"),gpu=calldata_bool(&s,"gpu");const int64_t completed=calldata_int(&s,"completed_frames");calldata_free(&s);
   const bool small=phase==1||phase==2;
   bool ready=phase==4|| (state==2&&!preparing&&completed>=initial+5&&obs_source_get_width(source)==(small?321u:640u)&&obs_source_get_height(source)==(small?193u:360u)&&(!(phase==1||phase==2)||gpu));
+  if(ready&&phase==0){
+   OBSDataAutoRelease settings=obs_source_get_settings(f);
+   if(gpu||std::string(obs_data_get_string(settings,"useGPU"))!="cpu"||obs_data_get_int(settings,"blur_background")!=9){finish("latest settings were not applied");return;}
+   report["latest_update_applied"]=true;
+  }
   if(ready){initial=completed;++phase;if(phase==6){finish();return;}beginPhase();}
  }
  if(ticks>1200)finish("phase timeout");
