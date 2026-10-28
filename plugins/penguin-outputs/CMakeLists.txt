@@ -35,7 +35,7 @@ if(PENGUIN_BUILD_TESTS AND OS_LINUX)
   target_link_libraries(penguin-wizard-lifecycle PRIVATE OBS::libobs OBS::frontend-api Qt::Widgets)
 
   find_package(X11 REQUIRED)
-  add_executable(penguin-local-stream tests/local-stream.cpp)
+  add_executable(penguin-local-stream tests/local-stream.cpp creator-tools.cpp)
   target_link_libraries(penguin-local-stream PRIVATE OBS::libobs OBS::frontend-api Qt::Widgets X11::X11)
   if(ENABLE_WAYLAND)
     target_link_libraries(penguin-local-stream PRIVATE Wayland::Client)

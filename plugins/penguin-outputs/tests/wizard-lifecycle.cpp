@@ -11,6 +11,7 @@
 namespace {
 QString configuration;
 int callbackRemovals = 0;
+int creatorCloseCalls = 0;
 
 void Require(bool condition, const char *message)
 {
@@ -38,7 +39,15 @@ void DrainDeletes()
 }
 } // namespace
 
+// This fixture intentionally has no OBS engine/frontend. Creator tools and
+// real output teardown are exercised by the separate Wayland integration test.
+void RegisterCreatorTools() {}
+void OpenCreatorTools() {}
+void CloseCreatorTools() { ++creatorCloseCalls; }
+
 extern "C" {
+obs_output_t *obs_frontend_get_streaming_output() { return nullptr; }
+bool obs_frontend_streaming_active() { return false; }
 bool text_lookup_getstr(lookup_t *, const char *key, const char **out)
 {
 	*out = key;
@@ -150,6 +159,7 @@ int main(int argc, char **argv)
 	}
 	FrontendEvent(OBS_FRONTEND_EVENT_EXIT, nullptr);
 	obs_module_unload();
+	Require(creatorCloseCalls == 1, "module unload must close Creator tools once");
 	Require(callbackRemovals == 0, "module unload must not call the destroyed frontend after EXIT");
 	std::cout << "PASS: asynchronous wizard/warnings, parent destruction, shutdown cancellation, duplicate guard, "
 		     "first-run dismissal and frontend unload\n";
