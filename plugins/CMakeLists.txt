@@ -132,4 +132,13 @@ add_core_module(win-capture PLATFORMS WINDOWS)
 add_core_module(win-dshow PLATFORMS WINDOWS)
 add_core_module(win-wasapi PLATFORMS WINDOWS)
 
+# Retained developer experiment; disabled in all product packages.
+option(PENGUIN_QUICK_WORKSPACE_PREVIEW "Build the optional QML navigation preview" OFF)
+if(PENGUIN_QUICK_WORKSPACE_PREVIEW AND ENABLE_FRONTEND AND OS_LINUX)
+  add_subdirectory(penguin-quick-workspace)
+  if(OS_FLATPAK)
+    target_enable(penguin-quick-workspace)
+  endif()
+endif()
+
 set_obs_core_modules()

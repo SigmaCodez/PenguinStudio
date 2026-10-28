@@ -4,6 +4,7 @@
 #include <util/platform.h>
 #include <util/dstr.h>
 #include <sys/stat.h>
+#include "image-file-watch.h"
 
 #define blog(log_level, format, ...) \
 	blog(log_level, "[image_source: '%s'] " format, obs_source_get_name(context->source), ##__VA_ARGS__)
@@ -16,6 +17,8 @@ struct image_source {
 	obs_source_t *source;
 
 	char *file;
+	struct image_file_watch *file_watch;
+	bool file_watch_attempted;
 	bool persistent;
 	bool is_slide;
 	bool linear_alpha;
@@ -180,6 +183,7 @@ static void *image_source_create(obs_data_t *settings, obs_source_t *source)
 static void image_source_destroy(void *data)
 {
 	struct image_source *context = data;
+	image_file_watch_destroy(context->file_watch);
 
 	image_source_unload(context);
 
@@ -243,13 +247,19 @@ static void image_source_tick(void *data, float seconds)
 	context->update_time_elapsed += seconds;
 
 	if (obs_source_showing(context->source)) {
+		time_t timestamp;
+		if (image_file_watch_take(context->file_watch, context->file, &timestamp) &&
+		    context->file_timestamp != timestamp)
+			image_source_load(context);
 		if (context->update_time_elapsed >= 1.0f) {
-			time_t t = get_modified_timestamp(context->file);
 			context->update_time_elapsed = 0.0f;
-
-			if (context->file_timestamp != t) {
-				image_source_load(context);
+			if (!context->file_watch_attempted && context->file && *context->file) {
+				context->file_watch_attempted = true;
+				context->file_watch = image_file_watch_create(get_modified_timestamp);
+				if (!context->file_watch)
+					warn("automatic image refresh unavailable: could not start file watcher");
 			}
+			image_file_watch_request(context->file_watch, context->file);
 		}
 	}
 

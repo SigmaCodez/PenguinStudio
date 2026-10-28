@@ -248,8 +248,16 @@ QRect BoundsInWindow(QWidget *widget)
 	return {widget->mapTo(mainWindow, QPoint()), widget->size()};
 }
 
+bool OpenSimplePanel(const char *id)
+{
+    if (!mainWindow->property("penguinSimpleWorkspace").toBool()) return false;
+    auto *bridge = mainWindow->findChild<QObject *>("penguinWorkspaceBridge");
+    return bridge && QMetaObject::invokeMethod(bridge, "openPanel", Q_ARG(QString, QString::fromLatin1(id)));
+}
+
 void RaiseInspector()
 {
+    if (OpenSimplePanel("penguinInspectorDock")) return;
 	if (auto *dock = mainWindow->findChild<QDockWidget *>(QStringLiteral("penguinInspectorDock")))
 		dock->raise();
 }
@@ -266,10 +274,21 @@ void CheckWorkspaceLayout(const QString &size, int requestedWidth, int requested
 		return;
 	Check(mainWindow->width() <= requestedWidth && mainWindow->height() <= requestedHeight,
 	      QStringLiteral("workspace-fits-requested-size-%1").arg(size));
-	Check(mainWindow->dockWidgetArea(layers) == Qt::LeftDockWidgetArea &&
-	      mainWindow->dockWidgetArea(scenes) == Qt::LeftDockWidgetArea &&
-	      BoundsInWindow(layers).bottom() < BoundsInWindow(scenes).top(),
-	      QStringLiteral("layers-above-scenes-%1").arg(size));
+	const bool quickLayout = mainWindow->findChild<QWidget *>("penguinQuickView") &&
+        config_get_int(obs_frontend_get_user_config(), "PenguinQuickPreview", "DesignLayout") >= 1;
+    if (quickLayout) {
+        auto *navigation = mainWindow->findChild<QDockWidget *>("penguinQuickWorkspace");
+        Check(navigation && navigation->isVisible() &&
+              mainWindow->dockWidgetArea(navigation) == Qt::LeftDockWidgetArea &&
+              mainWindow->dockWidgetArea(layers) == Qt::BottomDockWidgetArea &&
+              BoundsInWindow(navigation).right() < BoundsInWindow(canvas).left(),
+              QStringLiteral("quick-navigation-and-bottom-sources-%1").arg(size));
+    } else {
+        Check(mainWindow->dockWidgetArea(layers) == Qt::LeftDockWidgetArea &&
+              mainWindow->dockWidgetArea(scenes) == Qt::LeftDockWidgetArea &&
+              BoundsInWindow(layers).bottom() < BoundsInWindow(scenes).top(),
+              QStringLiteral("layers-above-scenes-%1").arg(size));
+    }
 	Check(mainWindow->dockWidgetArea(mixer) == Qt::BottomDockWidgetArea &&
 	      BoundsInWindow(mixer).top() > BoundsInWindow(canvas).top() && mixer->height() >= 90,
 	      QStringLiteral("mixer-below-canvas-%1").arg(size));
@@ -286,6 +305,10 @@ void CheckWorkspaceLayout(const QString &size, int requestedWidth, int requested
 	if (auto *live = Control<QToolButton>("penguinLiveButton")) {
 		for (const char *name : {"penguinRecordButton", "penguinClipButton", "penguinSettingsButton", "penguinToolbarButton"}) {
 			auto *button = Control<QToolButton>(name);
+            if (mainWindow->property("penguinSimpleWorkspace").toBool() && QString::fromLatin1(name) == "penguinClipButton") {
+                Check(button && !button->isVisible(), QStringLiteral("inactive-replay-shortcut-removed-%1").arg(size));
+                continue;
+            }
 			Check(button && std::abs(button->height() - live->height()) <= 2 &&
 			      std::abs(BoundsInWindow(button).center().y() - BoundsInWindow(live).center().y()) <= 1,
 			      QStringLiteral("toolbar-action-alignment-%1-%2").arg(size, QString::fromLatin1(name)));
@@ -293,6 +316,10 @@ void CheckWorkspaceLayout(const QString &size, int requestedWidth, int requested
 	}
 	for (const char *name : {"penguinLiveButton", "penguinRecordButton"}) {
 		if (auto *button = Control<QToolButton>(name)) {
+            if (mainWindow->property("penguinSimpleWorkspace").toBool() && QString::fromLatin1(name) == "penguinLiveButton") {
+                Check(!button->menu(), QStringLiteral("single-clear-live-action-%1").arg(size));
+                continue;
+            }
 			QStyleOptionToolButton option;
 			option.initFrom(button);
 			option.features = QStyleOptionToolButton::MenuButtonPopup | QStyleOptionToolButton::HasMenu;
@@ -313,7 +340,7 @@ void CheckWorkspaceLayout(const QString &size, int requestedWidth, int requested
 		QStyleOptionFrame option;
 		option.initFrom(search);
 		const QRect content = search->style()->subElementRect(QStyle::SE_LineEditContents, &option, search);
-		Check(search->isVisible() && !search->placeholderText().isEmpty() &&
+		Check((search->isVisible() || (quickLayout && scenes->isHidden() && QString::fromLatin1(name) == "penguinSceneSearch")) && !search->placeholderText().isEmpty() &&
 		      !search->accessibleName().isEmpty() && content.height() >= search->fontMetrics().height(),
 		      QStringLiteral("search-field-readable-%1-%2").arg(size, QString::fromLatin1(name)));
 	}
@@ -433,7 +460,12 @@ void CheckSidebarTabText(const QString &size)
 			      QStringLiteral("sidebar-tab-label-fits-%1-%2").arg(size).arg(index));
 		}
 	}
-	Check(found, QStringLiteral("sidebar-tab-bar-visible-%1").arg(size));
+	if (mainWindow->property("penguinSimpleWorkspace").toBool()) {
+        int visible = 0;
+        for (const char *id : {"penguinInspectorDock", "penguin-broadcast-destinations", "penguin-stream-details", "penguinTwitchChat"})
+            if (auto *dock = mainWindow->findChild<QDockWidget *>(id); dock && dock->isVisible()) ++visible;
+        Check(visible == 1, QStringLiteral("single-context-panel-%1").arg(size));
+    } else Check(found, QStringLiteral("sidebar-tab-bar-visible-%1").arg(size));
 }
 
 void TestRightSidebar()
@@ -448,16 +480,15 @@ void TestRightSidebar()
 		if (!dock)
 			continue;
 		Check(!dock->isFloating() && mainWindow->dockWidgetArea(dock) == Qt::RightDockWidgetArea &&
-		      mainWindow->tabifiedDockWidgets(inspector).contains(dock),
+		      (mainWindow->property("penguinSimpleWorkspace").toBool() || mainWindow->tabifiedDockWidgets(inspector).contains(dock)),
 		      QStringLiteral("integrated-sidebar-tab-%1").arg(QString::fromLatin1(name)));
-		if (auto *button = Control<QAbstractButton>(entry.second))
-			button->click();
+		if (!OpenSimplePanel(name))
+            if (auto *button = Control<QAbstractButton>(entry.second)) button->click();
 		QCoreApplication::processEvents();
 		Check(!dock->visibleRegion().isEmpty(),
 		      QStringLiteral("sidebar-tab-can-open-%1").arg(QString::fromLatin1(name)));
 	}
-	if (auto *button = Control<QAbstractButton>("penguinInspectorButton"))
-		button->click();
+	RaiseInspector();
 	QCoreApplication::processEvents();
 	Check(!inspector->visibleRegion().isEmpty(), QStringLiteral("inspector-tab-can-restore"));
 }
@@ -475,6 +506,14 @@ void Trigger(const char *name)
 
 void Click(const char *name)
 {
+    if (mainWindow->property("penguinSimpleWorkspace").toBool()) {
+        if (QString::fromLatin1(name) == "penguinDestinationsButton" && OpenSimplePanel("penguin-broadcast-destinations")) return;
+        if (QString::fromLatin1(name) == "penguinCanvasMode") {
+            if (auto *action = mainWindow->findChild<QAction *>(QString::fromLatin1(name) + "AdvancedAction")) {
+                action->trigger(); return;
+            }
+        }
+    }
 	if (auto *button = Control<QAbstractButton>(name))
 		button->click();
 }
@@ -750,8 +789,12 @@ void Tick()
 		Capture(QStringLiteral("workspace-1440.png"));
 		CheckWorkspaceLayout(QStringLiteral("large"), 1440, 900);
 		CheckInspectorWidth(QStringLiteral("large"));
-		TestWorkspaceSearch();
-		TestSceneRename();
+        auto *sceneDock = mainWindow->findChild<QDockWidget *>("scenesDock");
+        const bool hiddenSceneDock = sceneDock && sceneDock->isHidden();
+        if (hiddenSceneDock) sceneDock->show();
+        TestWorkspaceSearch();
+        TestSceneRename();
+        if (hiddenSceneDock) sceneDock->hide();
 		TestRightSidebar();
 		CheckSidebarTabText(QStringLiteral("large"));
 	}

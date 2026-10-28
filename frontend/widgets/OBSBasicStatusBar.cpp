@@ -36,8 +36,9 @@ OBSBasicStatusBar::OBSBasicStatusBar(QWidget *parent)
 	statusWidget->ui->issuesFrame->hide();
 	statusWidget->ui->kbps->hide();
 
+	setSizeGripEnabled(false);
 	addPermanentWidget(statusWidget, 1);
-	setMinimumHeight(statusWidget->height());
+	setMinimumHeight(statusWidget->minimumHeight() + 2);
 
 	UpdateIcons();
 	connect(App(), &OBSApp::StyleChanged, this, &OBSBasicStatusBar::UpdateIcons);
@@ -73,6 +74,9 @@ void OBSBasicStatusBar::Activate()
 	}
 
 	if (streamOutput) {
+		statusWidget->ui->networkFrame->show();
+		statusWidget->ui->streamFrame->show();
+		statusWidget->ui->streamTime->setText(QTStr("Penguin.Status.Live").arg(QStringLiteral("00:00:00")));
 		statusWidget->ui->streamIcon->setPixmap(streamingActivePixmap);
 		statusWidget->ui->streamTime->setDisabled(false);
 		statusWidget->ui->issuesFrame->show();
@@ -81,6 +85,8 @@ void OBSBasicStatusBar::Activate()
 	}
 
 	if (recordOutput) {
+		statusWidget->ui->recordFrame->show();
+		UpdateRecordTimeLabel();
 		statusWidget->ui->recordIcon->setPixmap(recordingActivePixmap);
 		statusWidget->ui->recordTime->setDisabled(false);
 	}
@@ -94,6 +100,8 @@ void OBSBasicStatusBar::Deactivate()
 	}
 
 	if (!streamOutput) {
+		statusWidget->ui->networkFrame->hide();
+		statusWidget->ui->streamFrame->hide();
 		statusWidget->ui->streamTime->setText(QString("00:00:00"));
 		statusWidget->ui->streamTime->setDisabled(true);
 		statusWidget->ui->streamIcon->setPixmap(streamingInactivePixmap);
@@ -108,6 +116,7 @@ void OBSBasicStatusBar::Deactivate()
 	}
 
 	if (!recordOutput) {
+		statusWidget->ui->recordFrame->hide();
 		statusWidget->ui->recordTime->setText(QString("00:00:00"));
 		statusWidget->ui->recordTime->setDisabled(true);
 		statusWidget->ui->recordIcon->setPixmap(recordingInactivePixmap);
@@ -215,24 +224,50 @@ void OBSBasicStatusBar::UpdateCPUUsage()
 	}
 
 	QString text;
-	text += QString("CPU: ") + QString::number(main->GetCPUUsage(), 'f', 1) + QString("%");
+	text += QString("CPU ") + QString::number(main->GetCPUUsage(), 'f', 1) + QString("%");
 
 	statusWidget->ui->cpuUsage->setText(text);
-	statusWidget->ui->cpuUsage->setMinimumWidth(statusWidget->ui->cpuUsage->width());
+	statusWidget->ui->cpuUsage->setMinimumWidth(
+		statusWidget->ui->cpuUsage->fontMetrics().horizontalAdvance(QStringLiteral("CPU 100.0%")));
+	statusWidget->ui->cpuUsage->setToolTip(QTStr("Penguin.Status.CPU"));
 
+	obs_video_info video = {};
+	if (obs_get_video_info(&video) && video.adapter != gpuAdapter) {
+		struct Selection { uint32_t adapter; QString node; } selection{video.adapter, {}};
+		obs_enter_graphics();
+		gs_enum_adapters([](void *opaque, const char *name, uint32_t id) {
+			auto *selection = static_cast<Selection *>(opaque);
+			if (id != selection->adapter) return true;
+			selection->node = QString::fromUtf8(name);
+			return false;
+		}, &selection);
+		const QString renderer = QString::fromUtf8(gs_get_renderer());
+		obs_leave_graphics();
+		gpuUsage.Configure(selection.node, renderer);
+		gpuAdapter = video.adapter;
+	}
+	const auto sample = gpuUsage.Poll();
+	statusWidget->ui->gpuUsage->setText(sample.percent < 0 ? QStringLiteral("GPU —")
+		: QStringLiteral("GPU %1%").arg(sample.percent));
+	statusWidget->ui->gpuUsage->setToolTip((sample.percent < 0 ? QTStr("Penguin.Status.GPUUnavailable")
+		: QTStr("Penguin.Status.GPU")) + "\n" + sample.renderer);
+	statusWidget->ui->gpuUsage->setMinimumWidth(
+		statusWidget->ui->gpuUsage->fontMetrics().horizontalAdvance(QStringLiteral("GPU 100%")));
 	UpdateCurrentFPS();
 }
 
 void OBSBasicStatusBar::UpdateCurrentFPS()
 {
-	struct obs_video_info ovi;
+	struct obs_video_info ovi = {};
 	obs_get_video_info(&ovi);
-	float targetFPS = (float)ovi.fps_num / (float)ovi.fps_den;
+	float targetFPS = ovi.fps_den ? (float)ovi.fps_num / (float)ovi.fps_den : 0.0f;
 
 	QString text = QString::asprintf("%.2f / %.2f FPS", obs_get_active_fps(), targetFPS);
 
-	statusWidget->ui->fpsCurrent->setText(text);
-	statusWidget->ui->fpsCurrent->setMinimumWidth(statusWidget->ui->fpsCurrent->width());
+	statusWidget->ui->fpsCurrent->setText(QString::number(obs_get_active_fps(), 'f', 0) + QStringLiteral(" FPS"));
+	statusWidget->ui->fpsCurrent->setToolTip(QTStr("Penguin.Status.FPS").arg(text));
+	statusWidget->ui->fpsCurrent->setMinimumWidth(
+		statusWidget->ui->fpsCurrent->fontMetrics().horizontalAdvance(QStringLiteral("120 FPS")));
 }
 
 void OBSBasicStatusBar::UpdateStreamTime()
@@ -245,7 +280,8 @@ void OBSBasicStatusBar::UpdateStreamTime()
 	int hours = totalMinutes / 60;
 
 	QString text = QString::asprintf("%02d:%02d:%02d", hours, minutes, seconds);
-	statusWidget->ui->streamTime->setText(text);
+	statusWidget->ui->streamTime->setText(QTStr("Penguin.Status.Live").arg(text));
+	statusWidget->ui->streamTime->setAccessibleName(QTStr("Penguin.Status.Live").arg(text));
 	if (streamOutput && !statusWidget->ui->streamTime->isEnabled()) {
 		statusWidget->ui->streamTime->setDisabled(false);
 	}
@@ -306,10 +342,13 @@ void OBSBasicStatusBar::UpdateRecordTimeLabel()
 
 	QString text = QString::asprintf("%02d:%02d:%02d", hours, minutes, seconds);
 	if (os_atomic_load_bool(&recording_paused)) {
-		text += QStringLiteral(" (PAUSED)");
+		text = QTStr("Penguin.Status.Paused").arg(text);
+	} else {
+		text = QTStr("Penguin.Status.Recording").arg(text);
 	}
 
 	statusWidget->ui->recordTime->setText(text);
+	statusWidget->ui->recordTime->setAccessibleName(text);
 }
 
 void OBSBasicStatusBar::UpdateDroppedFrames()
@@ -553,6 +592,7 @@ void OBSBasicStatusBar::RecordingStopped()
 void OBSBasicStatusBar::RecordingPaused()
 {
 	if (recordOutput) {
+		statusWidget->ui->recordFrame->show();
 		statusWidget->ui->recordIcon->setPixmap(recordingPausePixmap);
 		streamPauseIconToggle = true;
 	}
@@ -563,6 +603,7 @@ void OBSBasicStatusBar::RecordingPaused()
 void OBSBasicStatusBar::RecordingUnpaused()
 {
 	if (recordOutput) {
+		statusWidget->ui->recordFrame->show();
 		statusWidget->ui->recordIcon->setPixmap(recordingActivePixmap);
 	}
 

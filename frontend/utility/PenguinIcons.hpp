@@ -34,7 +34,8 @@ enum class Icon {
 	Fit,
 	Center,
 	FlipHorizontal,
-	FlipVertical
+	FlipVertical,
+	Privacy
 };
 
 // Original 24-unit line icons. Rendering both resolutions keeps the studio
@@ -54,6 +55,20 @@ inline QIcon StudioIcon(Icon glyph, QColor color = QColor("#BDC0CB"), int size =
 			p.drawLine(QPointF(x1, y1), QPointF(x2, y2));
 		};
 		switch (glyph) {
+		case Icon::Privacy: {
+			QPainterPath shield;
+			shield.moveTo(12, 3);
+			shield.lineTo(20, 6);
+			shield.lineTo(20, 12);
+			shield.quadTo(20, 18, 12, 22);
+			shield.quadTo(4, 18, 4, 12);
+			shield.lineTo(4, 6);
+			shield.closeSubpath();
+			p.drawPath(shield);
+			line(8, 12, 11, 15);
+			line(11, 15, 16, 9);
+			break;
+		}
 		case Icon::Camera:
 			p.drawRoundedRect(QRectF(3, 6, 13, 12), 2, 2);
 			p.drawPolygon(QPolygonF({QPointF(16, 10), QPointF(21, 7), QPointF(21, 17), QPointF(16, 14)}));

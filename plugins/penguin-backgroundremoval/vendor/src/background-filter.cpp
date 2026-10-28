@@ -41,9 +41,13 @@
 #include "obs-utils/obs-utils.hpp"
 #include "consts.h"
 #include "../../managed-threads.hpp"
+#include "../../single-task-worker.hpp"
 #include "../../gpu-worker-client.hpp"
 #include <filesystem>
+#include <cstring>
 #include <util/platform.h>
+#include <util/profiler.h>
+#include <utility>
 // Penguin Studio manages component updates.
 
 struct background_removal_filter : public filter_data, public std::enable_shared_from_this<background_removal_filter> {
@@ -73,13 +77,53 @@ struct background_removal_filter : public filter_data, public std::enable_shared
 
 	gs_effect_t *effect;
 	gs_effect_t *kawaseBlurEffect;
+	// Graphics-thread-owned scratch textures survive frames of the same size.
+	gs_texture_t *alphaTexture = nullptr;
+	gs_texrender_t *blurPasses[2] = {nullptr, nullptr};
+	// Borrowed from blurPasses; valid only for the currently displayed frame/mask.
+	gs_texture_t *cachedBlurTexture = nullptr;
 
 	std::mutex modelMutex;
 	std::atomic<int> penguinStatus{1};
 	bool maskPending = true;
+	// Render-thread-owned future and textures; worker-owned inference buffers.
+	// Update and destruction join the task before changing or freeing its state.
+	// One in-flight frame, never an unbounded queue. The displayed color frame
+	// and mask are published together after inference completes.
+	std::unique_ptr<PenguinSingleTaskWorker> inferenceWorker;
+	std::future<void> inferenceTask;
+	gs_texture_t *displayTexture = nullptr;
+	bool displayReady = false;
+	bool inferenceSucceeded = false;
+	// Accessed only by update after joining the task, or by the single worker.
+	bool modelNeedsInitialization = true;
+	obs_data_t *pendingSettings = nullptr;
+	std::atomic<uint64_t> completedFrames{0};
+	std::atomic<uint64_t> busyTicks{0};
 
 	~background_removal_filter() { obs_log(LOG_INFO, "Background removal filter destructor called"); }
 };
+
+static void finish_inference(background_removal_filter *tf)
+{
+	if (!tf->inferenceTask.valid())
+		return;
+	try {
+		tf->inferenceTask.get();
+	} catch (const std::exception &error) {
+		tf->inferenceSucceeded = false;
+		tf->gpuPreparing = false;
+		tf->penguinStatus = 3;
+		tf->isDisabled = true;
+		obs_log(LOG_ERROR, "Camera inference failed: %s; preserving the input", error.what());
+	} catch (...) {
+		tf->inferenceSucceeded = false;
+		tf->gpuPreparing = false;
+		tf->penguinStatus = 3;
+		tf->isDisabled = true;
+		obs_log(LOG_ERROR, "Camera inference failed; preserving the input");
+	}
+}
 
 void background_removal_thread(void *data); // Forward declaration
 
@@ -261,6 +305,79 @@ void background_filter_defaults(obs_data_t *settings)
 	obs_data_set_default_double(settings, "blur_focus_depth", 0.0);
 }
 
+static bool initialize_model(background_removal_filter *tf)
+{
+	// Session construction and old-session destruction can take hundreds of
+	// milliseconds. Only the companion worker calls this, outside graphics locks.
+	std::unique_lock<std::mutex> lock(tf->modelMutex);
+	if (!tf->env)
+		tf->env = std::make_unique<Ort::Env>(ORT_LOGGING_LEVEL_ERROR, "background-removal-inference");
+	tf->model.reset();
+	if (tf->modelSelection == MODEL_SINET) {
+		tf->model.reset(new ModelSINET);
+	}
+	if (tf->modelSelection == MODEL_SELFIE) {
+		tf->model.reset(new ModelSelfie);
+	}
+	if (tf->modelSelection == MODEL_SELFIE_MULTICLASS) {
+		tf->model.reset(new ModelSelfieMulticlass);
+	}
+	if (tf->modelSelection == MODEL_MEDIAPIPE) {
+		tf->model.reset(new ModelMediaPipe);
+	}
+	if (tf->modelSelection == MODEL_RVM) {
+		tf->model.reset(new ModelRVM(tf->preserveHands, int(tf->numThreads), "cpu"));
+	}
+	if (tf->modelSelection == MODEL_PPHUMANSEG) {
+		tf->model.reset(new ModelPPHumanSeg);
+	}
+	if (tf->modelSelection == MODEL_DEPTH_TCMONODEPTH) {
+		tf->model.reset(new ModelTCMonoDepth);
+	}
+
+	int ortSessionResult = createOrtSession(tf);
+	if (ortSessionResult != OBS_BGREMOVAL_ORT_SESSION_SUCCESS) {
+		obs_log(LOG_ERROR, "Failed to create ONNXRuntime session. Error code: %d", ortSessionResult);
+		// disable filter
+		tf->penguinStatus = 3;
+		tf->isDisabled = true;
+		tf->model.reset();
+		tf->gpuPreparing = false;
+		return false;
+	}
+	tf->gpuWorker.reset();
+	tf->activeGPU = false;
+	tf->cpuFallback = tf->useGPU != "cpu";
+	tf->gpuPreparing = false;
+	if (tf->useGPU != "cpu" && tf->modelSelection == MODEL_RVM) {
+		const auto module =
+			std::filesystem::path(obs_get_module_binary_path(obs_current_module())).parent_path();
+		auto runtime = module.parent_path() / "penguin-camera-gpu/libonnxruntime.so.1";
+		// In-app main-package updates may leave the compatible 0.6.x GPU add-on installed.
+		// Prefer the new layout, but retain that private runtime until the add-on is updated.
+		if (!std::filesystem::is_regular_file(runtime)) {
+			runtime = module.parent_path().parent_path() /
+				  "obs-plugins/penguin-camera-gpu/libonnxruntime.so.1";
+		}
+		const auto executable = module.parent_path() / "penguin-camera/penguin-gpu-worker";
+		if (std::filesystem::is_regular_file(runtime) && std::filesystem::is_regular_file(executable)) {
+			char *models = obs_module_file("models");
+			char *cache = obs_module_config_path("gpu-cache/onnxruntime-1.23.2");
+			if (models && cache) {
+				tf->gpuWorker = std::make_unique<PenguinGPUWorker>(executable.string(),
+										   runtime.string(), models,
+										   cache, int(tf->numThreads),
+										   false, PenguinGPUWorker::BackgroundFrameBudgetMs);
+				tf->gpuPreparing = tf->gpuWorker->Preparing();
+				tf->cpuFallback = tf->gpuWorker->Failed();
+			}
+			bfree(models);
+			bfree(cache);
+		}
+	}
+	return true;
+}
+
 void background_filter_update(void *data, obs_data_t *settings)
 {
 	obs_log(LOG_INFO, "Background filter updated");
@@ -276,7 +393,23 @@ void background_filter_update(void *data, obs_data_t *settings)
 		return;
 	}
 
+	// Keep only the latest settings while model initialization/inference runs.
+	// Joining here would stall the UI/graphics lock during a quick device change.
+	if (tf->inferenceTask.valid() &&
+	    tf->inferenceTask.wait_for(std::chrono::seconds(0)) != std::future_status::ready) {
+		obs_data_addref(settings);
+		obs_data_release(tf->pendingSettings);
+		tf->pendingSettings = settings;
+		tf->displayReady = false;
+		return;
+	}
+
+	obs_data_release(std::exchange(tf->pendingSettings, nullptr));
+
 	tf->isDisabled = true;
+	finish_inference(tf.get());
+	tf->displayReady = false;
+	tf->cachedBlurTexture = nullptr;
 
 	tf->stopWhenSourceIsInactive = obs_data_get_bool(settings, "stop_when_source_is_inactive");
 	tf->enableThreshold = (float)obs_data_get_bool(settings, "enable_threshold");
@@ -301,94 +434,36 @@ void background_filter_update(void *data, obs_data_t *settings)
 	penguin_configure_managed_threads(settings, os_get_physical_cores());
 	const bool preserveHands = obs_data_get_bool(settings, "penguin_preserve_hands") && newModel == MODEL_RVM;
 	const uint32_t configuredThreads = (uint32_t)obs_data_get_int(settings, "numThreads");
-	const uint32_t newNumThreads = preserveHands ? std::clamp(configuredThreads, 1u, 3u) : configuredThreads;
+	// Keep the configured CPU budget: the old hand-mode cap silently reduced
+	// managed four-thread sessions to three, increasing same-frame latency.
+	const uint32_t newNumThreads = std::clamp(configuredThreads, 1u, 8u);
 
 	if (!tf->model || tf->modelSelection.empty() || tf->modelSelection != newModel || tf->useGPU != newUseGpu ||
 	    tf->numThreads != newNumThreads || tf->preserveHands != preserveHands) {
-		// lock modelMutex
-		std::unique_lock<std::mutex> lock(tf->modelMutex);
-
-		tf->penguinStatus = 1;
-		// Re-initialize model if it's not already the selected one or switching inference device
 		tf->modelSelection = newModel;
 		tf->useGPU = newUseGpu;
 		tf->numThreads = newNumThreads;
 		tf->preserveHands = preserveHands;
-
-		if (tf->modelSelection == MODEL_SINET) {
-			tf->model.reset(new ModelSINET);
-		}
-		if (tf->modelSelection == MODEL_SELFIE) {
-			tf->model.reset(new ModelSelfie);
-		}
-		if (tf->modelSelection == MODEL_SELFIE_MULTICLASS) {
-			tf->model.reset(new ModelSelfieMulticlass);
-		}
-		if (tf->modelSelection == MODEL_MEDIAPIPE) {
-			tf->model.reset(new ModelMediaPipe);
-		}
-		if (tf->modelSelection == MODEL_RVM) {
-			tf->model.reset(new ModelRVM(tf->preserveHands, int(tf->numThreads), "cpu"));
-		}
-		if (tf->modelSelection == MODEL_PPHUMANSEG) {
-			tf->model.reset(new ModelPPHumanSeg);
-		}
-		if (tf->modelSelection == MODEL_DEPTH_TCMONODEPTH) {
-			tf->model.reset(new ModelTCMonoDepth);
-		}
-
-		int ortSessionResult = createOrtSession(tf.get());
-		if (ortSessionResult != OBS_BGREMOVAL_ORT_SESSION_SUCCESS) {
-			obs_log(LOG_ERROR, "Failed to create ONNXRuntime session. Error code: %d", ortSessionResult);
-			// disable filter
-			tf->penguinStatus = 3;
-			tf->isDisabled = true;
-			tf->model.reset();
-			return;
-		}
-		tf->gpuWorker.reset();
+		tf->modelNeedsInitialization = true;
+		tf->penguinStatus = 1;
 		tf->activeGPU = false;
-		tf->cpuFallback = tf->useGPU != "cpu";
-		tf->gpuPreparing = false;
-		if (tf->useGPU != "cpu" && tf->modelSelection == MODEL_RVM) {
-			const auto module =
-				std::filesystem::path(obs_get_module_binary_path(obs_current_module())).parent_path();
-			auto runtime = module.parent_path() / "penguin-camera-gpu/libonnxruntime.so.1";
-			// In-app main-package updates may leave the compatible 0.6.x GPU add-on installed.
-			// Prefer the new layout, but retain that private runtime until the add-on is updated.
-			if (!std::filesystem::is_regular_file(runtime)) {
-				runtime = module.parent_path().parent_path() /
-					  "obs-plugins/penguin-camera-gpu/libonnxruntime.so.1";
-			}
-			const auto executable = module.parent_path() / "penguin-camera/penguin-gpu-worker";
-			if (std::filesystem::is_regular_file(runtime) && std::filesystem::is_regular_file(executable)) {
-				char *models = obs_module_file("models");
-				char *cache = obs_module_config_path("gpu-cache/onnxruntime-1.23.2");
-				if (models && cache) {
-					tf->gpuWorker = std::make_unique<PenguinGPUWorker>(executable.string(),
-											   runtime.string(), models,
-											   cache, int(tf->numThreads),
-											   false);
-					tf->gpuPreparing = tf->gpuWorker->Preparing();
-					tf->cpuFallback = tf->gpuWorker->Failed();
-				}
-				bfree(models);
-				bfree(cache);
-			}
-		}
+		tf->cpuFallback = false;
+		tf->gpuPreparing = true;
 	}
 
 	obs_enter_graphics();
 
-	char *effect_path = obs_module_file(EFFECT_PATH);
-	gs_effect_destroy(tf->effect);
-	tf->effect = gs_effect_create_from_file(effect_path, NULL);
-	bfree(effect_path);
-
-	char *kawaseBlurEffectPath = obs_module_file(KAWASE_BLUR_EFFECT_PATH);
-	gs_effect_destroy(tf->kawaseBlurEffect);
-	tf->kawaseBlurEffect = gs_effect_create_from_file(kawaseBlurEffectPath, NULL);
-	bfree(kawaseBlurEffectPath);
+	// Shader programs are independent of settings; retain them across updates.
+	if (!tf->effect) {
+		char *path = obs_module_file(EFFECT_PATH);
+		tf->effect = gs_effect_create_from_file(path, nullptr);
+		bfree(path);
+	}
+	if (!tf->kawaseBlurEffect) {
+		char *path = obs_module_file(KAWASE_BLUR_EFFECT_PATH);
+		tf->kawaseBlurEffect = gs_effect_create_from_file(path, nullptr);
+		bfree(path);
+	}
 
 	obs_leave_graphics();
 
@@ -461,10 +536,9 @@ void *background_filter_create(obs_data_t *settings, obs_source_t *source)
 		auto instance = std::make_shared<background_removal_filter>();
 
 		instance->source = source;
+		instance->inferenceWorker = std::make_unique<PenguinSingleTaskWorker>();
 		instance->texrender = gs_texrender_create(GS_BGRA, GS_ZS_NONE);
 
-		std::string instanceName{"background-removal-inference"};
-		instance->env.reset(new Ort::Env(OrtLoggingLevel::ORT_LOGGING_LEVEL_ERROR, instanceName.c_str()));
 
 		instance->modelSelection.clear();
 
@@ -473,13 +547,16 @@ void *background_filter_create(obs_data_t *settings, obs_source_t *source)
 		background_filter_update(ptr, settings);
 		proc_handler_add(
 			obs_source_get_proc_handler(source),
-			"void camera_status(out int status, out bool gpu, out bool fallback, out bool preparing)",
+			"void camera_status(out int status, out bool gpu, out bool fallback, out bool preparing, "
+			"out int completed_frames, out int busy_ticks)",
 			[](void *data, calldata_t *params) {
 				auto *state = static_cast<std::shared_ptr<background_removal_filter> *>(data);
 				calldata_set_int(params, "status", (*state)->penguinStatus.load());
 				calldata_set_bool(params, "gpu", (*state)->activeGPU.load());
 				calldata_set_bool(params, "fallback", (*state)->cpuFallback.load());
 				calldata_set_bool(params, "preparing", (*state)->gpuPreparing.load());
+				calldata_set_int(params, "completed_frames", (*state)->completedFrames.load());
+				calldata_set_int(params, "busy_ticks", (*state)->busyTicks.load());
 			},
 			ptr);
 
@@ -502,6 +579,13 @@ void background_filter_destroy(void *data)
 		if (*ptr) {
 			// Mark as disabled to prevent further processing
 			(*ptr)->isDisabled = true;
+			finish_inference(ptr->get());
+			(*ptr)->inferenceWorker.reset();
+			obs_data_release((*ptr)->pendingSettings);
+			(*ptr)->pendingSettings = nullptr;
+			obs_log(LOG_INFO, "Camera inference: %llu completed frames, %llu busy video ticks",
+				(unsigned long long)(*ptr)->completedFrames.load(),
+				(unsigned long long)(*ptr)->busyTicks.load());
 
 			// Perform cleanup
 			obs_enter_graphics();
@@ -511,6 +595,11 @@ void background_filter_destroy(void *data)
 			}
 			gs_effect_destroy((*ptr)->effect);
 			gs_effect_destroy((*ptr)->kawaseBlurEffect);
+			gs_texture_destroy((*ptr)->alphaTexture);
+			gs_texture_destroy((*ptr)->displayTexture);
+			for (auto *pass : (*ptr)->blurPasses) {
+				gs_texrender_destroy(pass);
+			}
 			obs_leave_graphics();
 		}
 		// Delete the pointer to shared_ptr
@@ -524,14 +613,19 @@ static void processImageForBackground(struct background_removal_filter *tf, cons
 {
 	cv::Mat outputImage;
 	auto *rvm = tf->modelSelection == MODEL_RVM ? static_cast<ModelRVM *>(tf->model.get()) : nullptr;
+	// RVM and its hand companion share the same 320x192 frame. Resize once,
+	// before RGB conversion, instead of independently for CPU/GPU/hand paths.
+	cv::Mat resized;
+	if (rvm && imageBGRA.size() != cv::Size(320, 192))
+		cv::resize(imageBGRA, resized, cv::Size(320, 192));
+	const cv::Mat &frame = resized.empty() ? imageBGRA : resized;
 	bool handStarted = false;
 	auto startHand = [&] {
 		if (!rvm || !tf->preserveHands) {
 			return;
 		}
-		cv::Mat small, rgb, input;
-		cv::resize(imageBGRA, small, cv::Size(320, 192));
-		cv::cvtColor(small, rgb, cv::COLOR_BGRA2RGB);
+		cv::Mat rgb, input;
+		cv::cvtColor(frame, rgb, cv::COLOR_BGRA2RGB);
 		rgb.convertTo(input, CV_32F);
 		rvm->StartHandRecovery(input);
 		handStarted = true;
@@ -539,7 +633,7 @@ static void processImageForBackground(struct background_removal_filter *tf, cons
 	if (tf->gpuWorker && !tf->gpuWorker->Preparing() && !tf->gpuWorker->Failed()) {
 		startHand();
 	}
-	const bool gpu = tf->gpuWorker && tf->gpuWorker->Infer(imageBGRA, outputImage);
+	const bool gpu = tf->gpuWorker && tf->gpuWorker->Infer(frame, outputImage);
 	if (gpu && tf->preserveHands) {
 		if (!handStarted) {
 			startHand();
@@ -565,7 +659,7 @@ static void processImageForBackground(struct background_removal_filter *tf, cons
 		tf->activeGPU = false;
 		tf->gpuPreparing = tf->gpuWorker && tf->gpuWorker->Preparing();
 		tf->cpuFallback = tf->useGPU != "cpu" && !tf->gpuPreparing;
-		if (!runFilterModelInference(tf, imageBGRA, outputImage)) {
+		if (!runFilterModelInference(tf, frame, outputImage)) {
 			return;
 		}
 	} else {
@@ -597,13 +691,13 @@ void background_filter_video_tick(void *data, float seconds)
 	}
 }
 
-static void background_filter_process_current_frame(void *data)
+static bool background_filter_process_current_frame(void *data)
 {
 
 	// Cast to shared_ptr pointer and create a local shared_ptr
 	auto *ptr = static_cast<std::shared_ptr<background_removal_filter> *>(data);
 	if (!ptr) {
-		return;
+		return false;
 	}
 
 	// Create a local shared_ptr
@@ -612,18 +706,24 @@ static void background_filter_process_current_frame(void *data)
 	std::shared_ptr<background_removal_filter> tf = *ptr;
 
 	if (!tf || tf->isDisabled) {
-		return;
+		return false;
 	}
 
 	if (!obs_source_enabled(tf->source)) {
-		return;
+		return false;
+	}
+
+	if (tf->modelNeedsInitialization) {
+		tf->modelNeedsInitialization = false;
+		if (!initialize_model(tf.get()))
+			return false;
 	}
 
 	if (!tf->model) {
 		tf->penguinStatus = 3;
 		tf->isDisabled = true;
 		obs_log(LOG_ERROR, "Model is not initialized");
-		return;
+		return false;
 	}
 
 	cv::Mat imageBGRA;
@@ -631,13 +731,15 @@ static void background_filter_process_current_frame(void *data)
 		std::unique_lock<std::mutex> lock(tf->inputBGRALock, std::try_to_lock);
 		if (!lock.owns_lock()) {
 			// No data to process
-			return;
+			return false;
 		}
 		if (tf->inputBGRA.empty()) {
 			// No data to process
-			return;
+			return false;
 		}
-		imageBGRA = tf->inputBGRA.clone();
+		// Staging publishes a new owned Mat, never mutates the previous one.
+		// Retain that immutable snapshot instead of copying the full frame again.
+		imageBGRA = tf->inputBGRA;
 	}
 
 	if (tf->enableImageSimilarity) {
@@ -647,7 +749,7 @@ static void background_filter_process_current_frame(void *data)
 
 			if (psnr > tf->imageSimilarityThreshold) {
 				// The image is almost the same as the previous one. Skip processing.
-				return;
+				return !tf->backgroundMask.empty();
 			}
 		}
 		tf->lastImageBGRA = imageBGRA.clone();
@@ -681,7 +783,7 @@ static void background_filter_process_current_frame(void *data)
 				tf->isDisabled = true;
 				obs_log(LOG_ERROR,
 					"Background inference produced an empty mask; preserving the input.");
-				return;
+				return false;
 			}
 
 			// Temporal smoothing
@@ -770,16 +872,73 @@ static void background_filter_process_current_frame(void *data)
 		tf->isDisabled = true;
 		obs_log(LOG_ERROR, "%s", e.what());
 	}
+	return !tf->isDisabled && !tf->backgroundMask.empty();
+}
+
+static gs_texture_t *reuse_texture(gs_texture_t *&texture, uint32_t width, uint32_t height,
+				  gs_color_format format, uint32_t flags)
+{
+	if (texture && (gs_texture_get_width(texture) != width || gs_texture_get_height(texture) != height)) {
+		gs_texture_destroy(texture);
+		texture = nullptr;
+	}
+	if (!texture) {
+		texture = gs_texture_create(width, height, format, 1, nullptr, flags);
+	}
+	return texture;
+}
+
+static bool upload_alpha_texture(gs_texture_t *texture, const cv::Mat &mask)
+{
+	uint8_t *pixels = nullptr;
+	uint32_t pitch = 0;
+	if (!gs_texture_map(texture, &pixels, &pitch)) {
+		return false;
+	}
+	if (!pixels || pitch < uint32_t(mask.cols)) {
+		gs_texture_unmap(texture);
+		return false;
+	}
+	// Copy only logical pixels. Both OpenCV and graphics backends may pad rows.
+	for (int y = 0; y < mask.rows; ++y) {
+		std::memcpy(pixels + size_t(y) * pitch, mask.ptr<uint8_t>(y), size_t(mask.cols));
+	}
+	gs_texture_unmap(texture);
+	return true;
+}
+
+static bool upload_color_texture(gs_texture_t *texture, const cv::Mat &frame)
+{
+	uint8_t *pixels = nullptr;
+	uint32_t pitch = 0;
+	if (!gs_texture_map(texture, &pixels, &pitch))
+		return false;
+	if (!pixels || frame.type() != CV_8UC4 || pitch < uint32_t(frame.cols) * 4) {
+		gs_texture_unmap(texture);
+		return false;
+	}
+	for (int y = 0; y < frame.rows; ++y)
+		std::memcpy(pixels + size_t(y) * pitch, frame.ptr(y), size_t(frame.cols) * 4);
+	gs_texture_unmap(texture);
+	return true;
 }
 
 static gs_texture_t *blur_background(std::shared_ptr<background_removal_filter> tf, uint32_t width, uint32_t height,
 				     gs_texture_t *alphaTexture)
 {
 	if (tf->blurBackground == 0 || !tf->kawaseBlurEffect) {
+		tf->cachedBlurTexture = nullptr;
+		for (auto *&pass : tf->blurPasses) {
+			gs_texrender_destroy(pass);
+			pass = nullptr;
+		}
 		return nullptr;
 	}
-	gs_texture_t *blurredTexture = gs_texture_create(width, height, GS_BGRA, 1, nullptr, 0);
-	gs_copy_texture(blurredTexture, gs_texrender_get_texture(tf->texrender));
+	// Preview and output can render the same completed pair more than once.
+	// Reuse its blur until a new pair is uploaded or settings change.
+	if (tf->cachedBlurTexture)
+		return tf->cachedBlurTexture;
+	gs_texture_t *blurredTexture = tf->displayTexture;
 	gs_eparam_t *image = gs_effect_get_param_by_name(tf->kawaseBlurEffect, "image");
 	gs_eparam_t *focalmask = gs_effect_get_param_by_name(tf->kawaseBlurEffect, "focalmask");
 	gs_eparam_t *xOffset = gs_effect_get_param_by_name(tf->kawaseBlurEffect, "xOffset");
@@ -790,8 +949,18 @@ static gs_texture_t *blur_background(std::shared_ptr<background_removal_filter> 
 	gs_eparam_t *blurFocusDepthParam = gs_effect_get_param_by_name(tf->kawaseBlurEffect, "blurFocusDepth");
 
 	for (int i = 0; i < (int)tf->blurBackground; i++) {
-		gs_texrender_reset(tf->texrender);
-		if (!gs_texrender_begin(tf->texrender, width, height)) {
+		// Alternate render targets so the previous pass is sampled directly.
+		// This avoids the initial full-frame copy and a copy after each iteration.
+		auto *&pass = tf->blurPasses[i % 2];
+		if (!pass) {
+			pass = gs_texrender_create(GS_BGRA, GS_ZS_NONE);
+		}
+		if (!pass) {
+			obs_log(LOG_INFO, "Could not create background blur texrender!");
+			return blurredTexture;
+		}
+		gs_texrender_reset(pass);
+		if (!gs_texrender_begin(pass, width, height)) {
 			obs_log(LOG_INFO, "Could not open background blur texrender!");
 			return blurredTexture;
 		}
@@ -818,9 +987,10 @@ static gs_texture_t *blur_background(std::shared_ptr<background_removal_filter> 
 			gs_draw_sprite(blurredTexture, 0, width, height);
 		}
 		gs_blend_state_pop();
-		gs_texrender_end(tf->texrender);
-		gs_copy_texture(blurredTexture, gs_texrender_get_texture(tf->texrender));
+		gs_texrender_end(pass);
+		blurredTexture = gs_texrender_get_texture(pass);
 	}
+	tf->cachedBlurTexture = blurredTexture;
 	return blurredTexture;
 }
 
@@ -837,6 +1007,15 @@ void background_filter_video_render(void *data, gs_effect_t *_effect)
 	// Create a local shared_ptr
 	std::shared_ptr<background_removal_filter> tf = *ptr;
 
+	if (tf && tf->pendingSettings) {
+		if (tf->inferenceTask.valid() &&
+		    tf->inferenceTask.wait_for(std::chrono::seconds(0)) != std::future_status::ready)
+			return; // Transparent until settings and the matching frame are ready.
+		auto *settings = std::exchange(tf->pendingSettings, nullptr);
+		background_filter_update(data, settings);
+		obs_data_release(settings);
+	}
+
 	if (!tf || tf->isDisabled) {
 		if (tf && tf->source) {
 			obs_source_skip_video_filter(tf->source);
@@ -844,68 +1023,72 @@ void background_filter_video_render(void *data, gs_effect_t *_effect)
 		return;
 	}
 
-	uint32_t width, height;
-	if (!getRGBAFromStageSurface(tf.get(), width, height)) {
-		if (tf->source) {
-			obs_source_skip_video_filter(tf->source);
-		}
+	obs_source_t *target = obs_filter_get_target(tf->source);
+	const uint32_t width = target ? obs_source_get_base_width(target) : 0;
+	const uint32_t height = target ? obs_source_get_base_height(target) : 0;
+	if (!width || !height || !tf->effect) {
+		obs_source_skip_video_filter(tf->source);
 		return;
 	}
 
-	// The tick runs before rendering and therefore only has the previous input.
-	// Infer after staging this frame so moving hands and heads use their own
-	// mask. Multiple renders in one video tick must not advance recurrent state.
 	if (tf->maskPending) {
 		tf->maskPending = false;
-		background_filter_process_current_frame(data);
+		if (tf->inferenceTask.valid() &&
+		    tf->inferenceTask.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
+			finish_inference(tf.get());
+			const cv::Mat &frame = tf->inputBGRA;
+			// Settings and size changes must never pair a new frame with an old mask.
+			if (tf->inferenceSucceeded && !tf->isDisabled && !tf->backgroundMask.empty() &&
+			    frame.cols == int(width) && frame.rows == int(height)) {
+				tf->cachedBlurTexture = nullptr;
+				auto *color = reuse_texture(tf->displayTexture, width, height, GS_BGRA, GS_DYNAMIC);
+				auto *alpha = reuse_texture(tf->alphaTexture, tf->backgroundMask.cols,
+						    tf->backgroundMask.rows, GS_R8, GS_DYNAMIC);
+				tf->displayReady = false;
+				if (color && alpha && upload_alpha_texture(alpha, tf->backgroundMask) &&
+				    upload_color_texture(color, frame)) {
+					tf->displayReady = true;
+					++tf->completedFrames;
+				} else {
+					tf->penguinStatus = 3;
+					tf->isDisabled = true;
+					obs_log(LOG_ERROR, "Failed to upload camera frame and mask; preserving the input");
+				}
+			} else {
+				tf->displayReady = false;
+			}
+		}
+		if (!tf->inferenceTask.valid() && !tf->isDisabled) {
+			uint32_t stagedWidth, stagedHeight;
+			profile_start("Penguin stage");
+			const bool staged = getRGBAFromStageSurface(tf.get(), stagedWidth, stagedHeight);
+			profile_end("Penguin stage");
+			if (staged) {
+				tf->inferenceSucceeded = false;
+				tf->inferenceTask = tf->inferenceWorker->submit([data, state = tf.get()] {
+					state->inferenceSucceeded = background_filter_process_current_frame(data);
+				});
+			}
+		} else if (tf->inferenceTask.valid()) {
+			++tf->busyTicks;
+		}
 	}
 	if (tf->isDisabled) {
 		obs_source_skip_video_filter(tf->source);
 		return;
 	}
-
-	if (!tf->effect) {
-		// Effect failed to load, skip rendering
-		if (tf->source) {
-			obs_source_skip_video_filter(tf->source);
-		}
+	// Until the first matching frame/mask pair is ready, draw transparent output.
+	// Passing the input through here would briefly expose the raw background on
+	// startup or resize. An actual inference failure still preserves the input.
+	if (!tf->displayReady || gs_texture_get_width(tf->displayTexture) != width ||
+	    gs_texture_get_height(tf->displayTexture) != height)
 		return;
-	}
-
-	gs_texture_t *alphaTexture = nullptr;
-	{
-		std::lock_guard<std::mutex> lock(tf->outputLock);
-
-		if (tf->backgroundMask.empty()) {
-			// Preserve the input if no mask could be produced.
-			// Inference failures are reported through camera_status.
-			if (tf->source) {
-				obs_source_skip_video_filter(tf->source);
-			}
-			return;
-		}
-
-		alphaTexture = gs_texture_create(tf->backgroundMask.cols, tf->backgroundMask.rows, GS_R8, 1,
-						 (const uint8_t **)&tf->backgroundMask.data, 0);
-
-		if (!alphaTexture) {
-			obs_log(LOG_ERROR, "Failed to create alpha texture");
-			if (tf->source) {
-				obs_source_skip_video_filter(tf->source);
-			}
-			return;
-		}
-	}
+	gs_texture_t *alphaTexture = tf->alphaTexture;
 
 	// Output the masked image
 	gs_texture_t *blurredTexture = blur_background(tf, width, height, alphaTexture);
-
-	if (!obs_source_process_filter_begin(tf->source, GS_RGBA, OBS_ALLOW_DIRECT_RENDERING)) {
-		if (tf->source) {
-			obs_source_skip_video_filter(tf->source);
-		}
-		gs_texture_destroy(alphaTexture);
-		gs_texture_destroy(blurredTexture);
+	if (tf->blurBackground > 0 && !blurredTexture) {
+		obs_source_skip_video_filter(tf->source);
 		return;
 	}
 
@@ -932,10 +1115,11 @@ void background_filter_video_render(void *data, gs_effect_t *_effect)
 		techName = "DrawWithoutBlur";
 	}
 
-	obs_source_process_filter_tech_end(tf->source, tf->effect, 0, 0, techName);
+	gs_effect_set_texture(gs_effect_get_param_by_name(tf->effect, "image"), tf->displayTexture);
+	while (gs_effect_loop(tf->effect, techName)) {
+		gs_draw_sprite(tf->displayTexture, 0, width, height);
+	}
 
 	gs_blend_state_pop();
 
-	gs_texture_destroy(alphaTexture);
-	gs_texture_destroy(blurredTexture);
 }

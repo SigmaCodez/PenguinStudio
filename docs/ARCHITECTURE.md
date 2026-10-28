@@ -19,6 +19,24 @@ Selection refresh does not retain source references between events, and both
 workspace timers stop before the OBS shutdown sequence. The native mixer,
 canvas renderer, source tools and dialogs continue to use the OBS engine.
 
+## Qt Quick navigation and camera workers
+
+The `penguin-quick-workspace` module provides the scene/navigation sidebar,
+searchable application commands and settings navigation. Native Qt Widgets
+continue to own settings values, source controls, dialogs and output actions.
+The simplified layout hides duplicate shortcuts without replacing their underlying
+controllers. Layout migration preserves the previous arrangement for restoration.
+
+Camera preprocessing uses a bounded Rust library with no downloaded crate
+dependencies. One background task performs primary inference and hand recovery,
+publishing the matching color frame and mask together. A slow inference repeats
+the previous complete pair instead of blocking rendering or accumulating a queue.
+GPU work stays in its separate helper process, with bounded waits and CPU fallback.
+
+The Linux GPU status sampler reads the selected rendering device's driver counter
+outside the UI thread. It reports whole-device utilization, not application-only
+load; absent or stale data is displayed as unavailable.
+
 ## Output module
 
 `plugins/penguin-outputs` is built into the standard plugin set when the frontend is enabled. It creates a native Qt dock and first-run connection wizard using the public frontend API. Destinations use `rtmp_custom` services and `rtmp_output` outputs, with their own H.264 video and AAC audio encoders.
@@ -31,7 +49,7 @@ There is no promise of eight simultaneous hardware sessions: that depends on the
 
 `plugins/penguin-platforms` is a separate native Qt Widgets/Network dock. It has no embedded browser dependency. Twitch uses the public-client device grant and the Helix channel update API. YouTube uses a system-browser desktop authorization flow with PKCE, random state, a loopback-only ephemeral callback listener and the Data API.
 
-Network calls use TLS verification, finite timeouts, bounded response buffers, explicit redirect rejection and generation identifiers to reject callbacks from disconnected sessions. Tokens remain in memory. YouTube title changes read the existing video snippet and preserve other mutable fields when updating it.
+Network calls use TLS verification, finite timeouts, bounded response buffers, explicit redirect rejection and generation identifiers to reject callbacks from disconnected sessions. Active tokens remain in memory; supported system-keychain storage restores authorized accounts after restart. YouTube title changes read the existing video snippet and preserve other mutable fields when updating it.
 
 Metadata authorization does not configure an RTMP encoder or fetch a stream key. The output wizard remains a separate explicit server/key connection. This avoids claiming native account integration for providers whose public APIs or account eligibility do not permit it.
 

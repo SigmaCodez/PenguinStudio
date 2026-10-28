@@ -95,6 +95,15 @@ public:
 
 	const char *name;
 
+	// Models opt into writing their already allocated tensor directly. Returning
+	// false preserves the original preprocessing path for other models/builds.
+	virtual bool prepareBGRAInput(const cv::Mat &, uint32_t, uint32_t,
+				      std::vector<std::vector<float>> &)
+	{
+		return false;
+	}
+
+
 #if _WIN32
 	const std::wstring
 #else
@@ -300,6 +309,12 @@ public:
 
 	virtual void postprocessOutput(cv::Mat &output)
 	{
+		// A single-channel tensor already has the same CHW and HWC layout.
+		// Keep the original storage instead of allocating and copying the alpha
+		// plane twice. ModelRVM still runs hand recovery after this base method.
+		if (output.channels() == 1) {
+			return;
+		}
 		cv::Mat outputTransposed;
 		chw_to_hwc_32f(output, outputTransposed);
 		outputTransposed.copyTo(output);

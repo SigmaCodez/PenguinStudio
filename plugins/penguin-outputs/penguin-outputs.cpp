@@ -1,5 +1,10 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 #include "../../frontend/utility/PenguinHardwareEncoder.hpp"
+#include "creator-tools.hpp"
+#include "upload-rate.hpp"
+#include <util/platform.h>
+#include <QMainWindow>
+#include <QStatusBar>
 #include <obs-module.h>
 #include <obs-frontend-api.h>
 #include <obs.hpp>
@@ -319,6 +324,7 @@ public:
 };
 
 struct RunningOutput {
+	UploadRate uploadRate;
 	obs_output_t *output = nullptr;
 	obs_service_t *service = nullptr;
 	obs_encoder_t *video = nullptr;
@@ -562,6 +568,58 @@ class OutputDock final : public QWidget {
 	QPushButton *start;
 	QPushButton *stop;
 	QTimer timer;
+	QPointer<QLabel> uploadLabel;
+	UploadRate primaryRate;
+	uint64_t lastUploadSample = 0;
+	bool primaryStarting = false;
+
+	void UpdateUpload(bool force = false)
+	{
+		const uint64_t now = os_gettime_ns();
+		if (!force && lastUploadSample && now - lastUploadSample < 1000000000ULL)
+			return;
+		lastUploadSample = now;
+		double kbps = 0.0;
+		int count = 0;
+		bool reconnecting = false;
+		OBSOutputAutoRelease primary = obs_frontend_get_streaming_output();
+		if (primary && obs_output_active(primary)) {
+			++count;
+			if (obs_output_reconnecting(primary)) {
+				primaryRate.Reset();
+				reconnecting = true;
+			} else {
+				kbps += primaryRate.Sample(obs_output_get_total_bytes(primary), now);
+			}
+		} else {
+			primaryRate.Reset();
+		}
+		for (const auto &entry : entries) {
+			if (!entry->running)
+				continue;
+			auto &running = *entry->running;
+			++count;
+			if (running.reconnecting.load() || !running.started.load()) {
+				running.uploadRate.Reset();
+				reconnecting |= running.reconnecting.load();
+			} else {
+				kbps += running.uploadRate.Sample(obs_output_get_total_bytes(running.output), now);
+			}
+		}
+		if (uploadLabel) {
+			const QString value = count ? (kbps >= 1000.0 ? QString::number(kbps / 1000.0, 'f', 1) + " Mbps" : QString::number(kbps, 'f', 0) + " kbps") : QStringLiteral("—");
+			const QString text = Text("Penguin.Upload.Value").arg(value);
+			if (uploadLabel->text() != text)
+				uploadLabel->setText(text);
+			const QString tip = Text("Penguin.Upload.Tooltip").arg(count) +
+				(reconnecting ? "\n" + Text("Penguin.Reconnecting") : QString());
+			if (uploadLabel->toolTip() != tip)
+				uploadLabel->setToolTip(tip);
+		}
+		if (!count && !primaryStarting)
+			timer.stop();
+	}
+
 	std::vector<std::unique_ptr<Entry>> entries;
 	QPointer<ConnectionWizard> activeWizard;
 	bool setupShown = false;
@@ -734,6 +792,7 @@ class OutputDock final : public QWidget {
 		} else {
 			entry.status = Text("Penguin.Starting");
 			entry.running = std::move(running);
+			timer.start(250);
 		}
 		Refresh();
 	}
@@ -781,6 +840,7 @@ class OutputDock final : public QWidget {
 		if (changed) {
 			Refresh();
 		}
+		UpdateUpload();
 	}
 
 	void MaybeShowSetup()
@@ -925,11 +985,22 @@ public:
 			}
 		});
 		connect(destinations, &QTreeWidget::itemSelectionChanged, this, [this]() { UpdateButtons(); });
+		timer.setParent(this);
+		timer.setObjectName("penguinOutputMonitor");
 		connect(&timer, &QTimer::timeout, this, [this]() { Tick(); });
-		timer.start(250);
+		if (auto *main = qobject_cast<QMainWindow *>(parent)) {
+			uploadLabel = new QLabel(main->statusBar());
+			uploadLabel->setObjectName("penguinUploadRate");
+			uploadLabel->setText(Text("Penguin.Upload.Value").arg(QStringLiteral("—")));
+			uploadLabel->setAlignment(Qt::AlignCenter);
+			uploadLabel->setContentsMargins(10, 5, 10, 5);
+			main->statusBar()->addPermanentWidget(uploadLabel);
+		}
 		Load();
 		Refresh();
 	}
+
+	~OutputDock() override { delete uploadLabel.data(); }
 
 	void StopImmediately()
 	{
@@ -944,6 +1015,19 @@ public:
 
 	void Event(obs_frontend_event event)
 	{
+		if (event == OBS_FRONTEND_EVENT_FINISHED_LOADING) {
+			UpdateUpload(true);
+			if (obs_frontend_streaming_active()) timer.start(250);
+		}
+		if (event == OBS_FRONTEND_EVENT_STREAMING_STARTING || event == OBS_FRONTEND_EVENT_STREAMING_STARTED) {
+			primaryStarting = event == OBS_FRONTEND_EVENT_STREAMING_STARTING;
+			primaryRate.Reset();
+			timer.start(250);
+		} else if (event == OBS_FRONTEND_EVENT_STREAMING_STOPPED) {
+			primaryStarting = false;
+			primaryRate.Reset();
+			UpdateUpload(true);
+		}
 		if (event == OBS_FRONTEND_EVENT_FINISHED_LOADING && !setupShown) {
 			QTimer::singleShot(800, this, [this]() { MaybeShowSetup(); });
 		} else if (event == OBS_FRONTEND_EVENT_PROFILE_CHANGING ||
@@ -957,6 +1041,7 @@ public:
 			}
 			timer.stop();
 			StopImmediately();
+			delete uploadLabel.data();
 		} else if (event == OBS_FRONTEND_EVENT_SCENE_CHANGED ||
 			   event == OBS_FRONTEND_EVENT_TRANSITION_CHANGED) {
 			for (auto &entry : entries) {
@@ -985,11 +1070,13 @@ void FrontendEvent(obs_frontend_event event, void *)
 bool obs_module_load(void)
 {
 	frontendShutdown = false;
+	RegisterCreatorTools();
 	return true;
 }
 
 void obs_module_post_load(void)
 {
+	OpenCreatorTools();
 	auto *parent = static_cast<QWidget *>(obs_frontend_get_main_window());
 	if (!parent) {
 		return;
@@ -1004,6 +1091,7 @@ void obs_module_post_load(void)
 
 void obs_module_unload(void)
 {
+	CloseCreatorTools();
 	// OBS destroys its frontend callbacks immediately after the EXIT event.
 	if (frontendShutdown) {
 		return;

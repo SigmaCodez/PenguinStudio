@@ -15,7 +15,7 @@ struct Release {
 };
 inline QString PackageName(const QString &version, const QString &target)
 {
-	if (target == "ubuntu24.04" || target == "ubuntu26.04") {
+	if (target == "ubuntu24.04" || target == "ubuntu26.04" || target == "ubuntu26.10") {
 		return "penguin-studio_" + version + "-1+" + target + "_amd64.deb";
 	}
 	if (target == "fedora44") {

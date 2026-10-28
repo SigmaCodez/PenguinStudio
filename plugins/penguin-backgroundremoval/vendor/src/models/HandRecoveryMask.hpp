@@ -22,14 +22,17 @@ inline void MergeSupportedHandRecovery(cv::Mat &alpha, const cv::Mat &skin)
 			}
 		}
 	}
-	cv::Mat allowed = cv::Mat::zeros(skin.size(), CV_32F);
+	// Eligibility is constant for a component. Compute it once instead of
+	// repeating count conversion and threshold comparisons for every pixel.
+	std::vector<float> eligible(count, 0.0f);
+	for (int id = 1; id < count; ++id)
+		eligible[id] = support[id] > area[id] * 0.15f ? 1.0f : 0.0f;
+	cv::Mat allowed(skin.size(), CV_32F);
 	for (int y = 0; y < labels.rows; ++y) {
 		const int *ids = labels.ptr<int>(y);
 		float *row = allowed.ptr<float>(y);
 		for (int x = 0; x < labels.cols; ++x) {
-			const int id = ids[x];
-			if (id && support[id] > area[id] * 0.15f)
-				row[x] = 1.0f;
+			row[x] = eligible[ids[x]];
 		}
 	}
 	cv::GaussianBlur(allowed, allowed, cv::Size(3, 3), 0);

@@ -1,7 +1,7 @@
 # Camera appearance
 
 Select a camera or another video source and open **Camera appearance** in the
-source Inspector. Use the Inspector to manage background removal together with camera shapes.
+source Inspector. Select **Inspector** in the workspace navigation to manage background removal together with camera shapes.
 The Filters dialog exposes the individual appearance and matting filters.
 
 ![Camera appearance controls in the source Inspector](images/current/camera-en.png)
@@ -23,7 +23,7 @@ the optional compatible GPU runtime when available and fall back to CPU if
 preparation or processing fails. GPU preparation runs in a separate helper; the
 Inspector shows its status. CPU explicitly keeps inference on the CPU.
 
-The optional Ubuntu 26.04 AMD add-on enables primary matting on the tested
+The optional Ubuntu 26.04/26.10 AMD add-on enables primary matting on the tested
 RX 9070 XT; hand preservation continues on CPU. See [GPU setup](PACKAGING.md#optional-amd-camera-gpu-runtime).
 Other package/hardware combinations retain CPU processing unless a compatible
 runtime is provided. Existing scenes with an explicit CPU preference keep that
@@ -58,7 +58,7 @@ See `plugins/penguin-backgroundremoval/PROVENANCE.md` for the RVM plugin,
 model licenses and exact upstream revision. The legacy model retains its notices
 in `plugins/penguin-camera/data/MODEL-NOTICE.txt`.
 
-Current English interface, captured from Penguin Studio 0.7.1. The sample artwork demonstrates rounded corners; it is not a webcam or an AI-removal quality demonstration.
+Current English interface, captured from Penguin Studio 0.7.2. The sample artwork demonstrates rounded corners; it is not a webcam or an AI-removal quality demonstration.
 
 ## Validation
 

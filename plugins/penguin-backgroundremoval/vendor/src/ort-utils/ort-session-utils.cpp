@@ -99,24 +99,17 @@ bool runFilterModelInference(filter_data *tf, const cv::Mat &imageBGRA, cv::Mat 
 		return false;
 	}
 
-	// To RGB
-	cv::Mat imageRGB;
-	cv::cvtColor(imageBGRA, imageRGB, cv::COLOR_BGRA2RGB);
-
-	// Resize to network input size
 	uint32_t inputWidth, inputHeight;
 	tf->model->getNetworkInputSize(tf->inputDims, inputWidth, inputHeight);
-
-	cv::Mat resizedImageRGB;
-	cv::resize(imageRGB, resizedImageRGB, cv::Size(inputWidth, inputHeight));
-
-	// Prepare input to nework
-	cv::Mat resizedImage, preprocessedImage;
-	resizedImageRGB.convertTo(resizedImage, CV_32F);
-
-	tf->model->prepareInputToNetwork(resizedImage, preprocessedImage);
-
-	tf->model->loadInputToTensor(preprocessedImage, inputWidth, inputHeight, tf->inputTensorValues);
+	if (!tf->model->prepareBGRAInput(imageBGRA, inputWidth, inputHeight, tf->inputTensorValues)) {
+		// Keep the established path for non-RVM models and Rust-disabled builds.
+		cv::Mat imageRGB, resizedImageRGB, resizedImage, preprocessedImage;
+		cv::cvtColor(imageBGRA, imageRGB, cv::COLOR_BGRA2RGB);
+		cv::resize(imageRGB, resizedImageRGB, cv::Size(inputWidth, inputHeight));
+		resizedImageRGB.convertTo(resizedImage, CV_32F);
+		tf->model->prepareInputToNetwork(resizedImage, preprocessedImage);
+		tf->model->loadInputToTensor(preprocessedImage, inputWidth, inputHeight, tf->inputTensorValues);
+	}
 
 	// Run network inference
 	tf->model->runNetworkInference(tf->session, tf->inputNames, tf->outputNames, tf->inputTensor, tf->outputTensor);

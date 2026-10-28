@@ -12,7 +12,7 @@ on:
         description: Package builds to run
         type: choice
         default: all
-        options: [all, deb, deb-26.04, rpm, flatpak, snap, appimage, aur]
+        options: [all, deb, deb-26.04, deb-26.10, rpm, flatpak, snap, appimage, aur]
       publish:
         description: Publish all packages for the current version (main only)
         type: boolean
@@ -102,6 +102,8 @@ jobs:
         run: |
           c++ -std=c++17 -Wall -Wextra -Werror -fPIC -I. test/penguin-update-policy.cpp $(pkg-config --cflags --libs Qt6Core) -o /tmp/penguin-update-test
           /tmp/penguin-update-test
+          c++ -std=c++17 -Wall -Wextra -Werror -fPIC -I. test/penguin-gpu-usage.cpp $(pkg-config --cflags --libs Qt6Core) -o /tmp/penguin-gpu-usage-test
+          /tmp/penguin-gpu-usage-test
           c++ -std=c++17 -Wall -Wextra -Werror -fPIC -I. test/penguin-twitch-chat.cpp $(pkg-config --cflags --libs Qt6Widgets Qt6Network Qt6WebSockets) -o /tmp/penguin-chat-test
           QT_QPA_PLATFORM=offscreen /tmp/penguin-chat-test
           c++ -std=c++17 -Wall -Wextra -Werror -fPIC -I. test/penguin-chat-actions.cpp $(pkg-config --cflags --libs Qt6Widgets Qt6Network Qt6WebSockets) -o /tmp/penguin-chat-actions
@@ -159,7 +161,7 @@ jobs:
   deb:
     needs: [version, checks]
     name: Ubuntu ${{ matrix.ubuntu }} DEB (amd64)
-    if: github.event_name != 'workflow_dispatch' || inputs.packages == 'all' || startsWith(inputs.packages, 'deb') || inputs.packages == 'appimage' || inputs.packages == 'aur'
+    if: github.event_name != 'workflow_dispatch' || inputs.packages == 'all' || inputs.packages == 'deb' || inputs.packages == 'deb-26.04' || inputs.packages == 'appimage' || inputs.packages == 'aur'
     strategy:
       fail-fast: false
       matrix:
@@ -203,9 +205,9 @@ jobs:
         run: |
           c++ -std=c++17 -Wall -Wextra -Werror -Ilibobs test/penguin-camera-threads.cpp -lobs -o /tmp/penguin-camera-threads
           /tmp/penguin-camera-threads
-          sudo apt-get install -y --no-install-recommends xvfb xauth
+          sudo apt-get install -y --no-install-recommends xvfb xauth dbus-daemon
           c++ -std=c++17 -shared -fPIC -Wall -Wextra -Werror test/penguin-camera-gui.cpp $(pkg-config --cflags --libs Qt6Widgets) -I/usr/include/obs -lobs -lobs-frontend-api -o /tmp/penguin-camera-gui.so
-          xvfb-run -a env QT_QPA_PLATFORM=xcb LIBGL_ALWAYS_SOFTWARE=1 PENGUIN_CAMERA_HEADLESS=1 bash scripts/packaging/test-camera.sh /tmp/penguin-camera-gui.so /tmp/penguin-camera-test
+          xvfb-run -a dbus-run-session -- env QT_QPA_PLATFORM=xcb LIBGL_ALWAYS_SOFTWARE=1 PENGUIN_CAMERA_HEADLESS=1 bash scripts/packaging/test-camera.sh /tmp/penguin-camera-gui.so /tmp/penguin-camera-test
       - name: Preserve camera test diagnostics
         if: failure()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
@@ -220,6 +222,75 @@ jobs:
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: penguin-studio-ubuntu-${{ matrix.ubuntu }}-amd64
+          path: build_penguin_deb/*.deb*
+          if-no-files-found: error
+  deb-2610:
+    needs: [version, checks]
+    name: Ubuntu 26.10 DEB (amd64)
+    if: github.event_name != 'workflow_dispatch' || inputs.packages == 'all' || inputs.packages == 'deb' || inputs.packages == 'deb-26.10'
+    runs-on: ubuntu-24.04
+    container: ubuntu:26.10
+    steps:
+      - name: Install checkout prerequisites
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends git ca-certificates sudo dbus-bin
+          mkdir -p /var/lib/dbus
+          dbus-uuidgen --ensure
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          submodules: recursive
+          fetch-depth: 0
+      - name: Configure Ubuntu package downloads
+        run: sudo --preserve-env=GITHUB_ACTIONS bash scripts/packaging/configure-ci-apt.sh
+      - name: Install build dependencies
+        run: sudo bash scripts/packaging/install-build-deps.sh
+      - name: Configure publisher YouTube browser sign-in
+        env:
+          PENGUIN_YOUTUBE_CLIENT_ID: ${{ secrets.PENGUIN_YOUTUBE_CLIENT_ID }}
+          PENGUIN_YOUTUBE_CLIENT_SECRET: ${{ secrets.PENGUIN_YOUTUBE_CLIENT_SECRET }}
+          REQUIRE_YOUTUBE: ${{ needs.version.outputs.publish }}
+        run: |
+          if [ "$REQUIRE_YOUTUBE" = "true" ]; then
+            python3 scripts/packaging/configure-youtube.py --required
+          else
+            python3 scripts/packaging/configure-youtube.py
+          fi
+      - name: Compile and package
+        run: bash scripts/packaging/build-native.sh DEB
+      - name: Verify compiled YouTube configuration
+        run: python3 scripts/packaging/configure-youtube.py --verify build_penguin_deb
+      - name: Validate DEB preflight
+        run: |
+          python3 test/penguin-deb-install.py
+          bash scripts/packaging/install-deb.sh --check build_penguin_deb/penguin-studio_*.deb
+      - name: Inspect package metadata
+        run: dpkg-deb --info build_penguin_deb/penguin-studio_*.deb
+      - name: Install DEB and verify launcher
+        run: |
+          sudo apt-get install -y ./build_penguin_deb/penguin-studio_*.deb
+          penguin-studio --version
+      - name: Exercise camera shapes and local background removal
+        run: |
+          c++ -std=c++17 -Wall -Wextra -Werror -Ilibobs test/penguin-camera-threads.cpp -lobs -o /tmp/penguin-camera-threads
+          /tmp/penguin-camera-threads
+          sudo apt-get install -y --no-install-recommends xvfb xauth dbus-daemon
+          c++ -std=c++17 -shared -fPIC -Wall -Wextra -Werror test/penguin-camera-gui.cpp $(pkg-config --cflags --libs Qt6Widgets) -I/usr/include/obs -lobs -lobs-frontend-api -o /tmp/penguin-camera-gui.so
+          xvfb-run -a dbus-run-session -- env QT_QPA_PLATFORM=xcb LIBGL_ALWAYS_SOFTWARE=1 PENGUIN_CAMERA_HEADLESS=1 bash scripts/packaging/test-camera.sh /tmp/penguin-camera-gui.so /tmp/penguin-camera-test
+      - name: Preserve camera test diagnostics
+        if: failure()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: penguin-camera-debug-ubuntu-26.10
+          path: |
+            build_penguin_deb/*.deb
+            /tmp/penguin-camera-test/application.log
+            /tmp/penguin-camera-test/result.json
+            /tmp/penguin-camera-test/source.json
+          if-no-files-found: ignore
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: penguin-studio-ubuntu-26.10-amd64
           path: build_penguin_deb/*.deb*
           if-no-files-found: error
   rpm:
@@ -331,7 +402,7 @@ jobs:
       - name: Install packaging dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends qt6-base-dev qt6-svg-dev qt6-svg-plugins qt6-wayland patchelf file desktop-file-utils xvfb xauth libgl1-mesa-dri
+          sudo apt-get install -y --no-install-recommends qt6-base-dev qt6-declarative-dev qt6-svg-dev qt6-svg-plugins qt6-wayland patchelf file desktop-file-utils xvfb xauth libgl1-mesa-dri
           sudo apt-get install -y --no-remove ./deb-artifact/*.deb
       - name: Bundle and verify AppImage
         run: bash scripts/packaging/build-appimage.sh deb-artifact/*.deb
@@ -397,17 +468,19 @@ jobs:
           if-no-files-found: error
   amd-camera:
     needs: version
-    name: Optional AMD RX 9070 camera runtime (Ubuntu 26.04)
-    if: github.event_name != 'workflow_dispatch' || inputs.packages == 'all' || inputs.packages == 'deb-26.04'
+    name: Optional AMD RX 9070 camera runtime (Ubuntu 26.04 and 26.10)
+    if: github.event_name != 'workflow_dispatch' || inputs.packages == 'all' || inputs.packages == 'deb' || inputs.packages == 'deb-26.04' || inputs.packages == 'deb-26.10'
     runs-on: ubuntu-26.04
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: Stage verified private AMD libraries
         run: python3 scripts/packaging/prepare-amd-camera-runtime.py "$RUNNER_TEMP/penguin-amd" --architecture gfx1201
       - name: Build optional runtime package
-        run: python3 scripts/packaging/build-amd-camera-addon.py "$RUNNER_TEMP/penguin-amd" amd-artifact
+        run: |
+          python3 scripts/packaging/build-amd-camera-addon.py "$RUNNER_TEMP/penguin-amd" amd-artifact --ubuntu-release 26.04
+          python3 scripts/packaging/build-amd-camera-addon.py "$RUNNER_TEMP/penguin-amd" amd-artifact --ubuntu-release 26.10
       - name: Inspect runtime package
-        run: dpkg-deb --info amd-artifact/*.deb
+        run: for package in amd-artifact/*.deb; do dpkg-deb --info "$package"; done
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: penguin-studio-amd-camera-gfx1201
@@ -415,7 +488,7 @@ jobs:
           if-no-files-found: error
   release:
     name: Publish complete Linux download set
-    needs: [version, checks, flatpak, deb, rpm, snap, appimage, aur, amd-camera]
+    needs: [version, checks, flatpak, deb, deb-2610, rpm, snap, appimage, aur, amd-camera]
     if: needs.version.outputs.publish == 'true'
     runs-on: ubuntu-24.04
     permissions:

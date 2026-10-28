@@ -164,6 +164,24 @@ int main(int argc, char **argv)
 		Require(HasStatus(dialog, "Penguin.Update.Current") && !install->isEnabled(),
 			"Empty channel incorrectly offers install");
 	}
+	{
+		Transport network;
+		updater = new Updater(&parent, &network, "ubuntu26.04");
+		config_set_bool(configuration, "General", "EnableAutoUpdates", true);
+		config_set_int(configuration, "PenguinUpdates", "LastCheck", QDateTime::currentSecsSinceEpoch());
+		CheckPenguinLinuxUpdates(&parent, false);
+		Require(network.calls.size() == 1, "Recent check incorrectly suppresses startup check");
+		CheckPenguinLinuxUpdates(&parent, false);
+		Require(network.calls.size() == 1, "In-flight startup check duplicated");
+		network.calls[0]->Complete(200, "[]");
+		CheckPenguinLinuxUpdates(&parent, false);
+		Require(network.calls.size() == 2, "Subsequent startup-style check suppressed");
+		network.calls[1]->Complete(200, "[]");
+		config_set_bool(configuration, "General", "EnableAutoUpdates", false);
+		CheckPenguinLinuxUpdates(&parent, false);
+		Require(network.calls.size() == 2, "Explicit automatic-update opt-out ignored");
+		delete updater.data();
+	}
 	config_close(configuration);
 	std::cout << "Updater HTTP errors, checksum rejection, size cap and active-output exclusion passed\n";
 }

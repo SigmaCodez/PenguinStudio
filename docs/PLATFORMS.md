@@ -1,12 +1,12 @@
 # Platform connections and Wayland
 
-![English stream details dock in Penguin Studio 0.7.1](images/current/stream-details-en.png)
+![English stream details dock in Penguin Studio 0.7.2](images/current/stream-details-en.png)
 
-Current 0.7.1 interface before sign-in. This preview contains no account information.
+Current 0.7.2 interface before sign-in. This preview contains no account information.
 
 ## Twitch
 
-1. Open **Docks → Stream details → Twitch** and select **Connect with Twitch**.
+1. Open **Details → Twitch** and select **Connect with Twitch**.
 2. Penguin opens the official Twitch activation page in your system browser. Enter the displayed device code and authorize the application. No Twitch password is entered into Penguin Studio.
 3. Use **Load current stream details** to retrieve the current title and category name, or enter a title and select an optional category from the searchable game list, then select **Update stream details**.
 4. Open **Docks → Stream chat → Twitch**. The native dock reads and sends messages in the connected account's channel on Wayland as well as X11. It follows chat deletion/clear events and reconnects after connection loss. Right-click messages for moderation, open Chat settings for chat modes, or use Chat participants for connected/recent chatters and session bans. The implementation displays plain text, including emote names; it does not embed Twitch's web dashboard or render third-party emote extensions.
@@ -19,7 +19,7 @@ References: [device grant](https://dev.twitch.tv/docs/authentication/getting-tok
 
 ## YouTube
 
-1. Open **Docks → Stream details → YouTube** and select **Connect with YouTube**.
+1. Open **Details → YouTube** and select **Connect with YouTube**.
 2. Complete account selection and authorization in your system browser. Penguin restores saved sign-ins from the system keyring on subsequent starts.
 3. Create or schedule a broadcast in [YouTube Studio](https://studio.youtube.com), load your broadcasts in Penguin, select one, and update its title.
 4. Open **Docks → Stream chat → YouTube** and load an active broadcast to read, send and moderate its chat. **People / moderation** shows recent chatters and bans created in this session. See the [chat guide](CHAT.md) for permissions, viewer counts, polling and platform limitations.

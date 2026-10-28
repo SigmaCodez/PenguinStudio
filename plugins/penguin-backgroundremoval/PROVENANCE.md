@@ -89,5 +89,18 @@ matting, not that every processing step runs on the graphics card.
 
 Hand recovery runs in parallel in the application's existing CPU runtime while
 the isolated worker processes primary RVM only. This avoids depending on the
-AMD runtime's CPU hand performance. The helper has a bounded 40 ms frame
-transaction deadline and CPU processing remains available if it fails.
+AMD runtime's CPU hand performance. The helper has a bounded 250 ms background
+transaction watchdog and CPU processing remains available if it fails.
+
+The local asynchronous frame path runs primary inference and hand recovery off
+the graphics thread. It retains one in-flight input and publishes its color and
+mask together; no newer camera frame is combined with an older mask. Normal
+operation adds one video-tick latency (about 33 ms at 30 FPS). If inference is
+late, the last complete pair remains visible; `camera_status` exposes completed
+frames and busy video ticks rather than hiding those repeats behind render-loss
+counters. There is no unbounded queue. Updates and destruction drain the accepted
+job before replacing or freeing model state. Model files and notices are unchanged.
+Before the first complete frame/mask pair, and after a size change, output remains
+transparent instead of flashing the unprocessed background. Actual inference
+failures retain the visible input fallback. The camera pixel regression test
+checks this first-render behavior without allowing an intervening video tick.

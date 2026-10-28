@@ -1,0 +1,13 @@
+{
+  "build": "0.7.2-0+ubuntu26.04.classic8",
+  "locale": "en-US",
+  "captured_at": "2026-10-28",
+  "source": "Installed application under Wayland, isolated synthetic profile, loopback stream only. Native status-bar widget capture.",
+  "images": [
+    {
+      "file": "upload-status-en.png",
+      "sha256": "d0efc7d2bbce2e4a59b1a8edc12b6f306bf0ff278d274f0309722a3ddfde45dc",
+      "visually_reviewed": true
+    }
+  ]
+}

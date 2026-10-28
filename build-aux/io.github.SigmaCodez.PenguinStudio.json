@@ -190,7 +190,9 @@
                 "-DFETCHCONTENT_SOURCE_DIR_PENGUIN_ORT=/run/build/penguin-studio/onnxruntime",
                 "-DFETCHCONTENT_SOURCE_DIR_PENGUIN_CV=/run/build/penguin-studio/opencv",
                 "-DCMAKE_INCLUDE_PATH=/app/include;/usr/include",
-                "-DENABLE_FLATPAK=ON"
+                "-DENABLE_FLATPAK=ON",
+                "-DPENGUIN_RUST_PREPROCESS=ON",
+                "-DPENGUIN_QUICK_WORKSPACE_PREVIEW=OFF"
             ],
             "secret-opts": [
                 "-DRESTREAM_CLIENTID=$RESTREAM_CLIENTID",
@@ -225,5 +227,11 @@
                 }
             ]
         }
-    ]
+    ],
+    "sdk-extensions": [
+        "org.freedesktop.Sdk.Extension.rust-stable"
+    ],
+    "build-options": {
+        "append-path": "/usr/lib/sdk/rust-stable/bin"
+    }
 }

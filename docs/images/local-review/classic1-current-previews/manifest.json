@@ -1,0 +1,26 @@
+{
+  "version": "0.7.2",
+  "language": "en-US",
+  "source_commit": "dee756de22caf2c20c77c0612fd25658cc3dca0c",
+  "local_changes": "Classic workspace rollback: 0.7.1 theme restored; Qt Quick navigation excluded. This is an unpublished local candidate, not the unmodified source commit.",
+  "package": "0.7.2-0+ubuntu26.04.classic1",
+  "package_sha256": "61dbb70589dc73cc3f0cbbf5735b3014f9d0741202bf398ad0ebcd33fdaef41b",
+  "captured_on": "2026-10-27",
+  "capture_method": "XComposite capture of the extracted local Ubuntu DEB under XWayland; isolated English profile. Native Wayland verified separately.",
+  "content": "Synthetic local artwork and audio only; no private webcam, desktop or connected accounts.",
+  "visual_review": "All three captures inspected: classic Layers/Scenes layout, native Inspector/Outputs/Details tabs, charcoal theme, centered production controls, GPU usage and disconnected platform details. English only. Camera shape uses synthetic artwork.",
+  "images": [
+    {
+      "file": "workspace-en.png",
+      "sha256": "a87b4ebd24d5e1e8f4eefd1fa09987799f03331953291c66a91e5d3dd4432c06"
+    },
+    {
+      "file": "camera-en.png",
+      "sha256": "1b4e8c2f927ae5ed6c48a453d49bc2f21e8f978f6098864cfd06c99b258f3c7d"
+    },
+    {
+      "file": "stream-details-en.png",
+      "sha256": "b76a76f0701e2b57e6a2e3a5c361c8ee1bc100da1f91468c5e69c82bdc9cac54"
+    }
+  ]
+}

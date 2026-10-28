@@ -2,9 +2,9 @@
 
 Penguin Studio organizes the native Qt application around a large canvas, searchable layers and scenes, audio channel strips, and an integrated production sidebar.
 
-![Penguin Studio 0.7.1 workspace in English](images/current/workspace-en.png)
+![Penguin Studio 0.7.2 workspace in English](images/current/workspace-en.png)
 
-These English previews were captured from the validated 0.7.1 Ubuntu package using an isolated demo profile and synthetic media.
+These English previews were captured from the validated 0.7.2 Ubuntu package using an isolated demo profile and synthetic media.
 
 ## Compose and inspect
 
@@ -25,6 +25,7 @@ The bottom mixer presents native volume controls, meters and monitoring settings
 - The live button's menu exposes **Stream details** and the separate primary stream toggle inherited from OBS. The primary stream's setup and credentials are separate from Penguin destinations.
 - **Record** uses the original recording controller. Its menu offers pause/resume when the recording mode supports it.
 - **Clip** saves the active replay buffer. Enable the replay buffer in Settings → Output and start it through **More** before saving clips.
+- **Privacy** hides the program picture and silences source audio while streaming or recording continues. Open **Penguin Studio → Tools → Creator tools** for stream checks, performance help and the audio assistant. See [Creator tools](CREATOR-TOOLS.md) for scope and controls.
 - **More** contains replay-buffer and virtual-camera controls, Settings, the original Controls and Scene Transitions docks, and Reset workspace.
 
 The top FPS readout comes from the running video engine. No simulated audio levels, output states or canvas previews are shown.
@@ -40,3 +41,13 @@ On the first launch with layout version 3, Penguin applies the new layout and ve
 ## Scope
 
 Portrait destinations currently crop or fit the program scene. The workspace does not imply an independently editable second portrait scene. Twitch/YouTube authorization, live-provider verification, capture devices and cross-distribution release checks retain the limits documented in [VERIFICATION.md](VERIFICATION.md).
+
+The Qt Quick navigation experiment is not shipped. The classic Qt Widgets layout, menus and settings are retained. GPU usage remains available in the status bar, and Settings → General includes a manual update check.
+
+## Upload bitrate
+
+The bottom-right **Upload** indicator measures combined outgoing data from the primary stream and Penguin streaming destinations, including landscape and portrait outputs. It includes audio and video, uses elapsed monotonic time, and refreshes once per second. Values use decimal kbps/Mbps. It does not include local recordings, other applications or independently managed third-party outputs. The existing primary-stream rate remains specific to that single stream; Upload is the combined total.
+
+Offline, the indicator shows a dash. A newly started or reconnecting connection needs a fresh sampling interval; zero can also indicate a stalled transmission. The tooltip explains the scope and number of active/starting destinations. Configured encoder bitrate is not substituted for measured throughput.
+
+The output monitor sleeps when no streams are active or starting, and wakes for a new stream. Unchanged status text and tooltips are not rewritten. This reduces idle wakeups without changing video encoding, camera effects or recording behavior.

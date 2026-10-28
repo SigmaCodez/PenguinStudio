@@ -1,0 +1,26 @@
+{
+  "version": "0.7.2",
+  "language": "en-US",
+  "source_commit": "dee756de22caf2c20c77c0612fd25658cc3dca0c",
+  "local_changes": "Classic workspace and creator tools with harmonized actions, shared surfaces and responsive privacy control. Unpublished local review build, not the unmodified base commit.",
+  "package": "0.7.2-0+ubuntu26.04.classic6",
+  "package_sha256": "12f59068db2913c7172b4b14d21ae56cd062041cb8b5f20e5634a1859a2b6f2d",
+  "captured_on": "2026-10-28",
+  "capture_method": "XComposite capture of the real application under XWayland using the tested classic6 module and theme over the unchanged installed classic5 payload; isolated English synthetic profile. Wayland tests run separately.",
+  "content": "Synthetic local artwork and audio only; no private webcam, desktop or connected accounts.",
+  "visual_review": "All three captures inspected: English labels, active synthetic preview, aligned production actions including the privacy shield, classic inspector, rounded camera shape, disconnected Twitch/YouTube details. No personal media or account identity.",
+  "images": [
+    {
+      "file": "workspace-en.png",
+      "sha256": "6d78a619072dab4957e5a4c61b95502d9606aa83fcc154dbe167f5da4c8fe5a5"
+    },
+    {
+      "file": "camera-en.png",
+      "sha256": "03749b32fe4bb437c77da948c81215339e4f5267204993bb5547d18c8d3b4248"
+    },
+    {
+      "file": "stream-details-en.png",
+      "sha256": "673de0756a3a2697c930ceb351d5943e5a71d941ffa48c494d3c1aff555c5f3f"
+    }
+  ]
+}

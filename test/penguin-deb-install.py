@@ -23,6 +23,12 @@ cases = [
     ('missing-dependency', version, arch, 'penguin-test-nonexistent-dependency', 100, 'not installable'),
 ]
 with tempfile.TemporaryDirectory(prefix='penguin-deb-preflight-') as folder:
+    # Keep real APT dependency resolution, but exclude installed application
+    # add-ons: fixtures must never propose downgrades/removals on the test host.
+    status = Path(folder) / 'status'
+    status.write_text('')
+    apt_config = Path(folder) / 'apt.conf'
+    apt_config.write_text(f'Dir::State::status "{status}";\n')
     for name, package_version, package_arch, depends, expected_code, expected_text in cases:
         stage = Path(folder) / name
         control = stage / 'DEBIAN'
@@ -34,7 +40,8 @@ with tempfile.TemporaryDirectory(prefix='penguin-deb-preflight-') as folder:
         deb = stage.with_suffix('.deb')
         subprocess.run(['dpkg-deb', '--root-owner-group', '--build', str(stage), str(deb)], check=True, capture_output=True)
         result = subprocess.run(['bash', str(root / 'scripts/packaging/install-deb.sh'), '--check', str(deb)],
-                                env=dict(os.environ, LC_ALL='C'), text=True, capture_output=True)
+                                env=dict(os.environ, LC_ALL='C', APT_CONFIG=str(apt_config)),
+                                text=True, capture_output=True)
         output = result.stdout + result.stderr
         assert result.returncode == expected_code, f'{name}: exit {result.returncode}: {output}'
         assert expected_text in output, f'{name}: {output}'

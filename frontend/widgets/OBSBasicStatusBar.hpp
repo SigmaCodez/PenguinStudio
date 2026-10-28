@@ -1,6 +1,7 @@
 #pragma once
 
 #include "StatusBarWidget.hpp"
+#include <utility/PenguinGPUUsage.hpp>
 
 #include <obs.hpp>
 
@@ -14,6 +15,8 @@ class OBSBasicStatusBar : public QStatusBar {
 
 private:
 	StatusBarWidget *statusWidget = nullptr;
+	PenguinGPUUsage gpuUsage;
+	uint32_t gpuAdapter = UINT32_MAX;
 
 	OBSWeakOutputAutoRelease streamOutput;
 	std::vector<OBSSignal> streamSigs;

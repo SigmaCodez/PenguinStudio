@@ -120,6 +120,15 @@ target_include_directories(penguin-gpu-worker PRIVATE
   "${penguin_ort_SOURCE_DIR}/include" "${penguin_cv_SOURCE_DIR}/modules/core/include"
   "${penguin_cv_SOURCE_DIR}/modules/imgproc/include" "${penguin_cv_BINARY_DIR}" "${CMAKE_BINARY_DIR}")
 target_link_libraries(penguin-gpu-worker PRIVATE OBS::libobs opencv_core opencv_imgproc ${CMAKE_DL_LIBS})
+# Staged opt-in until all Linux package builders have a verified Rust toolchain.
+option(PENGUIN_RUST_PREPROCESS "Use bounded Rust camera tensor and hand-mask processing" OFF)
+if(PENGUIN_RUST_PREPROCESS)
+  add_subdirectory(rust-preprocess)
+  target_link_libraries(penguin-gpu-worker PRIVATE penguin-rust-preprocess)
+  target_compile_definitions(penguin-gpu-worker PRIVATE PENGUIN_RUST_PREPROCESS=1)
+  target_link_libraries(obs-backgroundremoval PRIVATE penguin-rust-preprocess)
+  target_compile_definitions(obs-backgroundremoval PRIVATE PENGUIN_RUST_PREPROCESS=1)
+endif()
 set_property(TARGET penguin-gpu-worker PROPERTY COMPILE_WARNING_AS_ERROR OFF)
 install(TARGETS penguin-gpu-worker RUNTIME DESTINATION "${OBS_PLUGIN_DESTINATION}/penguin-camera" COMPONENT Runtime)
 
@@ -129,4 +138,12 @@ if(PENGUIN_CAMERA_GPU_RUNTIME_DIR)
     message(FATAL_ERROR "The optional camera GPU runtime is incomplete")
   endif()
   install(DIRECTORY "${PENGUIN_CAMERA_GPU_RUNTIME_DIR}/" DESTINATION "${OBS_PLUGIN_DESTINATION}/penguin-camera-gpu" COMPONENT Runtime)
+endif()
+
+if(PENGUIN_BUILD_TESTS)
+  find_package(Threads REQUIRED)
+  add_executable(penguin-camera-worker-test tests/single-task-worker.cpp)
+  target_compile_features(penguin-camera-worker-test PRIVATE cxx_std_20)
+  target_link_libraries(penguin-camera-worker-test PRIVATE Threads::Threads)
+  add_test(NAME penguin-camera-worker-lifetime COMMAND penguin-camera-worker-test)
 endif()

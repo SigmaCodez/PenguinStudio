@@ -69,7 +69,7 @@ QString Target()
 	QSettings os("/etc/os-release", QSettings::IniFormat);
 	const auto id = os.value("ID").toString();
 	const auto version = os.value("VERSION_ID").toString();
-	if (id == "ubuntu" && (version == "24.04" || version == "26.04")) {
+	if (id == "ubuntu" && (version == "24.04" || version == "26.04" || version == "26.10")) {
 		return "ubuntu" + version;
 	}
 	if (id == "fedora" && version == "44") {
@@ -261,6 +261,7 @@ protected:
 				focused->clearFocus();
 			}
 			QDialog::reject();
+			setWindowModality(Qt::NonModal);
 		}
 	}
 
@@ -360,6 +361,12 @@ public:
 	void Check(bool manual)
 	{
 		if (manual) {
+			if (auto *modal = QApplication::activeModalWidget(); modal && modal != this) {
+				// Settings is modal. Show a new modal dialog above it without changing
+				// ownership or closing/discarding the user's pending settings edits.
+				hide();
+				setWindowModality(Qt::ApplicationModal);
+			}
 			notification.stop();
 			Show();
 		}
@@ -427,11 +434,7 @@ void CheckPenguinLinuxUpdates(QWidget *parent, bool manual)
 		if (!config_get_bool(config, "General", "EnableAutoUpdates")) {
 			return;
 		}
-		const auto elapsed =
-			QDateTime::currentSecsSinceEpoch() - config_get_int(config, "PenguinUpdates", "LastCheck");
-		if (elapsed >= 0 && elapsed < 24 * 60 * 60) {
-			return;
-		}
+
 	}
 	if (!updater) {
 		updater = new Updater(parent);

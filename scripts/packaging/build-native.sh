@@ -26,15 +26,19 @@ cmake -S "$project_root" -B "$build_dir" -G Ninja \
   -DOBS_VERSION_OVERRIDE=33.0.0 -DENABLE_WAYLAND=ON -DENABLE_BROWSER=ON -DENABLE_NVENC=ON \
   -DCEF_ROOT_DIR="$cef_dir" -DENABLE_AJA=OFF -DENABLE_VLC=ON \
   -DENABLE_WEBRTC=OFF -DENABLE_LIBFDK=OFF -DPENGUIN_BUILD_TESTS=ON \
+  -DPENGUIN_RUST_PREPROCESS=ON -DPENGUIN_QUICK_WORKSPACE_PREVIEW=OFF \
   -DOBS_COMPILE_DEPRECATION_AS_WARNING=ON "${package_options[@]}"
 cmake -DPACKAGE_CONFIG="$build_dir/CPackConfig.cmake" -DPACKAGE_BUILD_DIR="$(realpath "$build_dir")" \
   -DPACKAGE_VERSION="$(cat "$project_root/packaging/version.txt")" \
   -P "$project_root/test/penguin-cpack.cmake"
 cmake --build "$build_dir" --parallel "${CMAKE_BUILD_PARALLEL_LEVEL:-2}"
 "$build_dir/plugins/penguin-camera/penguin-camera-model" "$project_root/plugins/penguin-camera/data/selfie_segmentation.onnx"
+cargo test --release --locked --offline --manifest-path "$project_root/plugins/penguin-backgroundremoval/rust-preprocess/Cargo.toml" --target-dir "$build_dir/rust-unit-tests"
 "$build_dir/frontend/penguin-hardware-encoder"
 QT_QPA_PLATFORM=offscreen "$build_dir/frontend/penguin-update-flow"
 "$build_dir/plugins/penguin-outputs/penguin-output-safety"
+"$build_dir/plugins/penguin-outputs/penguin-creator-audio-guard"
+"$build_dir/plugins/penguin-outputs/penguin-upload-rate"
 QT_QPA_PLATFORM=offscreen "$build_dir/plugins/penguin-platforms/penguin-platform-flow"
 QT_QPA_PLATFORM=offscreen "$build_dir/plugins/penguin-outputs/penguin-wizard-lifecycle"
 (cd "$build_dir" && cpack -G "$package_format")

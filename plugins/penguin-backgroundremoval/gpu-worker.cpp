@@ -9,6 +9,9 @@
 #include <filesystem>
 #include <iostream>
 #include <obs-module.h>
+#ifdef PENGUIN_RUST_PREPROCESS
+#include "rust-preprocess/preprocess.h"
+#endif
 #include "vendor/src/models/ModelRVM.hpp"
 #include "vendor/src/ort-utils/ORTModelData.hpp"
 
@@ -85,7 +88,8 @@ int main(int argc, char **argv)
 			setenv(variable, directory.c_str(), 1);
 		}
 		const int threads = std::clamp(std::stoi(argv[4]), 1, 3);
-		ModelRVM model(std::string(argv[5]) == "1", threads, "gpu",
+		const bool preserveHands = std::string(argv[5]) == "1";
+		ModelRVM model(preserveHands, threads, "gpu",
 			       (models / "selfie_multiclass_256x256.with_runtime_opt.ort").string(), argv[3]);
 		ORTModelData data;
 		data.env = std::make_unique<Ort::Env>(ORT_LOGGING_LEVEL_ERROR, "Penguin GPU worker");
@@ -105,11 +109,25 @@ int main(int argc, char **argv)
 					    data.inputTensorValues, data.inputTensor, data.outputTensor);
 		cv::Mat input(192, 320, CV_8UC4, cv::Scalar(0, 0, 0, 255)), mask;
 		auto infer = [&] {
-			cv::Mat rgb, image, prepared;
-			cv::cvtColor(input, rgb, cv::COLOR_BGRA2RGB);
-			rgb.convertTo(image, CV_32F);
-			model.prepareInputToNetwork(image, prepared);
-			model.loadInputToTensor(prepared, 320, 192, data.inputTensorValues);
+#ifdef PENGUIN_RUST_PREPROCESS
+			// Write into the already allocated ORT input tensor. Preserve the
+			// original path on validation failure or worker-side hand recovery,
+			// which also starts work in prepareInputToNetwork.
+			auto &tensor = data.inputTensorValues[0];
+			const bool converted = !preserveHands && penguin_bgra_to_rgb_chw(
+				input.data, input.step[0] * size_t(input.rows), size_t(input.cols),
+				size_t(input.rows), input.step[0], tensor.data(), tensor.size()) == 1;
+			if (converted) {
+				data.inputTensorValues[5][0] = 1.0f;
+			} else
+#endif
+			{
+				cv::Mat rgb, image, prepared;
+				cv::cvtColor(input, rgb, cv::COLOR_BGRA2RGB);
+				rgb.convertTo(image, CV_32F);
+				model.prepareInputToNetwork(image, prepared);
+				model.loadInputToTensor(prepared, 320, 192, data.inputTensorValues);
+			}
 			model.runNetworkInference(data.session, data.inputNames, data.outputNames, data.inputTensor,
 						  data.outputTensor);
 			auto output = model.getNetworkOutput(data.outputDims, data.outputTensorValues);

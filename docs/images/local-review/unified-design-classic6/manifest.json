@@ -1,0 +1,18 @@
+{
+  "version": "0.7.2",
+  "package": "0.7.2-0+ubuntu26.04.classic6",
+  "language": "en-US",
+  "status": "local review",
+  "capture_method": "Qt widget renders of isolated synthetic Wayland profile; no native-video surfaces in these dialogs",
+  "visual_review": "English headings, shared dark cards and violet actions, consistent button placement, synthetic source names only",
+  "images": [
+    {
+      "file": "creator-audio.png",
+      "sha256": "43e1f93c5d6a9e67891babe78d52b89ec30b56f505ee09ec1ed03633d5e29f93"
+    },
+    {
+      "file": "creator-checks.png",
+      "sha256": "7d9c56404f124618256496ed3bafcc9c8d6d2ef49b2c9f2b637dfb9574f89e59"
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "product_version": "0.7.2",
+  "local_build": "0.7.2-0+ubuntu26.04.classic5",
+  "status": "unpublished local review",
+  "locale": "en-US",
+  "platform": "wayland",
+  "capture_method": "Qt widget render; no native video preview in these dialogs",
+  "synthetic_media_only": true,
+  "source": "creator-package-final",
+  "captures": [
+    "creator-audio.png",
+    "creator-checks.png"
+  ]
+}
