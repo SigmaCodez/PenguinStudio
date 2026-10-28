@@ -376,7 +376,11 @@ jobs:
           path: snap-debug/
           if-no-files-found: ignore
       - name: Verify compiled YouTube configuration
-        run: python3 scripts/packaging/configure-youtube.py --verify prime
+        run: |
+          python3 scripts/packaging/configure-youtube.py --verify prime
+          test -x prime/usr/lib/qt6/libexec/QtWebEngineProcess
+          test -f prime/usr/share/qt6/resources/qtwebengine_resources.pak
+          test -f prime/usr/share/qt6/translations/qtwebengine_locales/en-US.pak
       - name: Install Snap and verify confined launcher
         run: |
           sudo snap install --dangerous ./penguin-studio_*.snap
