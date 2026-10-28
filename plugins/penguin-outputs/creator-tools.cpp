@@ -816,11 +816,11 @@ void Event(obs_frontend_event event, void *)
 	if (event == OBS_FRONTEND_EVENT_FINISHED_LOADING && mainWindow && !privacyToolbar) {
 		auto *bar = mainWindow->findChild<QToolBar *>("penguinTopBar");
 		if (bar) {
-			auto *settings = mainWindow->findChild<QToolButton *>("penguinSettingsButton");
-			auto *row = settings ? qobject_cast<QHBoxLayout *>(settings->parentWidget()->layout()) : nullptr;
-			privacyToolbar = new PrivacyButton(row ? settings->parentWidget() : bar, bar);
+			auto *anchor = mainWindow->findChild<QToolButton *>("penguinToolbarButton");
+			auto *row = anchor ? qobject_cast<QHBoxLayout *>(anchor->parentWidget()->layout()) : nullptr;
+			privacyToolbar = new PrivacyButton(row ? anchor->parentWidget() : bar, bar);
 			if (row)
-				row->insertWidget(row->indexOf(settings), privacyToolbar);
+				row->insertWidget(row->indexOf(anchor), privacyToolbar);
 			else
 				bar->addWidget(privacyToolbar);
 		}

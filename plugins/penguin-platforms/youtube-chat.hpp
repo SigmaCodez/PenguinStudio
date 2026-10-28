@@ -27,7 +27,7 @@ class YoutubeChat final : public QWidget {
 	QLineEdit *input = new QLineEdit(this);
 	QPushButton *send = new QPushButton("Send", this);
 	QPushButton *refresh = new QPushButton("Load live broadcasts", this);
-	QString token, account, chat, page;
+	QString token, account, chat, page, preferredVideo;
 	quint64 generation = 0;
 	bool sending = false, moderating = false, authorizationExpired = false, ready = false;
 	QSet<QString> seen, loadPages;
@@ -159,9 +159,12 @@ class YoutubeChat final : public QWidget {
 		loadPages.insert(cursor);
 		refresh->setEnabled(false);
 		broadcasts->setEnabled(false);
-		Request("liveBroadcasts?part=id,snippet&broadcastStatus=active&broadcastType=all&maxResults=50&pageToken=" +
-				Encode(cursor),
-			"GET", {}, [this, entries](int code, const QJsonObject &data) mutable {
+		const QString selection =
+			preferredVideo.isEmpty()
+				? "broadcastStatus=active&broadcastType=all&maxResults=50&pageToken=" + Encode(cursor)
+				: "id=" + Encode(preferredVideo);
+		Request("liveBroadcasts?part=id,snippet&" + selection, "GET", {},
+			[this, entries](int code, const QJsonObject &data) mutable {
 				refresh->setEnabled(true);
 				broadcasts->setEnabled(true);
 				if (code != 200) {
@@ -192,16 +195,20 @@ class YoutubeChat final : public QWidget {
 				Select();
 				if (entries.isEmpty()) {
 					status->setText(
-						"No active broadcast with live chat. Start a broadcast on YouTube, then reload.");
+						"No live chat is available for the selected broadcast. Check the selection and chat settings in Stream details, then reload.");
 				}
 			});
 	}
 	void Moderate(const QString &action, const QString &id, const QString &target)
 	{
+		if (!PenguinChat::ValidModeration(action, id, target)) {
+			status->setText("Select a valid message or user before moderating.");
+			return;
+		}
 		if (token.isEmpty() || chat.isEmpty() || moderating) {
 			return;
 		}
-		if (action == "unban" && !bans.contains(target)) {
+		if (action == "unban" && bans.value(target).isEmpty()) {
 			status->setText(
 				"Only bans created in this chat session can be removed here. Use YouTube Studio for other bans.");
 			return;
@@ -211,7 +218,7 @@ class YoutubeChat final : public QWidget {
 						: action == "timeout" ? "Timeout this user for 10 minutes"
 						: action == "ban"     ? "Ban this user"
 								      : "Remove this user's ban or timeout") ||
-		    epoch != generation) {
+		    epoch != generation || moderating) {
 			return;
 		}
 		moderating = true;
@@ -238,11 +245,15 @@ class YoutubeChat final : public QWidget {
 		Request(path, method, body, [this, action, id, target](int code, const QJsonObject &data) {
 			moderating = false;
 			if (code < 200 || code >= 300) {
-				status->setText("Moderation failed. YouTube requires owner or moderator permissions.");
+				status->setText(PenguinChat::ModerationFailure(code, data));
 				return;
 			}
 			if (action == "ban" || action == "timeout") {
-				bans[target] = data.value("id").toString();
+				if (!data.value("id").toString().isEmpty()) {
+					bans[target] = data.value("id").toString();
+				} else {
+					bans.remove(target);
+				}
 				Remove({}, target);
 			}
 			if (action == "unban") {
@@ -251,7 +262,10 @@ class YoutubeChat final : public QWidget {
 			if (action == "delete") {
 				Remove(id, {});
 			}
-			status->setText("Moderation action completed");
+			status->setText(
+				(action == "ban" || action == "timeout") && !bans.contains(target)
+					? "Action completed, but YouTube returned no ban ID. Use YouTube Studio to remove it."
+					: "Moderation action completed");
 		});
 	}
 	void Remove(const QString &id, const QString &user)
@@ -362,6 +376,19 @@ public:
 		});
 		connect(input, &QLineEdit::returnPressed, send, &QPushButton::click);
 		Stop();
+	}
+	void SetBroadcast(const QString &video)
+	{
+		if (preferredVideo == video) {
+			return;
+		}
+		preferredVideo = video;
+		const auto access = token;
+		const auto identity = account;
+		Stop();
+		if (!access.isEmpty()) {
+			SetSession(access, identity);
+		}
 	}
 	void SetSession(const QString &access, const QString &identity)
 	{

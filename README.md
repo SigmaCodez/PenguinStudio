@@ -17,7 +17,7 @@ Penguin Studio brings a redesigned production workspace, native multi-destinatio
 
 ![Penguin Studio modern workspace with searchable layers and scenes, audio channel strips and an integrated inspector](docs/images/current/workspace-en.png)
 
-These English previews show the real 0.7.2 application with synthetic demo media. See the [workspace guide](docs/WORKSPACE.md) for the controls and layout.
+These English previews show the real 0.7.3 application with synthetic demo media. See the [workspace guide](docs/WORKSPACE.md) for the controls and layout.
 
 > Development preview. See [verification status](docs/VERIFICATION.md) for completed checks and remaining release tests, and [packaging](docs/PACKAGING.md) for development downloads and supported build targets. Validate your devices and streaming accounts before relying on this build for a live show.
 
@@ -38,7 +38,7 @@ These English previews show the real 0.7.2 application with synthetic demo media
 
 ## Get started
 
-**Current release: [Penguin Studio 0.7.2](docs/releases/0.7.2.md)** — classic workspace restored, GPU usage, Settings update checks, asynchronous camera processing and native Ubuntu 26.10 packages. Includes Creator tools, optional audio assistance, a program privacy shield and a measured total-upload indicator.
+**Current release: [Penguin Studio 0.7.3](docs/releases/0.7.3.md)** — original platform chat views where Qt WebEngine is available, reliable YouTube broadcast selection, automatic stream details and improved integrated-chat moderation. The toolbar removes redundant settings and details shortcuts.
 
 Camera processing offers **Automatic**, **GPU** and **CPU**, with automatic CPU fallback. The optional Ubuntu 26.04 or 26.10 AMD runtime add-on enables primary GPU matting on the tested RX 9070 XT; hand preservation stays on CPU. Other package/hardware combinations retain CPU processing unless a compatible runtime is provided. See [camera GPU setup](docs/PACKAGING.md#optional-amd-camera-gpu-runtime).
 
@@ -50,7 +50,7 @@ Camera processing offers **Automatic**, **GPU** and **CPU**, with automatic CPU 
 2. Launch `penguin-studio`. Finish the hardware configuration and destination assistants. Twitch and YouTube sign-in is optional during setup.
 3. Choose a platform, copy its RTMP(S) server and stream key from its creator dashboard, and choose landscape or portrait output.
 4. Use **Streaming channels** to add further destinations. **Go live** starts all configured Penguin destinations; **End stream** stops them. **Advanced** retains the separate primary-stream action.
-5. Open **Details** to connect Twitch or YouTube for title updates. Official packages include the application configuration for browser sign-in with both providers; you do not need to enter client IDs. Use the searchable Twitch game and YouTube category lists, and **Stream chat** for native chat and moderation. See the [chat guide](docs/CHAT.md). See [platform setup](docs/PLATFORMS.md).
+5. Open **Details** to connect Twitch or YouTube for title updates. Official packages include the application configuration for browser sign-in with both providers; you do not need to enter client IDs. Use the searchable Twitch game and YouTube category lists, and **Stream chat** for original platform views or integrated API chat and moderation. See the [chat guide](docs/CHAT.md). See [platform setup](docs/PLATFORMS.md).
 6. Make a private test stream before a public broadcast. Check picture framing, sound, reconnects, CPU/GPU load, dropped frames and total upload bandwidth.
 
 Twitch and YouTube sign-ins are saved in the system keyring and restored after restart when the keyring is available. **Disconnect** removes the saved account. The **Broadcast destinations** dock keeps stream keys in memory for the current session; they must be entered again after restart. Destination names, nonsecret server URLs and encoder choices are saved locally. Never put a stream key into a saved server URL. The separate **Settings → Stream** workflow can persist stream credentials in the local profile.

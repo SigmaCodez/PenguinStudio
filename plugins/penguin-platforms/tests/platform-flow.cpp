@@ -112,16 +112,43 @@ public:
 		QPointer<Reply> reply;
 	};
 	QList<Call> calls;
+	int automaticChannelLoads = 0;
+	int automaticVideoLoads = 0;
 	void Respond(qsizetype index, int code, const QJsonObject &body = {})
 	{
+		if (!(index >= 0 && index < calls.size() && calls[index].reply)) {
+			std::cerr << "Missing response index " << index << " of " << calls.size() << "\n";
+		}
 		Require(index >= 0 && index < calls.size() && calls[index].reply, "expected HTTP request missing");
 		calls[index].reply->Complete(code, body);
+		if (body.contains("user_id") && !calls.isEmpty() &&
+		    calls.last().request.url().path() == "/helix/channels" &&
+		    calls.last().request.attribute(QNetworkRequest::CustomVerbAttribute).toByteArray() == "GET") {
+			auto automatic = calls.takeLast();
+			++automaticChannelLoads;
+			automatic.reply->Complete(
+				200, {{"data", QJsonArray{QJsonObject{{"title", "Current title"},
+								      {"game_id", "20"},
+								      {"game_name", "Current category"}}}}});
+		}
 	}
 
 protected:
 	QNetworkReply *createRequest(Operation, const QNetworkRequest &request, QIODevice *body) override
 	{
 		auto *reply = new Reply(request, this);
+		if (QUrlQuery(request.url()).queryItemValue("fields") == "items(snippet(title,categoryId))") {
+			++automaticVideoLoads;
+			QTimer::singleShot(0, reply, [reply] {
+				if (!reply->aborted) {
+					reply->Complete(
+						200,
+						{{"items", QJsonArray{QJsonObject{
+								   {"snippet", QJsonObject{{"categoryId", "20"}}}}}}});
+				}
+			});
+			return reply;
+		}
 		calls.append({request, body ? body->readAll() : QByteArray(), reply});
 		return reply;
 	}
@@ -241,6 +268,8 @@ int main(int argc, char **argv)
 		network.Respond(3, 200, Tokens("twitch-access", "first+refresh"));
 		network.Respond(4, 200, Validation());
 		Require(Button(*pane, "Update")->isEnabled(), "validated Twitch session unavailable");
+		Require(network.automaticChannelLoads == 1 && Line(*pane, "Title")->text() == "Current title",
+			"Twitch details must load immediately after connection");
 		Line(*pane, "Title")->setText("Test title");
 		Button(*pane, "Update")->click();
 		Require(network.calls[5].request.attribute(QNetworkRequest::CustomVerbAttribute).toByteArray() ==
@@ -330,6 +359,7 @@ int main(int argc, char **argv)
 		network.Respond(3, 200, {{"items", QJsonArray{Broadcast("second", "Second title")}}});
 		auto *broadcasts = pane.findChild<QComboBox *>();
 		Require(broadcasts && broadcasts->count() == 2, "all broadcast pages must be loaded");
+		Require(network.automaticVideoLoads == 1, "YouTube selected broadcast details must load automatically");
 		broadcasts->setCurrentIndex(1);
 		Line(pane, "Title")->setText("A new title");
 		Button(pane, "Update")->click();
@@ -506,6 +536,68 @@ int main(int argc, char **argv)
 		Require(store.value.isEmpty(), "Google saved account was not removed");
 	}
 	QDesktopServices::unsetUrlHandler("https");
+	{
+		QSettings settings(configuration, QSettings::IniFormat);
+		settings.clear();
+		MemoryStore store;
+		store.value = QJsonDocument(QJsonObject{{"client", "test-client"}, {"refresh", "saved"}}).toJson();
+		Transport network;
+		TwitchPane pane(nullptr, &network, nullptr, &store);
+		Line(pane, "AppID")->setText("test-client");
+		Until([&] { return network.calls.size() == 1; });
+		network.Respond(0, 200, Tokens("access", "refresh"));
+		network.Respond(1, 200, Validation());
+		Line(pane, "Title")->setText("Unsaved title before opening");
+		Line(pane, "Title")->setModified(true);
+		auto *picker = pane.findChild<QComboBox *>("twitchCategory");
+		picker->setEditText("Unsaved category");
+		QMetaObject::invokeMethod(picker, "activated", Q_ARG(int, 0));
+		pane.show();
+		Require(network.calls.size() == 3, "Opening Twitch details must refresh automatically");
+		pane.hide(); pane.show();
+		Require(network.calls.size() == 3, "Opening an in-flight details pane must not duplicate the request");
+		network.Respond(2, 200, {{"data", QJsonArray{QJsonObject{{"title", "External title"}, {"game_id", "42"}, {"game_name", "External category"}}}}});
+		Require(Line(pane, "Title")->text() == "Unsaved title before opening" && picker->currentText() == "Unsaved category",
+			"Automatic refresh must preserve edits made before the request");
+		pane.hide();
+	}
+
+	// The first API result may be a completed broadcast. Restore an explicit
+	// choice, otherwise prefer a live broadcast across all result pages.
+	for (const QString saved : {QString(), QString("old"), QString("missing")}) {
+		QSettings settings(configuration, QSettings::IniFormat);
+		settings.clear();
+		settings.setValue("youtube/selectedBroadcast", saved);
+		settings.sync();
+		MemoryStore store;
+		store.value = QJsonDocument(QJsonObject{{"client", "google-client"}, {"refresh", "saved"},
+			{"secret", "desktop-test-secret"}}).toJson();
+		Transport network;
+		YoutubePane pane(nullptr, &network, &store);
+		Line(pane, "AppID")->setText("google-client");
+		QString chatVideo;
+		pane.chatLocation = [&](const QString &id) { chatVideo = id; };
+		Until([&] { return network.calls.size() == 1; });
+		network.Respond(0, 200, Tokens("access", "refresh"));
+		network.Respond(1, 200, {{"items", QJsonArray{}}});
+		auto old = Broadcast("old", "Completed broadcast");
+		old.insert("status", QJsonObject{{"lifeCycleStatus", "complete"}});
+		auto live = Broadcast("live", "Current broadcast");
+		live.insert("status", QJsonObject{{"lifeCycleStatus", "live"}});
+		network.Respond(2, 200, {{"items", QJsonArray{old}}, {"nextPageToken", "page-two"}});
+		network.Respond(3, 200, {{"items", QJsonArray{live}}});
+		auto *combo = pane.findChild<QComboBox *>("youtubeBroadcast");
+		const QString expected = saved == "old" ? "old" : "live";
+		Require(combo && combo->currentData().toString() == expected && chatVideo == expected,
+			"YouTube must restore selection or prefer live broadcasts and update chat consistently");
+		Require(Line(pane, "Title")->text() == combo->currentText(), "Restored broadcast title mismatch");
+		Require(pane.findChild<QLabel *>("youtubeBroadcastIdentity")->text() == "Video: " + expected, "Visible video ID must match chat");
+		combo->setCurrentIndex(combo->findData("live"));
+		QMetaObject::invokeMethod(combo, "activated", Q_ARG(int, combo->currentIndex()));
+		Require(QSettings(configuration, QSettings::IniFormat).value("youtube/selectedBroadcast").toString() == "live",
+			"Explicit broadcast selection must persist for restart");
+	}
+
 	std::cout
 		<< "PASS: device polling/backoff, token rotation, in-flight update exclusion, PKCE loopback, pagination, "
 		   "snippet preservation, revoked sessions and callback shutdown\n";

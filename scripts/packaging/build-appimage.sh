@@ -54,6 +54,15 @@ for integration in wayland-decoration-client wayland-graphics-integration-client
 done
 test -d "$appdir/usr/plugins/wayland-shell-integration"
 test -d "$appdir/usr/plugins/wayland-graphics-integration-client"
+# Original platform chat needs Chromium's helper and data, not just Qt shared libraries.
+# Fail the package build if the deploy plugin omitted its runtime resources.
+platform_module=$(find "$appdir/usr/lib" -type f -name penguin-platforms.so -print -quit)
+[[ -n "$platform_module" ]]
+if ldd "$platform_module" | grep Qt6WebEngine >/dev/null; then
+  find "$appdir/usr" -type f -name QtWebEngineProcess -print -quit | grep -q .
+  find "$appdir/usr" -type f -name qtwebengine_resources.pak -print -quit | grep -q .
+  find "$appdir/usr" -type f -path '*/qtwebengine_locales/en-US.pak' -print -quit | grep -q .
+fi
 # Retain dependency copyright notices as well as Penguin/OBS/CEF licenses from the DEB.
 mkdir -p "$appdir/usr/share/licenses/penguin-studio/bundled-dependencies"
 for copyright in /usr/share/doc/*/copyright; do

@@ -16,6 +16,7 @@
 ******************************************************************************/
 
 #include <OBSApp.hpp>
+#include <QSurfaceFormat>
 #include "ui-config.h"
 
 #include <components/VolumeAccessibleInterface.hpp>
@@ -891,6 +892,19 @@ static void set_process_mitigation_policies()
 
 int main(int argc, char *argv[])
 {
+	// Configure Qt's shared context before application creation. Linux OBS uses
+	// desktop OpenGL; requesting the same profile avoids mixed GL/GLES surfaces.
+#if defined(__linux__)
+	QSurfaceFormat format = QSurfaceFormat::defaultFormat();
+	format.setRenderableType(QSurfaceFormat::OpenGL);
+	format.setVersion(3, 3);
+	format.setProfile(QSurfaceFormat::CoreProfile);
+	QSurfaceFormat::setDefaultFormat(format);
+	if (qEnvironmentVariableIsEmpty("QSG_RHI_BACKEND")) {
+		qputenv("QSG_RHI_BACKEND", "opengl");
+	}
+#endif
+	QCoreApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
 #ifndef _WIN32
 	using SignalHandlerCallback = decltype(OBSApp::sigIntSignalHandler);
 

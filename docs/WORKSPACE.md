@@ -2,9 +2,9 @@
 
 Penguin Studio organizes the native Qt application around a large canvas, searchable layers and scenes, audio channel strips, and an integrated production sidebar.
 
-![Penguin Studio 0.7.2 workspace in English](images/current/workspace-en.png)
+![Penguin Studio 0.7.3 workspace in English](images/current/workspace-en.png)
 
-These English previews were captured from the validated 0.7.2 Ubuntu package using an isolated demo profile and synthetic media.
+These English previews were captured from the validated 0.7.3 Ubuntu package using an isolated demo profile and synthetic media.
 
 ## Compose and inspect
 
@@ -20,7 +20,7 @@ The bottom mixer presents native volume controls, meters and monitoring settings
 
 - **Penguin Studio** opens the full application menu: File, Edit, View, Docks, Profile, Scene Collection, Tools and Help. On macOS the native system menu is retained as well.
 - **Destinations** selects the integrated multi-output sidebar. Destinations appear as stacked cards with name, layout and real output status; editing, removal, individual start/stop and start/stop all remain available.
-- **Stream details** selects the scrollable Twitch/YouTube account and stream-management forms. **Settings** has its own toolbar shortcut.
+- **Details** selects the scrollable Twitch/YouTube account and stream-management forms. Open **Settings** through **More** or the application menu; redundant toolbar shortcuts have been removed.
 - **Go live** runs the destination panel's validated Start All action. With no destinations configured, it opens the setup assistant. While destinations are running, **End stream** runs Stop All.
 - The live button's menu exposes **Stream details** and the separate primary stream toggle inherited from OBS. The primary stream's setup and credentials are separate from Penguin destinations.
 - **Record** uses the original recording controller. Its menu offers pause/resume when the recording mode supports it.

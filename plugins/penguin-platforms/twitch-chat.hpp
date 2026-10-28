@@ -177,6 +177,10 @@ class TwitchChat final : public QWidget {
 	}
 	void Moderate(const QString &action, const QString &message, const QString &target)
 	{
+		if (!PenguinChat::ValidModeration(action, message, target)) {
+			status->setText("Select a valid message or user before moderating.");
+			return;
+		}
 		if (token.isEmpty() || moderating || target == user) {
 			return;
 		}
@@ -185,7 +189,7 @@ class TwitchChat final : public QWidget {
 						: action == "timeout" ? "Timeout this user for 10 minutes"
 						: action == "ban"     ? "Ban this user"
 								      : "Remove this user's ban or timeout") ||
-		    epoch != generation) {
+		    epoch != generation || moderating) {
 			return;
 		}
 		moderating = true;
@@ -197,7 +201,8 @@ class TwitchChat final : public QWidget {
 			       "&message_id=" + QString::fromLatin1(QUrl::toPercentEncoding(message));
 			method = "DELETE";
 		} else if (action == "unban") {
-			path = "moderation/bans" + ModerationQuery() + "&user_id=" + target;
+			path = "moderation/bans" + ModerationQuery() +
+			       "&user_id=" + QString::fromLatin1(QUrl::toPercentEncoding(target));
 			method = "DELETE";
 		} else {
 			path = "moderation/bans" + ModerationQuery();
@@ -210,7 +215,7 @@ class TwitchChat final : public QWidget {
 		}
 		Request(
 			path, body,
-			[this, action, target](int code, const QJsonObject &) {
+			[this, action, target, message](int code, const QJsonObject &data) {
 				moderating = false;
 				if (code >= 200 && code < 300) {
 					if (action == "ban" || action == "timeout") {
@@ -220,10 +225,16 @@ class TwitchChat final : public QWidget {
 						recentBans.remove(target);
 					}
 				}
-				status->setText(
-					code >= 200 && code < 300
-						? "Moderation action completed"
-						: "Moderation failed. Check your permissions; reconnect Twitch if needed.");
+				if (code >= 200 && code < 300 && action != "unban") {
+					for (auto it = messages.begin(); it != messages.end();) {
+						const bool remove = action == "delete" ? it->id == message
+										       : it->user == target;
+						it = remove ? messages.erase(it) : std::next(it);
+					}
+					Render();
+				}
+				status->setText(code >= 200 && code < 300 ? "Moderation action completed"
+									  : PenguinChat::ModerationFailure(code, data));
 			},
 			method);
 	}
@@ -285,10 +296,11 @@ class TwitchChat final : public QWidget {
 						}
 						Request(
 							"chat/settings" + ModerationQuery(), body,
-							[this](int result, const QJsonObject &) {
+							[this](int result, const QJsonObject &response) {
 								status->setText(
 									result == 200 ? "Chat settings saved"
-										      : "Could not save chat settings");
+										      : PenguinChat::ModerationFailure(
+												result, response));
 							},
 							"PATCH");
 						dialog->accept();

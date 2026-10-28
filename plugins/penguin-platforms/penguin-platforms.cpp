@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
-// Native metadata controls: no embedded browser or X11 dependency.
+// Native metadata controls and original platform chat views without an X11 dependency.
 #include "oauth-helpers.hpp"
 #include "twitch-chat.hpp"
 #include "youtube-chat.hpp"
+#include "web-chat.hpp"
 #include "category-picker.hpp"
 #include "credential-store.hpp"
 #if __has_include("youtube-app-config.hpp")
@@ -67,6 +68,10 @@ using PenguinOAuth::Form;
 using PenguinOAuth::RandomToken;
 
 class PlatformPane : public QWidget {
+public:
+	std::function<void(const QString &)> chatLocation;
+	virtual void UseIntegratedChat(bool) {}
+
 protected:
 	QNetworkAccessManager ownedNetwork{this};
 	QNetworkAccessManager &network;
@@ -363,12 +368,17 @@ class TwitchPane final : public PlatformPane {
 	QTimer categorySearch{this};
 	quint64 categoryRevision = 0;
 	QPointer<TwitchChat> chat;
+	bool chatEnabled = true;
+	bool categoryEdited = false;
 	QPushButton *loadDetails = nullptr;
 	static constexpr const char *scopes =
 		"channel:manage:broadcast user:read:chat user:write:chat moderator:read:chatters moderator:manage:chat_messages moderator:manage:banned_users moderator:manage:chat_settings";
 
 	void Reset() override
 	{
+		if (chatLocation) {
+			chatLocation({});
+		}
 		if (loadDetails) {
 			loadDetails->setEnabled(false);
 		}
@@ -377,6 +387,7 @@ class TwitchPane final : public PlatformPane {
 		}
 		categorySearch.stop();
 		++categoryRevision;
+		categoryEdited = false;
 		category->clear();
 		category->setEnabled(false);
 		pollTimer.stop();
@@ -386,6 +397,22 @@ class TwitchPane final : public PlatformPane {
 		PlatformPane::Reset();
 	}
 
+	void LoadDetails()
+	{
+		if (broadcaster.isEmpty() || accessToken.isEmpty() || updatePending || !loadDetails->isEnabled()) {
+			return;
+		}
+		loadDetails->click();
+	}
+
+protected:
+	void showEvent(QShowEvent *event) override
+	{
+		PlatformPane::showEvent(event);
+		LoadDetails();
+	}
+
+private:
 	void Validate()
 	{
 		// Twitch's validation endpoint accepts Bearer authentication as well as OAuth.
@@ -399,6 +426,7 @@ class TwitchPane final : public PlatformPane {
 					Fail();
 					return;
 				}
+				const bool firstConnection = broadcaster.isEmpty();
 				broadcaster = data.value("user_id").toString();
 				SetConnected(true);
 				category->setEnabled(true);
@@ -406,8 +434,14 @@ class TwitchPane final : public PlatformPane {
 				if (loadDetails) {
 					loadDetails->setEnabled(true);
 				}
-				if (chat) {
+				if (chat && chatEnabled) {
 					chat->SetSession(activeClient, accessToken, broadcaster);
+				}
+				if (chatLocation) {
+					chatLocation(data.value("login").toString());
+				}
+				if (firstConnection) {
+					LoadDetails();
 				}
 				validateTimer.start(55 * 60 * 1000);
 			});
@@ -445,6 +479,18 @@ class TwitchPane final : public PlatformPane {
 	}
 
 public:
+	void UseIntegratedChat(bool enabled) override
+	{
+		chatEnabled = enabled;
+		if (!chat) {
+			return;
+		}
+		if (enabled && !broadcaster.isEmpty()) {
+			chat->SetSession(activeClient, accessToken, broadcaster);
+		} else {
+			chat->Stop();
+		}
+	}
 	explicit TwitchPane(QWidget *parent, QNetworkAccessManager *transport = nullptr, TwitchChat *chatPane = nullptr,
 			    CredentialStore *store = nullptr)
 		: PlatformPane("twitch", parent, transport, store),
@@ -458,6 +504,8 @@ public:
 		connectButton->setText(Text("Twitch.Connect"));
 		form->addRow(Text("Twitch.Category"), category);
 		category->setObjectName("twitchCategory");
+		connect(category->lineEdit(), &QLineEdit::textEdited, this, [this] { categoryEdited = true; });
+		connect(category, &QComboBox::activated, this, [this] { categoryEdited = true; });
 		category->setEnabled(false);
 		category->lineEdit()->setPlaceholderText(Text("Category.Search"));
 		categorySearch.setSingleShot(true);
@@ -516,10 +564,11 @@ public:
 					}
 					const auto info = items.first().toObject();
 					// Do not replace text the user edited while the request was in flight.
-					if (title->text() == oldTitle) {
+					if (!title->isModified() && title->text() == oldTitle) {
 						title->setText(info.value("title").toString());
 					}
-					if (category->currentText() == oldCategory) {
+					if (!categoryEdited && !category->lineEdit()->isModified() &&
+					    category->currentText() == oldCategory) {
 						category->Select(info.value("game_id").toString(),
 								 info.value("game_name").toString());
 					}
@@ -589,7 +638,16 @@ public:
 			BeginUpdate();
 			Request("https://api.twitch.tv/helix/channels?broadcaster_id=" + broadcaster, "PATCH",
 				QJsonDocument(body).toJson(QJsonDocument::Compact), "application/json", true,
-				[this](int code, const QJsonObject &) {
+				[this, value, categoryId = category->Id()](int code, const QJsonObject &) {
+					if (code == 204) {
+						if (title->text().trimmed() == value) {
+							title->setModified(false);
+						}
+						if (category->Id() == categoryId) {
+							categoryEdited = false;
+							category->lineEdit()->setModified(false);
+						}
+					}
 					if (code == 401) {
 						Fail("Expired");
 						return;
@@ -604,6 +662,8 @@ public:
 
 class YoutubePane final : public PlatformPane {
 	QPointer<YoutubeChat> chat;
+	bool chatEnabled = true;
+	bool categoryEdited = false;
 	QTcpServer listener{this};
 	QTimer authorizationTimeout{this};
 	QLineEdit *secret = new QLineEdit(this);
@@ -614,6 +674,8 @@ class YoutubePane final : public PlatformPane {
 	QString redirect;
 	QString activeSecret;
 	quint64 broadcastLoad = 0;
+	quint64 videoLoad = 0;
+	QString remoteCategory;
 	CategoryPicker *category = new CategoryPicker(this);
 	QString SessionSecret() const override { return activeSecret; }
 	void RestoreSecret(const QString &value) override
@@ -622,6 +684,45 @@ class YoutubePane final : public PlatformPane {
 		secret->setText(value);
 		secret->setEnabled(false);
 	}
+	void LoadVideoDetails()
+	{
+		const auto id = broadcasts->currentData().toString();
+		if (id.isEmpty() || accessToken.isEmpty() || updatePending) {
+			return;
+		}
+		const auto request = ++videoLoad;
+		const auto oldTitle = title->text();
+		const auto oldCategory = category->currentText();
+		Request("https://www.googleapis.com/youtube/v3/videos?part=snippet&fields=items(snippet(title,categoryId))&id=" +
+				QString::fromLatin1(QUrl::toPercentEncoding(id)),
+			"GET", {}, {}, true,
+			[this, request, id, oldTitle, oldCategory](int code, const QJsonObject &data) {
+				if (request != videoLoad || broadcasts->currentData().toString() != id ||
+				    updatePending) {
+					return;
+				}
+				if (code == 401) {
+					Fail("Expired");
+					return;
+				}
+				const auto items = data.value("items").toArray();
+				if (code != 200 || items.isEmpty()) {
+					return;
+				}
+				const auto snippet = items.first().toObject().value("snippet").toObject();
+				if (snippet.contains("title") && !title->isModified() && title->text() == oldTitle) {
+					title->setText(snippet.value("title").toString());
+				}
+				remoteCategory = snippet.value("categoryId").toString();
+				if (!remoteCategory.isEmpty() && !categoryEdited &&
+				    !category->lineEdit()->isModified() && category->currentText() == oldCategory) {
+					const int index = category->findData(remoteCategory);
+					category->Select(remoteCategory,
+							 index >= 0 ? category->itemText(index) : remoteCategory);
+				}
+			});
+	}
+
 	void LoadCategories()
 	{
 		auto region = QLocale().name().section('_', 1, 1);
@@ -643,22 +744,40 @@ class YoutubePane final : public PlatformPane {
 								item.value("id").toString()});
 					}
 				}
+				const bool edited = categoryEdited || category->lineEdit()->isModified();
 				category->Choices(choices, false);
+				if (!edited && !remoteCategory.isEmpty()) {
+					const int index = category->findData(remoteCategory);
+					if (index >= 0) {
+						category->Select(remoteCategory, category->itemText(index));
+					}
+				}
 				category->setEnabled(true);
 			});
 	}
 	QList<QPair<QString, QString>> pendingBroadcasts;
+	QHash<QString, int> broadcastPriority;
+	QString preferredBroadcast;
+	QLabel *broadcastIdentity = new QLabel(this);
 	QSet<QString> pageTokens;
 
 	void Reset() override
 	{
+		if (chatLocation) {
+			chatLocation({});
+		}
 		if (chat) {
 			chat->Stop();
+			chat->SetBroadcast({});
 		}
+		categoryEdited = false;
 		category->clear();
 		category->setEnabled(false);
 		++broadcastLoad;
+		++videoLoad;
+		remoteCategory.clear();
 		pendingBroadcasts.clear();
+		broadcastPriority.clear();
 		pageTokens.clear();
 		listener.close();
 		authorizationTimeout.stop();
@@ -689,7 +808,7 @@ class YoutubePane final : public PlatformPane {
 				return;
 			}
 			SetConnected(true);
-			if (chat) {
+			if (chat && chatEnabled) {
 				chat->SetSession(accessToken, activeClient);
 			}
 			SaveSession();
@@ -704,7 +823,7 @@ class YoutubePane final : public PlatformPane {
 	void LoadBroadcastPage(const QString &pageToken, quint64 load, const QString &editedTitle)
 	{
 		QString url =
-			"https://www.googleapis.com/youtube/v3/liveBroadcasts?part=id,snippet&mine=true&broadcastType=all&maxResults=50";
+			"https://www.googleapis.com/youtube/v3/liveBroadcasts?part=id,snippet,status&mine=true&broadcastType=all&maxResults=50";
 		if (!pageToken.isEmpty()) {
 			url += "&pageToken=" + QString::fromLatin1(QUrl::toPercentEncoding(pageToken));
 		}
@@ -723,6 +842,12 @@ class YoutubePane final : public PlatformPane {
 			}
 			for (const auto &entry : data.value("items").toArray()) {
 				const auto item = entry.toObject();
+				const auto life = item.value("status").toObject().value("lifeCycleStatus").toString();
+				const int rank = life == "live"                           ? 0
+						 : life == "testing"                      ? 1
+						 : (life == "ready" || life == "created") ? 2
+											  : 3;
+				broadcastPriority.insert(item.value("id").toString(), rank);
 				pendingBroadcasts.append({item.value("snippet").toObject().value("title").toString(),
 							  item.value("id").toString()});
 			}
@@ -738,7 +863,10 @@ class YoutubePane final : public PlatformPane {
 				return;
 			}
 			// Avoid resetting the selected broadcast or an edited title on token refresh.
-			const auto selectedId = broadcasts->currentData().toString();
+			const auto selectedId = broadcasts->currentData().toString().isEmpty()
+							? preferredBroadcast
+							: broadcasts->currentData().toString();
+			const auto previousTitle = broadcasts->currentText();
 			QSignalBlocker block(broadcasts);
 			broadcasts->clear();
 			for (const auto &item : pendingBroadcasts) {
@@ -747,11 +875,39 @@ class YoutubePane final : public PlatformPane {
 			const int previous = broadcasts->findData(selectedId);
 			if (previous >= 0) {
 				broadcasts->setCurrentIndex(previous);
-				// Preserve edits made while the request was in flight as well.
-			} else if (title->text() == editedTitle) {
+				// Refresh unchanged fields while retaining unsaved local edits.
+				if (!updatePending && !title->isModified() && title->text() == editedTitle &&
+				    editedTitle == previousTitle) {
+					title->setText(broadcasts->currentText());
+				}
+			} else {
+				int best = 0;
+				for (int i = 1; i < broadcasts->count(); ++i) {
+					if (broadcastPriority.value(broadcasts->itemData(i).toString(), 3) <
+					    broadcastPriority.value(broadcasts->itemData(best).toString(), 3)) {
+						best = i;
+					}
+				}
+				if (broadcasts->count()) {
+					broadcasts->setCurrentIndex(best);
+				}
+				if (!title->isModified() && title->text() == editedTitle) {
+					title->setText(broadcasts->currentText());
+				}
+			}
+			if (previous >= 0 && previousTitle.isEmpty() && !title->isModified() &&
+			    title->text() == editedTitle) {
 				title->setText(broadcasts->currentText());
 			}
+			if (chat) chat->SetBroadcast(broadcasts->currentData().toString());
+			broadcastIdentity->setText(broadcasts->currentData().toString().isEmpty() ? QString() :
+				"Video: " + broadcasts->currentData().toString());
+			if (chatLocation) {
+				chatLocation(broadcasts->currentData().toString());
+			}
+			LoadVideoDetails();
 			pendingBroadcasts.clear();
+			broadcastPriority.clear();
 			pageTokens.clear();
 			loadButton->setEnabled(true);
 			if (!broadcasts->count()) {
@@ -762,8 +918,12 @@ class YoutubePane final : public PlatformPane {
 
 	void LoadBroadcasts()
 	{
+		if (accessToken.isEmpty() || !loadButton->isEnabled()) {
+			return;
+		}
 		loadButton->setEnabled(false);
 		pendingBroadcasts.clear();
+		broadcastPriority.clear();
 		pageTokens.clear();
 		LoadBroadcastPage({}, ++broadcastLoad, title->text());
 	}
@@ -818,7 +978,26 @@ class YoutubePane final : public PlatformPane {
 		}
 	}
 
+protected:
+	void showEvent(QShowEvent *event) override
+	{
+		PlatformPane::showEvent(event);
+		LoadBroadcasts();
+	}
+
 public:
+	void UseIntegratedChat(bool enabled) override
+	{
+		chatEnabled = enabled;
+		if (!chat) {
+			return;
+		}
+		if (enabled && !accessToken.isEmpty()) {
+			chat->SetSession(accessToken, activeClient);
+		} else {
+			chat->Stop();
+		}
+	}
 	explicit YoutubePane(QWidget *parent, QNetworkAccessManager *transport = nullptr,
 			     CredentialStore *store = nullptr, YoutubeChat *chatPane = nullptr)
 		: PlatformPane("youtube", parent, transport, store),
@@ -845,9 +1024,22 @@ public:
 		};
 		showAppSettings(false);
 		connect(appSettings, &QPushButton::toggled, this, showAppSettings);
+		broadcasts->setObjectName("youtubeBroadcast");
+		QSettings selectionSettings(configPath, QSettings::IniFormat);
+		preferredBroadcast = selectionSettings.value("youtube/selectedBroadcast").toString();
+		connect(broadcasts, &QComboBox::activated, this, [this] {
+			preferredBroadcast = broadcasts->currentData().toString();
+			QSettings settings(configPath, QSettings::IniFormat);
+			settings.setValue("youtube/selectedBroadcast", preferredBroadcast);
+		});
 		form->addRow(Text("YouTube.Broadcast"), broadcasts);
+		broadcastIdentity->setObjectName("youtubeBroadcastIdentity");
+		broadcastIdentity->setTextInteractionFlags(Qt::TextSelectableByMouse);
+		form->addRow(broadcastIdentity);
 		form->addRow(loadButton);
 		category->setObjectName("youtubeCategory");
+		connect(category->lineEdit(), &QLineEdit::textEdited, this, [this] { categoryEdited = true; });
+		connect(category, &QComboBox::activated, this, [this] { categoryEdited = true; });
 		category->setEnabled(false);
 		category->lineEdit()->setPlaceholderText(Text("Category.Search"));
 		form->addRow(Text("YouTube.Category"), category);
@@ -861,6 +1053,15 @@ public:
 		connect(&listener, &QTcpServer::newConnection, this, [this]() { AcceptConnection(); });
 		connect(loadButton, &QPushButton::clicked, this, [this]() { LoadBroadcasts(); });
 		connect(broadcasts, &QComboBox::currentTextChanged, title, &QLineEdit::setText);
+		connect(broadcasts, &QComboBox::currentIndexChanged, this, [this] {
+			if (chat) chat->SetBroadcast(broadcasts->currentData().toString());
+			broadcastIdentity->setText(broadcasts->currentData().toString().isEmpty() ? QString() :
+				"Video: " + broadcasts->currentData().toString());
+			if (chatLocation) {
+				chatLocation(broadcasts->currentData().toString());
+			}
+			LoadVideoDetails();
+		});
 		connect(connectButton, &QPushButton::clicked, this, [this]() {
 			if (client->text().trimmed().isEmpty()) {
 				status->setText(Text("YouTube.AppUnavailable"));
@@ -955,12 +1156,19 @@ public:
 						QJsonDocument(QJsonObject{{"id", id}, {"snippet", snippet}})
 							.toJson(QJsonDocument::Compact),
 						"application/json", true,
-						[this, id, value](int result, const QJsonObject &) {
+						[this, id, value, categoryId](int result, const QJsonObject &) {
 							if (result == 401) {
 								Fail("Expired");
 								return;
 							}
 							if (result == 200) {
+								if (title->text().trimmed() == value) {
+									title->setModified(false);
+								}
+								if (category->Id() == categoryId) {
+									categoryEdited = false;
+									category->lineEdit()->setModified(false);
+								}
 								const int index = broadcasts->findData(id);
 								if (index >= 0) {
 									QSignalBlocker block(broadcasts);
@@ -1033,21 +1241,47 @@ void CreateDock()
 	chatTabs->setDocumentMode(true);
 	chatDock = new TwitchChat(chatTabs, Text);
 	youtubeChatDock = new YoutubeChat(chatTabs);
-	chatTabs->addTab(chatDock, "Twitch");
-	chatTabs->addTab(youtubeChatDock, "YouTube");
-	auto *dashboard = new QPushButton("Dashboard ↗", chatTabs);
-	dashboard->setToolTip("Open Twitch or YouTube for platform features not available through their APIs.");
-	chatTabs->setCornerWidget(dashboard);
-	QObject::connect(dashboard, &QPushButton::clicked, chatTabs, [chatTabs] {
-		QDesktopServices::openUrl(QUrl(chatTabs->currentIndex() == 0 ? "https://dashboard.twitch.tv/"
-									     : "https://studio.youtube.com/"));
-	});
+	auto *twitchWebsite = new PenguinChat::WebsiteChat("twitch", chatDock, chatTabs);
+	auto *youtubeWebsite = new PenguinChat::WebsiteChat("youtube", youtubeChatDock, chatTabs);
+	chatTabs->addTab(twitchWebsite, "Twitch");
+	chatTabs->addTab(youtubeWebsite, "YouTube");
 	if (!obs_frontend_add_dock_by_id(ChatDockId, obs_module_text("Chat.Title"), chatTabs)) {
 		delete chatTabs;
 		chatDock = nullptr;
+		twitchWebsite = nullptr;
+		youtubeWebsite = nullptr;
 	}
-	addPlatform(new TwitchPane(tabs, nullptr, chatDock), QStringLiteral("Twitch"));
-	addPlatform(new YoutubePane(tabs, nullptr, nullptr, youtubeChatDock), QStringLiteral("YouTube"));
+	auto *twitchPane = new TwitchPane(tabs, nullptr, chatDock);
+	auto *youtubePane = new YoutubePane(tabs, nullptr, nullptr, youtubeChatDock);
+	twitchPane->UseIntegratedChat(!PenguinChat::WebsiteChat::SupportsOriginal);
+	youtubePane->UseIntegratedChat(!PenguinChat::WebsiteChat::SupportsOriginal);
+	if (twitchWebsite) {
+		twitchWebsite->useIntegrated = [pane = QPointer<TwitchPane>(twitchPane)](bool value) {
+			if (pane) {
+				pane->UseIntegratedChat(value);
+			}
+		};
+	}
+	if (youtubeWebsite) {
+		youtubeWebsite->useIntegrated = [pane = QPointer<YoutubePane>(youtubePane)](bool value) {
+			if (pane) {
+				pane->UseIntegratedChat(value);
+			}
+		};
+	}
+	QPointer<PenguinChat::WebsiteChat> twitchWeb(twitchWebsite), youtubeWeb(youtubeWebsite);
+	twitchPane->chatLocation = [twitchWeb](const QString &id) {
+		if (twitchWeb) {
+			twitchWeb->SetLocation(id);
+		}
+	};
+	youtubePane->chatLocation = [youtubeWeb](const QString &id) {
+		if (youtubeWeb) {
+			youtubeWeb->SetLocation(id);
+		}
+	};
+	addPlatform(twitchPane, QStringLiteral("Twitch"));
+	addPlatform(youtubePane, QStringLiteral("YouTube"));
 	layout->addWidget(tabs, 1);
 	auto *accountAction = new QAction(parent);
 	accountAction->setObjectName("penguinConnectAccountAction");

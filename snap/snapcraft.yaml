@@ -116,6 +116,7 @@ parts:
       - qt6-base-dev
       - qtkeychain-qt6-dev
       - qt6-websockets-dev
+      - qt6-webengine-dev
       - qt6-base-private-dev
       - qt6-svg-dev
       - libasound2-dev
@@ -149,6 +150,9 @@ parts:
       - libqt6network6
       - libqt6keychain1
       - libqt6websockets6
+      - libqt6webenginewidgets6
+      - libqt6webenginecore6-bin
+      - libqt6webengine6-data
       - libqt6xml6
       - libqt6dbus6
       - libqt6svg6

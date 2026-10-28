@@ -5,6 +5,8 @@
 > product previews. For the current English GUI, see the [workspace guide](WORKSPACE.md)
 > and [preview provenance](images/current/manifest.json).
 
+Version 0.7.3 adds original platform chat views, reliable YouTube selection and integrated moderation corrections. See the [local chat review](local-chat-review.md) for automated and real-provider test boundaries, and the [release notes](releases/0.7.3.md). Real bans/timeouts were not exercised because no separate test accounts were available.
+
 Version 0.7.2 retains the classic workspace and adds Creator tools, asynchronous camera processing and Ubuntu 26.10 packages. See the [Creator tools validation](validation/creator-tools-2026-10-28.md) and [classic workspace record](validation/classic-workspace-0.7.2.md). The classic8 design was installed and approved locally. The final complete Linux package set is validated by the release workflow. See also the [upload and installed-app validation](validation/upload-status-2026-10-28.md).
 
 Version 0.7.1 harmonizes the interface on the OBS 33.0.0 foundation. See the [design validation record](validation/design-consistency-0.7.1.md) for package-level layout, recording and shutdown checks.

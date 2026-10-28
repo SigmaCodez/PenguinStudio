@@ -81,7 +81,7 @@ void tick() {
   obs_frontend_source_list_free(&transitions);
   auto *bar=window->findChild<QWidget*>("penguinPrivacyButton");check(bool(bar),"Persistent privacy toolbar control exists");
   auto *privacyButton=window->findChild<QToolButton*>("penguinPrivacyButton");
-  auto *settingsButton=window->findChild<QToolButton*>("penguinSettingsButton");
+  auto *settingsButton=window->findChild<QToolButton*>("penguinToolbarButton");
   auto *recordButton=window->findChild<QToolButton*>("penguinRecordButton");
   check(privacyButton && settingsButton && privacyButton->parentWidget()==settingsButton->parentWidget(),"Privacy shares main action layout");
   check(privacyButton && recordButton && privacyButton->height()==recordButton->height(),"Privacy matches recording button height");

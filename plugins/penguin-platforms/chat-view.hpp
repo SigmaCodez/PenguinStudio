@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 #pragma once
 #include <QDateTime>
+#include <QJsonObject>
+#include <QJsonArray>
 #include <QStyledItemDelegate>
 #include <QPainter>
 #include <QTextLayout>
@@ -21,6 +23,39 @@
 #include <algorithm>
 
 namespace PenguinChat {
+inline QString ModerationFailure(int code, const QJsonObject &data)
+{
+	const auto errors = data.value("error").toObject().value("errors").toArray();
+	const auto reason = errors.isEmpty() ? QString() : errors.first().toObject().value("reason").toString();
+	if (code == 429 || reason == "quotaExceeded" || reason == "rateLimitExceeded") {
+		return "Moderation limit reached. Wait before retrying; check the platform API quota.";
+	}
+	if (code == 401) {
+		return "Moderation authorization expired or lacks the required scope. Reconnect your account.";
+	}
+	if (reason == "modificationNotAllowed" || reason == "liveChatBanInsertionNotAllowed") {
+		return "The platform does not allow this action on the selected user or message.";
+	}
+	if (code == 403) {
+		return "Moderation denied. The connected account needs owner or moderator permissions.";
+	}
+	if (code == 404) {
+		return "The message or ban no longer exists. Refresh the chat before retrying.";
+	}
+	if (code == 409) {
+		return "Another moderation action is in progress. Wait before retrying.";
+	}
+	if (code == 400) {
+		return "The platform rejected this action. Check the selected user, message and current ban state.";
+	}
+	return "Could not confirm the moderation result. Check the platform before retrying.";
+}
+inline bool ValidModeration(const QString &action, const QString &message, const QString &target)
+{
+	return (action == "delete" && !message.trimmed().isEmpty()) ||
+	       ((action == "timeout" || action == "ban" || action == "unban") && !target.trimmed().isEmpty());
+}
+
 class MessageDelegate final : public QStyledItemDelegate {
 	static qreal Layout(QTextLayout &layout, qreal width)
 	{

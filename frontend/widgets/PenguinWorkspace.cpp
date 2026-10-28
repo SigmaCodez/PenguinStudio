@@ -118,9 +118,6 @@ void PenguinWorkspace::CreateToolbar()
 	destinationsButton = Button(bar, "penguinDestinationsButton", QTStr("Penguin.Workspace.Destinations"), Icon::Live);
 	connect(destinationsButton, &QToolButton::clicked, this, [this]() { ShowDock("penguin-broadcast-destinations"); });
 	row->addWidget(destinationsButton);
-	detailsButton = Button(bar, "penguinDetailsButton", QTStr("Penguin.Workspace.StreamDetails"), Icon::Inspect, false);
-	connect(detailsButton, &QToolButton::clicked, this, [this]() { ShowDock("penguin-stream-details"); });
-	row->addWidget(detailsButton);
 	liveButton = Button(bar, "penguinLiveButton", QTStr("Penguin.Workspace.GoLive"), Icon::Live);
 	liveButton->setPopupMode(QToolButton::MenuButtonPopup);
 	auto *liveMenu = new QMenu(liveButton);
@@ -151,9 +148,6 @@ void PenguinWorkspace::CreateToolbar()
 		ClickControl(QStringLiteral("saveReplayButton"));
 	});
 	row->addWidget(clipButton);
-	auto *settings = Button(bar, "penguinSettingsButton", QTStr("Settings"), Icon::Settings, false);
-	connect(settings, &QToolButton::clicked, this, [this]() { ClickControl(QStringLiteral("settingsButton")); });
-	row->addWidget(settings);
 	auto *more = Button(bar, "penguinToolbarButton", QTStr("Penguin.Workspace.More"), Icon::More, false);
 	more->setPopupMode(QToolButton::InstantPopup);
 	auto *moreMenu = new QMenu(more);
@@ -434,7 +428,6 @@ void PenguinWorkspace::Refresh()
 	metrics->setText(QStringLiteral("%1 FPS").arg(obs_get_active_fps(), 0, 'f', 0));
 	metrics->setVisible(main->width() >= 1180);
 	workspaceLabel->setVisible(main->width() >= 1440);
-	detailsButton->setVisible(main->width() >= 1280);
 	FilterLists();
 	destinationsButton->setToolButtonStyle(main->width() >= 1180 ? Qt::ToolButtonTextBesideIcon : Qt::ToolButtonIconOnly);
 	Mirror(studioMode, main->controlsDock->findChild<QAbstractButton *>("modeSwitch"));

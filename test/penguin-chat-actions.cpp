@@ -94,7 +94,8 @@ struct PenguinChatTest {
 		Require(twitchNetwork.calls.last().body.value("data").toObject().value("duration").toInt() == 600,
 			"wrong timeout duration");
 		twitchNetwork.Finish(200, {});
-		Require(twitch.recentBans.contains("viewer"), "completed timeout must remain manageable after messages disappear");
+		Require(twitch.recentBans.contains("viewer"),
+			"completed timeout must remain manageable after messages disappear");
 		Confirm();
 		twitch.Moderate("delete", "message+id", "viewer");
 		Require(twitchNetwork.calls.last().request.attribute(QNetworkRequest::CustomVerbAttribute).toByteArray() ==
@@ -105,6 +106,88 @@ struct PenguinChatTest {
 		twitchNetwork.Finish(403, {});
 		Require(!twitch.token.isEmpty() && !twitch.moderating,
 			"moderation denial must not destroy chat session");
+
+		const int beforeInvalid = twitchNetwork.calls.size();
+		twitch.Moderate("delete", "", "viewer");
+		twitch.Moderate("unknown", "one", "viewer");
+		twitch.Moderate("ban", "", "");
+		twitch.Moderate("ban", "", "owner");
+		Require(twitchNetwork.calls.size() == beforeInvalid,
+			"invalid Twitch moderation must not send requests");
+		QTimer::singleShot(0, [] {
+			for (auto *w : QApplication::topLevelWidgets()) {
+				if (auto *b = qobject_cast<QMessageBox *>(w)) {
+					b->button(QMessageBox::Cancel)->click();
+				}
+			}
+		});
+		twitch.Moderate("ban", "", "viewer");
+		Require(twitchNetwork.calls.size() == beforeInvalid, "cancelled moderation must not send requests");
+		twitch.messages.push_back({"one", "viewer", "Text", "Viewer", "Text"});
+		twitch.messages.push_back({"two", "other", "Other", "Other", "Other"});
+		Confirm();
+		twitch.Moderate("delete", "one", "viewer");
+		twitchNetwork.Finish(204, {});
+		Require(twitch.messages.size() == 1 && twitch.messages.first().id == "two",
+			"successful Twitch deletion must update only the selected message without EventSub");
+		Confirm();
+		twitch.Moderate("ban", "", "viewer");
+		Require(!twitchNetwork.calls.last().body.value("data").toObject().contains("duration"),
+			"permanent Twitch ban must omit timeout duration");
+		const int pendingCount = twitchNetwork.calls.size();
+		twitch.Moderate("ban", "", "other");
+		Require(twitchNetwork.calls.size() == pendingCount,
+			"pending moderation must exclude duplicate actions");
+		twitchNetwork.Finish(200, {});
+		Confirm();
+		twitch.Moderate("unban", "", "viewer");
+		twitchNetwork.Finish(409, {});
+		Require(twitch.recentBans.contains("viewer") && twitch.status->text().contains("in progress"),
+			"conflicting unban must retain ban state and explain conflict");
+		Confirm();
+		twitch.Moderate("unban", "", "viewer");
+		twitchNetwork.Finish(204, {});
+		Require(!twitch.recentBans.contains("viewer"), "successful Twitch unban must remove the session entry");
+		twitch.ChatSettings();
+		twitchNetwork.Finish(
+			200, {{"data", QJsonArray{QJsonObject{{"slow_mode", false}, {"follower_mode", false}}}}});
+		QDialog *settingsDialog = nullptr;
+		for (auto *w : QApplication::topLevelWidgets()) {
+			if (w->isVisible() && w->windowTitle() == "Twitch chat settings") {
+				settingsDialog = qobject_cast<QDialog *>(w);
+			}
+		}
+		Require(settingsDialog, "chat settings dialog missing");
+		for (auto *box : settingsDialog->findChildren<QCheckBox *>()) {
+			box->setChecked(true);
+		}
+		settingsDialog->findChild<QDialogButtonBox *>()->button(QDialogButtonBox::Save)->click();
+		const auto settingsBody = twitchNetwork.calls.last().body;
+		Require(settingsBody.value("emote_mode").toBool() && settingsBody.value("subscriber_mode").toBool() &&
+				settingsBody.value("unique_chat_mode").toBool() &&
+				settingsBody.value("slow_mode_wait_time").toInt() == 30 &&
+				settingsBody.value("follower_mode_duration").toInt() == 0,
+			"chat settings payload must preserve supported modes and durations");
+		twitchNetwork.Finish(429, {});
+		Require(twitch.status->text().contains("limit"),
+			"chat settings rate limit must not appear as permissions failure");
+
+		twitch.ChatSettings();
+		twitchNetwork.Finish(200,
+				     {{"data", QJsonArray{QJsonObject{{"slow_mode", true}, {"follower_mode", true}}}}});
+		for (auto *w : QApplication::topLevelWidgets()) {
+			if (w->isVisible() && w->windowTitle() == "Twitch chat settings") {
+				settingsDialog = qobject_cast<QDialog *>(w);
+			}
+		}
+		for (auto *box : settingsDialog->findChildren<QCheckBox *>()) {
+			box->setChecked(false);
+		}
+		settingsDialog->findChild<QDialogButtonBox *>()->button(QDialogButtonBox::Save)->click();
+		Require(!twitchNetwork.calls.last().body.contains("slow_mode_wait_time") &&
+				!twitchNetwork.calls.last().body.contains("follower_mode_duration"),
+			"disabled chat modes must omit their duration fields");
+		twitchNetwork.Finish(200, {});
 		twitch.LoadParticipants();
 		twitchNetwork.Finish(200, {{"data", QJsonArray{QJsonObject{{"user_name", "Viewer"}}}},
 					   {"total", 2},
@@ -116,8 +199,12 @@ struct PenguinChatTest {
 
 		Transport youtubeNetwork;
 		YoutubeChat youtube(nullptr, &youtubeNetwork);
+		youtube.SetBroadcast("selected-video");
 		youtube.SetSession("fixture-token", "fixture-account");
-		Require(youtubeNetwork.calls.size() == 1, "YouTube sign-in should load active broadcasts");
+		Require(youtubeNetwork.calls.size() == 1, "YouTube sign-in should load the selected broadcast");
+		Require(youtubeNetwork.calls.last().request.url().query().contains("id=selected-video") &&
+				!youtubeNetwork.calls.last().request.url().query().contains("broadcastStatus=active"),
+			"Selected upcoming broadcasts must not be excluded by active-only filtering");
 		youtubeNetwork.Finish(
 			200, {{"items", QJsonArray{QJsonObject{{"snippet", QJsonObject{{"title", "Fixture live"},
 										       {"liveChatId", "chat-id"}}}}}}});
@@ -144,6 +231,9 @@ struct PenguinChatTest {
 		Require(youtubeNetwork.calls.last().body.value("snippet").toObject().value("type").toString() ==
 				"temporary",
 			"YouTube timeout body incorrect");
+		Require(youtubeNetwork.calls.last().body.value("snippet").toObject().value("banDurationSeconds").toInt() ==
+				600,
+			"YouTube timeout must last exactly 10 minutes");
 		youtubeNetwork.Finish(200, {{"id", "ban-id"}});
 		Require(youtube.history->count() == 0, "successful ban must remove user messages");
 		Confirm();
@@ -152,6 +242,46 @@ struct PenguinChatTest {
 			"YouTube unban requires ban id, not user id");
 		youtubeNetwork.Finish(204, {});
 		Require(!youtube.bans.contains("viewer"), "unban must clear stored ban id");
+
+		const int ytBefore = youtubeNetwork.calls.size();
+		youtube.Moderate("delete", "", "viewer");
+		youtube.Moderate("unknown", "one", "viewer");
+		youtube.Moderate("ban", "one", "");
+		youtube.Moderate("unban", "", "missing");
+		Require(youtubeNetwork.calls.size() == ytBefore,
+			"invalid YouTube actions and unknown bans must not send requests");
+		Confirm();
+		youtube.Moderate("ban", "one", "viewer");
+		Require(youtubeNetwork.calls.last().body.value("snippet").toObject().value("type") == "permanent" &&
+				!youtubeNetwork.calls.last().body.value("snippet").toObject().contains(
+					"banDurationSeconds"),
+			"permanent YouTube ban payload incorrect");
+		youtubeNetwork.Finish(200, {});
+		Require(!youtube.bans.contains("viewer") && youtube.status->text().contains("no ban ID"),
+			"missing ban identifier must not create an unusable undo action");
+		for (int code : {400, 403, 404, 409, 429, 500, 0}) {
+			Confirm();
+			youtube.Moderate("timeout", "one", "viewer");
+			youtubeNetwork.Finish(code, {});
+			Require(!youtube.moderating && !youtube.bans.contains("viewer") && !youtube.token.isEmpty(),
+				"failed YouTube moderation must preserve session and release pending action");
+		}
+		Require(PenguinChat::ModerationFailure(
+				403, {{"error",
+				       QJsonObject{{"errors", QJsonArray{QJsonObject{{"reason", "quotaExceeded"}}}}}}})
+				.contains("quota"),
+			"quota error must not be reported as permission denial");
+		Confirm();
+		youtube.Moderate("ban", "one", "viewer");
+		youtubeNetwork.Finish(200, {{"id", "ban-again"}});
+		Confirm();
+		youtube.Moderate("unban", "", "viewer");
+		youtubeNetwork.Finish(403, {});
+		Require(youtube.bans.value("viewer") == "ban-again",
+			"denied unban must retain the identifier for a later retry");
+		Confirm();
+		youtube.Moderate("unban", "", "viewer");
+		youtubeNetwork.Finish(204, {});
 		youtube.Read();
 		youtubeNetwork.Finish(401, {});
 		Require(!youtube.ready && !youtube.audienceTimer.isActive(),

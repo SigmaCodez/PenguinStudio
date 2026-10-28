@@ -29,6 +29,7 @@
 #include <QStyleOptionFrame>
 #include <QElapsedTimer>
 #include <QMainWindow>
+#include <QMenu>
 #include <QMessageBox>
 #include <QPointer>
 #include <QScreen>
@@ -302,8 +303,11 @@ void CheckWorkspaceLayout(const QString &size, int requestedWidth, int requested
 		Check(button && button->isVisible() && BoundsInWindow(topbar).contains(BoundsInWindow(button)),
 		      QStringLiteral("toolbar-control-fits-%1-%2").arg(size, QString::fromLatin1(name)));
 	}
+	Check(!mainWindow->findChild<QToolButton *>("penguinSettingsButton") &&
+		      !mainWindow->findChild<QToolButton *>("penguinDetailsButton"),
+	      QStringLiteral("redundant-toolbar-shortcuts-removed-%1").arg(size));
 	if (auto *live = Control<QToolButton>("penguinLiveButton")) {
-		for (const char *name : {"penguinRecordButton", "penguinClipButton", "penguinSettingsButton", "penguinToolbarButton"}) {
+		for (const char *name : {"penguinRecordButton", "penguinClipButton", "penguinToolbarButton"}) {
 			auto *button = Control<QToolButton>(name);
             if (mainWindow->property("penguinSimpleWorkspace").toBool() && QString::fromLatin1(name) == "penguinClipButton") {
                 Check(button && !button->isVisible(), QStringLiteral("inactive-replay-shortcut-removed-%1").arg(size));
@@ -482,8 +486,21 @@ void TestRightSidebar()
 		Check(!dock->isFloating() && mainWindow->dockWidgetArea(dock) == Qt::RightDockWidgetArea &&
 		      (mainWindow->property("penguinSimpleWorkspace").toBool() || mainWindow->tabifiedDockWidgets(inspector).contains(dock)),
 		      QStringLiteral("integrated-sidebar-tab-%1").arg(QString::fromLatin1(name)));
-		if (!OpenSimplePanel(name))
-            if (auto *button = Control<QAbstractButton>(entry.second)) button->click();
+		if (!OpenSimplePanel(name)) {
+			if (auto *button = mainWindow->findChild<QAbstractButton *>(entry.second)) {
+				button->click();
+			} else if (QString::fromLatin1(name) == "penguin-stream-details") {
+				auto *live = mainWindow->findChild<QToolButton *>("penguinLiveButton");
+				if (live && live->menu()) {
+					for (auto *action : live->menu()->actions()) {
+						if (action->text() == "Stream details") {
+							action->trigger();
+							break;
+						}
+					}
+				}
+			}
+		}
 		QCoreApplication::processEvents();
 		Check(!dock->visibleRegion().isEmpty(),
 		      QStringLiteral("sidebar-tab-can-open-%1").arg(QString::fromLatin1(name)));

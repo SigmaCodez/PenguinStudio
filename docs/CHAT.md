@@ -1,64 +1,37 @@
 # Stream chat
 
-Penguin Studio provides native Twitch and YouTube chat tabs. They
-work under Wayland without an embedded browser. Connect the corresponding account
-in **Details**, then open **Stream chat** from the Docks menu.
+Penguin Studio 0.7.3 offers Twitch and YouTube tabs with original platform web views where Qt WebEngine is available. Open **Stream chat** from the Docks menu. Connect your account in **Details**; current metadata loads automatically without overwriting unsaved edits.
 
-Messages are rendered as plain text with role labels and bounded history. The
-view follows new messages while you are at the bottom; scrolling up keeps your
-reading position. Right-click a message for moderation. Destructive actions ask
-for confirmation and are applied only when the platform accepts the request.
+## Original platform chat
 
-## Twitch
+The chat menu offers **Reload chat**, **Open in browser**, and **Use integrated chat**. Website sessions are separate from API account connections and your normal browser. Website cookies stay in dedicated local profiles; API tokens and system-browser cookies are never injected into them. Hidden web pages pause to reduce background activity.
 
-- Receive and send messages with EventSub and the Twitch chat API.
-- Delete a message, apply a ten-minute timeout, ban or unban a participant.
-- Change emote-only, follower-only, subscriber-only, slow and unique-message modes.
-- Search connected chat participants or recent chatters and display the live viewer count.
+Twitch website sign-in and sending were confirmed in local user testing. Google sign-in in the normal browser does not sign in the embedded YouTube page. Penguin Studio explains this and offers integrated chat or the original chat in the browser. Do not interpret a successful API connection as an authenticated website session.
 
-Existing accounts can continue reading and sending. Reconnect Twitch once to
-grant the additional moderation and participant-list permissions. A rejected
-moderation action does not sign the account out.
+Ubuntu DEB, Fedora RPM, Snap and AppImage builds request Qt WebEngine. The current Flatpak build uses integrated API chat because its bundled Qt build does not include WebEngine. Build-time fallback is explicit; no package claims unsupported website functionality.
 
-**Chat participants are not all viewers.** Twitch's list identifies users connected
-to chat and updates with a delay. Anonymous viewers and people watching without a
-chat connection are not identified. The stream viewer count is a separate metric.
+## YouTube broadcast selection
 
-## YouTube
+Choose the broadcast in **Details → YouTube**. The selected video ID appears beneath the selector. Explicit selections are remembered; when no selection can be restored, live/testing/upcoming broadcasts are preferred over completed broadcasts. Both chat views use the selected broadcast, including a scheduled broadcast if YouTube exposes its chat. Availability and permissions remain controlled by YouTube.
 
-- Select an active broadcast with live chat, receive and send messages.
-- Display owner, moderator and member labels.
-- Delete messages, apply ten-minute timeouts and ban participants.
-- Remove bans created during the current Penguin Studio chat session. Other bans
-  must be managed in YouTube Studio because their ban identifiers are not available
-  to this session.
-- Search people observed posting in the last 15 minutes and display the concurrent
-  viewer count when YouTube makes it available.
+## Integrated chat and moderation
 
-No chat appears until an active broadcast exposes a live chat. Permission,
-quota and ended-chat errors stop polling instead of repeatedly using quota.
-Temporary network failures retry with backoff. Message polling respects the
-server interval and uses a minimum ten-second interval; it is not instantaneous.
-Live viewer counts refresh once a minute. YouTube does not provide a complete
-named viewer/presence list through this integration.
+Choose **Use integrated chat** to use the account connected in Details. Messages are plain text with role labels and bounded history. Scroll up to retain your reading position. Right-click a message for moderation; actions require confirmation.
 
-## Platform-specific features
+Twitch supports sending, deleting individual messages, ten-minute timeouts, permanent bans and removing bans/timeouts. Chat settings include emote-only, follower-only, subscriber-only, slow and unique-message modes. Participant lists identify chat connections, not everyone watching; anonymous viewers are not identified.
 
-**Dashboard ↗** opens the official Twitch or YouTube dashboard for
-features not implemented natively, including platform-specific monetization,
-advanced AutoMod workflows, polls and management of older YouTube bans. This is
-not a claim of feature parity with either platform's website. Twitch emote codes
-remain text; this native view does not download third-party emote images.
+YouTube supports sending, individual-message deletion, ten-minute timeouts and permanent bans. Only bans with an identifier returned during the current session can be removed here; use YouTube Studio for older bans or missing identifiers. The app explains quota, authorization, protected-target, missing-target and conflicting-action failures. Uncertain results are not automatically retried.
 
-Use the participant menu to manage bans/timeouts completed during this session,
-even after the affected messages disappear.
+YouTube polling respects the server interval and a ten-second minimum. Viewer counts refresh once a minute. YouTube provides no complete named viewer list; recent chatters are people observed posting within 15 minutes.
 
-Signing out clears message history and participant data. Tokens continue to use
-the existing system-keychain sign-in flow; chat history is not saved to disk.
+## Verification and limits
 
-## API references
+User testing confirmed integrated YouTube sending and deletion in both the app and browser. Automated in-memory tests cover timeouts, bans, unbans, cancellation, invalid inputs, errors, token refresh and Twitch chat settings under Wayland. No separate test accounts were available, so real timeout/ban/unban operations are not claimed as verified. Platform-specific monetization, advanced AutoMod, polls and other website features are not feature-parity promises.
 
-- [Twitch API reference](https://dev.twitch.tv/docs/api/reference/)
-- [Twitch chat moderation](https://dev.twitch.tv/docs/chat/moderation/)
-- [YouTube live chat messages](https://developers.google.com/youtube/data/live/reference/rest/v3/liveChatMessages)
-- [YouTube live chat bans](https://developers.google.com/youtube/data/live/reference/rest/v3/liveChatBans)
+API tokens use the system keyring. Disconnect clears API chat state. Website sign-in uses its separate web profile; sign out on the website to end that session. Chat history in the integrated view is not persisted.
+
+## References
+
+- [Twitch moderation](https://dev.twitch.tv/docs/chat/moderation/)
+- [YouTube live chat API](https://developers.google.com/youtube/data/live/reference/rest/v3/liveChatMessages)
+- [Google supported sign-in browsers](https://support.google.com/accounts/answer/7675428?hl=en)

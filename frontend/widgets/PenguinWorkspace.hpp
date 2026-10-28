@@ -32,7 +32,6 @@ class PenguinWorkspace final : public QObject {
 	QLabel *layerCount = nullptr;
 	QLineEdit *sceneSearch = nullptr;
 	QLineEdit *layerSearch = nullptr;
-	QToolButton *detailsButton;
 	QToolButton *studioMode;
 	QToolButton *liveButton;
 	QToolButton *recordButton;
