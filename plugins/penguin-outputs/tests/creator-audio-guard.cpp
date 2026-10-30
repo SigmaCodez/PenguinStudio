@@ -45,5 +45,19 @@ int main()
 	assert(RecordingFormatAdvice("hybrid_mp4", false).contains("supports recovery"));
 	assert(RecordingFormatAdvice("mkv", true).contains("Custom recording"));
 	assert(!RecordingFormatAdvice("PRIVATE-PATH", false).contains("PRIVATE-PATH"));
+	config_t *config = nullptr;
+	assert(config_open_string(&config, "") == CONFIG_SUCCESS);
+	assert(RecordingDirectory(nullptr).isEmpty());
+	config_set_string(config, "SimpleOutput", "FilePath", "/simple");
+	assert(RecordingDirectory(config) == "/simple");
+	config_set_string(config, "Output", "Mode", "Advanced");
+	config_set_string(config, "AdvOut", "RecFilePath", "/standard");
+	assert(RecordingDirectory(config) == "/standard");
+	config_set_string(config, "AdvOut", "RecType", "FFmpeg");
+	config_set_string(config, "AdvOut", "FFFilePath", "/custom");
+	assert(RecordingDirectory(config).isEmpty());
+	config_set_bool(config, "AdvOut", "FFOutputToFile", true);
+	assert(RecordingDirectory(config) == "/custom");
+	config_close(config);
 	return 0;
 }

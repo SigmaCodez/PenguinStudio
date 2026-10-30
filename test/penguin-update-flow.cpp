@@ -179,7 +179,18 @@ int main(int argc, char **argv)
 		network.calls[1]->Complete(200, "[]");
 		config_set_bool(configuration, "General", "EnableAutoUpdates", false);
 		CheckPenguinLinuxUpdates(&parent, false);
-		Require(network.calls.size() == 2, "Explicit automatic-update opt-out ignored");
+		Require(network.calls.size() == 3, "Legacy preference suppressed mandatory startup check");
+		network.calls[2]->Complete(500, "service unavailable");
+		Require(!updater->isVisible(), "Failed background check displayed a dialog");
+		CheckPenguinLinuxUpdates(&parent, false);
+		network.calls[3]->Complete(200, "[]");
+		Require(!updater->isVisible(), "Up-to-date background check displayed a dialog");
+		parent.show();
+		parent.activateWindow();
+		QApplication::processEvents();
+		CheckPenguinLinuxUpdates(&parent, false);
+		network.calls[4]->Complete(200, Release());
+		Require(updater->isVisible(), "New release was not announced");
 		delete updater.data();
 	}
 	config_close(configuration);

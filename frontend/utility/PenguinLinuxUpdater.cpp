@@ -285,14 +285,11 @@ public:
 		auto *automatic = new QCheckBox(Text("Penguin.Update.Automatic"), this);
 		auto *preview = new QCheckBox(Text("Penguin.Update.Preview"), this);
 		auto *config = obs_frontend_get_app_config();
-		automatic->setChecked(config_get_bool(config, "General", "EnableAutoUpdates"));
+		automatic->setChecked(true);
+		automatic->setEnabled(false);
 		// Penguin currently ships development previews; users can opt out explicitly.
 		config_set_default_bool(config, "PenguinUpdates", "Preview", true);
 		preview->setChecked(config_get_bool(config, "PenguinUpdates", "Preview"));
-		connect(automatic, &QCheckBox::toggled, this, [config](bool value) {
-			config_set_bool(config, "General", "EnableAutoUpdates", value);
-			config_save_safe(config, "tmp", nullptr);
-		});
 		connect(preview, &QCheckBox::toggled, this, [this, config](bool value) {
 			config_set_bool(config, "PenguinUpdates", "Preview", value);
 			config_save_safe(config, "tmp", nullptr);
@@ -429,13 +426,7 @@ QPointer<Updater> updater;
 
 void CheckPenguinLinuxUpdates(QWidget *parent, bool manual)
 {
-	if (!manual) {
-		auto *config = obs_frontend_get_app_config();
-		if (!config_get_bool(config, "General", "EnableAutoUpdates")) {
-			return;
-		}
-
-	}
+	// Every normal Linux startup checks silently, including migrated profiles.
 	if (!updater) {
 		updater = new Updater(parent);
 	}

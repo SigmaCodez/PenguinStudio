@@ -17,9 +17,16 @@ Penguin Studio brings a redesigned production workspace, native multi-destinatio
 
 ![Penguin Studio modern workspace with searchable layers and scenes, audio channel strips and an integrated inspector](docs/images/current/workspace-en.png)
 
-These English previews show the real 0.7.3 application with synthetic demo media. See the [workspace guide](docs/WORKSPACE.md) for the controls and layout.
+These English previews show the real 0.7.4 application with synthetic demo media. See the [workspace guide](docs/WORKSPACE.md) for the controls and layout.
 
 > Development preview. See [verification status](docs/VERIFICATION.md) for completed checks and remaining release tests, and [packaging](docs/PACKAGING.md) for development downloads and supported build targets. Validate your devices and streaming accounts before relying on this build for a live show.
+
+## What is new in 0.7.4
+
+- Native Wayland preview recovery when opening embedded platform chat recreates the window surface.
+- Named recording chapters for compatible containers, plus format-independent highlight notes with text export. Pauses keep their video timestamp, and notes from different recordings remain separate. Export notes before quitting.
+- Recording storage checks follow custom FFmpeg paths and verify directory access. Stream checks show replay-buffer readiness and an active privacy shield.
+- See [Creator tools](docs/CREATOR-TOOLS.md) for the workflow and [release notes](docs/releases/0.7.4.md) for validation and limitations.
 
 ## What is included
 
@@ -38,7 +45,7 @@ These English previews show the real 0.7.3 application with synthetic demo media
 
 ## Get started
 
-**Current release: [Penguin Studio 0.7.3](docs/releases/0.7.3.md)** — original platform chat views where Qt WebEngine is available, reliable YouTube broadcast selection, automatic stream details and improved integrated-chat moderation. The toolbar removes redundant settings and details shortcuts.
+**Current release: [Penguin Studio 0.7.4](docs/releases/0.7.4.md)** — original platform chat views where Qt WebEngine is available, reliable YouTube broadcast selection, automatic stream details and improved integrated-chat moderation. The toolbar removes redundant settings and details shortcuts.
 
 Camera processing offers **Automatic**, **GPU** and **CPU**, with automatic CPU fallback. The optional Ubuntu 26.04 or 26.10 AMD runtime add-on enables primary GPU matting on the tested RX 9070 XT; hand preservation stays on CPU. Other package/hardware combinations retain CPU processing unless a compatible runtime is provided. See [camera GPU setup](docs/PACKAGING.md#optional-amd-camera-gpu-runtime).
 
@@ -57,7 +64,7 @@ Twitch and YouTube sign-ins are saved in the system keyring and restored after r
 
 ## Penguin Studio updates
 
-New Penguin Studio versions are published on our [GitHub Releases page](https://github.com/SigmaCodez/PenguinStudio/releases), with release notes, Linux packages and SHA-256 checksums. Use **Settings → General → Check for updates** to download and install a verified update on supported Ubuntu, Fedora and Flatpak installations. An automatic check at startup announces newer versions when enabled. Stop all outputs before updating, confirm any system administrator prompt, then restart the app. Locally installed Snap bundles and AppImages require a manual package update. Arch installations use the updated recipe until an AUR listing is available. You can also close Penguin Studio and install the newer package for the same distribution release and format. See the [package guide](docs/PACKAGING.md) for format-specific instructions. Direct downloads do not require a source checkout.
+New Penguin Studio versions are published on our [GitHub Releases page](https://github.com/SigmaCodez/PenguinStudio/releases), with release notes, Linux packages and SHA-256 checksums. Use **Settings → General → Check for updates** to download and install a verified update on supported Ubuntu, Fedora and Flatpak installations. Every normal Linux startup checks in the background and announces only newer versions. Up-to-date and unsuccessful background checks stay silent. Stop all outputs before updating, confirm any system administrator prompt, then restart the app. Locally installed Snap bundles and AppImages require a manual package update. Arch installations use the updated recipe until an AUR listing is available. You can also close Penguin Studio and install the newer package for the same distribution release and format. See the [package guide](docs/PACKAGING.md) for format-specific instructions. Direct downloads do not require a source checkout.
 
 Penguin Studio has its own version numbers and release schedule. Our GitHub Actions workflow builds and publishes the Linux packages when a new project version is released. These downloads are development previews; check the release notes and [verification status](docs/VERIFICATION.md) before updating a production setup.
 

@@ -179,9 +179,11 @@ void OBSBasic::TimedCheckForUpdates()
 	if (App()->IsUpdaterDisabled()) {
 		return;
 	}
+#if !defined(__linux__)
 	if (!config_get_bool(App()->GetAppConfig(), "General", "EnableAutoUpdates")) {
 		return;
 	}
+#endif
 
 #if defined(__linux__)
 	QTimer::singleShot(5000, this, [this]() {

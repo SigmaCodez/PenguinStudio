@@ -1,6 +1,6 @@
 # Linux builds and packages
 
-Penguin Studio's current source version is **0.7.3**, based on OBS Studio
+Penguin Studio's current source version is **0.7.4**, based on OBS Studio
 **33.0.0**. The application ID is `io.github.SigmaCodez.PenguinStudio` and the
 launcher is `penguin-studio`. Internal OBS libraries and plugin paths retain
 their names for compatibility. Application settings are stored separately
@@ -29,7 +29,7 @@ recipes deliberately target x86_64 only.
 
 ## Automatic versioned downloads
 
-**[Download Penguin Studio 0.7.3](https://github.com/SigmaCodez/PenguinStudio/releases/tag/penguin-v0.7.3)**
+**[Download Penguin Studio 0.7.4](https://github.com/SigmaCodez/PenguinStudio/releases/tag/penguin-v0.7.4)**
 Publication requires every package build and release check to pass. Refer to
 the release build manifest for the final source commit and checksums.
 
@@ -40,7 +40,7 @@ Snap, AppImage and an Arch recipe archive, plus `SHA256SUMS` and
 Releases are marked as prereleases while Penguin Studio remains a development preview.
 
 To publish a new version, increase **`packaging/version.txt`** (for example from
-`0.7.3` to `0.7.4`) and push it to `main`. This single file supplies the application,
+`0.7.4` to `0.7.4`) and push it to `main`. This single file supplies the application,
 native package and Snap versions; the Flatpak filename uses the same value.
 Refresh the English product text and real candidate-version screenshots together
 with the version change; the [publication check](PUBLICATION.md) rejects stale previews.
@@ -66,15 +66,15 @@ See [0.6.3 validation](validation/core-security-0.6.3.md) for the package-specif
 Wayland, recording, camera, platform-sign-in and shutdown results and their limits.
 Earlier installed results remain in the [verification history](VERIFICATION.md).
 
-The download is `penguin-studio_0.7.3-1+ubuntu26.04_amd64.deb`.
+The download is `penguin-studio_0.7.4-1+ubuntu26.04_amd64.deb`.
 Verify it against `SHA256SUMS` from the same release before installing.
 
 After downloading the matching DEB, the repository's installer checks the
 release, architecture and APT dependency resolution before installation:
 
 ```sh
-bash scripts/packaging/install-deb.sh --check /path/to/penguin-studio_0.7.3-1+ubuntu26.04_amd64.deb
-bash scripts/packaging/install-deb.sh /path/to/penguin-studio_0.7.3-1+ubuntu26.04_amd64.deb
+bash scripts/packaging/install-deb.sh --check /path/to/penguin-studio_0.7.4-1+ubuntu26.04_amd64.deb
+bash scripts/packaging/install-deb.sh /path/to/penguin-studio_0.7.4-1+ubuntu26.04_amd64.deb
 ```
 
 The first command makes no system changes. The second uses the normal Ubuntu
@@ -84,13 +84,13 @@ on the host's Qt, Python or FFmpeg library versions.
 
 ## Flatpak
 
-Download `penguin-studio-0.7.3-x86_64.flatpak` from the Penguin Studio release.
+Download `penguin-studio-0.7.4-x86_64.flatpak` from the Penguin Studio release.
 Only the runtime is needed to install or update the bundle:
 
 ```sh
 flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 flatpak install --user flathub org.freedesktop.Platform//26.08
-flatpak install --user --or-update ./penguin-studio-0.7.3-x86_64.flatpak
+flatpak install --user --or-update ./penguin-studio-0.7.4-x86_64.flatpak
 flatpak run io.github.SigmaCodez.PenguinStudio
 ```
 
@@ -129,10 +129,10 @@ on its supported target distribution:
 
 ```sh
 # Ubuntu 26.04 / 26.04.1, after downloading the matching build:
-sudo apt install --no-remove ./penguin-studio_0.7.3-1+ubuntu26.04_amd64.deb
+sudo apt install --no-remove ./penguin-studio_0.7.4-1+ubuntu26.04_amd64.deb
 # Use a package built for your Ubuntu release.
 # Fedora 44:
-sudo dnf install ./penguin-studio-0.7.3-1.x86_64.rpm
+sudo dnf install ./penguin-studio-0.7.4-1.x86_64.rpm
 ```
 
 To build from source, use the target distribution and start from a recursive checkout:
@@ -168,7 +168,7 @@ on a host with Snapcraft installed. To install a downloaded or locally built
 Snap on a host with snapd:
 
 ```sh
-sudo snap install --dangerous ./penguin-studio_0.7.3_amd64.snap
+sudo snap install --dangerous ./penguin-studio_0.7.4_amd64.snap
 sudo snap connect penguin-studio:audio-record
 sudo snap connect penguin-studio:camera
 # Only if media on removable drives is needed:
@@ -214,14 +214,14 @@ and [Snapcraft CMake plugin](https://documentation.ubuntu.com/snapcraft/stable/c
 
 ## Optional AMD camera GPU runtime
 
-Penguin Studio 0.7.3 provides Automatic, GPU and CPU preferences for automatic
+Penguin Studio 0.7.4 provides Automatic, GPU and CPU preferences for automatic
 camera background effects. The additional
-`penguin-studio-camera-amd-gfx1201_0.7.3-1+ubuntu26.04_amd64.deb` contains private
+`penguin-studio-camera-amd-gfx1201_0.7.4-1+ubuntu26.04_amd64.deb` contains private
 AMD ROCm/MIGraphX libraries for the tested Radeon RX 9070 XT (gfx1201) on Ubuntu
 26.04.1. Install it alongside the matching main Ubuntu 26.04 package:
 
 ```sh
-sudo apt install ./penguin-studio_0.7.3-1+ubuntu26.04_amd64.deb ./penguin-studio-camera-amd-gfx1201_0.7.3-1+ubuntu26.04_amd64.deb
+sudo apt install ./penguin-studio_0.7.4-1+ubuntu26.04_amd64.deb ./penguin-studio-camera-amd-gfx1201_0.7.4-1+ubuntu26.04_amd64.deb
 ```
 
 Verify both downloads against the release SHA256SUMS first. The add-on does not
@@ -247,13 +247,13 @@ require it.
 Use the native Ubuntu 26.10 package, built against that distribution’s libraries. Do not install it on Ubuntu 26.04.
 
 ```sh
-sudo apt install ./penguin-studio_0.7.3-1+ubuntu26.10_amd64.deb
+sudo apt install ./penguin-studio_0.7.4-1+ubuntu26.10_amd64.deb
 ```
 
 For the tested RX 9070 XT, install both matching packages to enable primary GPU matting:
 
 ```sh
-sudo apt install --no-remove ./penguin-studio_0.7.3-1+ubuntu26.10_amd64.deb ./penguin-studio-camera-amd-gfx1201_0.7.3-1+ubuntu26.10_amd64.deb
+sudo apt install --no-remove ./penguin-studio_0.7.4-1+ubuntu26.10_amd64.deb ./penguin-studio-camera-amd-gfx1201_0.7.4-1+ubuntu26.10_amd64.deb
 ```
 
 The in-app updater selects Ubuntu 26.10 assets only on Ubuntu 26.10. An optional AMD RX 9070 camera-runtime add-on is also provided for Ubuntu 26.10. It uses the same private runtime validated with the native 26.10 camera worker; it does not replace the system graphics driver. CPU camera processing remains available without the add-on.

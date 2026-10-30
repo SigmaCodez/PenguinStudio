@@ -1,0 +1,11 @@
+{
+  "build": "0.7.3-1+ubuntu26.04.local2",
+  "locale": "en-US",
+  "capture": "Real native Wayland application, isolated synthetic demo profile; visually reviewed",
+  "images": [
+    {
+      "file": "highlight-notes-en.png",
+      "sha256": "fc6594ba4d0273ac58273f4ecba80bbcd2fdba79214f489cfe2088059a46f6db"
+    }
+  ]
+}

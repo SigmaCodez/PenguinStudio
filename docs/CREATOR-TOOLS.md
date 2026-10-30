@@ -1,6 +1,6 @@
 # Creator tools
 
-Creator tools is included in Penguin Studio 0.7.2, with harmonized controls and integrated recording helpers.
+Creator tools is included in Penguin Studio, with harmonized controls and integrated recording helpers.
 Open **Penguin Studio → Tools → Creator tools**. The existing classic workspace and camera processing remain in place.
 
 ## Stream check
@@ -41,3 +41,23 @@ The shield replaces the program picture with an opaque dark surface and silences
 This is a program-output shield, not a camera hardware switch. The local editing preview may still show your camera, and already buffered or transmitted frames cannot be recalled. Independently implemented third-party outputs that bypass Penguin's program and normal source-audio pipeline are outside its scope. Do not disable or remove the temporary privacy filters while the shield is active.
 
 Privacy is a session control: after restarting the app, check your scene before starting an output. Transient filters saved during shutdown are cleaned on scene-collection load. The assistant never starts a stream or recording automatically.
+
+## Recording helpers in 0.7.4
+
+The recording storage check now follows the actual custom FFmpeg file-output directory and verifies that it exists and is writable. A custom network-only output is not presented as a ready local recording target.
+
+Stream check also reports whether replay buffering is running or merely configured, and explicitly reports an active privacy shield. These checks do not start outputs or change privacy settings.
+
+### Recording chapters
+
+In **Creator tools → Performance help**, enter an optional chapter name and select **Add chapter** while recording. Enter in the name field performs the same action. Chapter names are limited to 120 characters. The existing chapter hotkey remains available; no extra toolbar shortcut is added.
+
+A chapter-capable output, such as Hybrid MP4, is required. Unsupported outputs show an explanation and retain your name so it is not silently discarded. The action is unavailable while recording is stopped or paused and rechecks the state when clicked. Finish the recording normally to save its chapter index, then check chapter support in your editor. Chapters do not create separate clip files or YouTube stream markers.
+
+### Highlight notes
+
+**Creator tools → Highlight notes** keeps editing notes for any recording format. Enter an optional note and select **Mark highlight**, or press Enter in the input. Blank input creates a “Highlight” note. The time is derived from encoded video frames, so time spent paused is not added. Notes may also be added while paused. Times are approximate; split outputs can reset counters and are not presented as one continuous file timeline.
+
+Each new recording gets a separate number within the app session, even if Creator tools was hidden. Earlier notes remain available when another recording starts. Up to 1,000 notes of 240 characters are retained; no audio or images are captured by this feature.
+
+Use **Export notes…** to save a UTF-8 text file for editing. Export keeps your notes in the list, and a failed write leaves them available to retry. Notes are held in memory only: export before quitting Penguin Studio. They are not embedded in the video, sent to a platform, or included in copied performance diagnostics. Embedded chapter marks remain a separate feature for compatible containers.

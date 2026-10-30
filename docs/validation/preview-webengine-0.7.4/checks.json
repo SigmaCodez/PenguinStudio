@@ -1,0 +1,37 @@
+{
+  "checks": [
+    {
+      "name": "Native Wayland platform",
+      "passed": true
+    },
+    {
+      "name": "Preview rendered before browser creation",
+      "passed": true
+    },
+    {
+      "name": "Native display restored after browser creation",
+      "passed": true
+    },
+    {
+      "name": "Preview frames continue after browser creation",
+      "passed": true
+    },
+    {
+      "name": "Display survives browser replacement",
+      "passed": true
+    },
+    {
+      "name": "Frames continue across browser replacement",
+      "passed": true
+    },
+    {
+      "name": "Recording survives native surface changes",
+      "passed": true
+    },
+    {
+      "name": "Recording stops cleanly",
+      "passed": true
+    }
+  ],
+  "frames": 1143
+}

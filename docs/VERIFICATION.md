@@ -5,6 +5,8 @@
 > product previews. For the current English GUI, see the [workspace guide](WORKSPACE.md)
 > and [preview provenance](images/current/manifest.json).
 
+Version 0.7.4 adds recording chapters, highlight notes and startup update checks. See the reviewed [chapter/storage changes](validation/creator-chapters-0.7.3-local1.md), [highlight notes](validation/highlight-notes-0.7.3-local2.md), and [release notes](releases/0.7.4.md). The native preview regression passed eight dedicated Wayland assertions and was confirmed fixed in the user’s normal profile after candidate installation. See [candidate evidence](validation/release-0.7.4-candidate.md); final release-package validation remains separate.
+
 Version 0.7.3 adds original platform chat views, reliable YouTube selection and integrated moderation corrections. The [final release and installed-package checks](validation/chat-release-0.7.3.md) cover all downloads, Wayland recording and local installation. See the [local chat review](local-chat-review.md) for automated and real-provider test boundaries, and the [release notes](releases/0.7.3.md). Real bans/timeouts were not exercised because no separate test accounts were available.
 
 Version 0.7.2 retains the classic workspace and adds Creator tools, asynchronous camera processing and Ubuntu 26.10 packages. See the [Creator tools validation](validation/creator-tools-2026-10-28.md) and [classic workspace record](validation/classic-workspace-0.7.2.md). The classic8 design was installed and approved locally. The final complete Linux package set is validated by the release workflow. See also the [upload and installed-app validation](validation/upload-status-2026-10-28.md).

@@ -20,10 +20,17 @@ protected:
 		QPlatformSurfaceEvent *surfaceEvent;
 
 		switch (event->type()) {
+		case QEvent::Expose:
+			// SurfaceCreated may arrive before the replacement surface is exposed.
+			display->CreateDisplay();
+			break;
 		case QEvent::PlatformSurface:
 			surfaceEvent = static_cast<QPlatformSurfaceEvent *>(event);
 
 			switch (surfaceEvent->surfaceEventType()) {
+			case QPlatformSurfaceEvent::SurfaceCreated:
+				display->RestoreDisplay();
+				break;
 			case QPlatformSurfaceEvent::SurfaceAboutToBeDestroyed:
 				display->DestroyDisplay();
 				break;

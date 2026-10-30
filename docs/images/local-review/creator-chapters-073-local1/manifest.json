@@ -1,0 +1,17 @@
+{
+  "build": "0.7.3-1+ubuntu26.04.local1",
+  "date": "2026-10-30",
+  "locale": "en-US",
+  "platform": "wayland",
+  "capture": "Real application, isolated demo profile and synthetic media; local review only",
+  "images": [
+    {
+      "file": "chapters-en.png",
+      "sha256": "d745f3f8ad8549ea594efd5214b7bbed8bb4a0dcd61f9a237166d782a0812645"
+    },
+    {
+      "file": "checks-en.png",
+      "sha256": "c1336e1fa67acaad2b0d8ea49d4e67e6be4b2b81811b8e22627f95993a1e2051"
+    }
+  ]
+}

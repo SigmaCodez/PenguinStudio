@@ -1291,7 +1291,12 @@ void OBSBasicSettings::LoadGeneralSettings()
 	LoadLanguageList();
 
 #if defined(_WIN32) || defined(ENABLE_SPARKLE_UPDATER) || defined(__linux__)
-	bool enableAutoUpdates = config_get_bool(App()->GetAppConfig(), "General", "EnableAutoUpdates");
+	#if defined(__linux__)
+	const bool enableAutoUpdates = true;
+	ui->enableAutoUpdates->setEnabled(false);
+#else
+	const bool enableAutoUpdates = config_get_bool(App()->GetAppConfig(), "General", "EnableAutoUpdates");
+#endif
 	ui->enableAutoUpdates->setChecked(enableAutoUpdates);
 
 	LoadBranchesList();

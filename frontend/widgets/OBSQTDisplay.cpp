@@ -8,6 +8,7 @@
 #endif
 
 #include <QWindow>
+#include <QTimer>
 #ifdef ENABLE_WAYLAND
 #include <QApplication>
 #endif
@@ -71,6 +72,35 @@ OBSQTDisplay::OBSQTDisplay(QWidget *parent, Qt::WindowFlags flags) : QWidget(par
 	setAttribute(Qt::WA_DontCreateNativeAncestors);
 	setAttribute(Qt::WA_NativeWindow);
 
+	BindDisplayWindow();
+}
+
+bool OBSQTDisplay::event(QEvent *event)
+{
+	const bool result = QWidget::event(event);
+	if (event->type() == QEvent::WinIdChange) {
+		// Qt may replace the QWindow itself when the first WebEngine child
+		// changes the top-level surface type. Observe the replacement only
+		// after Qt has finished processing the native-handle transition.
+		QTimer::singleShot(0, this, [this] { BindDisplayWindow(); });
+	}
+	return result;
+}
+
+void OBSQTDisplay::BindDisplayWindow()
+{
+	auto *window = windowHandle();
+	if (displayWindow == window)
+		return;
+	if (displayWindow)
+		disconnect(displayWindow, nullptr, this, nullptr);
+	delete surfaceFilter.data();
+	surfaceFilter = nullptr;
+	display = nullptr;
+	displayWindow = window;
+	if (!window)
+		return;
+
 	auto windowVisible = [this](bool visible) {
 		if (!visible) {
 #if !defined(_WIN32) && !defined(__APPLE__)
@@ -94,10 +124,13 @@ OBSQTDisplay::OBSQTDisplay(QWidget *parent, Qt::WindowFlags flags) : QWidget(par
 		obs_display_resize(display, size.width(), size.height());
 	};
 
-	connect(windowHandle(), &QWindow::visibleChanged, this, windowVisible);
-	connect(windowHandle(), &QWindow::screenChanged, this, screenChanged);
+	connect(window, &QWindow::visibleChanged, this, windowVisible);
+	connect(window, &QWindow::screenChanged, this, screenChanged);
 
-	windowHandle()->installEventFilter(new SurfaceEventFilter(this));
+	surfaceFilter = new SurfaceEventFilter(this);
+	window->installEventFilter(surfaceFilter);
+	destroying = false;
+	QTimer::singleShot(0, this, [this] { CreateDisplay(); });
 }
 
 QColor OBSQTDisplay::GetDisplayBackgroundColor() const

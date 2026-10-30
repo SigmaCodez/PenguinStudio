@@ -8,6 +8,9 @@
 #include <QDialog>
 #include <QStatusBar>
 #include <QLabel>
+#include <QLineEdit>
+#include <QFileDialog>
+#include <QFileInfo>
 #include <QTreeWidget>
 #include <QPushButton>
 #include <QComboBox>
@@ -31,6 +34,7 @@ OBSSource fixture, tone, addedTone;
 OBSScene scene;
 QJsonArray checks;
 int tickCount = 0;
+QString pausedNoteTime;
 void check(bool ok, const char *name) { checks.append(QJsonObject{{"name", name}, {"passed", ok}}); }
 QPushButton *button(const QString &prefix) {
  if (!dialog) return nullptr;
@@ -112,7 +116,40 @@ void tick() {
   bool advice=false;
   for(auto *label:dialog->findChildren<QLabel*>())if(label->text()=="Recording resilience")advice=true;
   check(advice,"Recording resilience advice is present");
+  auto *chapter = dialog->findChild<QPushButton*>("creatorAddChapter");
+  auto *name = dialog->findChild<QLineEdit*>("creatorChapterName");
+  auto *chapterResult = dialog->findChild<QLabel*>("creatorChapterStatus");
+  check(chapter && chapter->isEnabled() && name, "Chapter action available during recording");
+  if(chapter && name){name->setText("Synthetic highlight");chapter->click();}
+  const bool supported=qEnvironmentVariableIsSet("PENGUIN_TEST_CHAPTERS");
+  check(chapterResult && chapterResult->text().contains(supported ? "Chapter sent" : "does not accept chapters"), "Chapter capability reported honestly");
+  check(name && (supported ? name->text().isEmpty() : name->text()=="Synthetic highlight"), "Chapter name retained on unsupported output");
   dialog->grab().save(qEnvironmentVariable("PENGUIN_SMOKE_DIR")+"/creator-performance.png");
+ }
+ if(tickCount==18 && dialog && qEnvironmentVariableIsSet("PENGUIN_TEST_NOTES")){
+  auto *input=dialog->findChild<QLineEdit*>("creatorNoteText");
+  auto *add=dialog->findChild<QPushButton*>("creatorAddNote");
+  auto *list=dialog->findChild<QTreeWidget*>("creatorNotes");
+  if(input && add){input->setText("Editing highlight ü");add->click();}
+  check(list && list->topLevelItemCount()==1 && list->topLevelItem(0)->text(2)=="Editing highlight ü", "Highlight text retained with Unicode");
+ }
+ if(tickCount==21 && dialog && qEnvironmentVariableIsSet("PENGUIN_TEST_NOTES")){
+  auto *add=dialog->findChild<QPushButton*>("creatorAddNote");
+  auto *list=dialog->findChild<QTreeWidget*>("creatorNotes");
+  if(add)add->click();
+  if(list && list->topLevelItemCount()==2)pausedNoteTime=list->topLevelItem(1)->text(1);
+ }
+ if(tickCount==19 && qEnvironmentVariableIsSet("PENGUIN_TEST_CHAPTERS"))obs_frontend_recording_pause(true);
+ if(tickCount==22 && qEnvironmentVariableIsSet("PENGUIN_TEST_CHAPTERS")){
+  auto *chapter=dialog ? dialog->findChild<QPushButton*>("creatorAddChapter") : nullptr;
+  check(obs_frontend_recording_paused() && chapter && !chapter->isEnabled(), "Chapter action disabled while recording is paused");
+  if(qEnvironmentVariableIsSet("PENGUIN_TEST_NOTES")){
+   auto *add=dialog->findChild<QPushButton*>("creatorAddNote");
+   auto *list=dialog->findChild<QTreeWidget*>("creatorNotes");
+   if(add)add->click();
+   check(list && list->topLevelItemCount()==3 && !pausedNoteTime.isEmpty() && list->topLevelItem(2)->text(1)==pausedNoteTime,"Highlight timestamp stays fixed during pause");
+  }
+  obs_frontend_recording_pause(false);
  }
  if(tickCount==18&&dialog){
   auto *tabs=dialog->findChild<QTabWidget*>();tabs->setCurrentIndex(2);
@@ -149,7 +186,34 @@ void tick() {
   obs_frontend_recording_stop();
   if(qEnvironmentVariableIsSet("PENGUIN_TEST_UPLOAD"))obs_frontend_streaming_stop();
  }
- if(tickCount==38){
+ if(tickCount==35 && qEnvironmentVariableIsSet("PENGUIN_TEST_NOTES") && dialog)dialog->hide();
+ if(tickCount==36 && qEnvironmentVariableIsSet("PENGUIN_TEST_NOTES"))obs_frontend_recording_start();
+ if(tickCount==39 && qEnvironmentVariableIsSet("PENGUIN_TEST_NOTES") && dialog){
+  dialog->show();
+  dialog->findChild<QTabWidget*>()->setCurrentIndex(3);
+  auto *add=dialog->findChild<QPushButton*>("creatorAddNote");
+  auto *list=dialog->findChild<QTreeWidget*>("creatorNotes");
+  if(add)add->click();
+  check(list && list->topLevelItemCount()==4 && list->topLevelItem(0)->text(0)!=list->topLevelItem(3)->text(0), "New recording has a separate identity even while tools were hidden");
+  dialog->grab().save(qEnvironmentVariable("PENGUIN_SMOKE_DIR")+"/highlight-notes.png");
+ }
+ if(tickCount==40 && qEnvironmentVariableIsSet("PENGUIN_TEST_NOTES"))obs_frontend_recording_stop();
+ if(tickCount==42 && qEnvironmentVariableIsSet("PENGUIN_TEST_NOTES") && dialog){
+  const QString path=qEnvironmentVariable("PENGUIN_SMOKE_DIR")+"/exported-notes.txt";
+  QTimer::singleShot(200,qApp,[path]{
+   for(auto*w:QApplication::topLevelWidgets())if(auto*d=qobject_cast<QFileDialog*>(w)){
+    d->setDirectory(QFileInfo(path).absolutePath());
+    if(auto *edit=d->findChild<QLineEdit*>("fileNameEdit"))edit->setText(QFileInfo(path).fileName());
+    QMetaObject::invokeMethod(d,"accept",Qt::QueuedConnection);break;
+   }
+  });
+  if(auto*b=dialog->findChild<QPushButton*>("creatorExportNotes"))b->click();
+  QFile file(path);const bool opened=file.open(QIODevice::ReadOnly);const auto content=opened ? file.readAll() : QByteArray{};
+  check(opened && content.contains("Editing highlight") && content.contains("Recording 2 |"), "Text export contains notes from both recordings");
+  auto *list=dialog->findChild<QTreeWidget*>("creatorNotes");
+  check(list && list->topLevelItemCount()==4,"Export preserves session notes");
+ }
+ if(tickCount==(qEnvironmentVariableIsSet("PENGUIN_TEST_NOTES") ? 45 : 38)){
   check(!obs_frontend_recording_active(),"Recording stopped");
   if(qEnvironmentVariableIsSet("PENGUIN_TEST_UPLOAD")) {
    auto *label=window->findChild<QLabel*>("penguinUploadRate");
@@ -159,11 +223,13 @@ void tick() {
   }
   auto *summary=dialog ? dialog->findChild<QLabel*>("creatorSessionSummary") : nullptr;
   check(summary && summary->text().contains("Recording: Stopped"),"Session summary reflects stopped recording");
+  auto *chapter=dialog ? dialog->findChild<QPushButton*>("creatorAddChapter") : nullptr;
+  check(chapter && !chapter->isEnabled(), "Chapter action disabled after recording stops");
   QFile file(qEnvironmentVariable("PENGUIN_SMOKE_DIR")+"/creator-checks.json");if(file.open(QIODevice::WriteOnly))file.write(QJsonDocument(QJsonObject{{"checks",checks},{"platform",QGuiApplication::platformName()}}).toJson());
   fixture=nullptr;tone=nullptr;addedTone=nullptr;scene=nullptr;
   window->close();
  }
 }
-void start(){if(qEnvironmentVariableIsEmpty("PENGUIN_SMOKE_DIR"))return;auto*t=new QTimer(qApp);QObject::connect(t,&QTimer::timeout,tick);t->start(1000);}
+void start(){if(qEnvironmentVariableIsSet("PENGUIN_TEST_NOTES"))QApplication::setAttribute(Qt::AA_DontUseNativeDialogs);if(qEnvironmentVariableIsEmpty("PENGUIN_SMOKE_DIR"))return;auto*t=new QTimer(qApp);QObject::connect(t,&QTimer::timeout,tick);t->start(1000);}
 Q_COREAPP_STARTUP_FUNCTION(start)
 }

@@ -26,6 +26,10 @@
 #include <QDialog>
 #include <QDialogButtonBox>
 #include <QLabel>
+#include <QLineEdit>
+#include <QFileInfo>
+#include <QFileDialog>
+#include <QSaveFile>
 #include <QPointer>
 #include <QPushButton>
 #include <QStorageInfo>
@@ -45,6 +49,7 @@ constexpr const char *VideoGuard = "penguin_privacy_video";
 constexpr const char *AudioGuard = "penguin_privacy_audio";
 std::atomic_bool privacy{false};
 QString lastOutputHelp;
+std::atomic_uint64_t recordingSession{0};
 QString ExplainOutputFailure(const char *raw, bool recording)
 {
 	// Only classification leaves this function. Never echo URLs, keys or local paths.
@@ -79,6 +84,19 @@ QString RecordingDuration(int frames, uint32_t numerator, uint32_t denominator)
 	const uint64_t seconds = uint64_t(frames) * denominator / numerator;
 	return QString("%1:%2:%3").arg(seconds / 3600, 2, 10, QChar('0'))
 		.arg((seconds / 60) % 60, 2, 10, QChar('0')).arg(seconds % 60, 2, 10, QChar('0'));
+}
+
+QString RecordingDirectory(config_t *config)
+{
+	if (!config)
+		return {};
+	const QString mode = QString::fromUtf8(config_get_string(config, "Output", "Mode"));
+	if (mode != "Advanced")
+		return QString::fromUtf8(config_get_string(config, "SimpleOutput", "FilePath"));
+	const QString type = QString::fromUtf8(config_get_string(config, "AdvOut", "RecType"));
+	if (type == "FFmpeg" && !config_get_bool(config, "AdvOut", "FFOutputToFile"))
+		return {};
+	return QString::fromUtf8(config_get_string(config, "AdvOut", type == "FFmpeg" ? "FFFilePath" : "RecFilePath"));
 }
 
 std::mutex guardMutex;
@@ -264,6 +282,14 @@ class CreatorTools final : public QDialog {
 	QTreeWidget *checks;
 	QLabel *health;
 	QLabel *session;
+	QLineEdit *chapterName;
+	QPushButton *addChapter;
+	QLabel *chapterStatus;
+	QTreeWidget *notes;
+	QLineEdit *noteText;
+	QPushButton *addNote;
+	QPushButton *exportNotes;
+	QLabel *noteStatus;
 	QString diagnostics;
 	QLabel *audioStatus;
 	QComboBox *microphone;
@@ -484,6 +510,8 @@ class CreatorTools final : public QDialog {
 			.arg(obs_frontend_streaming_active() ? "Active" : "Stopped")
 			.arg(privacy.load() ? "On" : "Off");
 		session->setText(summary);
+		addChapter->setEnabled(active && !obs_frontend_recording_paused());
+		addNote->setEnabled(active && notes->topLevelItemCount() < 1000);
 		diagnostics = QString("Penguin Studio — performance snapshot\n%1\nEngine render counters: %2 frames, %3 delayed\nEncoder skipped frames: %4\nPrimary stream dropped frames: %5\n\n%6\n\nCounters can reset between outputs. No account, source names, paths or credentials are included.")
 			.arg(summary).arg(frames).arg(lag).arg(skipped).arg(dropped)
 			.arg(problems.isEmpty() ? "No new loss events in the latest sample." : problems.join("\n"));
@@ -583,6 +611,37 @@ public:
 		session->setProperty("penguinStatusPanel", true);
 		session->setWordWrap(true);
 		healthLayout->addWidget(session);
+		auto *chapterRow = new QHBoxLayout;
+		chapterName = new QLineEdit(healthPage);
+		chapterName->setObjectName("creatorChapterName");
+		chapterName->setPlaceholderText("Chapter name (optional)");
+		chapterName->setAccessibleName("Recording chapter name");
+		chapterName->setMaxLength(120);
+		chapterRow->addWidget(chapterName, 1);
+		addChapter = new QPushButton("Add chapter", healthPage);
+		addChapter->setObjectName("creatorAddChapter");
+		addChapter->setAutoDefault(false);
+		chapterRow->addWidget(addChapter);
+		healthLayout->addLayout(chapterRow);
+		chapterStatus = new QLabel("Mark highlights while recording. Requires a chapter-capable output such as Hybrid MP4.", healthPage);
+		chapterStatus->setObjectName("creatorChapterStatus");
+		chapterStatus->setProperty("penguinHint", true);
+		chapterStatus->setWordWrap(true);
+		healthLayout->addWidget(chapterStatus);
+		connect(addChapter, &QPushButton::clicked, this, [this] {
+			if (!obs_frontend_recording_active() || obs_frontend_recording_paused()) {
+				chapterStatus->setText("Start or resume recording before adding a chapter.");
+				return;
+			}
+			const auto name = chapterName->text().trimmed().toUtf8();
+			if (obs_frontend_recording_add_chapter(name.isEmpty() ? nullptr : name.constData())) {
+				chapterStatus->setText("Chapter sent to the recording output. Finish the recording to save its chapter index.");
+				chapterName->clear();
+			} else {
+				chapterStatus->setText("This recording output does not accept chapters. Choose a chapter-capable format before your next recording.");
+			}
+		});
+		connect(chapterName, &QLineEdit::returnPressed, addChapter, &QPushButton::click);
 		health = new QLabel(healthPage);
 		health->setProperty("penguinStatusPanel", true);
 		health->setWordWrap(true);
@@ -663,6 +722,85 @@ public:
 		connect(measure, &QPushButton::clicked, this, [this] { MeasureAudio(); });
 		connect(apply, &QPushButton::clicked, this, [this] { ApplyAudio(); });
 		connect(undo, &QPushButton::clicked, this, [this] { UndoAudio(); });
+		auto *notesPage = new QWidget(tabs);
+		auto *notesLayout = new QVBoxLayout(notesPage);
+		notesLayout->setContentsMargins(0, 16, 0, 0);
+		notesLayout->setSpacing(12);
+		auto *notesHint = new QLabel("Keep highlight notes for editing, with approximate recording timestamps. Notes stay in this app session only: export them before quitting. Split recordings may use per-file timestamps.", notesPage);
+		notesHint->setWordWrap(true);
+		notesHint->setProperty("penguinHint", true);
+		notesLayout->addWidget(notesHint);
+		notes = new QTreeWidget(notesPage);
+		notes->setObjectName("creatorNotes");
+		notes->setAccessibleName("Recording highlight notes");
+		notes->setColumnCount(3);
+		notes->setHeaderLabels({"Recording", "Time", "Note"});
+		notes->setRootIsDecorated(false);
+		notes->setAlternatingRowColors(true);
+		notes->header()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
+		notes->header()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
+		notes->header()->setSectionResizeMode(2, QHeaderView::Stretch);
+		notesLayout->addWidget(notes, 1);
+		auto *noteRow = new QHBoxLayout;
+		noteText = new QLineEdit(notesPage);
+		noteText->setObjectName("creatorNoteText");
+		noteText->setAccessibleName("Highlight note");
+		noteText->setPlaceholderText("What should you keep for the edit?");
+		noteText->setMaxLength(240);
+		noteRow->addWidget(noteText, 1);
+		addNote = new QPushButton("Mark highlight", notesPage);
+		addNote->setObjectName("creatorAddNote");
+		addNote->setAutoDefault(false);
+		noteRow->addWidget(addNote);
+		notesLayout->addLayout(noteRow);
+		noteStatus = new QLabel("Start recording to add notes. Paused recordings keep their video timestamp.", notesPage);
+		noteStatus->setObjectName("creatorNoteStatus");
+		noteStatus->setWordWrap(true);
+		noteStatus->setProperty("penguinHint", true);
+		notesLayout->addWidget(noteStatus);
+		exportNotes = new QPushButton("Export notes…", notesPage);
+		exportNotes->setObjectName("creatorExportNotes");
+		exportNotes->setAutoDefault(false);
+		exportNotes->setEnabled(false);
+		notesLayout->addWidget(exportNotes, 0, Qt::AlignRight);
+		connect(addNote, &QPushButton::clicked, this, [this] {
+			if (!obs_frontend_recording_active() || notes->topLevelItemCount() >= 1000) {
+				noteStatus->setText("Start recording to mark a highlight. At most 1,000 notes can be kept per app session.");
+				return;
+			}
+			OBSOutputAutoRelease output = obs_frontend_get_recording_output();
+			obs_video_info info{};
+			if (!output || !obs_get_video_info(&info))
+				return;
+			const auto time = RecordingDuration(obs_output_get_total_frames(output), info.fps_num, info.fps_den);
+			if (time == "Unavailable") {
+				noteStatus->setText("The recording timestamp is not available yet. Try again in a moment.");
+				return;
+			}
+			const auto text = noteText->text().simplified();
+			auto *item = new QTreeWidgetItem(notes, {QString::number(recordingSession.load()), time,
+				text.isEmpty() ? "Highlight" : text});
+			notes->scrollToItem(item);
+			noteText->clear();
+			exportNotes->setEnabled(true);
+			noteStatus->setText(QString("%1 note(s) kept locally. Export before quitting; notes are not embedded in the video.").arg(notes->topLevelItemCount()));
+		});
+		connect(noteText, &QLineEdit::returnPressed, addNote, &QPushButton::click);
+		connect(exportNotes, &QPushButton::clicked, this, [this] {
+			const QString path = QFileDialog::getSaveFileName(this, "Export highlight notes", "penguin-highlights.txt", "Text files (*.txt)");
+			if (path.isEmpty())
+				return;
+			QString text = "Penguin Studio — recording highlights\nApproximate video timestamps; split files may reset counters.\n\n";
+			for (int i = 0; i < notes->topLevelItemCount(); ++i) {
+				const auto *item = notes->topLevelItem(i);
+				text += QString("Recording %1 | %2 | %3\n").arg(item->text(0), item->text(1), item->text(2));
+			}
+			const auto bytes = text.toUtf8();
+			QSaveFile file(path);
+			const bool saved = file.open(QIODevice::WriteOnly) && file.write(bytes) == bytes.size() && file.commit();
+			noteStatus->setText(saved ? "Notes exported. Your session notes remain available here." : "Could not export notes. Choose a writable location and try again; your notes are still here.");
+		});
+		tabs->addTab(notesPage, "Highlight notes");
 		sampleTimer.setSingleShot(true);
 		connect(&sampleTimer, &QTimer::timeout, this, [this] { FinishMeasurement(); });
 		auto *privacyCard = new QFrame(this);
@@ -730,10 +868,12 @@ public:
 		AddCheck(configured ? "Configured" : "Review", "Streaming destination", configured ? "A stream key is configured. Account permission and network reachability have not been tested." : "Configure a destination in Settings → Stream, or in Streaming channels for multistream.");
 		auto *config = obs_frontend_get_profile_config();
 		const char *mode = config_get_string(config, "Output", "Mode");
-		const char *path = config_get_string(config, mode && std::strcmp(mode, "Advanced") == 0 ? "AdvOut" : "SimpleOutput", mode && std::strcmp(mode, "Advanced") == 0 ? "RecFilePath" : "FilePath");
-		QStorageInfo storage(QString::fromUtf8(path ? path : ""));
-		const bool disk = storage.isValid() && storage.isReady() && !storage.isReadOnly() && storage.bytesAvailable() > (qint64(2) << 30);
-		AddCheck(disk ? "Ready" : "Review", "Recording storage", disk ? QString("%1 GiB available. Long recordings may need more.").arg(storage.bytesAvailable() / double(qint64(1) << 30), 0, 'f', 1) : "Check the recording directory and leave at least 2 GiB free.");
+		const QString path = RecordingDirectory(config);
+		const QFileInfo directory(path);
+		QStorageInfo storage(path);
+		const bool disk = !path.isEmpty() && directory.isDir() && directory.isWritable() &&
+			storage.isValid() && storage.isReady() && !storage.isReadOnly() && storage.bytesAvailable() > (qint64(2) << 30);
+		AddCheck(disk ? "Ready" : "Review", "Recording storage", disk ? QString("%1 GiB available. Long recordings may need more.").arg(storage.bytesAvailable() / double(qint64(1) << 30), 0, 'f', 1) : "Check that the recording directory exists, is writable and has at least 2 GiB free. Network-only custom outputs have no local recording directory.");
 		if (!sampleTimer.isActive()) {
 			const auto selected = microphone->currentData();
 			microphone->clear();
@@ -751,7 +891,15 @@ public:
 		AddCheck(result.audible ? "Review" : "Silent", "Audio",
 			QString("%1 active unmuted input(s), %2 muted or unrouted input(s). %3").arg(result.audible).arg(result.muted)
 			.arg(result.audible ? "Measure your microphone and listen to a short recording." : "Check the mixer, mute buttons and audio routing before going live."));
-		AddCheck("Review", "Privacy", "Check desktop notifications and sensitive windows. Preview your scene before going live.");
+		const bool replayActive = obs_frontend_replay_buffer_active();
+		const bool replayEnabled = config_get_bool(config, advanced ? "AdvOut" : "SimpleOutput", "RecRB");
+		AddCheck(replayActive ? "Active" : "Review", "Replay clips",
+			replayActive ? "The replay buffer is running. Use Save replay to keep a highlight; unsaved buffered video is lost when the buffer stops." :
+			replayEnabled ? "Replay buffering is configured but not running. Start it before the moments you want to save; it cannot recover earlier video." :
+			"Enable the replay buffer in Settings → Output to save recent highlights without recording the entire session. It uses additional memory and encoding resources.");
+		AddCheck(privacy.load() ? "Shield on" : "Review", "Privacy",
+			privacy.load() ? "The privacy shield is active: program video is hidden and audio is silenced. Resume output when you are ready to be seen and heard." :
+			"Check desktop notifications and sensitive windows. Preview your scene before going live.");
 		QTimer::singleShot(0, this, [this] { FitCheckRows(); });
 	}
 	void Shutdown() { timer.stop(); StopMeter(); hide(); }
@@ -794,6 +942,8 @@ QPointer<QWidget> mainWindow;
 bool stopped = false;
 void Event(obs_frontend_event event, void *)
 {
+	if (event == OBS_FRONTEND_EVENT_RECORDING_STARTED)
+		++recordingSession;
 	if (event == OBS_FRONTEND_EVENT_STREAMING_STARTED || event == OBS_FRONTEND_EVENT_RECORDING_STARTED)
 		lastOutputHelp.clear();
 	if (event == OBS_FRONTEND_EVENT_STREAMING_STOPPED || event == OBS_FRONTEND_EVENT_RECORDING_STOPPED) {

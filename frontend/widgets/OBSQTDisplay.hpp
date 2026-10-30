@@ -3,6 +3,8 @@
 #include <obs.hpp>
 
 #include <QWidget>
+#include <QPointer>
+#include <QWindow>
 
 #define GREY_COLOR_BACKGROUND 0xFF4C4C4C
 
@@ -13,8 +15,12 @@ class OBSQTDisplay : public QWidget {
 
 	OBSDisplay display;
 	bool destroying = false;
+	QPointer<QWindow> displayWindow;
+	QPointer<QObject> surfaceFilter;
+	void BindDisplayWindow();
 
 protected:
+	bool event(QEvent *event) override;
 	virtual void paintEvent(QPaintEvent *event) override;
 	virtual void moveEvent(QMoveEvent *event) override;
 	virtual void resizeEvent(QResizeEvent *event) override;
@@ -43,6 +49,14 @@ public:
 		display = nullptr;
 		destroying = true;
 	};
+
+	// Qt can recreate native surfaces when the first accelerated child (for
+	// example WebEngine chat) switches the top-level window's rendering mode.
+	void RestoreDisplay()
+	{
+		destroying = false;
+		CreateDisplay();
+	}
 
 	void OnMove();
 	void OnDisplayChange();

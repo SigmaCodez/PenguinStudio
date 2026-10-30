@@ -1,0 +1,955 @@
+{
+  "build": "0.7.3-1+ubuntu26.04.local2",
+  "platform": "wayland",
+  "exitCode": 0,
+  "checks": [
+    {
+      "name": "current-scene-available",
+      "passed": true
+    },
+    {
+      "name": "real-obs-background-created",
+      "passed": true
+    },
+    {
+      "name": "real-audio-fixture-Microphone test tone",
+      "passed": true
+    },
+    {
+      "name": "real-audio-fixture-Desktop test tone",
+      "passed": true
+    },
+    {
+      "name": "real-obs-image-created",
+      "passed": true
+    },
+    {
+      "name": "control-actionScaleWindow",
+      "passed": true
+    },
+    {
+      "name": "native-wayland-widget-render",
+      "passed": true
+    },
+    {
+      "name": "control-sourcesDock",
+      "passed": true
+    },
+    {
+      "name": "control-scenesDock",
+      "passed": true
+    },
+    {
+      "name": "control-mixerDock",
+      "passed": true
+    },
+    {
+      "name": "control-penguinInspectorDock",
+      "passed": true
+    },
+    {
+      "name": "control-penguinTopBar",
+      "passed": true
+    },
+    {
+      "name": "control-centralwidget",
+      "passed": true
+    },
+    {
+      "name": "workspace-fits-requested-size-large",
+      "passed": true
+    },
+    {
+      "name": "layers-above-scenes-large",
+      "passed": true
+    },
+    {
+      "name": "mixer-below-canvas-large",
+      "passed": true
+    },
+    {
+      "name": "inspector-right-of-canvas-large",
+      "passed": true
+    },
+    {
+      "name": "usable-preview-space-large",
+      "passed": true
+    },
+    {
+      "name": "control-penguinBrand",
+      "passed": true
+    },
+    {
+      "name": "toolbar-control-fits-large-penguinBrand",
+      "passed": true
+    },
+    {
+      "name": "control-penguinLiveButton",
+      "passed": true
+    },
+    {
+      "name": "toolbar-control-fits-large-penguinLiveButton",
+      "passed": true
+    },
+    {
+      "name": "control-penguinRecordButton",
+      "passed": true
+    },
+    {
+      "name": "toolbar-control-fits-large-penguinRecordButton",
+      "passed": true
+    },
+    {
+      "name": "control-penguinToolbarButton",
+      "passed": true
+    },
+    {
+      "name": "toolbar-control-fits-large-penguinToolbarButton",
+      "passed": true
+    },
+    {
+      "name": "redundant-toolbar-shortcuts-removed-large",
+      "passed": true
+    },
+    {
+      "name": "control-penguinLiveButton",
+      "passed": true
+    },
+    {
+      "name": "control-penguinRecordButton",
+      "passed": true
+    },
+    {
+      "name": "toolbar-action-alignment-large-penguinRecordButton",
+      "passed": true
+    },
+    {
+      "name": "control-penguinClipButton",
+      "passed": true
+    },
+    {
+      "name": "toolbar-action-alignment-large-penguinClipButton",
+      "passed": true
+    },
+    {
+      "name": "control-penguinToolbarButton",
+      "passed": true
+    },
+    {
+      "name": "toolbar-action-alignment-large-penguinToolbarButton",
+      "passed": true
+    },
+    {
+      "name": "control-penguinLiveButton",
+      "passed": true
+    },
+    {
+      "name": "toolbar-menu-hit-area-large-penguinLiveButton",
+      "passed": true
+    },
+    {
+      "name": "control-penguinRecordButton",
+      "passed": true
+    },
+    {
+      "name": "toolbar-menu-hit-area-large-penguinRecordButton",
+      "passed": true
+    },
+    {
+      "name": "control-penguinLayerSearch",
+      "passed": true
+    },
+    {
+      "name": "search-field-readable-large-penguinLayerSearch",
+      "passed": true
+    },
+    {
+      "name": "control-penguinSceneSearch",
+      "passed": true
+    },
+    {
+      "name": "search-field-readable-large-penguinSceneSearch",
+      "passed": true
+    },
+    {
+      "name": "control-inspectorScroll",
+      "passed": true
+    },
+    {
+      "name": "inspector-body-fits-viewport-large",
+      "passed": true
+    },
+    {
+      "name": "inspector-horizontal-fit-large-inspectorX",
+      "passed": true
+    },
+    {
+      "name": "inspector-horizontal-fit-large-inspectorY",
+      "passed": true
+    },
+    {
+      "name": "inspector-horizontal-fit-large-inspectorWidth",
+      "passed": true
+    },
+    {
+      "name": "inspector-horizontal-fit-large-inspectorHeight",
+      "passed": true
+    },
+    {
+      "name": "inspector-horizontal-fit-large-inspectorRotation",
+      "passed": true
+    },
+    {
+      "name": "inspector-horizontal-fit-large-inspectorVisible",
+      "passed": true
+    },
+    {
+      "name": "inspector-horizontal-fit-large-inspectorLocked",
+      "passed": true
+    },
+    {
+      "name": "inspector-horizontal-fit-large-inspectorAspectLock",
+      "passed": true
+    },
+    {
+      "name": "inspector-horizontal-fit-large-inspectorFit",
+      "passed": true
+    },
+    {
+      "name": "inspector-horizontal-fit-large-inspectorCenter",
+      "passed": true
+    },
+    {
+      "name": "inspector-horizontal-fit-large-inspectorFlipHorizontal",
+      "passed": true
+    },
+    {
+      "name": "inspector-horizontal-fit-large-inspectorFlipVertical",
+      "passed": true
+    },
+    {
+      "name": "inspector-horizontal-fit-large-inspectorProperties",
+      "passed": true
+    },
+    {
+      "name": "inspector-horizontal-fit-large-inspectorFilters",
+      "passed": true
+    },
+    {
+      "name": "inspector-horizontal-fit-large-inspectorAdvanced",
+      "passed": true
+    },
+    {
+      "name": "inspector-horizontal-fit-large-inspectorReset",
+      "passed": true
+    },
+    {
+      "name": "inspector-horizontal-fit-large-cameraShape",
+      "passed": true
+    },
+    {
+      "name": "inspector-horizontal-fit-large-cameraBackground",
+      "passed": true
+    },
+    {
+      "name": "control-penguinLayerSearch",
+      "passed": true
+    },
+    {
+      "name": "control-sources",
+      "passed": true
+    },
+    {
+      "name": "layers-filter-prevents-ambiguous-reorder",
+      "passed": true
+    },
+    {
+      "name": "layers-search-matches-case-insensitively",
+      "passed": true
+    },
+    {
+      "name": "layers-search-hides-without-removing-items",
+      "passed": true
+    },
+    {
+      "name": "layers-search-clear-preserves-items-and-selection",
+      "passed": true
+    },
+    {
+      "name": "layers-search-clear-restores-reorder",
+      "passed": true
+    },
+    {
+      "name": "control-scenes",
+      "passed": true
+    },
+    {
+      "name": "control-penguinSceneSearch",
+      "passed": true
+    },
+    {
+      "name": "scenes-filter-prevents-ambiguous-reorder",
+      "passed": true
+    },
+    {
+      "name": "scenes-search-matches-case-insensitively",
+      "passed": true
+    },
+    {
+      "name": "scenes-search-hides-without-removing-items",
+      "passed": true
+    },
+    {
+      "name": "scenes-search-clear-preserves-items-and-selection",
+      "passed": true
+    },
+    {
+      "name": "scenes-search-clear-restores-reorder",
+      "passed": true
+    },
+    {
+      "name": "layer-filter-does-not-change-rendered-scene",
+      "passed": true
+    },
+    {
+      "name": "control-scenes",
+      "passed": true
+    },
+    {
+      "name": "scene-rename-action-cancel",
+      "passed": true
+    },
+    {
+      "name": "scene-rename-editor-cancel",
+      "passed": true
+    },
+    {
+      "name": "scene-rename-escape-preserves-name",
+      "passed": true
+    },
+    {
+      "name": "scene-rename-action-commit",
+      "passed": true
+    },
+    {
+      "name": "scene-rename-editor-commit",
+      "passed": true
+    },
+    {
+      "name": "scene-rename-editor-updates-obs-source",
+      "passed": true
+    },
+    {
+      "name": "scene-rename-action-restore",
+      "passed": true
+    },
+    {
+      "name": "scene-rename-editor-restore",
+      "passed": true
+    },
+    {
+      "name": "scene-rename-editor-restores-name",
+      "passed": true
+    },
+    {
+      "name": "control-penguinInspectorDock",
+      "passed": true
+    },
+    {
+      "name": "control-penguin-broadcast-destinations",
+      "passed": true
+    },
+    {
+      "name": "integrated-sidebar-tab-penguin-broadcast-destinations",
+      "passed": true
+    },
+    {
+      "name": "sidebar-tab-can-open-penguin-broadcast-destinations",
+      "passed": true
+    },
+    {
+      "name": "control-penguin-stream-details",
+      "passed": true
+    },
+    {
+      "name": "integrated-sidebar-tab-penguin-stream-details",
+      "passed": true
+    },
+    {
+      "name": "sidebar-tab-can-open-penguin-stream-details",
+      "passed": true
+    },
+    {
+      "name": "inspector-tab-can-restore",
+      "passed": true
+    },
+    {
+      "name": "sidebar-tab-label-fits-large-0",
+      "passed": true
+    },
+    {
+      "name": "sidebar-tab-label-fits-large-1",
+      "passed": true
+    },
+    {
+      "name": "sidebar-tab-label-fits-large-2",
+      "passed": true
+    },
+    {
+      "name": "sidebar-tab-bar-visible-large",
+      "passed": true
+    },
+    {
+      "name": "control-inspectorX",
+      "passed": true
+    },
+    {
+      "name": "single-selection-editable",
+      "passed": true
+    },
+    {
+      "name": "position-edit-reaches-obs",
+      "passed": true
+    },
+    {
+      "name": "control-actionMainUndo",
+      "passed": true
+    },
+    {
+      "name": "position-undo",
+      "passed": true
+    },
+    {
+      "name": "control-actionMainRedo",
+      "passed": true
+    },
+    {
+      "name": "position-redo",
+      "passed": true
+    },
+    {
+      "name": "control-inspectorRotation",
+      "passed": true
+    },
+    {
+      "name": "rotation-edit-reaches-obs",
+      "passed": true
+    },
+    {
+      "name": "control-inspectorWidth",
+      "passed": true
+    },
+    {
+      "name": "width-edit-reaches-obs",
+      "passed": true
+    },
+    {
+      "name": "aspect-ratio-preserved",
+      "passed": true
+    },
+    {
+      "name": "control-inspectorCropToggle",
+      "passed": true
+    },
+    {
+      "name": "control-inspectorCropFields",
+      "passed": true
+    },
+    {
+      "name": "crop-section-collapsed-by-default",
+      "passed": true
+    },
+    {
+      "name": "crop-section-opens",
+      "passed": true
+    },
+    {
+      "name": "control-inspectorCropLeft",
+      "passed": true
+    },
+    {
+      "name": "crop-edit-reaches-obs",
+      "passed": true
+    },
+    {
+      "name": "control-actionMainUndo",
+      "passed": true
+    },
+    {
+      "name": "crop-undo",
+      "passed": true
+    },
+    {
+      "name": "control-actionMainRedo",
+      "passed": true
+    },
+    {
+      "name": "crop-redo",
+      "passed": true
+    },
+    {
+      "name": "control-inspectorVisible",
+      "passed": true
+    },
+    {
+      "name": "visibility-edit",
+      "passed": true
+    },
+    {
+      "name": "control-actionMainUndo",
+      "passed": true
+    },
+    {
+      "name": "visibility-undo",
+      "passed": true
+    },
+    {
+      "name": "control-inspectorLocked",
+      "passed": true
+    },
+    {
+      "name": "lock-disables-transform",
+      "passed": true
+    },
+    {
+      "name": "control-actionMainUndo",
+      "passed": true
+    },
+    {
+      "name": "lock-undo",
+      "passed": true
+    },
+    {
+      "name": "native-wayland-widget-render",
+      "passed": true
+    },
+    {
+      "name": "control-sourcesDock",
+      "passed": true
+    },
+    {
+      "name": "control-scenesDock",
+      "passed": true
+    },
+    {
+      "name": "control-mixerDock",
+      "passed": true
+    },
+    {
+      "name": "control-penguinInspectorDock",
+      "passed": true
+    },
+    {
+      "name": "control-penguinTopBar",
+      "passed": true
+    },
+    {
+      "name": "control-centralwidget",
+      "passed": true
+    },
+    {
+      "name": "workspace-fits-requested-size-compact",
+      "passed": true
+    },
+    {
+      "name": "layers-above-scenes-compact",
+      "passed": true
+    },
+    {
+      "name": "mixer-below-canvas-compact",
+      "passed": true
+    },
+    {
+      "name": "inspector-right-of-canvas-compact",
+      "passed": true
+    },
+    {
+      "name": "usable-preview-space-compact",
+      "passed": true
+    },
+    {
+      "name": "control-penguinBrand",
+      "passed": true
+    },
+    {
+      "name": "toolbar-control-fits-compact-penguinBrand",
+      "passed": true
+    },
+    {
+      "name": "control-penguinLiveButton",
+      "passed": true
+    },
+    {
+      "name": "toolbar-control-fits-compact-penguinLiveButton",
+      "passed": true
+    },
+    {
+      "name": "control-penguinRecordButton",
+      "passed": true
+    },
+    {
+      "name": "toolbar-control-fits-compact-penguinRecordButton",
+      "passed": true
+    },
+    {
+      "name": "control-penguinToolbarButton",
+      "passed": true
+    },
+    {
+      "name": "toolbar-control-fits-compact-penguinToolbarButton",
+      "passed": true
+    },
+    {
+      "name": "redundant-toolbar-shortcuts-removed-compact",
+      "passed": true
+    },
+    {
+      "name": "control-penguinLiveButton",
+      "passed": true
+    },
+    {
+      "name": "control-penguinRecordButton",
+      "passed": true
+    },
+    {
+      "name": "toolbar-action-alignment-compact-penguinRecordButton",
+      "passed": true
+    },
+    {
+      "name": "control-penguinClipButton",
+      "passed": true
+    },
+    {
+      "name": "toolbar-action-alignment-compact-penguinClipButton",
+      "passed": true
+    },
+    {
+      "name": "control-penguinToolbarButton",
+      "passed": true
+    },
+    {
+      "name": "toolbar-action-alignment-compact-penguinToolbarButton",
+      "passed": true
+    },
+    {
+      "name": "control-penguinLiveButton",
+      "passed": true
+    },
+    {
+      "name": "toolbar-menu-hit-area-compact-penguinLiveButton",
+      "passed": true
+    },
+    {
+      "name": "control-penguinRecordButton",
+      "passed": true
+    },
+    {
+      "name": "toolbar-menu-hit-area-compact-penguinRecordButton",
+      "passed": true
+    },
+    {
+      "name": "control-penguinLayerSearch",
+      "passed": true
+    },
+    {
+      "name": "search-field-readable-compact-penguinLayerSearch",
+      "passed": true
+    },
+    {
+      "name": "control-penguinSceneSearch",
+      "passed": true
+    },
+    {
+      "name": "search-field-readable-compact-penguinSceneSearch",
+      "passed": true
+    },
+    {
+      "name": "control-inspectorScroll",
+      "passed": true
+    },
+    {
+      "name": "inspector-body-fits-viewport-compact",
+      "passed": true
+    },
+    {
+      "name": "inspector-horizontal-fit-compact-inspectorX",
+      "passed": true
+    },
+    {
+      "name": "inspector-horizontal-fit-compact-inspectorY",
+      "passed": true
+    },
+    {
+      "name": "inspector-horizontal-fit-compact-inspectorWidth",
+      "passed": true
+    },
+    {
+      "name": "inspector-horizontal-fit-compact-inspectorHeight",
+      "passed": true
+    },
+    {
+      "name": "inspector-horizontal-fit-compact-inspectorRotation",
+      "passed": true
+    },
+    {
+      "name": "inspector-horizontal-fit-compact-inspectorCropLeft",
+      "passed": true
+    },
+    {
+      "name": "inspector-horizontal-fit-compact-inspectorCropRight",
+      "passed": true
+    },
+    {
+      "name": "inspector-horizontal-fit-compact-inspectorCropTop",
+      "passed": true
+    },
+    {
+      "name": "inspector-horizontal-fit-compact-inspectorCropBottom",
+      "passed": true
+    },
+    {
+      "name": "inspector-horizontal-fit-compact-inspectorVisible",
+      "passed": true
+    },
+    {
+      "name": "inspector-horizontal-fit-compact-inspectorLocked",
+      "passed": true
+    },
+    {
+      "name": "inspector-horizontal-fit-compact-inspectorAspectLock",
+      "passed": true
+    },
+    {
+      "name": "inspector-horizontal-fit-compact-inspectorFit",
+      "passed": true
+    },
+    {
+      "name": "inspector-horizontal-fit-compact-inspectorCenter",
+      "passed": true
+    },
+    {
+      "name": "inspector-horizontal-fit-compact-inspectorFlipHorizontal",
+      "passed": true
+    },
+    {
+      "name": "inspector-horizontal-fit-compact-inspectorFlipVertical",
+      "passed": true
+    },
+    {
+      "name": "inspector-horizontal-fit-compact-inspectorProperties",
+      "passed": true
+    },
+    {
+      "name": "inspector-horizontal-fit-compact-inspectorFilters",
+      "passed": true
+    },
+    {
+      "name": "inspector-horizontal-fit-compact-inspectorAdvanced",
+      "passed": true
+    },
+    {
+      "name": "inspector-horizontal-fit-compact-inspectorReset",
+      "passed": true
+    },
+    {
+      "name": "inspector-horizontal-fit-compact-cameraShape",
+      "passed": true
+    },
+    {
+      "name": "inspector-horizontal-fit-compact-cameraBackground",
+      "passed": true
+    },
+    {
+      "name": "sidebar-tab-label-fits-compact-0",
+      "passed": true
+    },
+    {
+      "name": "sidebar-tab-label-fits-compact-1",
+      "passed": true
+    },
+    {
+      "name": "sidebar-tab-label-fits-compact-2",
+      "passed": true
+    },
+    {
+      "name": "sidebar-tab-bar-visible-compact",
+      "passed": true
+    },
+    {
+      "name": "control-inspectorFlipHorizontal",
+      "passed": true
+    },
+    {
+      "name": "horizontal-flip",
+      "passed": true
+    },
+    {
+      "name": "control-actionMainUndo",
+      "passed": true
+    },
+    {
+      "name": "horizontal-flip-undo",
+      "passed": true
+    },
+    {
+      "name": "control-inspectorX",
+      "passed": true
+    },
+    {
+      "name": "multiple-selection-inspector-disabled",
+      "passed": true
+    },
+    {
+      "name": "control-inspectorX",
+      "passed": true
+    },
+    {
+      "name": "empty-scene-clears-inspector",
+      "passed": true
+    },
+    {
+      "name": "control-inspectorX",
+      "passed": true
+    },
+    {
+      "name": "scene-switch-restores-inspector",
+      "passed": true
+    },
+    {
+      "name": "control-penguinDestinationsButton",
+      "passed": true
+    },
+    {
+      "name": "control-penguin-broadcast-destinations",
+      "passed": true
+    },
+    {
+      "name": "destinations-toolbar-opens-panel",
+      "passed": true
+    },
+    {
+      "name": "destinations-toolbar-selects-integrated-tab",
+      "passed": true
+    },
+    {
+      "name": "control-penguinCanvasMode",
+      "passed": true
+    },
+    {
+      "name": "studio-mode-toolbar-enabled",
+      "passed": true
+    },
+    {
+      "name": "control-penguinCanvasMode",
+      "passed": true
+    },
+    {
+      "name": "control-penguinOutputPanel",
+      "passed": true
+    },
+    {
+      "name": "no-external-destinations-configured",
+      "passed": true
+    },
+    {
+      "name": "control-penguinLiveButton",
+      "passed": true
+    },
+    {
+      "name": "go-live-opens-real-connection-wizard",
+      "passed": true
+    },
+    {
+      "name": "studio-mode-toolbar-disabled",
+      "passed": true
+    },
+    {
+      "name": "control-penguinRecordButton",
+      "passed": true
+    },
+    {
+      "name": "record-toolbar-starts-real-recording",
+      "passed": true
+    },
+    {
+      "name": "control-penguinRecordButton",
+      "passed": true
+    },
+    {
+      "name": "record-toolbar-stops-recording",
+      "passed": true
+    },
+    {
+      "name": "local-recording-file-created",
+      "passed": true
+    },
+    {
+      "name": "control-inspectorWidth",
+      "passed": true
+    },
+    {
+      "name": "control-inspectorHeight",
+      "passed": true
+    },
+    {
+      "name": "negative-cropped-dimensions-display",
+      "passed": true
+    },
+    {
+      "name": "negative-cropped-width-edit",
+      "passed": true
+    },
+    {
+      "name": "negative-scale-aspect-link",
+      "passed": true
+    },
+    {
+      "name": "bounded-dimensions-display",
+      "passed": true
+    },
+    {
+      "name": "bounded-width-edit-aspect-link",
+      "passed": true
+    },
+    {
+      "name": "control-actionMainUndo",
+      "passed": true
+    },
+    {
+      "name": "bounded-width-undo",
+      "passed": true
+    },
+    {
+      "name": "group-fixture-created",
+      "passed": true
+    },
+    {
+      "name": "control-inspectorX",
+      "passed": true
+    },
+    {
+      "name": "group-child-inspector-editable",
+      "passed": true
+    },
+    {
+      "name": "group-child-edit-moves-world-position",
+      "passed": true
+    },
+    {
+      "name": "control-actionMainUndo",
+      "passed": true
+    },
+    {
+      "name": "group-child-undo-restores-world-position",
+      "passed": true
+    },
+    {
+      "name": "control-actionMainRedo",
+      "passed": true
+    },
+    {
+      "name": "group-child-redo-restores-world-position",
+      "passed": true
+    }
+  ]
+}

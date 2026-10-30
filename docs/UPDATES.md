@@ -2,10 +2,8 @@
 
 On Linux, **Settings → General → Check for updates** opens Penguin Studio's updater. It checks
 only releases in `SigmaCodez/PenguinStudio`, compares numeric Penguin versions,
-and offers newer versions. The app also checks five seconds after every startup when automatic checks are
-enabled. A successful check earlier that day does not suppress a new startup check. Automatic notifications wait until active
-outputs and modal dialogs have finished and Penguin is active. Automatic checks
-and development-preview releases can be disabled in the update dialog.
+and offers newer versions. The app also checks five seconds after every normal Linux startup, including profiles that previously disabled automatic checks. Up-to-date and failed background checks do not open a dialog. A successful check earlier that day does not suppress a new startup check. Automatic notifications wait until active
+outputs and modal dialogs have finished and Penguin is active. Development-preview releases can be excluded in the update dialog. Automatic startup checking is always enabled on Linux; the explicit `--disable-updater` switch remains available for isolated tests.
 
 **Download and install update** chooses the matching x86_64 Ubuntu 26.04 or Ubuntu 26.10
 DEB, Fedora 44 RPM, or Flatpak bundle. It verifies the exact asset name, release

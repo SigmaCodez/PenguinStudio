@@ -1,26 +1,26 @@
 {
-  "version": "0.7.3",
+  "version": "0.7.4",
   "language": "en-US",
-  "source_commit": "d3fc7ff8186331318f6f25020f9c8729ebd8ccb7",
-  "local_changes": "Approved 0.7.3 chat, moderation, broadcast selection and toolbar changes on the recorded baseline; candidate frontend rebuilt with PENGUIN_VERSION=0.7.3.",
-  "package": "0.7.3-0+ubuntu26.04.candidate1",
-  "package_sha256": "4336aae75855b7386c6f4ae33f03141cae3a86ad83740eca6be9ff140291f55d",
-  "captured_on": "2026-10-29",
-  "capture_method": "XComposite capture of the real 0.7.3 candidate under XWayland, isolated English synthetic profile. Native Wayland functional and recording checks are separate.",
-  "content": "Synthetic local artwork and audio only; no private webcam, desktop or connected accounts.",
-  "visual_review": "All three captures visually inspected: English workspace, reduced toolbar without duplicate settings/details shortcuts, rounded-corner Inspector and disconnected stream details. No private media or account identity.",
+  "source_commit": "9427445d4c1c9ea8f2f3a4270e271cc999159507",
+  "local_changes": "Approved creator tools, highlight notes, silent startup update checks and native preview recovery when opening embedded WebEngine chat. Frontend rebuilt from source with PENGUIN_VERSION=0.7.4.",
+  "package": "0.7.4-0+ubuntu26.04.candidate2",
+  "package_sha256": "6dfcd2cdca65a6319dda5a66065a680100b6d2f6bbecc027efc8afcc4e59afd5",
+  "captured_on": "2026-10-30",
+  "capture_method": "XComposite capture of the real 0.7.4 candidate under XWayland; isolated English synthetic demo profile. Native Wayland validation is separate.",
+  "content": "Synthetic logo and audio only; no private desktop, camera or account contents.",
+  "visual_review": "All three images visually inspected: English workspace, rounded corner Inspector, and disconnected stream details.",
   "images": [
     {
       "file": "workspace-en.png",
-      "sha256": "86117cb9ee64cd9131541989bc44130199bea393abe0fec4e8fb48c96bd70dce"
+      "sha256": "4243b2bf1eecb2271d1c884a473bb06dd7659988a46a8aa26628b4fd0f6a4ede"
     },
     {
       "file": "camera-en.png",
-      "sha256": "ce24631a5892d454f2839110508c6d3068946fc0f5d651446a683fc653725da4"
+      "sha256": "be90d635d396be403c181a17efb2f6dc6266a2c165ea42aaea0f1b293b8cc877"
     },
     {
       "file": "stream-details-en.png",
-      "sha256": "840d69446ef3eeff36adcbf535028e09d2a62f8fd4d0b1396c847c35f5f4b31b"
+      "sha256": "21e8035b1e5f0e01a4eab184007ad5a927e1f84ecabf52352f907997d12bbb32"
     }
   ]
 }

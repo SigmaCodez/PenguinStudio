@@ -35,8 +35,9 @@
   </branding>
   <content_rating type="oars-1.1"/>
   <releases>
-    <release version="@PENGUIN_VERSION@" date="2026-10-29" type="development">
+    <release version="@PENGUIN_VERSION@" date="2026-10-30" type="development">
       <url type="details">https://github.com/SigmaCodez/PenguinStudio/releases</url>
+      <description><p>Recording chapters, exportable highlight notes, improved stream checks and silent startup update checks.</p></description>
     </release>
   </releases>
 </component>
