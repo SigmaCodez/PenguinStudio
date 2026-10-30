@@ -1,0 +1,4819 @@
+{
+    "captureMethod": "qt-widget-render",
+    "capturedLayouts": [
+        {
+            "height": 900,
+            "image": "workspace-1440.png",
+            "minimumHeight": 612,
+            "minimumHintHeight": 612,
+            "minimumHintWidth": 1033,
+            "minimumWidth": 1033,
+            "width": 1440
+        },
+        {
+            "height": 800,
+            "image": "workspace-1280.png",
+            "minimumHeight": 612,
+            "minimumHintHeight": 612,
+            "minimumHintWidth": 968,
+            "minimumWidth": 968,
+            "width": 1280
+        }
+    ],
+    "checks": [
+        {
+            "name": "current-scene-available",
+            "passed": true
+        },
+        {
+            "name": "real-obs-background-created",
+            "passed": true
+        },
+        {
+            "name": "real-audio-fixture-Microphone test tone",
+            "passed": true
+        },
+        {
+            "name": "real-audio-fixture-Desktop test tone",
+            "passed": true
+        },
+        {
+            "name": "real-obs-image-created",
+            "passed": true
+        },
+        {
+            "name": "control-actionScaleWindow",
+            "passed": true
+        },
+        {
+            "name": "native-wayland-widget-render",
+            "passed": true
+        },
+        {
+            "name": "control-sourcesDock",
+            "passed": true
+        },
+        {
+            "name": "control-scenesDock",
+            "passed": true
+        },
+        {
+            "name": "control-mixerDock",
+            "passed": true
+        },
+        {
+            "name": "control-penguinInspectorDock",
+            "passed": true
+        },
+        {
+            "name": "control-penguinTopBar",
+            "passed": true
+        },
+        {
+            "name": "control-centralwidget",
+            "passed": true
+        },
+        {
+            "name": "workspace-fits-requested-size-large",
+            "passed": true
+        },
+        {
+            "name": "layers-above-scenes-large",
+            "passed": true
+        },
+        {
+            "name": "mixer-below-canvas-large",
+            "passed": true
+        },
+        {
+            "name": "inspector-right-of-canvas-large",
+            "passed": true
+        },
+        {
+            "name": "usable-preview-space-large",
+            "passed": true
+        },
+        {
+            "name": "control-penguinBrand",
+            "passed": true
+        },
+        {
+            "name": "toolbar-control-fits-large-penguinBrand",
+            "passed": true
+        },
+        {
+            "name": "control-penguinLiveButton",
+            "passed": true
+        },
+        {
+            "name": "toolbar-control-fits-large-penguinLiveButton",
+            "passed": true
+        },
+        {
+            "name": "control-penguinRecordButton",
+            "passed": true
+        },
+        {
+            "name": "toolbar-control-fits-large-penguinRecordButton",
+            "passed": true
+        },
+        {
+            "name": "control-penguinToolbarButton",
+            "passed": true
+        },
+        {
+            "name": "toolbar-control-fits-large-penguinToolbarButton",
+            "passed": true
+        },
+        {
+            "name": "redundant-toolbar-shortcuts-removed-large",
+            "passed": true
+        },
+        {
+            "name": "control-penguinLiveButton",
+            "passed": true
+        },
+        {
+            "name": "control-penguinRecordButton",
+            "passed": true
+        },
+        {
+            "name": "toolbar-action-alignment-large-penguinRecordButton",
+            "passed": true
+        },
+        {
+            "name": "control-penguinClipButton",
+            "passed": true
+        },
+        {
+            "name": "toolbar-action-alignment-large-penguinClipButton",
+            "passed": true
+        },
+        {
+            "name": "control-penguinToolbarButton",
+            "passed": true
+        },
+        {
+            "name": "toolbar-action-alignment-large-penguinToolbarButton",
+            "passed": true
+        },
+        {
+            "name": "control-penguinLiveButton",
+            "passed": true
+        },
+        {
+            "name": "toolbar-menu-hit-area-large-penguinLiveButton",
+            "passed": true
+        },
+        {
+            "name": "control-penguinRecordButton",
+            "passed": true
+        },
+        {
+            "name": "toolbar-menu-hit-area-large-penguinRecordButton",
+            "passed": true
+        },
+        {
+            "name": "control-penguinLayerSearch",
+            "passed": true
+        },
+        {
+            "name": "search-field-readable-large-penguinLayerSearch",
+            "passed": true
+        },
+        {
+            "name": "control-penguinSceneSearch",
+            "passed": true
+        },
+        {
+            "name": "search-field-readable-large-penguinSceneSearch",
+            "passed": true
+        },
+        {
+            "name": "control-inspectorScroll",
+            "passed": true
+        },
+        {
+            "name": "inspector-body-fits-viewport-large",
+            "passed": true
+        },
+        {
+            "name": "inspector-horizontal-fit-large-inspectorX",
+            "passed": true
+        },
+        {
+            "name": "inspector-horizontal-fit-large-inspectorY",
+            "passed": true
+        },
+        {
+            "name": "inspector-horizontal-fit-large-inspectorWidth",
+            "passed": true
+        },
+        {
+            "name": "inspector-horizontal-fit-large-inspectorHeight",
+            "passed": true
+        },
+        {
+            "name": "inspector-horizontal-fit-large-inspectorRotation",
+            "passed": true
+        },
+        {
+            "name": "inspector-horizontal-fit-large-inspectorVisible",
+            "passed": true
+        },
+        {
+            "name": "inspector-horizontal-fit-large-inspectorLocked",
+            "passed": true
+        },
+        {
+            "name": "inspector-horizontal-fit-large-inspectorAspectLock",
+            "passed": true
+        },
+        {
+            "name": "inspector-horizontal-fit-large-inspectorFit",
+            "passed": true
+        },
+        {
+            "name": "inspector-horizontal-fit-large-inspectorCenter",
+            "passed": true
+        },
+        {
+            "name": "inspector-horizontal-fit-large-inspectorFlipHorizontal",
+            "passed": true
+        },
+        {
+            "name": "inspector-horizontal-fit-large-inspectorFlipVertical",
+            "passed": true
+        },
+        {
+            "name": "inspector-horizontal-fit-large-inspectorProperties",
+            "passed": true
+        },
+        {
+            "name": "inspector-horizontal-fit-large-inspectorFilters",
+            "passed": true
+        },
+        {
+            "name": "inspector-horizontal-fit-large-inspectorAdvanced",
+            "passed": true
+        },
+        {
+            "name": "inspector-horizontal-fit-large-inspectorReset",
+            "passed": true
+        },
+        {
+            "name": "inspector-horizontal-fit-large-cameraShape",
+            "passed": true
+        },
+        {
+            "name": "inspector-horizontal-fit-large-cameraBackground",
+            "passed": true
+        },
+        {
+            "name": "control-penguinLayerSearch",
+            "passed": true
+        },
+        {
+            "name": "control-sources",
+            "passed": true
+        },
+        {
+            "name": "layers-filter-prevents-ambiguous-reorder",
+            "passed": true
+        },
+        {
+            "name": "layers-search-matches-case-insensitively",
+            "passed": true
+        },
+        {
+            "name": "layers-search-hides-without-removing-items",
+            "passed": true
+        },
+        {
+            "name": "layers-search-clear-preserves-items-and-selection",
+            "passed": true
+        },
+        {
+            "name": "layers-search-clear-restores-reorder",
+            "passed": true
+        },
+        {
+            "name": "control-scenes",
+            "passed": true
+        },
+        {
+            "name": "control-penguinSceneSearch",
+            "passed": true
+        },
+        {
+            "name": "scenes-filter-prevents-ambiguous-reorder",
+            "passed": true
+        },
+        {
+            "name": "scenes-search-matches-case-insensitively",
+            "passed": true
+        },
+        {
+            "name": "scenes-search-hides-without-removing-items",
+            "passed": true
+        },
+        {
+            "name": "scenes-search-clear-preserves-items-and-selection",
+            "passed": true
+        },
+        {
+            "name": "scenes-search-clear-restores-reorder",
+            "passed": true
+        },
+        {
+            "name": "layer-filter-does-not-change-rendered-scene",
+            "passed": true
+        },
+        {
+            "name": "control-scenes",
+            "passed": true
+        },
+        {
+            "name": "scene-rename-action-cancel",
+            "passed": true
+        },
+        {
+            "name": "scene-rename-editor-cancel",
+            "passed": true
+        },
+        {
+            "name": "scene-rename-escape-preserves-name",
+            "passed": true
+        },
+        {
+            "name": "scene-rename-action-commit",
+            "passed": true
+        },
+        {
+            "name": "scene-rename-editor-commit",
+            "passed": true
+        },
+        {
+            "name": "scene-rename-editor-updates-obs-source",
+            "passed": true
+        },
+        {
+            "name": "scene-rename-action-restore",
+            "passed": true
+        },
+        {
+            "name": "scene-rename-editor-restore",
+            "passed": true
+        },
+        {
+            "name": "scene-rename-editor-restores-name",
+            "passed": true
+        },
+        {
+            "name": "control-penguinInspectorDock",
+            "passed": true
+        },
+        {
+            "name": "control-penguin-broadcast-destinations",
+            "passed": true
+        },
+        {
+            "name": "integrated-sidebar-tab-penguin-broadcast-destinations",
+            "passed": true
+        },
+        {
+            "name": "sidebar-tab-can-open-penguin-broadcast-destinations",
+            "passed": true
+        },
+        {
+            "name": "control-penguin-stream-details",
+            "passed": true
+        },
+        {
+            "name": "integrated-sidebar-tab-penguin-stream-details",
+            "passed": true
+        },
+        {
+            "name": "sidebar-tab-can-open-penguin-stream-details",
+            "passed": true
+        },
+        {
+            "name": "inspector-tab-can-restore",
+            "passed": true
+        },
+        {
+            "name": "sidebar-tab-label-fits-large-0",
+            "passed": true
+        },
+        {
+            "name": "sidebar-tab-label-fits-large-1",
+            "passed": true
+        },
+        {
+            "name": "sidebar-tab-label-fits-large-2",
+            "passed": true
+        },
+        {
+            "name": "sidebar-tab-bar-visible-large",
+            "passed": true
+        },
+        {
+            "name": "control-inspectorX",
+            "passed": true
+        },
+        {
+            "name": "single-selection-editable",
+            "passed": true
+        },
+        {
+            "name": "position-edit-reaches-obs",
+            "passed": true
+        },
+        {
+            "name": "control-actionMainUndo",
+            "passed": true
+        },
+        {
+            "name": "position-undo",
+            "passed": true
+        },
+        {
+            "name": "control-actionMainRedo",
+            "passed": true
+        },
+        {
+            "name": "position-redo",
+            "passed": true
+        },
+        {
+            "name": "control-inspectorRotation",
+            "passed": true
+        },
+        {
+            "name": "rotation-edit-reaches-obs",
+            "passed": true
+        },
+        {
+            "name": "control-inspectorWidth",
+            "passed": true
+        },
+        {
+            "name": "width-edit-reaches-obs",
+            "passed": true
+        },
+        {
+            "name": "aspect-ratio-preserved",
+            "passed": true
+        },
+        {
+            "name": "control-inspectorCropToggle",
+            "passed": true
+        },
+        {
+            "name": "control-inspectorCropFields",
+            "passed": true
+        },
+        {
+            "name": "crop-section-collapsed-by-default",
+            "passed": true
+        },
+        {
+            "name": "crop-section-opens",
+            "passed": true
+        },
+        {
+            "name": "control-inspectorCropLeft",
+            "passed": true
+        },
+        {
+            "name": "crop-edit-reaches-obs",
+            "passed": true
+        },
+        {
+            "name": "control-actionMainUndo",
+            "passed": true
+        },
+        {
+            "name": "crop-undo",
+            "passed": true
+        },
+        {
+            "name": "control-actionMainRedo",
+            "passed": true
+        },
+        {
+            "name": "crop-redo",
+            "passed": true
+        },
+        {
+            "name": "control-inspectorVisible",
+            "passed": true
+        },
+        {
+            "name": "visibility-edit",
+            "passed": true
+        },
+        {
+            "name": "control-actionMainUndo",
+            "passed": true
+        },
+        {
+            "name": "visibility-undo",
+            "passed": true
+        },
+        {
+            "name": "control-inspectorLocked",
+            "passed": true
+        },
+        {
+            "name": "lock-disables-transform",
+            "passed": true
+        },
+        {
+            "name": "control-actionMainUndo",
+            "passed": true
+        },
+        {
+            "name": "lock-undo",
+            "passed": true
+        },
+        {
+            "name": "native-wayland-widget-render",
+            "passed": true
+        },
+        {
+            "name": "control-sourcesDock",
+            "passed": true
+        },
+        {
+            "name": "control-scenesDock",
+            "passed": true
+        },
+        {
+            "name": "control-mixerDock",
+            "passed": true
+        },
+        {
+            "name": "control-penguinInspectorDock",
+            "passed": true
+        },
+        {
+            "name": "control-penguinTopBar",
+            "passed": true
+        },
+        {
+            "name": "control-centralwidget",
+            "passed": true
+        },
+        {
+            "name": "workspace-fits-requested-size-compact",
+            "passed": true
+        },
+        {
+            "name": "layers-above-scenes-compact",
+            "passed": true
+        },
+        {
+            "name": "mixer-below-canvas-compact",
+            "passed": true
+        },
+        {
+            "name": "inspector-right-of-canvas-compact",
+            "passed": true
+        },
+        {
+            "name": "usable-preview-space-compact",
+            "passed": true
+        },
+        {
+            "name": "control-penguinBrand",
+            "passed": true
+        },
+        {
+            "name": "toolbar-control-fits-compact-penguinBrand",
+            "passed": true
+        },
+        {
+            "name": "control-penguinLiveButton",
+            "passed": true
+        },
+        {
+            "name": "toolbar-control-fits-compact-penguinLiveButton",
+            "passed": true
+        },
+        {
+            "name": "control-penguinRecordButton",
+            "passed": true
+        },
+        {
+            "name": "toolbar-control-fits-compact-penguinRecordButton",
+            "passed": true
+        },
+        {
+            "name": "control-penguinToolbarButton",
+            "passed": true
+        },
+        {
+            "name": "toolbar-control-fits-compact-penguinToolbarButton",
+            "passed": true
+        },
+        {
+            "name": "redundant-toolbar-shortcuts-removed-compact",
+            "passed": true
+        },
+        {
+            "name": "control-penguinLiveButton",
+            "passed": true
+        },
+        {
+            "name": "control-penguinRecordButton",
+            "passed": true
+        },
+        {
+            "name": "toolbar-action-alignment-compact-penguinRecordButton",
+            "passed": true
+        },
+        {
+            "name": "control-penguinClipButton",
+            "passed": true
+        },
+        {
+            "name": "toolbar-action-alignment-compact-penguinClipButton",
+            "passed": true
+        },
+        {
+            "name": "control-penguinToolbarButton",
+            "passed": true
+        },
+        {
+            "name": "toolbar-action-alignment-compact-penguinToolbarButton",
+            "passed": true
+        },
+        {
+            "name": "control-penguinLiveButton",
+            "passed": true
+        },
+        {
+            "name": "toolbar-menu-hit-area-compact-penguinLiveButton",
+            "passed": true
+        },
+        {
+            "name": "control-penguinRecordButton",
+            "passed": true
+        },
+        {
+            "name": "toolbar-menu-hit-area-compact-penguinRecordButton",
+            "passed": true
+        },
+        {
+            "name": "control-penguinLayerSearch",
+            "passed": true
+        },
+        {
+            "name": "search-field-readable-compact-penguinLayerSearch",
+            "passed": true
+        },
+        {
+            "name": "control-penguinSceneSearch",
+            "passed": true
+        },
+        {
+            "name": "search-field-readable-compact-penguinSceneSearch",
+            "passed": true
+        },
+        {
+            "name": "control-inspectorScroll",
+            "passed": true
+        },
+        {
+            "name": "inspector-body-fits-viewport-compact",
+            "passed": true
+        },
+        {
+            "name": "inspector-horizontal-fit-compact-inspectorX",
+            "passed": true
+        },
+        {
+            "name": "inspector-horizontal-fit-compact-inspectorY",
+            "passed": true
+        },
+        {
+            "name": "inspector-horizontal-fit-compact-inspectorWidth",
+            "passed": true
+        },
+        {
+            "name": "inspector-horizontal-fit-compact-inspectorHeight",
+            "passed": true
+        },
+        {
+            "name": "inspector-horizontal-fit-compact-inspectorRotation",
+            "passed": true
+        },
+        {
+            "name": "inspector-horizontal-fit-compact-inspectorCropLeft",
+            "passed": true
+        },
+        {
+            "name": "inspector-horizontal-fit-compact-inspectorCropRight",
+            "passed": true
+        },
+        {
+            "name": "inspector-horizontal-fit-compact-inspectorCropTop",
+            "passed": true
+        },
+        {
+            "name": "inspector-horizontal-fit-compact-inspectorCropBottom",
+            "passed": true
+        },
+        {
+            "name": "inspector-horizontal-fit-compact-inspectorVisible",
+            "passed": true
+        },
+        {
+            "name": "inspector-horizontal-fit-compact-inspectorLocked",
+            "passed": true
+        },
+        {
+            "name": "inspector-horizontal-fit-compact-inspectorAspectLock",
+            "passed": true
+        },
+        {
+            "name": "inspector-horizontal-fit-compact-inspectorFit",
+            "passed": true
+        },
+        {
+            "name": "inspector-horizontal-fit-compact-inspectorCenter",
+            "passed": true
+        },
+        {
+            "name": "inspector-horizontal-fit-compact-inspectorFlipHorizontal",
+            "passed": true
+        },
+        {
+            "name": "inspector-horizontal-fit-compact-inspectorFlipVertical",
+            "passed": true
+        },
+        {
+            "name": "inspector-horizontal-fit-compact-inspectorProperties",
+            "passed": true
+        },
+        {
+            "name": "inspector-horizontal-fit-compact-inspectorFilters",
+            "passed": true
+        },
+        {
+            "name": "inspector-horizontal-fit-compact-inspectorAdvanced",
+            "passed": true
+        },
+        {
+            "name": "inspector-horizontal-fit-compact-inspectorReset",
+            "passed": true
+        },
+        {
+            "name": "inspector-horizontal-fit-compact-cameraShape",
+            "passed": true
+        },
+        {
+            "name": "inspector-horizontal-fit-compact-cameraBackground",
+            "passed": true
+        },
+        {
+            "name": "sidebar-tab-label-fits-compact-0",
+            "passed": true
+        },
+        {
+            "name": "sidebar-tab-label-fits-compact-1",
+            "passed": true
+        },
+        {
+            "name": "sidebar-tab-label-fits-compact-2",
+            "passed": true
+        },
+        {
+            "name": "sidebar-tab-bar-visible-compact",
+            "passed": true
+        },
+        {
+            "name": "control-inspectorFlipHorizontal",
+            "passed": true
+        },
+        {
+            "name": "horizontal-flip",
+            "passed": true
+        },
+        {
+            "name": "control-actionMainUndo",
+            "passed": true
+        },
+        {
+            "name": "horizontal-flip-undo",
+            "passed": true
+        },
+        {
+            "name": "control-inspectorX",
+            "passed": true
+        },
+        {
+            "name": "multiple-selection-inspector-disabled",
+            "passed": true
+        },
+        {
+            "name": "control-inspectorX",
+            "passed": true
+        },
+        {
+            "name": "empty-scene-clears-inspector",
+            "passed": true
+        },
+        {
+            "name": "control-inspectorX",
+            "passed": true
+        },
+        {
+            "name": "scene-switch-restores-inspector",
+            "passed": true
+        },
+        {
+            "name": "control-penguinDestinationsButton",
+            "passed": true
+        },
+        {
+            "name": "control-penguin-broadcast-destinations",
+            "passed": true
+        },
+        {
+            "name": "destinations-toolbar-opens-panel",
+            "passed": true
+        },
+        {
+            "name": "destinations-toolbar-selects-integrated-tab",
+            "passed": true
+        },
+        {
+            "name": "control-penguinCanvasMode",
+            "passed": true
+        },
+        {
+            "name": "studio-mode-toolbar-enabled",
+            "passed": true
+        },
+        {
+            "name": "control-penguinCanvasMode",
+            "passed": true
+        },
+        {
+            "name": "control-penguinOutputPanel",
+            "passed": true
+        },
+        {
+            "name": "no-external-destinations-configured",
+            "passed": true
+        },
+        {
+            "name": "control-penguinLiveButton",
+            "passed": true
+        },
+        {
+            "name": "go-live-opens-real-connection-wizard",
+            "passed": true
+        },
+        {
+            "name": "studio-mode-toolbar-disabled",
+            "passed": true
+        },
+        {
+            "name": "control-penguinRecordButton",
+            "passed": true
+        },
+        {
+            "name": "record-toolbar-starts-real-recording",
+            "passed": true
+        },
+        {
+            "name": "control-penguinRecordButton",
+            "passed": true
+        },
+        {
+            "name": "record-toolbar-stops-recording",
+            "passed": true
+        },
+        {
+            "name": "local-recording-file-created",
+            "passed": true
+        },
+        {
+            "name": "control-inspectorWidth",
+            "passed": true
+        },
+        {
+            "name": "control-inspectorHeight",
+            "passed": true
+        },
+        {
+            "name": "negative-cropped-dimensions-display",
+            "passed": true
+        },
+        {
+            "name": "negative-cropped-width-edit",
+            "passed": true
+        },
+        {
+            "name": "negative-scale-aspect-link",
+            "passed": true
+        },
+        {
+            "name": "bounded-dimensions-display",
+            "passed": true
+        },
+        {
+            "name": "bounded-width-edit-aspect-link",
+            "passed": true
+        },
+        {
+            "name": "control-actionMainUndo",
+            "passed": true
+        },
+        {
+            "name": "bounded-width-undo",
+            "passed": true
+        },
+        {
+            "name": "group-fixture-created",
+            "passed": true
+        },
+        {
+            "name": "control-inspectorX",
+            "passed": true
+        },
+        {
+            "name": "group-child-inspector-editable",
+            "passed": true
+        },
+        {
+            "name": "group-child-edit-moves-world-position",
+            "passed": true
+        },
+        {
+            "name": "control-actionMainUndo",
+            "passed": true
+        },
+        {
+            "name": "group-child-undo-restores-world-position",
+            "passed": true
+        },
+        {
+            "name": "control-actionMainRedo",
+            "passed": true
+        },
+        {
+            "name": "group-child-redo-restores-world-position",
+            "passed": true
+        }
+    ],
+    "devicePixelRatio": 1,
+    "platform": "wayland",
+    "previousDockStateSaved": false,
+    "screenHeight": 1440,
+    "screenWidth": 2560,
+    "sidebarTabs": [
+        {
+            "availableWidth": 58,
+            "barWidth": 340,
+            "index": 0,
+            "size": "large",
+            "tabWidth": 86,
+            "text": "Inspector",
+            "textWidth": 57
+        },
+        {
+            "availableWidth": 50,
+            "barWidth": 340,
+            "index": 1,
+            "size": "large",
+            "tabWidth": 78,
+            "text": "Outputs",
+            "textWidth": 49
+        },
+        {
+            "availableWidth": 50,
+            "barWidth": 340,
+            "index": 2,
+            "size": "large",
+            "tabWidth": 78,
+            "text": "Details",
+            "textWidth": 41
+        },
+        {
+            "availableWidth": 58,
+            "barWidth": 340,
+            "index": 0,
+            "size": "compact",
+            "tabWidth": 86,
+            "text": "Inspector",
+            "textWidth": 57
+        },
+        {
+            "availableWidth": 50,
+            "barWidth": 340,
+            "index": 1,
+            "size": "compact",
+            "tabWidth": 78,
+            "text": "Outputs",
+            "textWidth": 49
+        },
+        {
+            "availableWidth": 50,
+            "barWidth": 340,
+            "index": 2,
+            "size": "compact",
+            "tabWidth": 78,
+            "text": "Details",
+            "textWidth": 41
+        }
+    ],
+    "widgets": [
+        {
+            "class": "OBSDock",
+            "height": 663,
+            "name": "penguin-broadcast-destinations",
+            "visible": true,
+            "width": 340,
+            "x": -840,
+            "y": -1163
+        },
+        {
+            "class": "QDockWidgetTitleButton",
+            "height": 20,
+            "name": "qt_dockwidget_floatbutton",
+            "visible": true,
+            "width": 21,
+            "x": -538,
+            "y": -1154
+        },
+        {
+            "class": "QDockWidgetTitleButton",
+            "height": 20,
+            "name": "qt_dockwidget_closebutton",
+            "visible": true,
+            "width": 21,
+            "x": -519,
+            "y": -1154
+        },
+        {
+            "class": "QWidget",
+            "height": 626,
+            "name": "penguinOutputPanel",
+            "visible": true,
+            "width": 340,
+            "x": -840,
+            "y": -1126
+        },
+        {
+            "class": "QLabel",
+            "height": 21,
+            "name": "penguinDestinationHeading",
+            "visible": true,
+            "width": 259,
+            "x": -826,
+            "y": -1112
+        },
+        {
+            "class": "QLabel",
+            "height": 21,
+            "name": "penguinDestinationCount",
+            "visible": true,
+            "width": 43,
+            "x": -557,
+            "y": -1112
+        },
+        {
+            "class": "QTreeWidget",
+            "height": 480,
+            "name": "penguinDestinationList",
+            "visible": false,
+            "width": 640,
+            "x": -840,
+            "y": -1126
+        },
+        {
+            "class": "QWidget",
+            "height": 476,
+            "name": "qt_scrollarea_viewport",
+            "visible": false,
+            "width": 640,
+            "x": -840,
+            "y": -1124
+        },
+        {
+            "class": "QWidget",
+            "height": 8,
+            "name": "qt_scrollarea_hcontainer",
+            "visible": false,
+            "width": 100,
+            "x": -840,
+            "y": -1126
+        },
+        {
+            "class": "QWidget",
+            "height": 30,
+            "name": "qt_scrollarea_vcontainer",
+            "visible": false,
+            "width": 8,
+            "x": -840,
+            "y": -1126
+        },
+        {
+            "class": "QWidget",
+            "height": 0,
+            "name": "qt_scrollarea_viewport",
+            "visible": false,
+            "width": 640,
+            "x": -840,
+            "y": -1124
+        },
+        {
+            "class": "QWidget",
+            "height": 8,
+            "name": "qt_scrollarea_hcontainer",
+            "visible": false,
+            "width": 100,
+            "x": -840,
+            "y": -1124
+        },
+        {
+            "class": "QWidget",
+            "height": 30,
+            "name": "qt_scrollarea_vcontainer",
+            "visible": false,
+            "width": 8,
+            "x": -840,
+            "y": -1124
+        },
+        {
+            "class": "QLabel",
+            "height": 21,
+            "name": "penguinDestinationEmptyTitle",
+            "visible": true,
+            "width": 288,
+            "x": -814,
+            "y": -914
+        },
+        {
+            "class": "QPushButton",
+            "height": 34,
+            "name": "penguinAddDestination",
+            "visible": true,
+            "width": 312,
+            "x": -826,
+            "y": -705
+        },
+        {
+            "class": "QPushButton",
+            "height": 34,
+            "name": "penguinStartAll",
+            "visible": true,
+            "width": 151,
+            "x": -826,
+            "y": -573
+        },
+        {
+            "class": "QPushButton",
+            "height": 34,
+            "name": "penguinStopAll",
+            "visible": true,
+            "width": 151,
+            "x": -665,
+            "y": -573
+        },
+        {
+            "class": "OBSDock",
+            "height": 763,
+            "name": "penguin-stream-details",
+            "visible": true,
+            "width": 340,
+            "x": -840,
+            "y": -1263
+        },
+        {
+            "class": "QDockWidgetTitleButton",
+            "height": 20,
+            "name": "qt_dockwidget_floatbutton",
+            "visible": true,
+            "width": 21,
+            "x": -538,
+            "y": -1254
+        },
+        {
+            "class": "QDockWidgetTitleButton",
+            "height": 20,
+            "name": "qt_dockwidget_closebutton",
+            "visible": true,
+            "width": 21,
+            "x": -519,
+            "y": -1254
+        },
+        {
+            "class": "QWidget",
+            "height": 726,
+            "name": "penguinPlatformPanel",
+            "visible": true,
+            "width": 340,
+            "x": -840,
+            "y": -1226
+        },
+        {
+            "class": "QTabWidget",
+            "height": 629,
+            "name": "penguinPlatformTabs",
+            "visible": true,
+            "width": 312,
+            "x": -826,
+            "y": -1170
+        },
+        {
+            "class": "QStackedWidget",
+            "height": 590,
+            "name": "qt_tabwidget_stackedwidget",
+            "visible": true,
+            "width": 312,
+            "x": -826,
+            "y": -1131
+        },
+        {
+            "class": "QScrollArea",
+            "height": 30,
+            "name": "penguinPlatformScroll",
+            "visible": false,
+            "width": 100,
+            "x": -826,
+            "y": -1131
+        },
+        {
+            "class": "QWidget",
+            "height": 30,
+            "name": "qt_scrollarea_viewport",
+            "visible": false,
+            "width": 92,
+            "x": -826,
+            "y": -1131
+        },
+        {
+            "class": "QWidget",
+            "height": 674,
+            "name": "penguinPlatformPane",
+            "visible": false,
+            "width": 230,
+            "x": -826,
+            "y": -1131
+        },
+        {
+            "class": "QLabel",
+            "height": 72,
+            "name": "penguinPlatformStatus",
+            "visible": false,
+            "width": 206,
+            "x": -814,
+            "y": -571
+        },
+        {
+            "class": "QPushButton",
+            "height": 34,
+            "name": "youtubeConnectAccount",
+            "visible": false,
+            "width": 206,
+            "x": -814,
+            "y": -1117
+        },
+        {
+            "class": "QLabel",
+            "height": 18,
+            "name": "penguinCredentialStatus",
+            "visible": false,
+            "width": 206,
+            "x": -814,
+            "y": -489
+        },
+        {
+            "class": "QComboBox",
+            "height": 34,
+            "name": "youtubeBroadcast",
+            "visible": false,
+            "width": 206,
+            "x": -814,
+            "y": -957
+        },
+        {
+            "class": "QWidget",
+            "height": 14,
+            "name": "qt_scrollarea_viewport",
+            "visible": false,
+            "width": 90,
+            "x": -809,
+            "y": -949
+        },
+        {
+            "class": "QWidget",
+            "height": 8,
+            "name": "qt_scrollarea_hcontainer",
+            "visible": false,
+            "width": 100,
+            "x": -814,
+            "y": -952
+        },
+        {
+            "class": "QWidget",
+            "height": 30,
+            "name": "qt_scrollarea_vcontainer",
+            "visible": false,
+            "width": 8,
+            "x": -814,
+            "y": -952
+        },
+        {
+            "class": "QComboBox",
+            "height": 34,
+            "name": "youtubeCategory",
+            "visible": false,
+            "width": 206,
+            "x": -814,
+            "y": -813
+        },
+        {
+            "class": "QWidget",
+            "height": 24,
+            "name": "qt_scrollarea_viewport",
+            "visible": false,
+            "width": 90,
+            "x": -809,
+            "y": -810
+        },
+        {
+            "class": "QWidget",
+            "height": 8,
+            "name": "qt_scrollarea_hcontainer",
+            "visible": false,
+            "width": 100,
+            "x": -814,
+            "y": -813
+        },
+        {
+            "class": "QWidget",
+            "height": 30,
+            "name": "qt_scrollarea_vcontainer",
+            "visible": false,
+            "width": 8,
+            "x": -814,
+            "y": -813
+        },
+        {
+            "class": "QLabel",
+            "height": 18,
+            "name": "youtubeBroadcastIdentity",
+            "visible": false,
+            "width": 206,
+            "x": -814,
+            "y": -913
+        },
+        {
+            "class": "QPushButton",
+            "height": 34,
+            "name": "youtubeAppSettings",
+            "visible": false,
+            "width": 206,
+            "x": -814,
+            "y": -1029
+        },
+        {
+            "class": "QWidget",
+            "height": 8,
+            "name": "qt_scrollarea_hcontainer",
+            "visible": false,
+            "width": 100,
+            "x": -826,
+            "y": -1131
+        },
+        {
+            "class": "QWidget",
+            "height": 30,
+            "name": "qt_scrollarea_vcontainer",
+            "visible": false,
+            "width": 8,
+            "x": -734,
+            "y": -1131
+        },
+        {
+            "class": "QScrollArea",
+            "height": 590,
+            "name": "penguinPlatformScroll",
+            "visible": true,
+            "width": 312,
+            "x": -826,
+            "y": -1131
+        },
+        {
+            "class": "QWidget",
+            "height": 590,
+            "name": "qt_scrollarea_viewport",
+            "visible": true,
+            "width": 312,
+            "x": -826,
+            "y": -1131
+        },
+        {
+            "class": "QWidget",
+            "height": 590,
+            "name": "penguinPlatformPane",
+            "visible": true,
+            "width": 312,
+            "x": -826,
+            "y": -1131
+        },
+        {
+            "class": "QLabel",
+            "height": 54,
+            "name": "penguinPlatformStatus",
+            "visible": true,
+            "width": 288,
+            "x": -814,
+            "y": -823
+        },
+        {
+            "class": "QPushButton",
+            "height": 34,
+            "name": "twitchConnectAccount",
+            "visible": true,
+            "width": 288,
+            "x": -814,
+            "y": -1117
+        },
+        {
+            "class": "QLabel",
+            "height": 18,
+            "name": "penguinCredentialStatus",
+            "visible": true,
+            "width": 288,
+            "x": -814,
+            "y": -715
+        },
+        {
+            "class": "QComboBox",
+            "height": 34,
+            "name": "twitchCategory",
+            "visible": true,
+            "width": 288,
+            "x": -814,
+            "y": -983
+        },
+        {
+            "class": "QWidget",
+            "height": 24,
+            "name": "qt_scrollarea_viewport",
+            "visible": false,
+            "width": 90,
+            "x": -809,
+            "y": -980
+        },
+        {
+            "class": "QWidget",
+            "height": 8,
+            "name": "qt_scrollarea_hcontainer",
+            "visible": false,
+            "width": 100,
+            "x": -814,
+            "y": -983
+        },
+        {
+            "class": "QWidget",
+            "height": 30,
+            "name": "qt_scrollarea_vcontainer",
+            "visible": false,
+            "width": 8,
+            "x": -814,
+            "y": -983
+        },
+        {
+            "class": "QWidget",
+            "height": 8,
+            "name": "qt_scrollarea_hcontainer",
+            "visible": false,
+            "width": 100,
+            "x": -826,
+            "y": -1131
+        },
+        {
+            "class": "QWidget",
+            "height": 590,
+            "name": "qt_scrollarea_vcontainer",
+            "visible": false,
+            "width": 8,
+            "x": -522,
+            "y": -1131
+        },
+        {
+            "class": "QTabBar",
+            "height": 38,
+            "name": "qt_tabwidget_tabbar",
+            "visible": true,
+            "width": 312,
+            "x": -826,
+            "y": -1170
+        },
+        {
+            "class": "QToolButton",
+            "height": 30,
+            "name": "ScrollLeftButton",
+            "visible": false,
+            "width": 18,
+            "x": -757,
+            "y": -1170
+        },
+        {
+            "class": "QToolButton",
+            "height": 30,
+            "name": "ScrollRightButton",
+            "visible": false,
+            "width": 18,
+            "x": -742,
+            "y": -1170
+        },
+        {
+            "class": "QMenuBar",
+            "height": 0,
+            "name": "menubar",
+            "visible": false,
+            "width": 1280,
+            "x": 0,
+            "y": 0
+        },
+        {
+            "class": "QToolButton",
+            "height": 0,
+            "name": "qt_menubar_ext_button",
+            "visible": false,
+            "width": 12,
+            "x": 1267,
+            "y": 2
+        },
+        {
+            "class": "QMenu",
+            "height": 30,
+            "name": "menu_File",
+            "visible": false,
+            "width": 100,
+            "x": 0,
+            "y": 0
+        },
+        {
+            "class": "QMenu",
+            "height": 30,
+            "name": "menuBasic_MainMenu_Help",
+            "visible": false,
+            "width": 100,
+            "x": 0,
+            "y": 0
+        },
+        {
+            "class": "QMenu",
+            "height": 30,
+            "name": "menuLogFiles",
+            "visible": false,
+            "width": 100,
+            "x": 0,
+            "y": 0
+        },
+        {
+            "class": "QMenu",
+            "height": 30,
+            "name": "menuBasic_MainMenu_Edit",
+            "visible": false,
+            "width": 100,
+            "x": 0,
+            "y": 0
+        },
+        {
+            "class": "QMenu",
+            "height": 30,
+            "name": "transformMenu",
+            "visible": false,
+            "width": 100,
+            "x": 0,
+            "y": 0
+        },
+        {
+            "class": "QMenu",
+            "height": 30,
+            "name": "orderMenu",
+            "visible": false,
+            "width": 100,
+            "x": 0,
+            "y": 0
+        },
+        {
+            "class": "QMenu",
+            "height": 30,
+            "name": "scalingMenu",
+            "visible": false,
+            "width": 100,
+            "x": 0,
+            "y": 0
+        },
+        {
+            "class": "QMenu",
+            "height": 30,
+            "name": "profileMenu",
+            "visible": false,
+            "width": 100,
+            "x": 0,
+            "y": 0
+        },
+        {
+            "class": "QMenu",
+            "height": 30,
+            "name": "sceneCollectionMenu",
+            "visible": false,
+            "width": 100,
+            "x": 0,
+            "y": 0
+        },
+        {
+            "class": "QMenu",
+            "height": 30,
+            "name": "viewMenu",
+            "visible": false,
+            "width": 100,
+            "x": 0,
+            "y": 0
+        },
+        {
+            "class": "QMenu",
+            "height": 30,
+            "name": "sceneListModeMenu",
+            "visible": false,
+            "width": 100,
+            "x": 0,
+            "y": 0
+        },
+        {
+            "class": "QMenu",
+            "height": 30,
+            "name": "multiviewProjectorMenu",
+            "visible": false,
+            "width": 100,
+            "x": 0,
+            "y": 0
+        },
+        {
+            "class": "QMenu",
+            "height": 30,
+            "name": "menuTools",
+            "visible": false,
+            "width": 100,
+            "x": 0,
+            "y": 0
+        },
+        {
+            "class": "QMenu",
+            "height": 30,
+            "name": "menuDocks",
+            "visible": false,
+            "width": 100,
+            "x": 0,
+            "y": 0
+        },
+        {
+            "class": "OBSBasicStatusBar",
+            "height": 44,
+            "name": "statusbar",
+            "visible": true,
+            "width": 1280,
+            "x": 0,
+            "y": 756
+        },
+        {
+            "class": "StatusBarWidget",
+            "height": 42,
+            "name": "StatusBarWidget",
+            "visible": true,
+            "width": 1191,
+            "x": 2,
+            "y": 759
+        },
+        {
+            "class": "QFrame",
+            "height": 30,
+            "name": "messageFrame",
+            "visible": true,
+            "width": 855,
+            "x": 14,
+            "y": 765
+        },
+        {
+            "class": "QLabel",
+            "height": 18,
+            "name": "message",
+            "visible": true,
+            "width": 841,
+            "x": 21,
+            "y": 770
+        },
+        {
+            "class": "QFrame",
+            "height": 30,
+            "name": "delayFrame",
+            "visible": false,
+            "width": 100,
+            "x": 2,
+            "y": 759
+        },
+        {
+            "class": "QLabel",
+            "height": 18,
+            "name": "delayInfo",
+            "visible": false,
+            "width": 0,
+            "x": 52,
+            "y": 764
+        },
+        {
+            "class": "QFrame",
+            "height": 30,
+            "name": "issuesFrame",
+            "visible": false,
+            "width": 100,
+            "x": 2,
+            "y": 759
+        },
+        {
+            "class": "QLabel",
+            "height": 18,
+            "name": "droppedFrames",
+            "visible": false,
+            "width": 65,
+            "x": 20,
+            "y": 764
+        },
+        {
+            "class": "QFrame",
+            "height": 30,
+            "name": "networkFrame",
+            "visible": false,
+            "width": 100,
+            "x": 2,
+            "y": 759
+        },
+        {
+            "class": "QLabel",
+            "height": 16,
+            "name": "statusIcon",
+            "visible": false,
+            "width": 16,
+            "x": 44,
+            "y": 765
+        },
+        {
+            "class": "QLabel",
+            "height": 30,
+            "name": "kbps",
+            "visible": false,
+            "width": 100,
+            "x": 2,
+            "y": 759
+        },
+        {
+            "class": "QFrame",
+            "height": 30,
+            "name": "streamFrame",
+            "visible": false,
+            "width": 100,
+            "x": 2,
+            "y": 759
+        },
+        {
+            "class": "QLabel",
+            "height": 16,
+            "name": "streamIcon",
+            "visible": false,
+            "width": 16,
+            "x": 20,
+            "y": 765
+        },
+        {
+            "class": "QLabel",
+            "height": 18,
+            "name": "streamTime",
+            "visible": false,
+            "width": 43,
+            "x": 42,
+            "y": 764
+        },
+        {
+            "class": "QFrame",
+            "height": 30,
+            "name": "recordFrame",
+            "visible": false,
+            "width": 181,
+            "x": 688,
+            "y": 765
+        },
+        {
+            "class": "QLabel",
+            "height": 16,
+            "name": "recordIcon",
+            "visible": false,
+            "width": 16,
+            "x": 706,
+            "y": 771
+        },
+        {
+            "class": "QLabel",
+            "height": 18,
+            "name": "recordTime",
+            "visible": false,
+            "width": 124,
+            "x": 728,
+            "y": 770
+        },
+        {
+            "class": "QFrame",
+            "height": 30,
+            "name": "cpuFrame",
+            "visible": true,
+            "width": 108,
+            "x": 877,
+            "y": 765
+        },
+        {
+            "class": "QLabel",
+            "height": 18,
+            "name": "cpuUsage",
+            "visible": true,
+            "width": 73,
+            "x": 895,
+            "y": 770
+        },
+        {
+            "class": "QFrame",
+            "height": 30,
+            "name": "gpuFrame",
+            "visible": true,
+            "width": 98,
+            "x": 993,
+            "y": 765
+        },
+        {
+            "class": "QLabel",
+            "height": 18,
+            "name": "gpuUsage",
+            "visible": true,
+            "width": 63,
+            "x": 1011,
+            "y": 770
+        },
+        {
+            "class": "QFrame",
+            "height": 30,
+            "name": "fpsFrame",
+            "visible": true,
+            "width": 82,
+            "x": 1099,
+            "y": 765
+        },
+        {
+            "class": "QLabel",
+            "height": 18,
+            "name": "fpsCurrent",
+            "visible": true,
+            "width": 47,
+            "x": 1117,
+            "y": 770
+        },
+        {
+            "class": "QLabel",
+            "height": 39,
+            "name": "penguinUploadRate",
+            "visible": true,
+            "width": 81,
+            "x": 1199,
+            "y": 759
+        },
+        {
+            "class": "OBSDock",
+            "height": 261,
+            "name": "scenesDock",
+            "visible": true,
+            "width": 230,
+            "x": 0,
+            "y": 495
+        },
+        {
+            "class": "QDockWidgetTitleButton",
+            "height": 30,
+            "name": "qt_dockwidget_floatbutton",
+            "visible": false,
+            "width": 100,
+            "x": 0,
+            "y": 495
+        },
+        {
+            "class": "QDockWidgetTitleButton",
+            "height": 30,
+            "name": "qt_dockwidget_closebutton",
+            "visible": false,
+            "width": 100,
+            "x": 0,
+            "y": 495
+        },
+        {
+            "class": "QWidget",
+            "height": 166,
+            "name": "dockWidgetContents_2",
+            "visible": true,
+            "width": 230,
+            "x": 0,
+            "y": 590
+        },
+        {
+            "class": "QFrame",
+            "height": 165,
+            "name": "scenesFrame",
+            "visible": true,
+            "width": 228,
+            "x": 1,
+            "y": 590
+        },
+        {
+            "class": "SceneTree",
+            "height": 165,
+            "name": "scenes",
+            "visible": true,
+            "width": 228,
+            "x": 1,
+            "y": 590
+        },
+        {
+            "class": "QWidget",
+            "height": 153,
+            "name": "qt_scrollarea_viewport",
+            "visible": true,
+            "width": 216,
+            "x": 7,
+            "y": 596
+        },
+        {
+            "class": "QWidget",
+            "height": 30,
+            "name": "qt_scrollarea_vcontainer",
+            "visible": false,
+            "width": 8,
+            "x": 1,
+            "y": 590
+        },
+        {
+            "class": "QWidget",
+            "height": 8,
+            "name": "qt_scrollarea_hcontainer",
+            "visible": false,
+            "width": 216,
+            "x": 7,
+            "y": 778
+        },
+        {
+            "class": "QToolBar",
+            "height": 30,
+            "name": "scenesToolbar",
+            "visible": false,
+            "width": 100,
+            "x": 1,
+            "y": 590
+        },
+        {
+            "class": "QToolBarExtension",
+            "height": 27,
+            "name": "qt_toolbar_ext_button",
+            "visible": false,
+            "width": 24,
+            "x": 88,
+            "y": 592
+        },
+        {
+            "class": "QWidget",
+            "height": 95,
+            "name": "penguinPanelHeader",
+            "visible": true,
+            "width": 230,
+            "x": 0,
+            "y": 495
+        },
+        {
+            "class": "QLabel",
+            "height": 33,
+            "name": "penguinPanelIcon",
+            "visible": true,
+            "width": 18,
+            "x": 12,
+            "y": 505
+        },
+        {
+            "class": "QLabel",
+            "height": 33,
+            "name": "penguinPanelTitle",
+            "visible": true,
+            "width": 67,
+            "x": 38,
+            "y": 505
+        },
+        {
+            "class": "QLabel",
+            "height": 33,
+            "name": "penguinPanelCount",
+            "visible": true,
+            "width": 25,
+            "x": 113,
+            "y": 505
+        },
+        {
+            "class": "QToolButton",
+            "height": 33,
+            "name": "penguinPanelAction",
+            "visible": true,
+            "width": 33,
+            "x": 146,
+            "y": 505
+        },
+        {
+            "class": "QToolButton",
+            "height": 33,
+            "name": "penguinPanelAction",
+            "visible": true,
+            "width": 33,
+            "x": 187,
+            "y": 505
+        },
+        {
+            "class": "QLineEdit",
+            "height": 34,
+            "name": "penguinSceneSearch",
+            "visible": true,
+            "width": 210,
+            "x": 10,
+            "y": 546
+        },
+        {
+            "class": "OBSDock",
+            "height": 435,
+            "name": "sourcesDock",
+            "visible": true,
+            "width": 230,
+            "x": 0,
+            "y": 57
+        },
+        {
+            "class": "QDockWidgetTitleButton",
+            "height": 30,
+            "name": "qt_dockwidget_floatbutton",
+            "visible": false,
+            "width": 100,
+            "x": 0,
+            "y": 57
+        },
+        {
+            "class": "QDockWidgetTitleButton",
+            "height": 30,
+            "name": "qt_dockwidget_closebutton",
+            "visible": false,
+            "width": 100,
+            "x": 0,
+            "y": 57
+        },
+        {
+            "class": "QWidget",
+            "height": 340,
+            "name": "dockWidgetContents_6",
+            "visible": true,
+            "width": 230,
+            "x": 0,
+            "y": 152
+        },
+        {
+            "class": "QFrame",
+            "height": 339,
+            "name": "sourcesFrame",
+            "visible": true,
+            "width": 228,
+            "x": 1,
+            "y": 152
+        },
+        {
+            "class": "SourceTree",
+            "height": 339,
+            "name": "sources",
+            "visible": true,
+            "width": 228,
+            "x": 1,
+            "y": 152
+        },
+        {
+            "class": "QWidget",
+            "height": 327,
+            "name": "qt_scrollarea_viewport",
+            "visible": true,
+            "width": 216,
+            "x": 7,
+            "y": 158
+        },
+        {
+            "class": "QWidget",
+            "height": 8,
+            "name": "qt_scrollarea_hcontainer",
+            "visible": false,
+            "width": 100,
+            "x": 1,
+            "y": 152
+        },
+        {
+            "class": "QWidget",
+            "height": 30,
+            "name": "qt_scrollarea_vcontainer",
+            "visible": false,
+            "width": 8,
+            "x": 1,
+            "y": 152
+        },
+        {
+            "class": "QToolBar",
+            "height": 30,
+            "name": "sourcesToolbar",
+            "visible": false,
+            "width": 100,
+            "x": 1,
+            "y": 152
+        },
+        {
+            "class": "QToolBarExtension",
+            "height": 27,
+            "name": "qt_toolbar_ext_button",
+            "visible": false,
+            "width": 24,
+            "x": 88,
+            "y": 154
+        },
+        {
+            "class": "QWidget",
+            "height": 95,
+            "name": "penguinPanelHeader",
+            "visible": true,
+            "width": 230,
+            "x": 0,
+            "y": 57
+        },
+        {
+            "class": "QLabel",
+            "height": 33,
+            "name": "penguinPanelIcon",
+            "visible": true,
+            "width": 18,
+            "x": 12,
+            "y": 67
+        },
+        {
+            "class": "QLabel",
+            "height": 33,
+            "name": "penguinPanelTitle",
+            "visible": true,
+            "width": 67,
+            "x": 38,
+            "y": 67
+        },
+        {
+            "class": "QLabel",
+            "height": 33,
+            "name": "penguinPanelCount",
+            "visible": true,
+            "width": 25,
+            "x": 113,
+            "y": 67
+        },
+        {
+            "class": "QToolButton",
+            "height": 33,
+            "name": "penguinPanelAction",
+            "visible": true,
+            "width": 33,
+            "x": 146,
+            "y": 67
+        },
+        {
+            "class": "QToolButton",
+            "height": 33,
+            "name": "penguinPanelAction",
+            "visible": true,
+            "width": 33,
+            "x": 187,
+            "y": 67
+        },
+        {
+            "class": "QLineEdit",
+            "height": 34,
+            "name": "penguinLayerSearch",
+            "visible": true,
+            "width": 210,
+            "x": 10,
+            "y": 108
+        },
+        {
+            "class": "OBSDock",
+            "height": 348,
+            "name": "mixerDock",
+            "visible": true,
+            "width": 704,
+            "x": 233,
+            "y": 408
+        },
+        {
+            "class": "QDockWidgetTitleButton",
+            "height": 30,
+            "name": "qt_dockwidget_floatbutton",
+            "visible": false,
+            "width": 100,
+            "x": 233,
+            "y": 408
+        },
+        {
+            "class": "QDockWidgetTitleButton",
+            "height": 30,
+            "name": "qt_dockwidget_closebutton",
+            "visible": false,
+            "width": 100,
+            "x": 233,
+            "y": 408
+        },
+        {
+            "class": "QWidget",
+            "height": 480,
+            "name": "dockWidgetContents_7",
+            "visible": false,
+            "width": 640,
+            "x": 233,
+            "y": 408
+        },
+        {
+            "class": "QWidget",
+            "height": 44,
+            "name": "penguinPanelHeader",
+            "visible": true,
+            "width": 704,
+            "x": 233,
+            "y": 408
+        },
+        {
+            "class": "QLabel",
+            "height": 26,
+            "name": "penguinPanelIcon",
+            "visible": true,
+            "width": 18,
+            "x": 245,
+            "y": 418
+        },
+        {
+            "class": "QLabel",
+            "height": 26,
+            "name": "penguinPanelTitle",
+            "visible": true,
+            "width": 656,
+            "x": 271,
+            "y": 418
+        },
+        {
+            "class": "QStackedWidget",
+            "height": 273,
+            "name": "stackedMixerArea",
+            "visible": true,
+            "width": 704,
+            "x": 233,
+            "y": 452
+        },
+        {
+            "class": "QScrollArea",
+            "height": 141,
+            "name": "hMixerScrollArea",
+            "visible": false,
+            "width": 654,
+            "x": 233,
+            "y": 452
+        },
+        {
+            "class": "QWidget",
+            "height": 141,
+            "name": "qt_scrollarea_viewport",
+            "visible": false,
+            "width": 654,
+            "x": 233,
+            "y": 452
+        },
+        {
+            "class": "QWidget",
+            "height": 0,
+            "name": "hVolumeWidgets",
+            "visible": false,
+            "width": 654,
+            "x": 233,
+            "y": 452
+        },
+        {
+            "class": "QWidget",
+            "height": 8,
+            "name": "qt_scrollarea_hcontainer",
+            "visible": false,
+            "width": 100,
+            "x": 233,
+            "y": 452
+        },
+        {
+            "class": "QWidget",
+            "height": 30,
+            "name": "qt_scrollarea_vcontainer",
+            "visible": false,
+            "width": 8,
+            "x": 233,
+            "y": 452
+        },
+        {
+            "class": "QScrollArea",
+            "height": 273,
+            "name": "vMixerScrollArea",
+            "visible": true,
+            "width": 704,
+            "x": 233,
+            "y": 452
+        },
+        {
+            "class": "QWidget",
+            "height": 273,
+            "name": "qt_scrollarea_viewport",
+            "visible": true,
+            "width": 704,
+            "x": 233,
+            "y": 452
+        },
+        {
+            "class": "QWidget",
+            "height": 273,
+            "name": "vVolumeWidgets",
+            "visible": true,
+            "width": 704,
+            "x": 233,
+            "y": 452
+        },
+        {
+            "class": "VolumeControl",
+            "height": 273,
+            "name": "Desktop test tone",
+            "visible": true,
+            "width": 132,
+            "x": 233,
+            "y": 452
+        },
+        {
+            "class": "QLabel",
+            "height": 19,
+            "name": "volLabel",
+            "visible": true,
+            "width": 40,
+            "x": 279,
+            "y": 650
+        },
+        {
+            "class": "QFrame",
+            "height": 121,
+            "name": "volMeterFrame",
+            "visible": true,
+            "width": 98,
+            "x": 250,
+            "y": 524
+        },
+        {
+            "class": "VolumeControl",
+            "height": 273,
+            "name": "Microphone test tone",
+            "visible": true,
+            "width": 132,
+            "x": 365,
+            "y": 452
+        },
+        {
+            "class": "QLabel",
+            "height": 19,
+            "name": "volLabel",
+            "visible": true,
+            "width": 40,
+            "x": 411,
+            "y": 650
+        },
+        {
+            "class": "QFrame",
+            "height": 121,
+            "name": "volMeterFrame",
+            "visible": true,
+            "width": 98,
+            "x": 382,
+            "y": 524
+        },
+        {
+            "class": "QWidget",
+            "height": 8,
+            "name": "qt_scrollarea_hcontainer",
+            "visible": false,
+            "width": 100,
+            "x": 233,
+            "y": 452
+        },
+        {
+            "class": "QWidget",
+            "height": 30,
+            "name": "qt_scrollarea_vcontainer",
+            "visible": false,
+            "width": 8,
+            "x": 233,
+            "y": 452
+        },
+        {
+            "class": "QToolBarExtension",
+            "height": 27,
+            "name": "qt_toolbar_ext_button",
+            "visible": false,
+            "width": 26,
+            "x": 233,
+            "y": 725
+        },
+        {
+            "class": "OBSDock",
+            "height": 216,
+            "name": "transitionsDock",
+            "visible": false,
+            "width": 183,
+            "x": 283,
+            "y": 700
+        },
+        {
+            "class": "QDockWidgetTitleButton",
+            "height": 20,
+            "name": "qt_dockwidget_floatbutton",
+            "visible": false,
+            "width": 21,
+            "x": 428,
+            "y": 709
+        },
+        {
+            "class": "QDockWidgetTitleButton",
+            "height": 20,
+            "name": "qt_dockwidget_closebutton",
+            "visible": false,
+            "width": 21,
+            "x": 447,
+            "y": 709
+        },
+        {
+            "class": "QWidget",
+            "height": 179,
+            "name": "dockWidgetContents_5",
+            "visible": false,
+            "width": 183,
+            "x": 283,
+            "y": 737
+        },
+        {
+            "class": "QFrame",
+            "height": 178,
+            "name": "transitionsFrame",
+            "visible": false,
+            "width": 181,
+            "x": 284,
+            "y": 737
+        },
+        {
+            "class": "QComboBox",
+            "height": 34,
+            "name": "transitions",
+            "visible": false,
+            "width": 165,
+            "x": 292,
+            "y": 745
+        },
+        {
+            "class": "QWidget",
+            "height": 14,
+            "name": "qt_scrollarea_viewport",
+            "visible": false,
+            "width": 90,
+            "x": 297,
+            "y": 753
+        },
+        {
+            "class": "QWidget",
+            "height": 8,
+            "name": "qt_scrollarea_hcontainer",
+            "visible": false,
+            "width": 100,
+            "x": 292,
+            "y": 750
+        },
+        {
+            "class": "QWidget",
+            "height": 30,
+            "name": "qt_scrollarea_vcontainer",
+            "visible": false,
+            "width": 8,
+            "x": 292,
+            "y": 750
+        },
+        {
+            "class": "QLabel",
+            "height": 34,
+            "name": "transitionDurationLabel",
+            "visible": false,
+            "width": 54,
+            "x": 292,
+            "y": 779
+        },
+        {
+            "class": "QSpinBox",
+            "height": 34,
+            "name": "transitionDuration",
+            "visible": false,
+            "width": 107,
+            "x": 350,
+            "y": 779
+        },
+        {
+            "class": "QLineEdit",
+            "height": 22,
+            "name": "qt_spinbox_lineedit",
+            "visible": false,
+            "width": 72,
+            "x": 359,
+            "y": 785
+        },
+        {
+            "class": "QPushButton",
+            "height": 28,
+            "name": "transitionAdd",
+            "visible": false,
+            "width": 26,
+            "x": 371,
+            "y": 813
+        },
+        {
+            "class": "QPushButton",
+            "height": 28,
+            "name": "transitionRemove",
+            "visible": false,
+            "width": 26,
+            "x": 401,
+            "y": 813
+        },
+        {
+            "class": "QPushButton",
+            "height": 28,
+            "name": "transitionProps",
+            "visible": false,
+            "width": 26,
+            "x": 431,
+            "y": 813
+        },
+        {
+            "class": "OBSDock",
+            "height": 216,
+            "name": "controlsDock",
+            "visible": false,
+            "width": 209,
+            "x": 469,
+            "y": 700
+        },
+        {
+            "class": "QDockWidgetTitleButton",
+            "height": 20,
+            "name": "qt_dockwidget_floatbutton",
+            "visible": false,
+            "width": 21,
+            "x": 640,
+            "y": 709
+        },
+        {
+            "class": "QDockWidgetTitleButton",
+            "height": 20,
+            "name": "qt_dockwidget_closebutton",
+            "visible": false,
+            "width": 21,
+            "x": 659,
+            "y": 709
+        },
+        {
+            "class": "OBSBasicControls",
+            "height": 179,
+            "name": "OBSBasicControls",
+            "visible": false,
+            "width": 209,
+            "x": 469,
+            "y": 737
+        },
+        {
+            "class": "QFrame",
+            "height": 178,
+            "name": "controlsFrame",
+            "visible": false,
+            "width": 207,
+            "x": 470,
+            "y": 737
+        },
+        {
+            "class": "QPushButton",
+            "height": 36,
+            "name": "streamButton",
+            "visible": false,
+            "width": 191,
+            "x": 478,
+            "y": 745
+        },
+        {
+            "class": "QPushButton",
+            "height": 36,
+            "name": "broadcastButton",
+            "visible": false,
+            "width": 150,
+            "x": 470,
+            "y": 737
+        },
+        {
+            "class": "QPushButton",
+            "height": 36,
+            "name": "recordButton",
+            "visible": false,
+            "width": 191,
+            "x": 478,
+            "y": 781
+        },
+        {
+            "class": "QPushButton",
+            "height": 36,
+            "name": "pauseRecordButton",
+            "visible": false,
+            "width": 34,
+            "x": 470,
+            "y": 737
+        },
+        {
+            "class": "QPushButton",
+            "height": 36,
+            "name": "replayBufferButton",
+            "visible": false,
+            "width": 100,
+            "x": 470,
+            "y": 737
+        },
+        {
+            "class": "QPushButton",
+            "height": 36,
+            "name": "saveReplayButton",
+            "visible": false,
+            "width": 34,
+            "x": 470,
+            "y": 737
+        },
+        {
+            "class": "QPushButton",
+            "height": 38,
+            "name": "virtualCamButton",
+            "visible": false,
+            "width": 100,
+            "x": 470,
+            "y": 737
+        },
+        {
+            "class": "QPushButton",
+            "height": 36,
+            "name": "virtualCamConfigButton",
+            "visible": false,
+            "width": 34,
+            "x": 470,
+            "y": 737
+        },
+        {
+            "class": "QPushButton",
+            "height": 38,
+            "name": "modeSwitch",
+            "visible": false,
+            "width": 191,
+            "x": 478,
+            "y": 817
+        },
+        {
+            "class": "QPushButton",
+            "height": 38,
+            "name": "settingsButton",
+            "visible": false,
+            "width": 191,
+            "x": 478,
+            "y": 855
+        },
+        {
+            "class": "OBSDock",
+            "height": 261,
+            "name": "statsDock",
+            "visible": false,
+            "width": 720,
+            "x": 930,
+            "y": 620
+        },
+        {
+            "class": "QDockWidgetTitleButton",
+            "height": 20,
+            "name": "qt_dockwidget_floatbutton",
+            "visible": false,
+            "width": 21,
+            "x": 1611,
+            "y": 630
+        },
+        {
+            "class": "QDockWidgetTitleButton",
+            "height": 20,
+            "name": "qt_dockwidget_closebutton",
+            "visible": false,
+            "width": 21,
+            "x": 1630,
+            "y": 630
+        },
+        {
+            "class": "QWidget",
+            "height": 66,
+            "name": "qt_scrollarea_viewport",
+            "visible": false,
+            "width": 690,
+            "x": 941,
+            "y": 764
+        },
+        {
+            "class": "QWidget",
+            "height": 8,
+            "name": "qt_scrollarea_hcontainer",
+            "visible": false,
+            "width": 690,
+            "x": 941,
+            "y": 822
+        },
+        {
+            "class": "QWidget",
+            "height": 66,
+            "name": "qt_scrollarea_vcontainer",
+            "visible": false,
+            "width": 8,
+            "x": 1631,
+            "y": 764
+        },
+        {
+            "class": "QToolBar",
+            "height": 57,
+            "name": "penguinTopBar",
+            "visible": true,
+            "width": 1280,
+            "x": 0,
+            "y": 0
+        },
+        {
+            "class": "QToolBarExtension",
+            "height": 30,
+            "name": "qt_toolbar_ext_button",
+            "visible": false,
+            "width": 18,
+            "x": 0,
+            "y": 0
+        },
+        {
+            "class": "QToolButton",
+            "height": 33,
+            "name": "penguinBrand",
+            "visible": true,
+            "width": 177,
+            "x": 14,
+            "y": 12
+        },
+        {
+            "class": "QLabel",
+            "height": 37,
+            "name": "penguinWorkspaceLabel",
+            "visible": false,
+            "width": 99,
+            "x": 199,
+            "y": 10
+        },
+        {
+            "class": "QLabel",
+            "height": 37,
+            "name": "penguinMetric",
+            "visible": true,
+            "width": 56,
+            "x": 550,
+            "y": 10
+        },
+        {
+            "class": "QToolButton",
+            "height": 37,
+            "name": "penguinDestinationsButton",
+            "visible": true,
+            "width": 140,
+            "x": 614,
+            "y": 10
+        },
+        {
+            "class": "QToolButton",
+            "height": 37,
+            "name": "penguinLiveButton",
+            "visible": true,
+            "width": 123,
+            "x": 762,
+            "y": 10
+        },
+        {
+            "class": "QToolButton",
+            "height": 37,
+            "name": "penguinRecordButton",
+            "visible": true,
+            "width": 124,
+            "x": 893,
+            "y": 10
+        },
+        {
+            "class": "QToolButton",
+            "height": 37,
+            "name": "penguinClipButton",
+            "visible": true,
+            "width": 82,
+            "x": 1025,
+            "y": 10
+        },
+        {
+            "class": "QToolButton",
+            "height": 37,
+            "name": "penguinToolbarButton",
+            "visible": true,
+            "width": 37,
+            "x": 1229,
+            "y": 10
+        },
+        {
+            "class": "QToolButton",
+            "height": 37,
+            "name": "penguinPrivacyButton",
+            "visible": true,
+            "width": 106,
+            "x": 1115,
+            "y": 10
+        },
+        {
+            "class": "OutputTimer",
+            "height": 274,
+            "name": "OutputTimer",
+            "visible": false,
+            "width": 697,
+            "x": 0,
+            "y": 0
+        },
+        {
+            "class": "QLabel",
+            "height": 34,
+            "name": "hoursLabel",
+            "visible": false,
+            "width": 37,
+            "x": 246,
+            "y": 11
+        },
+        {
+            "class": "QSpinBox",
+            "height": 34,
+            "name": "recordingTimerHours",
+            "visible": false,
+            "width": 87,
+            "x": 153,
+            "y": 105
+        },
+        {
+            "class": "QLineEdit",
+            "height": 22,
+            "name": "qt_spinbox_lineedit",
+            "visible": false,
+            "width": 52,
+            "x": 162,
+            "y": 111
+        },
+        {
+            "class": "QSpinBox",
+            "height": 34,
+            "name": "streamingTimerSeconds",
+            "visible": false,
+            "width": 87,
+            "x": 438,
+            "y": 11
+        },
+        {
+            "class": "QLineEdit",
+            "height": 22,
+            "name": "qt_spinbox_lineedit",
+            "visible": false,
+            "width": 52,
+            "x": 447,
+            "y": 17
+        },
+        {
+            "class": "QPushButton",
+            "height": 34,
+            "name": "outputTimerStream",
+            "visible": false,
+            "width": 98,
+            "x": 588,
+            "y": 11
+        },
+        {
+            "class": "QSpinBox",
+            "height": 34,
+            "name": "recordingTimerMinutes",
+            "visible": false,
+            "width": 88,
+            "x": 289,
+            "y": 105
+        },
+        {
+            "class": "QLineEdit",
+            "height": 22,
+            "name": "qt_spinbox_lineedit",
+            "visible": false,
+            "width": 53,
+            "x": 298,
+            "y": 111
+        },
+        {
+            "class": "QLabel",
+            "height": 34,
+            "name": "streamingLabel",
+            "visible": false,
+            "width": 136,
+            "x": 11,
+            "y": 11
+        },
+        {
+            "class": "QSpinBox",
+            "height": 34,
+            "name": "streamingTimerMinutes",
+            "visible": false,
+            "width": 88,
+            "x": 289,
+            "y": 11
+        },
+        {
+            "class": "QLineEdit",
+            "height": 22,
+            "name": "qt_spinbox_lineedit",
+            "visible": false,
+            "width": 53,
+            "x": 298,
+            "y": 17
+        },
+        {
+            "class": "QPushButton",
+            "height": 34,
+            "name": "outputTimerRecord",
+            "visible": false,
+            "width": 98,
+            "x": 588,
+            "y": 105
+        },
+        {
+            "class": "QLabel",
+            "height": 18,
+            "name": "recordStoppingIn",
+            "visible": false,
+            "width": 136,
+            "x": 11,
+            "y": 205
+        },
+        {
+            "class": "QLabel",
+            "height": 34,
+            "name": "secondsLabel_2",
+            "visible": false,
+            "width": 51,
+            "x": 531,
+            "y": 105
+        },
+        {
+            "class": "QLabel",
+            "height": 18,
+            "name": "streamTime",
+            "visible": false,
+            "width": 87,
+            "x": 153,
+            "y": 81
+        },
+        {
+            "class": "QLabel",
+            "height": 34,
+            "name": "minutesLabel_2",
+            "visible": false,
+            "width": 49,
+            "x": 383,
+            "y": 105
+        },
+        {
+            "class": "QSpinBox",
+            "height": 34,
+            "name": "streamingTimerHours",
+            "visible": false,
+            "width": 87,
+            "x": 153,
+            "y": 11
+        },
+        {
+            "class": "QLineEdit",
+            "height": 22,
+            "name": "qt_spinbox_lineedit",
+            "visible": false,
+            "width": 52,
+            "x": 162,
+            "y": 17
+        },
+        {
+            "class": "QLabel",
+            "height": 18,
+            "name": "recordTime",
+            "visible": false,
+            "width": 87,
+            "x": 153,
+            "y": 205
+        },
+        {
+            "class": "QLabel",
+            "height": 34,
+            "name": "minutesLabel",
+            "visible": false,
+            "width": 49,
+            "x": 383,
+            "y": 11
+        },
+        {
+            "class": "QLabel",
+            "height": 34,
+            "name": "recordingLabel",
+            "visible": false,
+            "width": 136,
+            "x": 11,
+            "y": 105
+        },
+        {
+            "class": "QSpinBox",
+            "height": 34,
+            "name": "recordingTimerSeconds",
+            "visible": false,
+            "width": 87,
+            "x": 438,
+            "y": 105
+        },
+        {
+            "class": "QLineEdit",
+            "height": 22,
+            "name": "qt_spinbox_lineedit",
+            "visible": false,
+            "width": 52,
+            "x": 447,
+            "y": 111
+        },
+        {
+            "class": "QCheckBox",
+            "height": 24,
+            "name": "autoStartStreamTimer",
+            "visible": false,
+            "width": 272,
+            "x": 11,
+            "y": 51
+        },
+        {
+            "class": "QLabel",
+            "height": 18,
+            "name": "streamStoppingIn",
+            "visible": false,
+            "width": 136,
+            "x": 11,
+            "y": 81
+        },
+        {
+            "class": "QCheckBox",
+            "height": 24,
+            "name": "autoStartRecordTimer",
+            "visible": false,
+            "width": 272,
+            "x": 11,
+            "y": 145
+        },
+        {
+            "class": "QDialogButtonBox",
+            "height": 34,
+            "name": "buttonBox",
+            "visible": false,
+            "width": 98,
+            "x": 588,
+            "y": 229
+        },
+        {
+            "class": "QLabel",
+            "height": 34,
+            "name": "hoursLabel_2",
+            "visible": false,
+            "width": 37,
+            "x": 246,
+            "y": 105
+        },
+        {
+            "class": "QLabel",
+            "height": 34,
+            "name": "secondsLabel",
+            "visible": false,
+            "width": 51,
+            "x": 531,
+            "y": 11
+        },
+        {
+            "class": "QCheckBox",
+            "height": 24,
+            "name": "pauseRecordTimer",
+            "visible": false,
+            "width": 272,
+            "x": 11,
+            "y": 175
+        },
+        {
+            "class": "SettingsDialog",
+            "height": 632,
+            "name": "SettingsDialog",
+            "visible": false,
+            "width": 675,
+            "x": 0,
+            "y": 0
+        },
+        {
+            "class": "QGroupBox",
+            "height": 149,
+            "name": "pluginSettingsGroupBox",
+            "visible": false,
+            "width": 653,
+            "x": 11,
+            "y": 11
+        },
+        {
+            "class": "QCheckBox",
+            "height": 24,
+            "name": "enableWebSocketServerCheckBox",
+            "visible": false,
+            "width": 453,
+            "x": 189,
+            "y": 50
+        },
+        {
+            "class": "QCheckBox",
+            "height": 24,
+            "name": "enableSystemTrayAlertsCheckBox",
+            "visible": false,
+            "width": 453,
+            "x": 189,
+            "y": 80
+        },
+        {
+            "class": "QCheckBox",
+            "height": 24,
+            "name": "enableDebugLoggingCheckBox",
+            "visible": false,
+            "width": 163,
+            "x": 189,
+            "y": 110
+        },
+        {
+            "class": "QLabel",
+            "height": 24,
+            "name": "enableDebugLoggingToolTipLabel",
+            "visible": false,
+            "width": 16,
+            "x": 354,
+            "y": 110
+        },
+        {
+            "class": "QGroupBox",
+            "height": 209,
+            "name": "serverSettingsGroupBox",
+            "visible": false,
+            "width": 653,
+            "x": 11,
+            "y": 166
+        },
+        {
+            "class": "QLabel",
+            "height": 31,
+            "name": "serverPortLabel",
+            "visible": false,
+            "width": 68,
+            "x": 115,
+            "y": 205
+        },
+        {
+            "class": "QSpinBox",
+            "height": 34,
+            "name": "serverPortSpinBox",
+            "visible": false,
+            "width": 453,
+            "x": 189,
+            "y": 205
+        },
+        {
+            "class": "QLineEdit",
+            "height": 22,
+            "name": "qt_spinbox_lineedit",
+            "visible": false,
+            "width": 418,
+            "x": 198,
+            "y": 211
+        },
+        {
+            "class": "QCheckBox",
+            "height": 24,
+            "name": "enableAuthenticationCheckBox",
+            "visible": false,
+            "width": 453,
+            "x": 189,
+            "y": 245
+        },
+        {
+            "class": "QLabel",
+            "height": 31,
+            "name": "serverPasswordLabel",
+            "visible": false,
+            "width": 101,
+            "x": 82,
+            "y": 275
+        },
+        {
+            "class": "QLineEdit",
+            "height": 34,
+            "name": "serverPasswordLineEdit",
+            "visible": false,
+            "width": 303,
+            "x": 189,
+            "y": 275
+        },
+        {
+            "class": "QPushButton",
+            "height": 34,
+            "name": "generatePasswordButton",
+            "visible": false,
+            "width": 144,
+            "x": 498,
+            "y": 275
+        },
+        {
+            "class": "QPushButton",
+            "height": 34,
+            "name": "showConnectInfoButton",
+            "visible": false,
+            "width": 453,
+            "x": 189,
+            "y": 315
+        },
+        {
+            "class": "QGroupBox",
+            "height": 200,
+            "name": "sessionTableGroupBox",
+            "visible": false,
+            "width": 653,
+            "x": 11,
+            "y": 381
+        },
+        {
+            "class": "QTableWidget",
+            "height": 128,
+            "name": "websocketSessionTable",
+            "visible": false,
+            "width": 609,
+            "x": 33,
+            "y": 427
+        },
+        {
+            "class": "QWidget",
+            "height": 85,
+            "name": "qt_scrollarea_viewport",
+            "visible": false,
+            "width": 607,
+            "x": 34,
+            "y": 469
+        },
+        {
+            "class": "QWidget",
+            "height": 30,
+            "name": "qt_scrollarea_vcontainer",
+            "visible": false,
+            "width": 8,
+            "x": 33,
+            "y": 427
+        },
+        {
+            "class": "QWidget",
+            "height": 85,
+            "name": "qt_scrollarea_viewport",
+            "visible": false,
+            "width": 0,
+            "x": 34,
+            "y": 469
+        },
+        {
+            "class": "QWidget",
+            "height": 8,
+            "name": "qt_scrollarea_hcontainer",
+            "visible": false,
+            "width": 100,
+            "x": 34,
+            "y": 469
+        },
+        {
+            "class": "QWidget",
+            "height": 30,
+            "name": "qt_scrollarea_vcontainer",
+            "visible": false,
+            "width": 8,
+            "x": 34,
+            "y": 469
+        },
+        {
+            "class": "QWidget",
+            "height": 41,
+            "name": "qt_scrollarea_viewport",
+            "visible": false,
+            "width": 607,
+            "x": 34,
+            "y": 428
+        },
+        {
+            "class": "QWidget",
+            "height": 8,
+            "name": "qt_scrollarea_hcontainer",
+            "visible": false,
+            "width": 100,
+            "x": 34,
+            "y": 428
+        },
+        {
+            "class": "QWidget",
+            "height": 30,
+            "name": "qt_scrollarea_vcontainer",
+            "visible": false,
+            "width": 8,
+            "x": 34,
+            "y": 428
+        },
+        {
+            "class": "QWidget",
+            "height": 8,
+            "name": "qt_scrollarea_hcontainer",
+            "visible": false,
+            "width": 607,
+            "x": 34,
+            "y": 546
+        },
+        {
+            "class": "QDialogButtonBox",
+            "height": 34,
+            "name": "buttonBox",
+            "visible": false,
+            "width": 653,
+            "x": 11,
+            "y": 587
+        },
+        {
+            "class": "OBSDock",
+            "height": 574,
+            "name": "penguinTwitchChat",
+            "visible": false,
+            "width": 375,
+            "x": 452,
+            "y": 193
+        },
+        {
+            "class": "QDockWidgetTitleButton",
+            "height": 30,
+            "name": "qt_dockwidget_floatbutton",
+            "visible": false,
+            "width": 100,
+            "x": 452,
+            "y": 193
+        },
+        {
+            "class": "QDockWidgetTitleButton",
+            "height": 30,
+            "name": "qt_dockwidget_closebutton",
+            "visible": false,
+            "width": 100,
+            "x": 452,
+            "y": 193
+        },
+        {
+            "class": "QStackedWidget",
+            "height": 497,
+            "name": "qt_tabwidget_stackedwidget",
+            "visible": false,
+            "width": 371,
+            "x": 454,
+            "y": 268
+        },
+        {
+            "class": "QWidget",
+            "height": 30,
+            "name": "penguinWebsiteChat-youtube",
+            "visible": false,
+            "width": 100,
+            "x": 454,
+            "y": 268
+        },
+        {
+            "class": "QWidget",
+            "height": 30,
+            "name": "penguinYouTubeChat",
+            "visible": false,
+            "width": 100,
+            "x": 462,
+            "y": 290
+        },
+        {
+            "class": "QWidget",
+            "height": 14,
+            "name": "qt_scrollarea_viewport",
+            "visible": false,
+            "width": 90,
+            "x": 479,
+            "y": 313
+        },
+        {
+            "class": "QWidget",
+            "height": 8,
+            "name": "qt_scrollarea_hcontainer",
+            "visible": false,
+            "width": 100,
+            "x": 474,
+            "y": 310
+        },
+        {
+            "class": "QWidget",
+            "height": 30,
+            "name": "qt_scrollarea_vcontainer",
+            "visible": false,
+            "width": 8,
+            "x": 474,
+            "y": 310
+        },
+        {
+            "class": "QListWidget",
+            "height": 0,
+            "name": "penguinChatHistory",
+            "visible": false,
+            "width": 76,
+            "x": 474,
+            "y": 313
+        },
+        {
+            "class": "QWidget",
+            "height": 0,
+            "name": "qt_scrollarea_viewport",
+            "visible": false,
+            "width": 62,
+            "x": 481,
+            "y": 320
+        },
+        {
+            "class": "QWidget",
+            "height": 8,
+            "name": "qt_scrollarea_hcontainer",
+            "visible": false,
+            "width": 100,
+            "x": 474,
+            "y": 313
+        },
+        {
+            "class": "QWidget",
+            "height": 30,
+            "name": "qt_scrollarea_vcontainer",
+            "visible": false,
+            "width": 8,
+            "x": 474,
+            "y": 313
+        },
+        {
+            "class": "QWidget",
+            "height": 497,
+            "name": "penguinWebsiteChat-twitch",
+            "visible": false,
+            "width": 371,
+            "x": 454,
+            "y": 268
+        },
+        {
+            "class": "QWidget",
+            "height": 30,
+            "name": "penguinTwitchChat",
+            "visible": false,
+            "width": 100,
+            "x": 462,
+            "y": 335
+        },
+        {
+            "class": "QListWidget",
+            "height": 0,
+            "name": "penguinChatHistory",
+            "visible": false,
+            "width": 76,
+            "x": 474,
+            "y": 357
+        },
+        {
+            "class": "QWidget",
+            "height": 0,
+            "name": "qt_scrollarea_viewport",
+            "visible": false,
+            "width": 62,
+            "x": 481,
+            "y": 364
+        },
+        {
+            "class": "QWidget",
+            "height": 8,
+            "name": "qt_scrollarea_hcontainer",
+            "visible": false,
+            "width": 100,
+            "x": 474,
+            "y": 357
+        },
+        {
+            "class": "QWidget",
+            "height": 30,
+            "name": "qt_scrollarea_vcontainer",
+            "visible": false,
+            "width": 8,
+            "x": 474,
+            "y": 357
+        },
+        {
+            "class": "QTabBar",
+            "height": 36,
+            "name": "qt_tabwidget_tabbar",
+            "visible": false,
+            "width": 373,
+            "x": 453,
+            "y": 231
+        },
+        {
+            "class": "QToolButton",
+            "height": 30,
+            "name": "ScrollLeftButton",
+            "visible": false,
+            "width": 18,
+            "x": 522,
+            "y": 231
+        },
+        {
+            "class": "QToolButton",
+            "height": 30,
+            "name": "ScrollRightButton",
+            "visible": false,
+            "width": 18,
+            "x": 537,
+            "y": 231
+        },
+        {
+            "class": "DecklinkOutputUI",
+            "height": 484,
+            "name": "Output",
+            "visible": false,
+            "width": 785,
+            "x": 0,
+            "y": 0
+        },
+        {
+            "class": "QLabel",
+            "height": 188,
+            "name": "label",
+            "visible": false,
+            "width": 763,
+            "x": 11,
+            "y": 11
+        },
+        {
+            "class": "QPushButton",
+            "height": 34,
+            "name": "outputButton",
+            "visible": false,
+            "width": 55,
+            "x": 719,
+            "y": 205
+        },
+        {
+            "class": "QLabel",
+            "height": 188,
+            "name": "label_2",
+            "visible": false,
+            "width": 763,
+            "x": 11,
+            "y": 245
+        },
+        {
+            "class": "QPushButton",
+            "height": 34,
+            "name": "previewOutputButton",
+            "visible": false,
+            "width": 55,
+            "x": 719,
+            "y": 439
+        },
+        {
+            "class": "QToolButton",
+            "height": 30,
+            "name": "ScrollLeftButton",
+            "visible": false,
+            "width": 18,
+            "x": 1009,
+            "y": 57
+        },
+        {
+            "class": "QToolButton",
+            "height": 30,
+            "name": "ScrollRightButton",
+            "visible": false,
+            "width": 18,
+            "x": 1024,
+            "y": 57
+        },
+        {
+            "class": "QDockWidget",
+            "height": 663,
+            "name": "penguinInspectorDock",
+            "visible": true,
+            "width": 340,
+            "x": 940,
+            "y": 93
+        },
+        {
+            "class": "QDockWidgetTitleButton",
+            "height": 30,
+            "name": "qt_dockwidget_floatbutton",
+            "visible": false,
+            "width": 100,
+            "x": 940,
+            "y": 93
+        },
+        {
+            "class": "QDockWidgetTitleButton",
+            "height": 30,
+            "name": "qt_dockwidget_closebutton",
+            "visible": false,
+            "width": 100,
+            "x": 940,
+            "y": 93
+        },
+        {
+            "class": "PenguinInspector",
+            "height": 619,
+            "name": "penguinInspector",
+            "visible": true,
+            "width": 340,
+            "x": 940,
+            "y": 137
+        },
+        {
+            "class": "QScrollArea",
+            "height": 619,
+            "name": "inspectorScroll",
+            "visible": true,
+            "width": 340,
+            "x": 940,
+            "y": 137
+        },
+        {
+            "class": "QWidget",
+            "height": 619,
+            "name": "qt_scrollarea_viewport",
+            "visible": true,
+            "width": 332,
+            "x": 940,
+            "y": 137
+        },
+        {
+            "class": "QWidget",
+            "height": 1052,
+            "name": "inspectorBody",
+            "visible": true,
+            "width": 332,
+            "x": 940,
+            "y": 137
+        },
+        {
+            "class": "QWidget",
+            "height": 187,
+            "name": "inspectorEmptyState",
+            "visible": false,
+            "width": 308,
+            "x": 952,
+            "y": 151
+        },
+        {
+            "class": "QLabel",
+            "height": 64,
+            "name": "inspectorEmptyIcon",
+            "visible": false,
+            "width": 64,
+            "x": 1074,
+            "y": 187
+        },
+        {
+            "class": "QLabel",
+            "height": 21,
+            "name": "inspectorEmptyTitle",
+            "visible": false,
+            "width": 284,
+            "x": 964,
+            "y": 263
+        },
+        {
+            "class": "QLabel",
+            "height": 30,
+            "name": "inspectorEmptyHint",
+            "visible": false,
+            "width": 284,
+            "x": 964,
+            "y": 296
+        },
+        {
+            "class": "QWidget",
+            "height": 1024,
+            "name": "inspectorContent",
+            "visible": true,
+            "width": 308,
+            "x": 952,
+            "y": 151
+        },
+        {
+            "class": "QFrame",
+            "height": 109,
+            "name": "inspectorIdentity",
+            "visible": true,
+            "width": 308,
+            "x": 952,
+            "y": 151
+        },
+        {
+            "class": "QLabel",
+            "height": 40,
+            "name": "inspectorSourceIcon",
+            "visible": true,
+            "width": 40,
+            "x": 963,
+            "y": 162
+        },
+        {
+            "class": "QLabel",
+            "height": 19,
+            "name": "inspectorSourceName",
+            "visible": true,
+            "width": 236,
+            "x": 1013,
+            "y": 162
+        },
+        {
+            "class": "QLabel",
+            "height": 18,
+            "name": "inspectorSourceType",
+            "visible": true,
+            "width": 236,
+            "x": 1013,
+            "y": 184
+        },
+        {
+            "class": "QToolButton",
+            "height": 37,
+            "name": "inspectorVisible",
+            "visible": true,
+            "width": 140,
+            "x": 963,
+            "y": 212
+        },
+        {
+            "class": "QToolButton",
+            "height": 37,
+            "name": "inspectorLocked",
+            "visible": true,
+            "width": 140,
+            "x": 1109,
+            "y": 212
+        },
+        {
+            "class": "QPushButton",
+            "height": 34,
+            "name": "inspectorProperties",
+            "visible": true,
+            "width": 308,
+            "x": 952,
+            "y": 274
+        },
+        {
+            "class": "QPushButton",
+            "height": 34,
+            "name": "inspectorFilters",
+            "visible": true,
+            "width": 308,
+            "x": 952,
+            "y": 314
+        },
+        {
+            "class": "QFrame",
+            "height": 219,
+            "name": "inspectorCard",
+            "visible": true,
+            "width": 308,
+            "x": 952,
+            "y": 362
+        },
+        {
+            "class": "QLabel",
+            "height": 28,
+            "name": "inspectorSectionTitle",
+            "visible": true,
+            "width": 308,
+            "x": 952,
+            "y": 375
+        },
+        {
+            "class": "QLabel",
+            "height": 15,
+            "name": "inspectorFieldLabel",
+            "visible": true,
+            "width": 308,
+            "x": 952,
+            "y": 413
+        },
+        {
+            "class": "QComboBox",
+            "height": 34,
+            "name": "cameraShape",
+            "visible": true,
+            "width": 308,
+            "x": 952,
+            "y": 438
+        },
+        {
+            "class": "QWidget",
+            "height": 14,
+            "name": "qt_scrollarea_viewport",
+            "visible": false,
+            "width": 90,
+            "x": 957,
+            "y": 446
+        },
+        {
+            "class": "QWidget",
+            "height": 8,
+            "name": "qt_scrollarea_hcontainer",
+            "visible": false,
+            "width": 100,
+            "x": 952,
+            "y": 443
+        },
+        {
+            "class": "QWidget",
+            "height": 30,
+            "name": "qt_scrollarea_vcontainer",
+            "visible": false,
+            "width": 8,
+            "x": 952,
+            "y": 443
+        },
+        {
+            "class": "QSpinBox",
+            "height": 34,
+            "name": "cameraRadius",
+            "visible": false,
+            "width": 316,
+            "x": 952,
+            "y": 412
+        },
+        {
+            "class": "QLineEdit",
+            "height": 22,
+            "name": "qt_spinbox_lineedit",
+            "visible": false,
+            "width": 281,
+            "x": 961,
+            "y": 418
+        },
+        {
+            "class": "QLabel",
+            "height": 15,
+            "name": "inspectorFieldLabel",
+            "visible": true,
+            "width": 308,
+            "x": 952,
+            "y": 482
+        },
+        {
+            "class": "QComboBox",
+            "height": 34,
+            "name": "cameraBackground",
+            "visible": true,
+            "width": 308,
+            "x": 952,
+            "y": 507
+        },
+        {
+            "class": "QWidget",
+            "height": 14,
+            "name": "qt_scrollarea_viewport",
+            "visible": false,
+            "width": 90,
+            "x": 957,
+            "y": 515
+        },
+        {
+            "class": "QWidget",
+            "height": 8,
+            "name": "qt_scrollarea_hcontainer",
+            "visible": false,
+            "width": 100,
+            "x": 952,
+            "y": 512
+        },
+        {
+            "class": "QWidget",
+            "height": 30,
+            "name": "qt_scrollarea_vcontainer",
+            "visible": false,
+            "width": 8,
+            "x": 952,
+            "y": 512
+        },
+        {
+            "class": "QLabel",
+            "height": 3,
+            "name": "inspectorFieldLabel",
+            "visible": false,
+            "width": 316,
+            "x": 952,
+            "y": 448
+        },
+        {
+            "class": "QComboBox",
+            "height": 34,
+            "name": "cameraProcessing",
+            "visible": false,
+            "width": 316,
+            "x": 952,
+            "y": 461
+        },
+        {
+            "class": "QWidget",
+            "height": 14,
+            "name": "qt_scrollarea_viewport",
+            "visible": false,
+            "width": 90,
+            "x": 957,
+            "y": 469
+        },
+        {
+            "class": "QWidget",
+            "height": 8,
+            "name": "qt_scrollarea_hcontainer",
+            "visible": false,
+            "width": 100,
+            "x": 952,
+            "y": 466
+        },
+        {
+            "class": "QWidget",
+            "height": 30,
+            "name": "qt_scrollarea_vcontainer",
+            "visible": false,
+            "width": 8,
+            "x": 952,
+            "y": 466
+        },
+        {
+            "class": "QCheckBox",
+            "height": 2,
+            "name": "cameraPreserveHands",
+            "visible": false,
+            "width": 316,
+            "x": 952,
+            "y": 473
+        },
+        {
+            "class": "QSpinBox",
+            "height": 34,
+            "name": "cameraSimilarity",
+            "visible": false,
+            "width": 316,
+            "x": 952,
+            "y": 485
+        },
+        {
+            "class": "QLineEdit",
+            "height": 22,
+            "name": "qt_spinbox_lineedit",
+            "visible": false,
+            "width": 281,
+            "x": 961,
+            "y": 491
+        },
+        {
+            "class": "QSpinBox",
+            "height": 34,
+            "name": "cameraBlur",
+            "visible": false,
+            "width": 316,
+            "x": 952,
+            "y": 497
+        },
+        {
+            "class": "QLineEdit",
+            "height": 22,
+            "name": "qt_spinbox_lineedit",
+            "visible": false,
+            "width": 281,
+            "x": 961,
+            "y": 503
+        },
+        {
+            "class": "QPushButton",
+            "height": 34,
+            "name": "cameraImage",
+            "visible": false,
+            "width": 316,
+            "x": 952,
+            "y": 509
+        },
+        {
+            "class": "QLabel",
+            "height": 30,
+            "name": "inspectorFieldLabel",
+            "visible": true,
+            "width": 308,
+            "x": 952,
+            "y": 551
+        },
+        {
+            "class": "QFrame",
+            "height": 306,
+            "name": "inspectorCard",
+            "visible": true,
+            "width": 308,
+            "x": 952,
+            "y": 595
+        },
+        {
+            "class": "QLabel",
+            "height": 28,
+            "name": "inspectorSectionTitle",
+            "visible": true,
+            "width": 308,
+            "x": 952,
+            "y": 608
+        },
+        {
+            "class": "QLabel",
+            "height": 15,
+            "name": "inspectorFieldLabel",
+            "visible": true,
+            "width": 308,
+            "x": 952,
+            "y": 646
+        },
+        {
+            "class": "QDoubleSpinBox",
+            "height": 34,
+            "name": "inspectorX",
+            "visible": true,
+            "width": 151,
+            "x": 952,
+            "y": 671
+        },
+        {
+            "class": "QLineEdit",
+            "height": 22,
+            "name": "qt_spinbox_lineedit",
+            "visible": true,
+            "width": 116,
+            "x": 961,
+            "y": 677
+        },
+        {
+            "class": "QDoubleSpinBox",
+            "height": 34,
+            "name": "inspectorY",
+            "visible": true,
+            "width": 151,
+            "x": 1109,
+            "y": 671
+        },
+        {
+            "class": "QLineEdit",
+            "height": 22,
+            "name": "qt_spinbox_lineedit",
+            "visible": true,
+            "width": 116,
+            "x": 1118,
+            "y": 677
+        },
+        {
+            "class": "QLabel",
+            "height": 29,
+            "name": "inspectorFieldLabel",
+            "visible": true,
+            "width": 269,
+            "x": 952,
+            "y": 715
+        },
+        {
+            "class": "QToolButton",
+            "height": 29,
+            "name": "inspectorAspectLock",
+            "visible": true,
+            "width": 29,
+            "x": 1231,
+            "y": 715
+        },
+        {
+            "class": "QDoubleSpinBox",
+            "height": 34,
+            "name": "inspectorWidth",
+            "visible": true,
+            "width": 151,
+            "x": 952,
+            "y": 754
+        },
+        {
+            "class": "QLineEdit",
+            "height": 22,
+            "name": "qt_spinbox_lineedit",
+            "visible": true,
+            "width": 116,
+            "x": 961,
+            "y": 760
+        },
+        {
+            "class": "QDoubleSpinBox",
+            "height": 34,
+            "name": "inspectorHeight",
+            "visible": true,
+            "width": 151,
+            "x": 1109,
+            "y": 754
+        },
+        {
+            "class": "QLineEdit",
+            "height": 22,
+            "name": "qt_spinbox_lineedit",
+            "visible": true,
+            "width": 116,
+            "x": 1118,
+            "y": 760
+        },
+        {
+            "class": "QLabel",
+            "height": 15,
+            "name": "inspectorSourceSize",
+            "visible": true,
+            "width": 308,
+            "x": 952,
+            "y": 798
+        },
+        {
+            "class": "QLabel",
+            "height": 34,
+            "name": "inspectorFieldLabel",
+            "visible": true,
+            "width": 149,
+            "x": 952,
+            "y": 823
+        },
+        {
+            "class": "QDoubleSpinBox",
+            "height": 34,
+            "name": "inspectorRotation",
+            "visible": true,
+            "width": 149,
+            "x": 1111,
+            "y": 823
+        },
+        {
+            "class": "QLineEdit",
+            "height": 22,
+            "name": "qt_spinbox_lineedit",
+            "visible": true,
+            "width": 114,
+            "x": 1120,
+            "y": 829
+        },
+        {
+            "class": "QPushButton",
+            "height": 34,
+            "name": "inspectorFit",
+            "visible": true,
+            "width": 73,
+            "x": 952,
+            "y": 867
+        },
+        {
+            "class": "QPushButton",
+            "height": 34,
+            "name": "inspectorCenter",
+            "visible": true,
+            "width": 72,
+            "x": 1031,
+            "y": 867
+        },
+        {
+            "class": "QPushButton",
+            "height": 34,
+            "name": "inspectorFlipHorizontal",
+            "visible": true,
+            "width": 73,
+            "x": 1109,
+            "y": 867
+        },
+        {
+            "class": "QPushButton",
+            "height": 34,
+            "name": "inspectorFlipVertical",
+            "visible": true,
+            "width": 72,
+            "x": 1188,
+            "y": 867
+        },
+        {
+            "class": "QFrame",
+            "height": 172,
+            "name": "inspectorCard",
+            "visible": true,
+            "width": 308,
+            "x": 952,
+            "y": 915
+        },
+        {
+            "class": "QToolButton",
+            "height": 33,
+            "name": "inspectorCropToggle",
+            "visible": true,
+            "width": 308,
+            "x": 952,
+            "y": 928
+        },
+        {
+            "class": "QWidget",
+            "height": 116,
+            "name": "inspectorCropFields",
+            "visible": true,
+            "width": 308,
+            "x": 952,
+            "y": 971
+        },
+        {
+            "class": "QSpinBox",
+            "height": 34,
+            "name": "inspectorCropLeft",
+            "visible": true,
+            "width": 151,
+            "x": 952,
+            "y": 992
+        },
+        {
+            "class": "QLineEdit",
+            "height": 22,
+            "name": "qt_spinbox_lineedit",
+            "visible": true,
+            "width": 116,
+            "x": 961,
+            "y": 998
+        },
+        {
+            "class": "QLabel",
+            "height": 15,
+            "name": "inspectorFieldLabel",
+            "visible": true,
+            "width": 151,
+            "x": 952,
+            "y": 971
+        },
+        {
+            "class": "QSpinBox",
+            "height": 34,
+            "name": "inspectorCropRight",
+            "visible": true,
+            "width": 151,
+            "x": 1109,
+            "y": 992
+        },
+        {
+            "class": "QLineEdit",
+            "height": 22,
+            "name": "qt_spinbox_lineedit",
+            "visible": true,
+            "width": 116,
+            "x": 1118,
+            "y": 998
+        },
+        {
+            "class": "QLabel",
+            "height": 15,
+            "name": "inspectorFieldLabel",
+            "visible": true,
+            "width": 151,
+            "x": 1109,
+            "y": 971
+        },
+        {
+            "class": "QSpinBox",
+            "height": 34,
+            "name": "inspectorCropTop",
+            "visible": true,
+            "width": 151,
+            "x": 952,
+            "y": 1053
+        },
+        {
+            "class": "QLineEdit",
+            "height": 22,
+            "name": "qt_spinbox_lineedit",
+            "visible": true,
+            "width": 116,
+            "x": 961,
+            "y": 1059
+        },
+        {
+            "class": "QLabel",
+            "height": 15,
+            "name": "inspectorFieldLabel",
+            "visible": true,
+            "width": 151,
+            "x": 952,
+            "y": 1032
+        },
+        {
+            "class": "QSpinBox",
+            "height": 34,
+            "name": "inspectorCropBottom",
+            "visible": true,
+            "width": 151,
+            "x": 1109,
+            "y": 1053
+        },
+        {
+            "class": "QLineEdit",
+            "height": 22,
+            "name": "qt_spinbox_lineedit",
+            "visible": true,
+            "width": 116,
+            "x": 1118,
+            "y": 1059
+        },
+        {
+            "class": "QLabel",
+            "height": 15,
+            "name": "inspectorFieldLabel",
+            "visible": true,
+            "width": 151,
+            "x": 1109,
+            "y": 1032
+        },
+        {
+            "class": "QPushButton",
+            "height": 34,
+            "name": "inspectorAdvanced",
+            "visible": true,
+            "width": 308,
+            "x": 952,
+            "y": 1101
+        },
+        {
+            "class": "QPushButton",
+            "height": 34,
+            "name": "inspectorReset",
+            "visible": true,
+            "width": 308,
+            "x": 952,
+            "y": 1141
+        },
+        {
+            "class": "QWidget",
+            "height": 8,
+            "name": "qt_scrollarea_hcontainer",
+            "visible": false,
+            "width": 100,
+            "x": 940,
+            "y": 137
+        },
+        {
+            "class": "QWidget",
+            "height": 619,
+            "name": "qt_scrollarea_vcontainer",
+            "visible": true,
+            "width": 8,
+            "x": 1272,
+            "y": 137
+        },
+        {
+            "class": "QWidget",
+            "height": 44,
+            "name": "penguinPanelHeader",
+            "visible": true,
+            "width": 340,
+            "x": 940,
+            "y": 93
+        },
+        {
+            "class": "QLabel",
+            "height": 26,
+            "name": "penguinPanelIcon",
+            "visible": true,
+            "width": 18,
+            "x": 952,
+            "y": 103
+        },
+        {
+            "class": "QLabel",
+            "height": 26,
+            "name": "penguinPanelTitle",
+            "visible": true,
+            "width": 292,
+            "x": 978,
+            "y": 103
+        },
+        {
+            "class": "QWidget",
+            "height": 348,
+            "name": "centralwidget",
+            "visible": true,
+            "width": 704,
+            "x": 233,
+            "y": 57
+        },
+        {
+            "class": "QWidget",
+            "height": 295,
+            "name": "canvasEditor",
+            "visible": true,
+            "width": 696,
+            "x": 237,
+            "y": 110
+        },
+        {
+            "class": "QFrame",
+            "height": 30,
+            "name": "previewDisabledWidget",
+            "visible": false,
+            "width": 100,
+            "x": 237,
+            "y": 110
+        },
+        {
+            "class": "QLabel",
+            "height": 14,
+            "name": "label",
+            "visible": false,
+            "width": 98,
+            "x": 238,
+            "y": 111
+        },
+        {
+            "class": "QPushButton",
+            "height": 34,
+            "name": "enablePreviewButton",
+            "visible": false,
+            "width": 98,
+            "x": 238,
+            "y": 125
+        },
+        {
+            "class": "QWidget",
+            "height": 293,
+            "name": "previewContainer",
+            "visible": true,
+            "width": 694,
+            "x": 238,
+            "y": 111
+        },
+        {
+            "class": "QLabel",
+            "height": 32,
+            "name": "previewLabel",
+            "visible": false,
+            "width": 268,
+            "x": 238,
+            "y": 111
+        },
+        {
+            "class": "OBSBasicPreview",
+            "height": 261,
+            "name": "preview",
+            "visible": true,
+            "width": 678,
+            "x": 238,
+            "y": 111
+        },
+        {
+            "class": "QWidget",
+            "height": 32,
+            "name": "previewXContainer",
+            "visible": true,
+            "width": 678,
+            "x": 238,
+            "y": 372
+        },
+        {
+            "class": "QPushButton",
+            "height": 32,
+            "name": "previewZoomOutButton",
+            "visible": true,
+            "width": 20,
+            "x": 238,
+            "y": 372
+        },
+        {
+            "class": "OBSPreviewScalingLabel",
+            "height": 14,
+            "name": "previewScalePercent",
+            "visible": true,
+            "width": 44,
+            "x": 258,
+            "y": 381
+        },
+        {
+            "class": "QPushButton",
+            "height": 32,
+            "name": "previewZoomInButton",
+            "visible": true,
+            "width": 20,
+            "x": 302,
+            "y": 372
+        },
+        {
+            "class": "OBSPreviewScalingComboBox",
+            "height": 24,
+            "name": "previewScalingMode",
+            "visible": true,
+            "width": 122,
+            "x": 322,
+            "y": 380
+        },
+        {
+            "class": "QWidget",
+            "height": 14,
+            "name": "qt_scrollarea_viewport",
+            "visible": false,
+            "width": 90,
+            "x": 327,
+            "y": 388
+        },
+        {
+            "class": "QWidget",
+            "height": 8,
+            "name": "qt_scrollarea_hcontainer",
+            "visible": false,
+            "width": 100,
+            "x": 322,
+            "y": 385
+        },
+        {
+            "class": "QWidget",
+            "height": 30,
+            "name": "qt_scrollarea_vcontainer",
+            "visible": false,
+            "width": 8,
+            "x": 322,
+            "y": 385
+        },
+        {
+            "class": "QScrollBar",
+            "height": 16,
+            "name": "previewXScrollBar",
+            "visible": true,
+            "width": 468,
+            "x": 448,
+            "y": 380
+        },
+        {
+            "class": "QScrollBar",
+            "height": 261,
+            "name": "previewYScrollBar",
+            "visible": true,
+            "width": 16,
+            "x": 916,
+            "y": 111
+        },
+        {
+            "class": "QFrame",
+            "height": 46,
+            "name": "contextContainer",
+            "visible": false,
+            "width": 646,
+            "x": 237,
+            "y": 651
+        },
+        {
+            "class": "QFrame",
+            "height": 34,
+            "name": "contextSubContainer",
+            "visible": false,
+            "width": 410,
+            "x": 243,
+            "y": 659
+        },
+        {
+            "class": "QLabel",
+            "height": 22,
+            "name": "contextSourceIcon",
+            "visible": false,
+            "width": 22,
+            "x": 243,
+            "y": 659
+        },
+        {
+            "class": "QLabel",
+            "height": 22,
+            "name": "contextSourceLabel",
+            "visible": false,
+            "width": 160,
+            "x": 243,
+            "y": 665
+        },
+        {
+            "class": "QLabel",
+            "height": 22,
+            "name": "contextSourceIconSpacer",
+            "visible": false,
+            "width": 22,
+            "x": 409,
+            "y": 665
+        },
+        {
+            "class": "QFrame",
+            "height": 34,
+            "name": "line_3",
+            "visible": false,
+            "width": 3,
+            "x": 437,
+            "y": 659
+        },
+        {
+            "class": "QPushButton",
+            "height": 34,
+            "name": "sourcePropertiesButton",
+            "visible": false,
+            "width": 109,
+            "x": 446,
+            "y": 659
+        },
+        {
+            "class": "QPushButton",
+            "height": 34,
+            "name": "sourceFiltersButton",
+            "visible": false,
+            "width": 83,
+            "x": 561,
+            "y": 659
+        },
+        {
+            "class": "QPushButton",
+            "height": 34,
+            "name": "sourceInteractButton",
+            "visible": false,
+            "width": 100,
+            "x": 243,
+            "y": 659
+        },
+        {
+            "class": "QFrame",
+            "height": 34,
+            "name": "line",
+            "visible": false,
+            "width": 3,
+            "x": 650,
+            "y": 659
+        },
+        {
+            "class": "QFrame",
+            "height": 34,
+            "name": "emptySpace",
+            "visible": false,
+            "width": 218,
+            "x": 659,
+            "y": 659
+        },
+        {
+            "class": "ImageSourceToolbar",
+            "height": 22,
+            "name": "ImageSourceToolbar",
+            "visible": false,
+            "width": 580,
+            "x": 659,
+            "y": 659
+        },
+        {
+            "class": "QLabel",
+            "height": 30,
+            "name": "pathLabel",
+            "visible": false,
+            "width": 100,
+            "x": 659,
+            "y": 659
+        },
+        {
+            "class": "QLineEdit",
+            "height": 34,
+            "name": "path",
+            "visible": false,
+            "width": 100,
+            "x": 659,
+            "y": 659
+        },
+        {
+            "class": "QPushButton",
+            "height": 34,
+            "name": "browse",
+            "visible": false,
+            "width": 100,
+            "x": 659,
+            "y": 659
+        },
+        {
+            "class": "QWidget",
+            "height": 53,
+            "name": "penguinCanvasBar",
+            "visible": true,
+            "width": 696,
+            "x": 237,
+            "y": 57
+        },
+        {
+            "class": "QLabel",
+            "height": 37,
+            "name": "penguinCanvasIcon",
+            "visible": true,
+            "width": 18,
+            "x": 251,
+            "y": 65
+        },
+        {
+            "class": "QLabel",
+            "height": 37,
+            "name": "penguinCanvasTitle",
+            "visible": true,
+            "width": 295,
+            "x": 279,
+            "y": 65
+        },
+        {
+            "class": "QLabel",
+            "height": 37,
+            "name": "penguinCanvasBadge",
+            "visible": true,
+            "width": 78,
+            "x": 584,
+            "y": 65
+        },
+        {
+            "class": "QLabel",
+            "height": 37,
+            "name": "penguinCanvasStatus",
+            "visible": true,
+            "width": 62,
+            "x": 672,
+            "y": 65
+        },
+        {
+            "class": "QToolButton",
+            "height": 33,
+            "name": "penguinCanvasMode",
+            "visible": true,
+            "width": 128,
+            "x": 744,
+            "y": 67
+        },
+        {
+            "class": "QToolButton",
+            "height": 37,
+            "name": "penguinInspectorButton",
+            "visible": true,
+            "width": 37,
+            "x": 882,
+            "y": 65
+        }
+    ],
+    "windowHeight": 800,
+    "windowWidth": 1280,
+    "workspaceVersion": 3
+}
