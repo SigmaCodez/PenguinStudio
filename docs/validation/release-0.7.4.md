@@ -12,3 +12,5 @@ The exact Ubuntu 26.04 DEB passed on the Ubuntu 26.04.1 Wayland desktop:
 The user also confirmed the correction in their normal profile: the picture remained visible after opening embedded chat. That session exited normally with zero OBS memory leaks. No private scene, webcam, desktop capture, credentials or account information is included here.
 
 The known host RADV diagnostic can appear during WebEngine startup; these results do not claim that every third-party diagnostic is absent. Other Linux formats passed their CI packaging checks; they were not all installed on physical machines. This release does not add real-account ban/timeout validation.
+
+The final system-wide Ubuntu installation of `penguin-studio` and `penguin-studio-camera-amd-gfx1201`, both `0.7.4-1+ubuntu26.04`, was verified with dpkg integrity checks. The installed app then passed all 237 workspace checks under Wayland, exited with status zero and reported zero OBS memory leaks.
