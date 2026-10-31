@@ -1,26 +1,26 @@
 {
-  "version": "0.7.4",
+  "version": "0.7.5",
   "language": "en-US",
-  "source_commit": "9427445d4c1c9ea8f2f3a4270e271cc999159507",
-  "local_changes": "Approved creator tools, highlight notes, silent startup update checks and native preview recovery when opening embedded WebEngine chat. Frontend rebuilt from source with PENGUIN_VERSION=0.7.4.",
-  "package": "0.7.4-0+ubuntu26.04.candidate2",
-  "package_sha256": "6dfcd2cdca65a6319dda5a66065a680100b6d2f6bbecc027efc8afcc4e59afd5",
-  "captured_on": "2026-10-30",
-  "capture_method": "XComposite capture of the real 0.7.4 candidate under XWayland; isolated English synthetic demo profile. Native Wayland validation is separate.",
+  "source_commit": "7d8ff0240b49da0b8bf3bcdd7342d77629164d3c",
+  "local_changes": "Approved local1/local2 integrated chat improvements. Frontend rebuilt with PENGUIN_VERSION=0.7.5; real synthetic English demo captures.",
+  "package": "0.7.5-0+ubuntu26.04.candidate1",
+  "package_sha256": "feadde303459d33df2e88638d98afdfe8cc38c340a007c54254a3bd30e94f7b9",
+  "captured_on": "2026-10-31",
+  "capture_method": "XComposite capture of the real 0.7.5 candidate under XWayland; isolated English synthetic demo profile. Native Wayland validation is separate.",
   "content": "Synthetic logo and audio only; no private desktop, camera or account contents.",
   "visual_review": "All three images visually inspected: English workspace, rounded corner Inspector, and disconnected stream details.",
   "images": [
     {
       "file": "workspace-en.png",
-      "sha256": "4243b2bf1eecb2271d1c884a473bb06dd7659988a46a8aa26628b4fd0f6a4ede"
+      "sha256": "2463f253c299c4461ff2656e681dc8a6be3f8c784bda94ff4bd0f63b0d223f5c"
     },
     {
       "file": "camera-en.png",
-      "sha256": "be90d635d396be403c181a17efb2f6dc6266a2c165ea42aaea0f1b293b8cc877"
+      "sha256": "11d7d5fcab720395ef2e4e49da80a8791ec4ab803cd141a909c19caa0096eb04"
     },
     {
       "file": "stream-details-en.png",
-      "sha256": "21e8035b1e5f0e01a4eab184007ad5a927e1f84ecabf52352f907997d12bbb32"
+      "sha256": "d1ae339b8b81f46857c42b9ff6e2762b784e5618a92a60fce4053fd461f72298"
     }
   ]
 }
