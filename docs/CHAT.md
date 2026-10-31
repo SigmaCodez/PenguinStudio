@@ -16,7 +16,7 @@ Choose the broadcast in **Details → YouTube**. The selected video ID appears b
 
 ## Integrated chat and moderation
 
-Choose **Use integrated chat** to use the account connected in Details. Messages are plain text with role labels and bounded history. Scroll up to retain your reading position. Right-click a message for moderation; actions require confirmation.
+Choose **Use integrated chat** to use the account connected in Details. Messages are plain text with role labels and bounded history. Twitch updates retain unchanged message rows, selection and the visible reading position while older rows are trimmed. Scroll up to retain your reading position. Right-click a message for moderation; actions require confirmation.
 
 Twitch supports sending, deleting individual messages, ten-minute timeouts, permanent bans and removing bans/timeouts. Chat settings include emote-only, follower-only, subscriber-only, slow and unique-message modes. Participant lists identify chat connections, not everyone watching; anonymous viewers are not identified.
 

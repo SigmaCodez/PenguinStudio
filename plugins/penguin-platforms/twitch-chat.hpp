@@ -4,6 +4,7 @@
 #include "chat-view.hpp"
 #include <QCheckBox>
 #include <QMap>
+#include <QHash>
 #include <QSpinBox>
 #include <QFormLayout>
 #include <QJsonArray>
@@ -33,6 +34,7 @@ class TwitchChat final : public QWidget {
 	};
 	QNetworkAccessManager ownedNetwork{this};
 	QNetworkAccessManager &network;
+	QList<QPointer<QNetworkReply>> pendingRequests;
 	QPointer<QWebSocket> socket;
 	QTimer retry{this}, heartbeat{this}, renderTimer{this};
 	QListWidget *history = new QListWidget(this);
@@ -60,23 +62,54 @@ class TwitchChat final : public QWidget {
 	{
 		const bool follow = history->verticalScrollBar()->value() >=
 				    history->verticalScrollBar()->maximum() - 4;
-		const auto selected = history->currentItem() ? history->currentItem()->data(Qt::UserRole).toString()
-							     : QString();
 		const int scroll = history->verticalScrollBar()->value();
-		history->clear();
+		QListWidgetItem *anchor = nullptr;
+		for (int y = 0; !anchor && y < history->viewport()->height(); ++y) {
+			anchor = history->itemAt(QPoint(history->viewport()->width() / 2, y));
+		}
+		const QString anchorId = anchor ? anchor->data(Qt::UserRole).toString() : QString();
+		const int anchorTop = anchor ? history->visualItemRect(anchor).top() : 0;
+		QSet<QString> wanted;
 		for (const auto &message : messages) {
+			wanted.insert(message.id);
+		}
+		QHash<QString, QListWidgetItem *> existing;
+		bool changed = false;
+		for (int i = history->count() - 1; i >= 0; --i) {
+			auto *item = history->item(i);
+			const auto id = item->data(Qt::UserRole).toString();
+			if (!wanted.contains(id)) {
+				delete history->takeItem(i);
+				changed = true;
+			} else {
+				existing.insert(id, item);
+			}
+		}
+		// EventSub appends immutable messages; retained rows keep their order,
+		// selection and layout instead of recreating the complete widget list.
+		for (const auto &message : messages) {
+			if (existing.contains(message.id)) {
+				continue;
+			}
 			auto *item = new QListWidgetItem(message.text, history);
 			item->setData(Qt::UserRole, message.id);
 			item->setData(Qt::UserRole + 1, message.user);
 			item->setData(Qt::UserRole + 2, message.name);
 			item->setData(Qt::UserRole + 3, message.body);
-			if (message.id == selected) {
-				history->setCurrentItem(item);
-			}
+			changed = true;
+		}
+		if (!changed) {
+			return;
 		}
 		history->doItemsLayout();
 		if (follow) {
 			history->scrollToBottom();
+		} else if (auto *retainedAnchor = existing.value(anchorId)) {
+			history->scrollToItem(retainedAnchor, QAbstractItemView::PositionAtTop);
+			if (history->verticalScrollMode() == QAbstractItemView::ScrollPerPixel) {
+				history->verticalScrollBar()->setValue(history->verticalScrollBar()->value() -
+								       anchorTop);
+			}
 		} else {
 			history->verticalScrollBar()->setValue(scroll);
 		}
@@ -94,6 +127,7 @@ class TwitchChat final : public QWidget {
 		auto *reply = network.sendCustomRequest(
 			request, method,
 			body.isEmpty() ? QByteArray() : QJsonDocument(body).toJson(QJsonDocument::Compact));
+		pendingRequests.append(reply);
 		const auto epoch = generation;
 		connect(reply, &QNetworkReply::readyRead, this, [reply]() {
 			if (reply->bytesAvailable() > 256 * 1024) {
@@ -101,6 +135,7 @@ class TwitchChat final : public QWidget {
 			}
 		});
 		connect(reply, &QNetworkReply::finished, this, [this, reply, epoch, done]() {
+			pendingRequests.removeAll(reply);
 			const int code = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
 			const auto data = QJsonDocument::fromJson(reply->readAll()).object();
 			reply->deleteLater();
@@ -553,8 +588,12 @@ public:
 						input->clear();
 					}
 					status->setText(text(sent ? "Chat.Connected" : "Chat.SendFailed"));
-					QTimer::singleShot(code == 429 ? 30000 : 1500, this,
-							   [this]() { send->setEnabled(ready && !sending); });
+					const auto epoch = generation;
+					QTimer::singleShot(code == 429 ? 30000 : 1500, this, [this, epoch]() {
+						if (epoch == generation) {
+							send->setEnabled(ready && !sending);
+						}
+					});
 				});
 		});
 		connect(input, &QLineEdit::returnPressed, send, &QPushButton::click);
@@ -596,8 +635,12 @@ public:
 			ws->abort();
 			ws->deleteLater();
 		}
-		for (auto *reply : network.findChildren<QNetworkReply *>()) {
-			reply->abort();
+		const auto pending = pendingRequests;
+		pendingRequests.clear();
+		for (const auto &reply : pending) {
+			if (reply) {
+				reply->abort();
+			}
 		}
 		socket = nullptr;
 		token.clear();

@@ -4,6 +4,7 @@
 #include "../plugins/penguin-platforms/youtube-chat.hpp"
 #include <QApplication>
 #include <QElapsedTimer>
+#include <QPersistentModelIndex>
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
@@ -84,6 +85,58 @@ struct PenguinChatTest {
 	{
 		Transport twitchNetwork;
 		TwitchChat twitch(nullptr, [](const char *key) { return QString(key); }, &twitchNetwork);
+		for (int i = 0; i < 500; ++i) {
+			twitch.ApplyEvent("channel.chat.message",
+					  {{"message_id", QString::number(i)},
+					   {"chatter_user_id", "viewer"},
+					   {"chatter_user_name", "Viewer"},
+					   {"message", QJsonObject{{"text", "Synthetic chat message"}}}});
+		}
+		twitch.Render();
+		twitch.history->setCurrentRow(250);
+		QPersistentModelIndex selected(twitch.history->model()->index(250, 0));
+		QElapsedTimer renderTime;
+		renderTime.start();
+		for (int i = 0; i < 100; ++i) {
+			twitch.Render();
+		}
+		std::cout << "100 Twitch renders of 500 retained rows: " << renderTime.elapsed() << " ms" << std::endl;
+		Require(selected.isValid() && selected.data(Qt::UserRole).toString() == "250",
+			"unchanged Twitch rows must not be destroyed during render");
+		twitch.ApplyEvent("channel.chat.message_delete", {{"message_id", "249"}});
+		twitch.Render();
+		Require(selected.isValid() && twitch.history->currentItem()->data(Qt::UserRole) == "250" &&
+				twitch.history->count() == 499,
+			"moderation must preserve unaffected selection");
+		twitch.ApplyEvent("channel.chat.message", {{"message_id", "500"},
+							   {"chatter_user_id", "other"},
+							   {"message", QJsonObject{{"text", "New message"}}}});
+		twitch.Render();
+		Require(twitch.history->count() == 500 && twitch.history->item(499)->data(Qt::UserRole) == "500",
+			"new Twitch messages must append in order");
+		twitch.resize(600, 500);
+		twitch.show();
+		QApplication::processEvents();
+		auto *readingRow = twitch.history->item(200);
+		const QString readingId = readingRow->data(Qt::UserRole).toString();
+		twitch.history->scrollToItem(readingRow, QAbstractItemView::PositionAtTop);
+		const int readingTop = twitch.history->visualItemRect(readingRow).top();
+		twitch.ApplyEvent("channel.chat.message", {{"message_id", "501"},
+							   {"chatter_user_id", "other"},
+							   {"message", QJsonObject{{"text", "New message"}}}});
+		twitch.Render();
+		Require(twitch.history->count() == 500 && readingRow->data(Qt::UserRole) == readingId &&
+				twitch.history->visualItemRect(readingRow).top() == readingTop,
+			"history trimming must preserve the visible reading position");
+		twitch.hide();
+		twitch.ApplyEvent("channel.chat.clear_user_messages", {{"target_user_id", "viewer"}});
+		twitch.Render();
+		Require(twitch.history->count() == 2 && twitch.history->item(0)->data(Qt::UserRole) == "500",
+			"user moderation must remove only the target's rows");
+		twitch.ApplyEvent("channel.chat.clear", {});
+		twitch.Render();
+		Require(twitch.history->count() == 0, "clear event must remove the rendered chat");
+		twitch.Stop();
 		twitch.token = "fixture";
 		twitch.user = "owner";
 		twitch.client = "fixture-app";
@@ -194,7 +247,12 @@ struct PenguinChatTest {
 					   {"pagination", QJsonObject{{"cursor", "next"}}}});
 		Require(twitchNetwork.calls.last().request.url().query().contains("after=next"),
 			"chatters pagination not followed");
+		auto ownPending = twitchNetwork.calls.last().reply;
+		auto *unrelatedTwitch = twitchNetwork.get(QNetworkRequest(QUrl("https://example.invalid/unrelated")));
 		twitch.Stop();
+		Require(ownPending->isFinished(), "Twitch disconnect must cancel its own pending request");
+		Require(!unrelatedTwitch->isFinished(), "Twitch disconnect must not abort an unrelated request");
+		unrelatedTwitch->abort();
 		Require(twitch.history->count() == 0 && twitch.token.isEmpty(), "Twitch stop must erase session");
 
 		Transport youtubeNetwork;
