@@ -19,5 +19,13 @@
   },
   "tested_deb_sha256": "af3dcc387464c71d0df654237bd85304b0db4e8e4362d3bbfb5e0eddffb8c504",
   "source_commit": "41246cb547f49547ff77018bffbc3f24d3a7f918",
-  "workflow": "https://github.com/SigmaCodez/PenguinStudio/actions/runs/41249398071"
+  "workflow": "https://github.com/SigmaCodez/PenguinStudio/actions/runs/41249398071",
+  "installed_release": {
+    "version": "0.7.5-1+ubuntu26.04",
+    "package_integrity": true,
+    "workspace_checks": 237,
+    "all_passed": true,
+    "exit_code": 0,
+    "obs_memory_leaks": 0
+  }
 }
