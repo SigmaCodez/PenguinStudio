@@ -1,0 +1,23 @@
+{
+  "workspace": {
+    "checks": 237,
+    "all_passed": true,
+    "clean_exit": true,
+    "obs_memory_leaks": 0
+  },
+  "loopback": {
+    "checks": 35,
+    "all_passed": true,
+    "clean_exit": true,
+    "obs_memory_leaks": 0
+  },
+  "preview": {
+    "checks": 8,
+    "all_passed": true,
+    "clean_exit": true,
+    "obs_memory_leaks": 0
+  },
+  "tested_deb_sha256": "af3dcc387464c71d0df654237bd85304b0db4e8e4362d3bbfb5e0eddffb8c504",
+  "source_commit": "41246cb547f49547ff77018bffbc3f24d3a7f918",
+  "workflow": "https://github.com/SigmaCodez/PenguinStudio/actions/runs/41249398071"
+}
