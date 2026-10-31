@@ -299,6 +299,55 @@ struct PenguinChatTest {
 		Require(youtube.history->count() == 0 && youtube.active.isEmpty() && !youtube.poll.isActive(),
 			"disconnect must clear YouTube data and stop polling");
 		Require(pending->isFinished(), "disconnect must abort pending requests");
+
+		Transport refreshNetwork;
+		YoutubeChat refreshed(nullptr, &refreshNetwork);
+		refreshed.SetSession("fixture", "owner");
+		refreshNetwork.Finish(
+			200, {{"items", QJsonArray{QJsonObject{{"id", "video"},
+							       {"snippet", QJsonObject{{"title", "Test"},
+										       {"liveChatId", "chat"}}}}}}});
+		auto oldRead = refreshNetwork.calls.last().reply;
+		const auto callsBeforeRead = refreshNetwork.calls.size();
+		refreshed.Read();
+		Require(refreshNetwork.calls.size() == callsBeforeRead, "only one message poll may be in flight");
+		auto *unrelated = refreshNetwork.get(QNetworkRequest(QUrl("https://example.invalid/unrelated")));
+		refreshed.Load();
+		Require(oldRead->isFinished(), "reload must cancel the previous chat request");
+		Require(!unrelated->isFinished(), "reload must not abort another transport user's request");
+		Require(!refreshed.ready && refreshed.chat.isEmpty() && !refreshed.send->isEnabled() &&
+				!refreshed.poll.isActive() && !refreshed.audienceTimer.isActive(),
+			"reload must stop stale chat actions and polling while loading");
+		refreshNetwork.Finish(503, {});
+		Require(!refreshed.ready && !refreshed.poll.isActive(), "failed reload must not revive the old chat");
+		refreshed.Stop();
+		Require(!unrelated->isFinished(), "disconnect must leave unrelated network requests intact");
+		unrelated->abort();
+
+		// Retention must stay bounded and duplicates must not reappear after moderation.
+		QJsonArray batch;
+		for (int i = 0; i < 2500; ++i) {
+			auto item = message;
+			item["id"] = QString::number(i);
+			batch.append(item);
+		}
+		QElapsedTimer batchTime;
+		batchTime.start();
+		refreshed.ApplyMessages(batch);
+		QJsonArray duplicates;
+		for (int i = 2000; i < batch.size(); ++i) {
+			duplicates.append(batch.at(i));
+		}
+		refreshed.ApplyMessages(duplicates);
+		std::cout << "2500 messages plus 500 duplicate messages: " << batchTime.elapsed() << " ms\n";
+		Require(refreshed.history->count() == 500 && refreshed.visibleIds.size() == 500 &&
+				refreshed.seen.size() == 2048,
+			"message retention and deduplication must remain bounded");
+		refreshed.Remove("2499", {});
+		refreshed.ApplyMessages(QJsonArray{batch.last()});
+		Require(refreshed.history->count() == 499 && refreshed.visibleIds.size() == 499,
+			"deleted messages must not reappear on replay");
+		refreshed.Stop();
 	}
 };
 int main(int argc, char **argv)

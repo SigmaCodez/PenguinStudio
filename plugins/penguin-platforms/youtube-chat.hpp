@@ -12,6 +12,7 @@
 #include <QMap>
 #include <QSet>
 #include <QQueue>
+#include <QPointer>
 #include <algorithm>
 
 class YoutubeChat final : public QWidget {
@@ -30,12 +31,26 @@ class YoutubeChat final : public QWidget {
 	QString token, account, chat, page, preferredVideo;
 	quint64 generation = 0;
 	bool sending = false, moderating = false, authorizationExpired = false, ready = false;
-	QSet<QString> seen, loadPages;
+	QSet<QString> seen, visibleIds, loadPages;
+	QList<QPointer<QNetworkReply>> pendingRequests;
+	bool reading = false;
 	QQueue<QString> seenOrder;
 	int failures = 0;
 	QMap<QString, QPair<QString, QDateTime>> active;
 	QMap<QString, QString> bans;
 	static QString Encode(const QString &value) { return QString::fromLatin1(QUrl::toPercentEncoding(value)); }
+	void CancelRequests()
+	{
+		++generation;
+		reading = false;
+		const auto pending = pendingRequests;
+		pendingRequests.clear();
+		for (const auto &reply : pending) {
+			if (reply) {
+				reply->abort();
+			}
+		}
+	}
 	void Request(const QString &path, const QByteArray &method, const QJsonObject &body,
 		     std::function<void(int, const QJsonObject &)> done)
 	{
@@ -47,6 +62,7 @@ class YoutubeChat final : public QWidget {
 		auto *reply = network.sendCustomRequest(
 			request, method,
 			body.isEmpty() ? QByteArray() : QJsonDocument(body).toJson(QJsonDocument::Compact));
+		pendingRequests.append(reply);
 		const auto epoch = generation;
 		connect(reply, &QNetworkReply::readyRead, this, [reply] {
 			if (reply->bytesAvailable() > 2 * 1024 * 1024) {
@@ -54,6 +70,7 @@ class YoutubeChat final : public QWidget {
 			}
 		});
 		connect(reply, &QNetworkReply::finished, this, [this, reply, epoch, done] {
+			pendingRequests.removeAll(reply);
 			const int code = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
 			const auto data = QJsonDocument::fromJson(reply->readAll()).object();
 			reply->deleteLater();
@@ -85,12 +102,14 @@ class YoutubeChat final : public QWidget {
 	}
 	void Read()
 	{
-		if (token.isEmpty() || chat.isEmpty()) {
+		if (token.isEmpty() || chat.isEmpty() || reading) {
 			return;
 		}
+		reading = true;
 		Request("liveChat/messages?part=id,snippet,authorDetails&maxResults=200&liveChatId=" + Encode(chat) +
 				"&pageToken=" + Encode(page),
 			"GET", {}, [this](int code, const QJsonObject &data) {
+				reading = false;
 				if (code != 200) {
 					if (code == 401 || code == 403 || code == 404) {
 						authorizationExpired = code == 401;
@@ -102,7 +121,8 @@ class YoutubeChat final : public QWidget {
 						return;
 					}
 					status->setText("Chat connection interrupted. Retrying…");
-					poll.start(std::min(60000, 5000 * ++failures));
+					failures = std::min(failures + 1, 12);
+					poll.start(5000 * failures);
 					return;
 				}
 				failures = 0;
@@ -124,10 +144,11 @@ class YoutubeChat final : public QWidget {
 	}
 	void Select()
 	{
-		++generation;
+		CancelRequests();
 		poll.stop();
 		page.clear();
 		history->clear();
+		visibleIds.clear();
 		active.clear();
 		bans.clear();
 		seen.clear();
@@ -148,6 +169,15 @@ class YoutubeChat final : public QWidget {
 			return;
 		}
 		if (cursor.isEmpty()) {
+			CancelRequests();
+			poll.stop();
+			audienceTimer.stop();
+			sending = moderating = ready = authorizationExpired = false;
+			failures = 0;
+			chat.clear();
+			page.clear();
+			send->setEnabled(false);
+			audience->setText("YouTube · Loading broadcasts…");
 			loadPages.clear();
 			videos.clear();
 		} else if (loadPages.contains(cursor)) {
@@ -274,6 +304,7 @@ class YoutubeChat final : public QWidget {
 			auto *item = history->item(i);
 			if ((!id.isEmpty() && item->data(Qt::UserRole).toString() == id) ||
 			    (!user.isEmpty() && item->data(Qt::UserRole + 1).toString() == user)) {
+				visibleIds.remove(item->data(Qt::UserRole).toString());
 				delete history->takeItem(i);
 			}
 		}
@@ -409,7 +440,7 @@ public:
 	}
 	void Stop()
 	{
-		++generation;
+		CancelRequests();
 		poll.stop();
 		audienceTimer.stop();
 		audience->setText("YouTube · Not connected");
@@ -418,12 +449,10 @@ public:
 		chat.clear();
 		account.clear();
 		page.clear();
-		for (auto *reply : network.findChildren<QNetworkReply *>()) {
-			reply->abort();
-		}
 		QSignalBlocker block(broadcasts);
 		broadcasts->clear();
 		history->clear();
+		visibleIds.clear();
 		active.clear();
 		bans.clear();
 		seen.clear();
@@ -466,14 +495,7 @@ public:
 			if (id.isEmpty()) {
 				continue;
 			}
-			bool exists = false;
-			for (int i = 0; i < history->count(); ++i) {
-				if (history->item(i)->data(Qt::UserRole).toString() == id) {
-					exists = true;
-					break;
-				}
-			}
-			if (exists || seen.contains(id)) {
+			if (seen.contains(id) || visibleIds.contains(id)) {
 				continue;
 			}
 			seen.insert(id);
@@ -492,6 +514,7 @@ public:
 			if (text.isEmpty()) {
 				continue;
 			}
+			visibleIds.insert(id);
 			auto *row = new QListWidgetItem(badge + name + ": " + text, history);
 			row->setData(Qt::UserRole, id);
 			row->setData(Qt::UserRole + 1, user);
@@ -503,7 +526,9 @@ public:
 				active[user] = {name, published};
 			}
 			while (history->count() > 500) {
-				delete history->takeItem(0);
+				auto *oldest = history->takeItem(0);
+				visibleIds.remove(oldest->data(Qt::UserRole).toString());
+				delete oldest;
 			}
 		}
 		// Bound presence memory even if the participant dialog is never opened.

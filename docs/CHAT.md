@@ -1,6 +1,6 @@
 # Stream chat
 
-Penguin Studio 0.7.3 offers Twitch and YouTube tabs with original platform web views where Qt WebEngine is available. Open **Stream chat** from the Docks menu. Connect your account in **Details**; current metadata loads automatically without overwriting unsaved edits.
+Penguin Studio offers Twitch and YouTube tabs with original platform web views where Qt WebEngine is available. Open **Stream chat** from the Docks menu. Connect your account in **Details**; current metadata loads automatically without overwriting unsaved edits.
 
 ## Original platform chat
 
@@ -21,6 +21,8 @@ Choose **Use integrated chat** to use the account connected in Details. Messages
 Twitch supports sending, deleting individual messages, ten-minute timeouts, permanent bans and removing bans/timeouts. Chat settings include emote-only, follower-only, subscriber-only, slow and unique-message modes. Participant lists identify chat connections, not everyone watching; anonymous viewers are not identified.
 
 YouTube supports sending, individual-message deletion, ten-minute timeouts and permanent bans. Only bans with an identifier returned during the current session can be removed here; use YouTube Studio for older bans or missing identifiers. The app explains quota, authorization, protected-target, missing-target and conflicting-action failures. Uncertain results are not automatically retried.
+
+Reloading integrated YouTube chat cancels its previous requests and pauses sending until the broadcast has loaded again. Only one message poll is allowed in flight; duplicate messages are checked using bounded ID indices.
 
 YouTube polling respects the server interval and a ten-second minimum. Viewer counts refresh once a minute. YouTube provides no complete named viewer list; recent chatters are people observed posting within 15 minutes.
 
