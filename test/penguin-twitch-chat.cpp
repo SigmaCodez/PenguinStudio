@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 #include "../plugins/penguin-platforms/twitch-chat.hpp"
 #include <QApplication>
+#include <QPersistentModelIndex>
 #include <cstdlib>
 #include <iostream>
 
@@ -55,13 +56,25 @@ int main(int argc, char **argv)
 	QApplication::processEvents();
 	history->verticalScrollBar()->setValue(history->verticalScrollBar()->maximum() / 2);
 	const int readingPosition = history->verticalScrollBar()->value();
+	QListWidgetItem *readingItem = nullptr;
+	for (int y = 0; !readingItem && y < history->viewport()->height(); ++y) {
+		readingItem = history->itemAt(QPoint(history->viewport()->width() / 2, y));
+	}
+	Require(readingItem != nullptr, "visible reading anchor missing");
+	const QPersistentModelIndex readingIndex(history->model()->index(history->row(readingItem), 0));
+	const QString readingId = readingItem->data(Qt::UserRole).toString();
+	const int readingTop = history->visualItemRect(readingItem).top();
 	auto next = event;
 	next["message_id"] = "later";
 	chat.ApplyEvent("channel.chat.message", next);
 	FlushChat();
 	QApplication::processEvents();
-	Require(readingPosition > 0 && history->verticalScrollBar()->value() == readingPosition,
-		"new messages must not reset a reader's scroll position");
+	// Trimming the oldest row changes the scrollbar value. What must remain
+	// stable is the message being read and its position in the viewport.
+	Require(readingPosition > 0 && readingIndex.isValid() && readingIndex.data(Qt::UserRole) == readingId,
+		"new messages must preserve the message being read");
+	Require(history->visualItemRect(history->item(readingIndex.row())).top() == readingTop,
+		"new messages must preserve the reading anchor's viewport position");
 	Require(TwitchChat::IsEndpoint(QUrl("wss://eventsub.wss.twitch.tv/ws?reconnect=123")),
 		"legitimate reconnect rejected");
 	for (const auto *url :
