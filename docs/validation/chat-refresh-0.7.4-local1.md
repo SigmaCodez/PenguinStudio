@@ -17,4 +17,4 @@ A synthetic run of 2,500 messages plus 500 duplicate messages took 37 ms before 
 
 The platform-flow suite passed using in-memory HTTP and a local OAuth callback. The restricted sandbox cannot bind that callback, so this suite ran with host loopback access. No real account actions, chat sends or moderation were performed.
 
-The package passed 237 workspace assertions under Wayland and exited normally with zero OBS memory leaks. All 35 recording/local-loopback stream assertions also passed, including audio and privacy shielding; recorded and received video fully decoded. Installation verification is pending normal administrator confirmation.
+The package passed 237 workspace assertions under Wayland and exited normally with zero OBS memory leaks. All 35 recording/local-loopback stream assertions also passed, including audio and privacy shielding; recorded and received video fully decoded. The system-wide local1 installation completed with normal administrator confirmation. Package integrity and the installed platform module were verified. The installed app passed all 237 workspace checks under Wayland and exited normally with zero OBS memory leaks.
