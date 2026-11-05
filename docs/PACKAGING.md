@@ -40,7 +40,7 @@ Snap, AppImage and an Arch recipe archive, plus `SHA256SUMS` and
 Releases are marked as prereleases while Penguin Studio remains a development preview.
 
 To publish a new version, increase **`packaging/version.txt`** (for example from
-`0.7.4` to `0.7.6`) and push it to `main`. This single file supplies the application,
+`0.7.5` to `0.7.6`) and push it to `main`. This single file supplies the application,
 native package and Snap versions; the Flatpak filename uses the same value.
 Refresh the English product text and real candidate-version screenshots together
 with the version change; the [publication check](PUBLICATION.md) rejects stale previews.

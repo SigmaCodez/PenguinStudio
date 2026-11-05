@@ -1,0 +1,68 @@
+{
+    "checks": [
+        {
+            "name": "Account module provides wizard bridge",
+            "passed": true
+        },
+        {
+            "name": "Auto-configuration wizard opens",
+            "passed": true
+        },
+        {
+            "name": "Twitch defaults to account sign-in with optional key",
+            "passed": true
+        },
+        {
+            "name": "No credentials cannot advance",
+            "passed": true
+        },
+        {
+            "name": "Manual stream key remains available",
+            "passed": true
+        },
+        {
+            "name": "Twitch button requests matching provider",
+            "passed": true
+        },
+        {
+            "name": "Twitch account supplies hidden key and enables Next",
+            "passed": true
+        },
+        {
+            "name": "YouTube service available",
+            "passed": true
+        },
+        {
+            "name": "Service switch discards pending account and credentials",
+            "passed": true
+        },
+        {
+            "name": "YouTube defaults to account sign-in",
+            "passed": true
+        },
+        {
+            "name": "YouTube button requests matching provider",
+            "passed": true
+        },
+        {
+            "name": "YouTube account completes setup without manual key entry",
+            "passed": true
+        },
+        {
+            "name": "Account-connected YouTube cannot send bandwidth-test video",
+            "passed": true
+        },
+        {
+            "name": "Resolved YouTube stream settings validate",
+            "passed": true
+        },
+        {
+            "name": "Account setup never starts outputs",
+            "passed": true
+        },
+        {
+            "name": "Manual alternative clears account key and restores controls",
+            "passed": true
+        }
+    ]
+}

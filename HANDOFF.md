@@ -11,14 +11,35 @@ The initial request was to inspect the code and create this file. The user then
 explicitly authorized fixing the three reviewed chat bugs, testing them and
 installing a local build for review, with no publication.
 
-## Release approval — 2026-11-05
+## Latest status — 0.7.6 published
 
-The user explicitly requested publication after local2 was installed and opened
-for review. This supersedes the earlier no-publication restriction for the
-reviewed chat fixes and wizard account setup. Release 0.7.6 is being prepared
-from GitHub main `52865ccce337e5237ba038b146ef65c12b1bcd65` in the isolated checkout
-`/tmp/penguin-release-076/repo`, preserving unrelated website/local work in the
-original checkout. Follow `docs/validation/release-0.7.6.md` for final status.
+The user explicitly approved publication on 2026-11-05 after local2 installation
+and opening the app for review. Release **0.7.6** is now public as a development
+prerelease: https://github.com/SigmaCodez/PenguinStudio/releases/tag/penguin-v0.7.6.
+Source/tag commit: `c8842c9c1e9334076b139f54d35b88e67fbea2dc`.
+All eleven jobs in workflow **41990529592** passed. The release contains nine
+packages/recipe archives plus SHA256SUMS and build-manifest.json.
+
+The exact Ubuntu release DEB passed 237 workspace, 35 recording/local-RTMP,
+8 preview/WebEngine and 16 wizard assertions under Wayland. All four sessions
+closed normally with zero OBS memory leaks; all generated recordings and the
+received stream fully decode. The public Ubuntu download matches that tested
+CI artifact. See `docs/validation/release-0.7.6.md` for final download checks.
+Real provider consent or live streaming success is not inferred from approval.
+
+System-wide installation was requested through normal `pkexec apt-get` and is
+awaiting the user's Ubuntu administrator confirmation. Last verified installed
+version remains `0.7.5-1+ubuntu26.04.local2`. Do not claim installed 0.7.6 validation
+until that transaction completes. The verified release DEB and manifests are
+archived in `dist/releases/0.7.6/`. No passwordless rules or password storage.
+
+Release work used `/tmp/penguin-release-076/repo`, based on GitHub main
+`52865ccce337e5237ba038b146ef65c12b1bcd65`. The original checkout retains its older
+branch/HEAD and unrelated website work; only reviewed changes and release
+publication files were synchronized back. Do not overwrite the original dirty
+worktree or infer that its HEAD equals the released source. Temporary candidate
+build objects were removed after successful validation to free tmpfs quota;
+source, staged binaries, package archives and portable evidence remain.
 
 ## Reviewed work — wizard account setup local2
 
@@ -103,7 +124,7 @@ version increment, commit, push, tag, GitHub release or website deployment occur
 
 ## Current checkout
 
-- Product version in `packaging/version.txt`: **0.7.5**.
+- Product version in `packaging/version.txt`: **0.7.6**.
 - Branch: `codex/rust-camera-preprocessing`.
 - Local HEAD: `b018b3a7326a8dc921da3612335118499a4b6fc7`
   (`Fix Creator tools linkage in native release tests`).

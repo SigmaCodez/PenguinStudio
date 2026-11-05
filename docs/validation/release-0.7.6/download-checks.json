@@ -1,0 +1,59 @@
+{
+  "source_commit": "c8842c9c1e9334076b139f54d35b88e67fbea2dc",
+  "checks": [
+    {
+      "file": "penguin-studio_0.7.6-1+ubuntu26.04_amd64.deb",
+      "bytes": 218299296,
+      "sha256": "a32ccf47a7b1aa18498b99d3f853bc2f903d91bd7873f8e2ab816d1e76ebd96e",
+      "passed": true
+    },
+    {
+      "file": "penguin-studio-0.7.6-1.x86_64.rpm",
+      "bytes": 195315606,
+      "sha256": "6e3af00a07c0c3e2a8b779885ddc53302e8a612040a8f6d819fff92bca671c9c",
+      "passed": true
+    },
+    {
+      "file": "penguin-studio-0.7.6-aur.tar.gz",
+      "bytes": 1446,
+      "sha256": "49df3a531ec6f1f9a31d5dd6792609764ceece7e4c6e5137c214a2eb2656934e",
+      "passed": true
+    },
+    {
+      "file": "penguin-studio-0.7.6-x86_64.flatpak",
+      "bytes": 214021928,
+      "sha256": "48333f6e73486813458eddcb49fbdcb8275a243a29e28df47af80a84b69ceb41",
+      "passed": true
+    },
+    {
+      "file": "penguin-studio-camera-amd-gfx1201_0.7.6-1+ubuntu26.04_amd64.deb",
+      "bytes": 556858944,
+      "sha256": "3576cf2a061759b39662d74f3553f8b1073cfb199d7291602b844a8ebb95dd8d",
+      "passed": true
+    },
+    {
+      "file": "penguin-studio-0.7.6-x86_64.AppImage",
+      "bytes": 454441464,
+      "sha256": "84d7fd3922280ec7d8cda8612eb74878de7dfd236d3198b33193c4c991090d21",
+      "passed": true
+    },
+    {
+      "file": "penguin-studio_0.7.6_amd64.snap",
+      "bytes": 632111104,
+      "sha256": "19b03056e39bd9d63ddd43e936373804bf5045a5f292a266f6dce3dac19e6612",
+      "passed": true
+    },
+    {
+      "file": "penguin-studio-camera-amd-gfx1201_0.7.6-1+ubuntu26.10_amd64.deb",
+      "bytes": 556862496,
+      "sha256": "58da942da8f446e189ebe9c93f67987de93b53503fbaf11cf2f91593b48f4588",
+      "passed": true
+    },
+    {
+      "file": "penguin-studio_0.7.6-1+ubuntu26.10_amd64.deb",
+      "bytes": 218143172,
+      "sha256": "60371d9675cdea08359aa25b29cdbeeaf0858a99c53a9ea5aed69abcc039d369",
+      "passed": true
+    }
+  ]
+}

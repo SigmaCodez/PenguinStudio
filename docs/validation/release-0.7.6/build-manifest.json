@@ -1,0 +1,61 @@
+{
+  "version": "0.7.6",
+  "source_commit": "c8842c9c1e9334076b139f54d35b88e67fbea2dc",
+  "workflow_url": "https://github.com/SigmaCodez/PenguinStudio/actions/runs/41990529592",
+  "packages": [
+    {
+      "target": "Ubuntu 26.04 / 26.04.1 (amd64)",
+      "file": "penguin-studio_0.7.6-1+ubuntu26.04_amd64.deb",
+      "sha256": "a32ccf47a7b1aa18498b99d3f853bc2f903d91bd7873f8e2ab816d1e76ebd96e",
+      "bytes": 218299296
+    },
+    {
+      "target": "Fedora 44 (x86_64)",
+      "file": "penguin-studio-0.7.6-1.x86_64.rpm",
+      "sha256": "6e3af00a07c0c3e2a8b779885ddc53302e8a612040a8f6d819fff92bca671c9c",
+      "bytes": 195315606
+    },
+    {
+      "target": "Arch Linux / AUR recipe (x86_64)",
+      "file": "penguin-studio-0.7.6-aur.tar.gz",
+      "sha256": "49df3a531ec6f1f9a31d5dd6792609764ceece7e4c6e5137c214a2eb2656934e",
+      "bytes": 1446
+    },
+    {
+      "target": "Flatpak (x86_64)",
+      "file": "penguin-studio-0.7.6-x86_64.flatpak",
+      "sha256": "48333f6e73486813458eddcb49fbdcb8275a243a29e28df47af80a84b69ceb41",
+      "bytes": 214021928
+    },
+    {
+      "target": "Optional RX 9070 camera GPU runtime (Ubuntu 26.04)",
+      "file": "penguin-studio-camera-amd-gfx1201_0.7.6-1+ubuntu26.04_amd64.deb",
+      "sha256": "3576cf2a061759b39662d74f3553f8b1073cfb199d7291602b844a8ebb95dd8d",
+      "bytes": 556858944
+    },
+    {
+      "target": "AppImage (x86_64, glibc 2.43+)",
+      "file": "penguin-studio-0.7.6-x86_64.AppImage",
+      "sha256": "84d7fd3922280ec7d8cda8612eb74878de7dfd236d3198b33193c4c991090d21",
+      "bytes": 454441464
+    },
+    {
+      "target": "Snap core26 (amd64)",
+      "file": "penguin-studio_0.7.6_amd64.snap",
+      "sha256": "19b03056e39bd9d63ddd43e936373804bf5045a5f292a266f6dce3dac19e6612",
+      "bytes": 632111104
+    },
+    {
+      "target": "Optional RX 9070 camera GPU runtime (Ubuntu 26.10)",
+      "file": "penguin-studio-camera-amd-gfx1201_0.7.6-1+ubuntu26.10_amd64.deb",
+      "sha256": "58da942da8f446e189ebe9c93f67987de93b53503fbaf11cf2f91593b48f4588",
+      "bytes": 556862496
+    },
+    {
+      "target": "Ubuntu 26.10 (amd64)",
+      "file": "penguin-studio_0.7.6-1+ubuntu26.10_amd64.deb",
+      "sha256": "60371d9675cdea08359aa25b29cdbeeaf0858a99c53a9ea5aed69abcc039d369",
+      "bytes": 218143172
+    }
+  ]
+}
