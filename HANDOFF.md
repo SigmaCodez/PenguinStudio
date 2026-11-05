@@ -11,14 +11,35 @@ The initial request was to inspect the code and create this file. The user then
 explicitly authorized fixing the three reviewed chat bugs, testing them and
 installing a local build for review, with no publication.
 
-## Latest release work — 0.7.7 approved
+## Latest status — 0.7.7 published
 
-The user explicitly approved publishing the tested Output-account fix on
-2026-11-05. Version 0.7.7 is being prepared from main
-`25e9cd52423322e75a39ba2025d188610f88ce19`; see
-`docs/validation/release-0.7.7.md` for candidate and final package results.
-The installed reviewed build is `0.7.6-1+ubuntu26.04.local1` until a subsequent
-verified installation is recorded. No new installation is implied by publication.
+The user confirmed the Output-account fix worked and explicitly approved
+publication on 2026-11-05. Release **0.7.7** is public as a development prerelease:
+https://github.com/SigmaCodez/PenguinStudio/releases/tag/penguin-v0.7.7.
+Source/tag commit: `1a3d226d19f92cb8a37d2878ba58a678078db1bc`, merged through PR #20.
+All eleven jobs in workflow **42024096136** passed. All nine public package/recipe
+downloads match SHA256SUMS and build-manifest.json (sizes and source included).
+
+The exact Ubuntu release package passed **237 workspace**, **35 recording/local
+RTMP**, **8 preview/WebEngine** and **18 Output-account** assertions under Wayland.
+All four sessions exited normally with zero reported OBS memory leaks. All
+recordings and the received stream fully decode. The public Ubuntu download is
+byte-identical to the tested CI artifact. See `docs/validation/release-0.7.7.md`
+and its evidence directory. Current English previews, installation examples,
+README and release notes are updated; historical evidence retains its version.
+
+The installed reviewed build was verified as `0.7.6-1+ubuntu26.04.local1` during
+release validation. Publication does not replace it. The final 0.7.7 Ubuntu DEB
+and manifests are archived in `dist/releases/0.7.7/`; its installation preflight
+requires no new or removed packages. Any later system-wide installation should
+use the normal Ubuntu administrator confirmation, with no password storage or
+passwordless rules.
+
+Release work reused `/tmp/penguin-release-076/repo` based on main
+`25e9cd52423322e75a39ba2025d188610f88ce19`; 0.7.7 build/test/download files are in
+`/tmp/penguin-release-077/`. Only approved changes were included. The original
+checkout retains unrelated dirty work and an older HEAD; do not reset or blanket
+commit it. Final validation documentation is a separate post-release commit.
 
 ## Reviewed local correction — account-based Output destinations
 
@@ -41,7 +62,7 @@ synthetic accounts. The user confirmed that the wizard was open and reported tha
 The user then explicitly approved publication and requested this handoff update.
 The specific provider(s) tested were not stated; do not infer exhaustive coverage.
 
-## Latest status — 0.7.6 published
+## Previous release — 0.7.6 published
 
 The user explicitly approved publication on 2026-11-05 after local2 installation
 and opening the app for review. Release **0.7.6** is now public as a development
