@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 #pragma once
 #include <QDateTime>
+#include <QJsonDocument>
+#include <QNetworkReply>
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QStyledItemDelegate>
@@ -23,6 +25,24 @@
 #include <algorithm>
 
 namespace PenguinChat {
+// Preserve provider error codes, but never report an incomplete successful reply
+// as a confirmed action. 204 is the documented bodyless success case.
+inline int ReadResponse(QNetworkReply *reply, QJsonObject &data)
+{
+	const int code = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+	const auto bytes = reply->readAll();
+	QJsonParseError error;
+	const auto document = QJsonDocument::fromJson(bytes, &error);
+	data = document.object();
+	if (code >= 200 && code < 300 &&
+	    (reply->error() != QNetworkReply::NoError ||
+	     (code != 204 && (error.error != QJsonParseError::NoError || !document.isObject())))) {
+		data = {};
+		return 0;
+	}
+	return code;
+}
+
 inline QString ModerationFailure(int code, const QJsonObject &data)
 {
 	const auto errors = data.value("error").toObject().value("errors").toArray();

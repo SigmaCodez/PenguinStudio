@@ -35,6 +35,9 @@
   </branding>
   <content_rating type="oars-1.1"/>
   <releases>
+    <release version="0.7.6" date="2026-11-05">
+      <description><p>Connect Twitch and YouTube in the setup wizard, with optional manual stream keys, and improve integrated chat recovery.</p></description>
+    </release>
     <release version="@PENGUIN_VERSION@" date="2026-10-31" type="development">
       <url type="details">https://github.com/SigmaCodez/PenguinStudio/releases</url>
       <description><p>Faster integrated chat updates, stable Twitch reading position and reliable YouTube reloads.</p></description>

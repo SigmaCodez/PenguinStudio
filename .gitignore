@@ -38,6 +38,7 @@
 !README.rst
 !README.md
 !CHANGELOG.md
+!HANDOFF.md
 
 # Exclude lock files
 *.lock.json

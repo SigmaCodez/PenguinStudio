@@ -34,6 +34,7 @@ class YoutubeChat final : public QWidget {
 	QSet<QString> seen, visibleIds, loadPages;
 	QList<QPointer<QNetworkReply>> pendingRequests;
 	bool reading = false;
+	bool reloadAfterAuthorization = false;
 	QQueue<QString> seenOrder;
 	int failures = 0;
 	QMap<QString, QPair<QString, QDateTime>> active;
@@ -71,8 +72,8 @@ class YoutubeChat final : public QWidget {
 		});
 		connect(reply, &QNetworkReply::finished, this, [this, reply, epoch, done] {
 			pendingRequests.removeAll(reply);
-			const int code = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
-			const auto data = QJsonDocument::fromJson(reply->readAll()).object();
+			QJsonObject data;
+			const int code = PenguinChat::ReadResponse(reply, data);
 			reply->deleteLater();
 			if (epoch != generation) {
 				return;
@@ -174,6 +175,7 @@ class YoutubeChat final : public QWidget {
 			audienceTimer.stop();
 			sending = moderating = ready = authorizationExpired = false;
 			failures = 0;
+			reloadAfterAuthorization = false;
 			chat.clear();
 			page.clear();
 			send->setEnabled(false);
@@ -198,6 +200,7 @@ class YoutubeChat final : public QWidget {
 				refresh->setEnabled(true);
 				broadcasts->setEnabled(true);
 				if (code != 200) {
+					reloadAfterAuthorization = code == 401;
 					status->setText(
 						"Cannot load live broadcasts. Check YouTube sign-in and API quota.");
 					return;
@@ -401,13 +404,15 @@ public:
 						}
 					} else {
 						status->setText(
-							"Message not sent. Check chat permissions, quota and rate limits.");
+							code == 0 ? "Could not confirm whether the message was sent. Check the chat before retrying."
+							          : "Message not sent. Check chat permissions, quota and rate limits.");
 					}
 				});
 		});
 		connect(input, &QLineEdit::returnPressed, send, &QPushButton::click);
 		Stop();
 	}
+	void Reload() { Load(); }
 	void SetBroadcast(const QString &video)
 	{
 		if (preferredVideo == video) {
@@ -424,7 +429,12 @@ public:
 	void SetSession(const QString &access, const QString &identity)
 	{
 		if (!token.isEmpty() && account == identity) {
+			const bool renewed = token != access;
 			token = access;
+			if (renewed && reloadAfterAuthorization) {
+				Load();
+				return;
+			}
 			if (authorizationExpired && !chat.isEmpty()) {
 				authorizationExpired = false;
 				Read();
@@ -441,6 +451,7 @@ public:
 	void Stop()
 	{
 		CancelRequests();
+		reloadAfterAuthorization = false;
 		poll.stop();
 		audienceTimer.stop();
 		audience->setText("YouTube · Not connected");

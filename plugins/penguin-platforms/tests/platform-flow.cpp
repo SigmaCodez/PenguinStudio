@@ -598,6 +598,64 @@ int main(int argc, char **argv)
 			"Explicit broadcast selection must persist for restart");
 	}
 
+	// Stream setup reads existing provider resources only; it never starts or creates a broadcast.
+	{
+		QSettings(configuration, QSettings::IniFormat).clear();
+		MemoryStore store;
+		store.value = QJsonDocument(QJsonObject{{"client", "test-client"}, {"refresh", "saved"}}).toJson();
+		Transport network;
+		TwitchPane pane(nullptr, &network, nullptr, &store);
+		Line(pane, "AppID")->setText("test-client");
+		Until([&] { return network.calls.size() == 1; });
+		network.Respond(0, 200, Tokens("access", "refresh"));
+		network.Respond(1, 200, Validation());
+		QString result, error;
+		auto done = [&](const QString &, const QString &key, const QString &, const QString &failure) { result = key; error = failure; };
+		pane.PrepareStream(done);
+		Require(network.calls.last().request.url().path() == "/helix/streams/key", "Twitch setup must retrieve the authorized stream key");
+		network.Respond(network.calls.size() - 1, 403, {});
+		Require(result.isEmpty() && error.contains("Reconnect"), "Older Twitch grants must request renewed authorization");
+		pane.PrepareStream(done);
+		network.Respond(network.calls.size() - 1, 200, {{"data", QJsonArray{QJsonObject{{"stream_key", "synthetic-key"}}}}});
+		Require(result == "synthetic-key" && error.isEmpty(), "Twitch setup did not deliver stream access");
+		result.clear();
+		pane.PrepareStream(done);
+		const auto pending = network.calls.last().reply;
+		Button(pane, "Disconnect")->click();
+		Require(pending->aborted && result.isEmpty(), "Disconnected setup must not deliver stale access");
+	}
+	{
+		QSettings(configuration, QSettings::IniFormat).clear();
+		MemoryStore store;
+		store.value = QJsonDocument(QJsonObject{{"client", "google-client"}, {"refresh", "saved"}, {"secret", "test"}}).toJson();
+		Transport network;
+		YoutubePane pane(nullptr, &network, &store);
+		Line(pane, "AppID")->setText("google-client");
+		Until([&] { return network.calls.size() == 1; });
+		network.Respond(0, 200, Tokens("access", "refresh"));
+		network.Respond(1, 200, {{"items", QJsonArray{}}});
+		network.Respond(2, 200, {{"items", QJsonArray{Broadcast("video", "Synthetic broadcast")}}});
+		QString result, address, error;
+		auto done = [&](const QString &server, const QString &key, const QString &, const QString &failure) { address = server; result = key; error = failure; };
+		const QJsonObject bound{{"id", "video"}, {"status", QJsonObject{{"lifeCycleStatus", "ready"}}}, {"contentDetails", QJsonObject{{"boundStreamId", "stream"}}}};
+		const auto response = [](const QString &url) { return QJsonObject{{"items", QJsonArray{QJsonObject{{"id", "stream"}, {"cdn", QJsonObject{{"ingestionInfo", QJsonObject{{"streamName", "synthetic-key"}, {"rtmpsIngestionAddress", url}}}}}}}}}; };
+		pane.PrepareStream(done);
+		network.Respond(network.calls.size() - 1, 200, {{"items", QJsonArray{Broadcast("video", "Unbound")}}});
+		Require(result.isEmpty() && error.contains("encoder"), "Unbound broadcast must not produce stream access");
+		pane.PrepareStream(done);
+		network.Respond(network.calls.size() - 1, 200, {{"items", QJsonArray{bound}}});
+		Require(network.calls.last().request.url().path().endsWith("/liveStreams"), "Bound stream must be resolved by ID");
+		network.Respond(network.calls.size() - 1, 200, response("https://example.invalid/app"));
+		Require(result.isEmpty() && !error.isEmpty(), "Invalid ingestion protocol must be rejected");
+		pane.PrepareStream(done);
+		network.Respond(network.calls.size() - 1, 200, {{"items", QJsonArray{bound}}});
+		network.Respond(network.calls.size() - 1, 200, response("rtmps://a.rtmps.youtube.com/live2"));
+		Require(result == "synthetic-key" && address == "rtmps://a.rtmps.youtube.com/live2" && error.isEmpty(), "YouTube setup must return the selected broadcast's secure stream");
+		for (const auto &call : network.calls) {
+			Require(!call.request.url().path().endsWith("/bind") && !call.request.url().path().endsWith("/transition"), "Setup must not bind or start a broadcast");
+		}
+	}
+
 	std::cout
 		<< "PASS: device polling/backoff, token rotation, in-flight update exclusion, PKCE loopback, pagination, "
 		   "snippet preservation, revoked sessions and callback shutdown\n";

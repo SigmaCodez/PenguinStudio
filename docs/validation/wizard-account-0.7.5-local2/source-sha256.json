@@ -1,0 +1,8 @@
+{
+  "frontend/wizards/AutoConfigStreamPage.cpp": "4f3dc812df7d2a3713e1830b09a2ee68790c00b30bbcd908f0ea8efc3fcc2f58",
+  "frontend/wizards/AutoConfigStreamPage.hpp": "27be0b14118844052933f7e80a56733c5958cfa178d865441f301d5814037020",
+  "shared/penguin-account-setup.hpp": "7e0dec407d9684f58b18e574bf052b07009419d3311865fe1b8c4da8b1a7213a",
+  "plugins/penguin-platforms/penguin-platforms.cpp": "d71917cbadb03c97683d956c46c86f0b31090b52733924fa37e0f0d328ae5490",
+  "plugins/penguin-platforms/tests/platform-flow.cpp": "a5527811d2bf5c14de667ef49f093d6ac4c7b7a571068e639982feea7c039d56",
+  "test/penguin-wizard-account.cpp": "6ff940844304fc9b9127ff7738b2dc04f36e9ab356fe88249a60e95e2d26b4bc"
+}

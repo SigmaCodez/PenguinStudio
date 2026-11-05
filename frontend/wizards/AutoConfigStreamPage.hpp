@@ -1,6 +1,10 @@
 #pragma once
 
 #include <QWizardPage>
+#include <QPointer>
+
+class QAction;
+class PenguinAccountSetupRequest;
 
 class Auth;
 class Ui_AutoConfigStreamPage;
@@ -20,6 +24,13 @@ class AutoConfigStreamPage : public QWizardPage {
 	std::unique_ptr<Ui_AutoConfigStreamPage> ui;
 	QString lastService;
 	bool ready = false;
+	QPointer<PenguinAccountSetupRequest> accountSetup;
+	QString setupService, accountServer, accountLabel;
+	bool accountConnected = false, manualKey = false;
+	bool bandwidthLocked = false, previousBandwidthTest = false;
+	QString PenguinProvider() const;
+	QAction *PenguinAccountAction() const;
+
 
 	void LoadServices(bool showAll);
 	inline bool IsCustomService() const;

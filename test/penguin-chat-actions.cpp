@@ -40,8 +40,13 @@ public:
 	qint64 bytesAvailable() const override { return data.size() - offset + QNetworkReply::bytesAvailable(); }
 	void Finish(int code, QJsonObject body)
 	{
+		FinishRaw(code, code == 204 ? QByteArray() : QJsonDocument(body).toJson());
+	}
+	void FinishRaw(int code, const QByteArray &body, NetworkError error = NoError)
+	{
+		if (error != NoError) setError(error, "Synthetic transport failure");
 		setAttribute(QNetworkRequest::HttpStatusCodeAttribute, code);
-		data = QJsonDocument(body).toJson();
+		data = body;
 		setFinished(true);
 		emit readyRead();
 		emit finished();
@@ -83,6 +88,61 @@ static void Confirm()
 struct PenguinChatTest {
 	static void Run()
 	{
+        // Exercise the real request adapters: HTTP headers alone cannot confirm success.
+        for (bool youtubeProvider : {false, true}) {
+            Transport transport;
+            TwitchChat tc(nullptr, [](const char *key) { return QString(key); }, &transport);
+            YoutubeChat yc(nullptr, &transport);
+            for (const auto &payload : {QByteArray("{broken"), QByteArray("[]"), QByteArray()}) {
+                int result = -1;
+                auto done = [&](int code, const QJsonObject &) { result = code; };
+                if (youtubeProvider) yc.Request("test", "GET", {}, done);
+                else tc.Request("test", {}, done, "GET");
+                transport.calls.last().reply->FinishRaw(200, payload);
+                Require(result == 0, "invalid successful JSON must not be accepted");
+            }
+            for (int status : {200, 204}) {
+                int result = -1;
+                auto done = [&](int code, const QJsonObject &) { result = code; };
+                if (youtubeProvider) yc.Request("test", "GET", {}, done);
+                else tc.Request("test", {}, done, "GET");
+                transport.calls.last().reply->FinishRaw(status, "{}", QNetworkReply::RemoteHostClosedError);
+                Require(result == 0, "transport error after success headers must remain unconfirmed");
+                if (youtubeProvider) yc.Request("test", "GET", {}, done);
+                else tc.Request("test", {}, done, "GET");
+                transport.calls.last().reply->FinishRaw(status, status == 204 ? QByteArray() : QByteArray("{}"));
+                Require(result == status, "valid JSON and bodyless 204 must remain supported");
+            }
+        }
+        {
+            Transport transport;
+            YoutubeChat yc(nullptr, &transport);
+            yc.SetBroadcast("selected-video");
+            yc.SetSession("expired-token", "owner");
+            transport.Finish(401, {});
+            const auto count = transport.calls.size();
+            yc.SetSession("expired-token", "owner");
+            Require(transport.calls.size() == count, "unchanged expired token must not trigger reload loop");
+            yc.SetSession("renewed-token", "owner");
+            Require(transport.calls.size() == count + 1 &&
+                    transport.calls.last().request.url().path().endsWith("/liveBroadcasts") &&
+                    transport.calls.last().request.rawHeader("Authorization") == "Bearer renewed-token",
+                    "renewed token must resume failed broadcast loading");
+            transport.Finish(200, {{"items", QJsonArray{QJsonObject{{"id", "selected-video"},
+                {"snippet", QJsonObject{{"liveChatId", "selected-chat"}, {"title", "Synthetic"}}}}}}});
+            transport.Finish(200, {{"items", QJsonArray()}, {"nextPageToken", "next"}});
+            Require(yc.ready, "broadcast-load recovery must restore chat");
+            yc.input->setText("Keep this uncertain message");
+            yc.send->click();
+            const auto sendCalls = transport.calls.size();
+            transport.calls.last().reply->FinishRaw(200, "{truncated", QNetworkReply::RemoteHostClosedError);
+            Require(yc.input->text() == "Keep this uncertain message" && !yc.sending &&
+                    transport.calls.size() == sendCalls && yc.status->text().contains("confirm"),
+                    "uncertain send must preserve text, explain uncertainty and never retry automatically");
+            yc.Reload();
+            Require(!yc.ready && transport.calls.last().request.url().path().endsWith("/liveBroadcasts"),
+                    "public reload must restart integrated YouTube loading");
+        }
 		Transport twitchNetwork;
 		TwitchChat twitch(nullptr, [](const char *key) { return QString(key); }, &twitchNetwork);
 		for (int i = 0; i < 500; ++i) {

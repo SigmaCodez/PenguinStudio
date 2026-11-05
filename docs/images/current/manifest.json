@@ -1,26 +1,26 @@
 {
-  "version": "0.7.5",
+  "version": "0.7.6",
   "language": "en-US",
-  "source_commit": "7d8ff0240b49da0b8bf3bcdd7342d77629164d3c",
-  "local_changes": "Approved local1/local2 integrated chat improvements. Frontend rebuilt with PENGUIN_VERSION=0.7.5; real synthetic English demo captures.",
-  "package": "0.7.5-0+ubuntu26.04.candidate1",
-  "package_sha256": "feadde303459d33df2e88638d98afdfe8cc38c340a007c54254a3bd30e94f7b9",
-  "captured_on": "2026-10-31",
-  "capture_method": "XComposite capture of the real 0.7.5 candidate under XWayland; isolated English synthetic demo profile. Native Wayland validation is separate.",
-  "content": "Synthetic logo and audio only; no private desktop, camera or account contents.",
-  "visual_review": "All three images visually inspected: English workspace, rounded corner Inspector, and disconnected stream details.",
+  "source_commit": "52865ccce337e5237ba038b146ef65c12b1bcd65",
+  "local_changes": "Approved chat reliability and wizard account changes; frontend rebuilt with Penguin version 0.7.6. See release-0.7.6 validation.",
+  "package": "0.7.6 candidate frontend with verified installed 0.7.5 local2 runtime modules",
+  "frontend_sha256": "d77d9964b8d95552d2d6f38eb5c2bf802f3168ece098ee05195cdc035f42b981",
+  "captured_on": "2026-11-05",
+  "capture_method": "XComposite window capture of the real 0.7.6 frontend under XWayland, isolated English demo profile. Native Wayland validation recorded separately.",
+  "content": "Synthetic Penguin logo and audio tones; no private camera, desktop or account content.",
+  "visual_review": "All three images inspected: English workspace with native preview, rounded-corner Inspector controls and disconnected Twitch stream details.",
   "images": [
     {
       "file": "workspace-en.png",
-      "sha256": "2463f253c299c4461ff2656e681dc8a6be3f8c784bda94ff4bd0f63b0d223f5c"
+      "sha256": "e9e85ce0499b47db93a9d4a78dd7e2e98f79c67f274387dc23129225d6c6e797"
     },
     {
       "file": "camera-en.png",
-      "sha256": "11d7d5fcab720395ef2e4e49da80a8791ec4ab803cd141a909c19caa0096eb04"
+      "sha256": "987cf8fcc7145d6a75d58e80e1af109b2defdc532f82c4b1ae99f75e3e2266d0"
     },
     {
       "file": "stream-details-en.png",
-      "sha256": "d1ae339b8b81f46857c42b9ff6e2762b784e5618a92a60fce4053fd461f72298"
+      "sha256": "be13431764d04ffcd3f3eba500fbafffefd4098ebbdb28c8f087572b81c1cdcb"
     }
   ]
 }

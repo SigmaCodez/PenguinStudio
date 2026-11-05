@@ -136,8 +136,8 @@ class TwitchChat final : public QWidget {
 		});
 		connect(reply, &QNetworkReply::finished, this, [this, reply, epoch, done]() {
 			pendingRequests.removeAll(reply);
-			const int code = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
-			const auto data = QJsonDocument::fromJson(reply->readAll()).object();
+			QJsonObject data;
+			const int code = PenguinChat::ReadResponse(reply, data);
 			reply->deleteLater();
 			if (epoch != generation) {
 				return;
@@ -600,6 +600,13 @@ public:
 		Stop();
 	}
 
+	void Reload()
+	{
+		if (token.isEmpty()) return;
+		const auto id = client, access = token, account = user;
+		Stop();
+		SetSession(id, access, account);
+	}
 	void SetSession(const QString &id, const QString &access, const QString &account)
 	{
 		if (client == id && user == account && !token.isEmpty()) {

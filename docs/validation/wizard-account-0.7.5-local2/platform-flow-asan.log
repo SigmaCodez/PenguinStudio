@@ -1,0 +1,2 @@
+This plugin does not support propagateSizeHints()
+PASS: device polling/backoff, token rotation, in-flight update exclusion, PKCE loopback, pagination, snippet preservation, revoked sessions and callback shutdown

@@ -152,6 +152,7 @@ protected:
 public:
 	static constexpr bool SupportsOriginal = true;
 	std::function<void(bool)> useIntegrated;
+	std::function<void()> reloadIntegrated;
 	WebsiteChat(const QString &service, QWidget *integrated, QWidget *parent = nullptr)
 		: QWidget(parent),
 		  provider(service),
@@ -171,7 +172,9 @@ public:
 		options->setPopupMode(QToolButton::InstantPopup);
 		auto *menu = new QMenu(options);
 		menu->addAction("Reload chat", this, [this] {
-			if (browser) {
+			if (!original) {
+				if (reloadIntegrated) reloadIntegrated();
+			} else if (browser) {
 				browser->reload();
 			} else {
 				EnsureBrowser();
@@ -269,6 +272,7 @@ class WebsiteChat final : public QWidget {
 public:
 	static constexpr bool SupportsOriginal = false;
 	std::function<void(bool)> useIntegrated;
+	std::function<void()> reloadIntegrated;
 	WebsiteChat(const QString &, QWidget *api, QWidget *parent = nullptr) : QWidget(parent)
 	{
 		auto *layout = new QVBoxLayout(this);

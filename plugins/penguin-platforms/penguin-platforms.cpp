@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 // Native metadata controls and original platform chat views without an X11 dependency.
+#include "../../shared/penguin-account-setup.hpp"
 #include "oauth-helpers.hpp"
 #include "twitch-chat.hpp"
 #include "youtube-chat.hpp"
@@ -71,6 +72,12 @@ class PlatformPane : public QWidget {
 public:
 	std::function<void(const QString &)> chatLocation;
 	virtual void UseIntegratedChat(bool) {}
+	using StreamReady = std::function<void(const QString &, const QString &, const QString &, const QString &)>;
+	virtual void PrepareStream(StreamReady done) { done({}, {}, {}, "Streaming setup unavailable"); }
+	bool Connected() const { return !accessToken.isEmpty() && !connectButton->isEnabled(); }
+	quint64 SessionGeneration() const { return generation; }
+	void SignIn() { connectButton->setEnabled(true); connectButton->click(); }
+
 
 protected:
 	QNetworkAccessManager ownedNetwork{this};
@@ -372,7 +379,7 @@ class TwitchPane final : public PlatformPane {
 	bool categoryEdited = false;
 	QPushButton *loadDetails = nullptr;
 	static constexpr const char *scopes =
-		"channel:manage:broadcast user:read:chat user:write:chat moderator:read:chatters moderator:manage:chat_messages moderator:manage:banned_users moderator:manage:chat_settings";
+		"channel:read:stream_key channel:manage:broadcast user:read:chat user:write:chat moderator:read:chatters moderator:manage:chat_messages moderator:manage:banned_users moderator:manage:chat_settings";
 
 	void Reset() override
 	{
@@ -479,6 +486,26 @@ private:
 	}
 
 public:
+	void PrepareStream(StreamReady done) override
+	{
+		if (broadcaster.isEmpty() || accessToken.isEmpty()) {
+			done({}, {}, {}, "Sign in to Twitch first.");
+			return;
+		}
+		Request("https://api.twitch.tv/helix/streams/key?broadcaster_id=" +
+			QString::fromLatin1(QUrl::toPercentEncoding(broadcaster)), "GET", {}, {}, true,
+			[done](int code, const QJsonObject &data) {
+				const auto rows = data.value("data").toArray();
+				const auto key = rows.isEmpty() ? QString() : rows.first().toObject().value("stream_key").toString();
+				if (code != 200 || key.isEmpty()) {
+					done({}, {}, {}, code == 401 || code == 403
+						? "Reconnect Twitch and allow access to your stream key, or use a manual stream key."
+						: "Could not load Twitch streaming access. Try again or use a manual stream key.");
+					return;
+				}
+				done({}, key, "Twitch account connected", {});
+			});
+	}
 	void UseIntegratedChat(bool enabled) override
 	{
 		chatEnabled = enabled;
@@ -986,6 +1013,44 @@ protected:
 	}
 
 public:
+	void PrepareStream(StreamReady done) override
+	{
+		const auto video = broadcasts->currentData().toString();
+		const auto label = broadcasts->currentText();
+		if (accessToken.isEmpty() || video.isEmpty()) {
+			done({}, {}, {}, "Sign in and select an encoder broadcast. Create one in YouTube Studio if none is available.");
+			return;
+		}
+		Request("https://www.googleapis.com/youtube/v3/liveBroadcasts?part=id,contentDetails,status&id=" +
+			QString::fromLatin1(QUrl::toPercentEncoding(video)), "GET", {}, {}, true,
+			[this, video, label, done](int code, const QJsonObject &data) {
+				const auto rows = data.value("items").toArray();
+				const auto item = rows.isEmpty() ? QJsonObject() : rows.first().toObject();
+				const auto stream = item.value("contentDetails").toObject().value("boundStreamId").toString();
+				const auto lifecycle = item.value("status").toObject().value("lifeCycleStatus").toString();
+				if (code != 200 || item.value("id").toString() != video || stream.isEmpty() ||
+				    lifecycle == "complete" || lifecycle == "revoked" || broadcasts->currentData().toString() != video) {
+					done({}, {}, {}, "Select an upcoming or live encoder broadcast with a stream configured in YouTube Studio, then try again.");
+					return;
+				}
+				Request("https://www.googleapis.com/youtube/v3/liveStreams?part=id,cdn&id=" +
+					QString::fromLatin1(QUrl::toPercentEncoding(stream)), "GET", {}, {}, true,
+					[this, video, stream, label, done](int result, const QJsonObject &response) {
+						const auto rows = response.value("items").toArray();
+						const auto item = rows.isEmpty() ? QJsonObject() : rows.first().toObject();
+						const auto ingest = item.value("cdn").toObject().value("ingestionInfo").toObject();
+						const auto key = ingest.value("streamName").toString();
+						const QUrl server(ingest.value("rtmpsIngestionAddress").toString());
+						if (result != 200 || item.value("id").toString() != stream || key.isEmpty() ||
+						    server.scheme() != "rtmps" || server.host().isEmpty() || !server.userInfo().isEmpty() ||
+						    server.hasQuery() || server.hasFragment() || broadcasts->currentData().toString() != video) {
+							done({}, {}, {}, "Could not load secure streaming access for this broadcast. Try again or use a manual stream key.");
+							return;
+						}
+						done(server.toString(), key, label, {});
+					});
+			});
+	}
 	void UseIntegratedChat(bool enabled) override
 	{
 		chatEnabled = enabled;
@@ -1256,6 +1321,9 @@ void CreateDock()
 	twitchPane->UseIntegratedChat(!PenguinChat::WebsiteChat::SupportsOriginal);
 	youtubePane->UseIntegratedChat(!PenguinChat::WebsiteChat::SupportsOriginal);
 	if (twitchWebsite) {
+		twitchWebsite->reloadIntegrated = [chat = QPointer<TwitchChat>(chatDock)] {
+			if (chat) chat->Reload();
+		};
 		twitchWebsite->useIntegrated = [pane = QPointer<TwitchPane>(twitchPane)](bool value) {
 			if (pane) {
 				pane->UseIntegratedChat(value);
@@ -1263,6 +1331,9 @@ void CreateDock()
 		};
 	}
 	if (youtubeWebsite) {
+		youtubeWebsite->reloadIntegrated = [chat = QPointer<YoutubeChat>(youtubeChatDock)] {
+			if (chat) chat->Reload();
+		};
 		youtubeWebsite->useIntegrated = [pane = QPointer<YoutubePane>(youtubePane)](bool value) {
 			if (pane) {
 				pane->UseIntegratedChat(value);
@@ -1285,7 +1356,9 @@ void CreateDock()
 	layout->addWidget(tabs, 1);
 	auto *accountAction = new QAction(parent);
 	accountAction->setObjectName("penguinConnectAccountAction");
-	QObject::connect(accountAction, &QAction::triggered, dock, [tabs, accountAction, parent]() {
+	QObject::connect(accountAction, &QAction::triggered, dock, [tabs, accountAction, parent, twitchPane, youtubePane]() {
+		QPointer<PenguinAccountSetupRequest> setup = dynamic_cast<PenguinAccountSetupRequest *>(accountAction->property("penguinSetupRequest").value<QObject *>());
+		accountAction->setProperty("penguinSetupRequest", QVariant());
 		const QString provider = accountAction->data().toString();
 		const int index = provider == "twitch" ? 0 : provider == "youtube" ? 1 : -1;
 		if (index < 0 || tabs->count() != 2) {
@@ -1305,6 +1378,41 @@ void CreateDock()
 		page->show();
 		auto *buttons = new QDialogButtonBox(QDialogButtonBox::Close, dialog);
 		box->addWidget(buttons);
+		if (setup && setup->provider == provider) {
+			QPointer<PlatformPane> pane = provider == "twitch" ? static_cast<PlatformPane *>(twitchPane)
+				: static_cast<PlatformPane *>(youtubePane);
+			auto *hint = new QLabel("Sign in, then use this account for streaming. This does not start a broadcast.", dialog);
+			hint->setWordWrap(true);
+			hint->setTextFormat(Qt::PlainText);
+			box->insertWidget(0, hint);
+			auto *use = buttons->addButton("Use this account", QDialogButtonBox::ActionRole);
+			use->setObjectName("penguinUseStreamingAccount");
+			use->setEnabled(false);
+			auto *again = buttons->addButton("Reconnect", QDialogButtonBox::ActionRole);
+			QObject::connect(again, &QPushButton::clicked, dialog, [pane] { if (pane) pane->SignIn(); });
+			auto *timer = new QTimer(dialog);
+			QObject::connect(timer, &QTimer::timeout, dialog, [pane, use] {
+				if (!pane) return;
+				if (use->property("setupEpoch").toULongLong() != pane->SessionGeneration()) use->setProperty("pending", false);
+				use->setEnabled(pane->Connected() && !use->property("pending").toBool());
+			});
+			timer->start(200);
+			QObject::connect(use, &QPushButton::clicked, dialog, [pane, setup, use, hint, guarded = QPointer<QDialog>(dialog)] {
+				if (!pane || !setup || !guarded || use->property("pending").toBool()) return;
+				use->setProperty("pending", true);
+				use->setProperty("setupEpoch", QVariant::fromValue(pane->SessionGeneration()));
+				use->setEnabled(false);
+				hint->setText("Loading streaming access…");
+				pane->PrepareStream([setup, guarded, use, hint](const QString &server, const QString &key, const QString &label, const QString &error) {
+					if (!setup || !guarded || !guarded->isVisible()) return;
+					use->setProperty("pending", false);
+					if (!error.isEmpty()) { hint->setText(error); return; }
+					if (setup->complete) setup->complete(server, key, label);
+					guarded->accept();
+				});
+			});
+			QObject::connect(setup, &QObject::destroyed, dialog, &QDialog::reject);
+		}
 		QObject::connect(buttons, &QDialogButtonBox::rejected, dialog, &QDialog::reject);
 		const auto restore = [original, page, index, label]() {
 			if (original && page && original->indexOf(page) < 0) {
@@ -1316,8 +1424,8 @@ void CreateDock()
 		QObject::connect(dialog, &QObject::destroyed, parent, restore);
 		dialog->setWindowModality(Qt::WindowModal);
 		dialog->show();
-		if (provider == "twitch") {
-			if (auto *button = page->findChild<QPushButton *>("twitchConnectAccount");
+		if (provider == "twitch" || setup) {
+			if (auto *button = page->findChild<QPushButton *>(provider + "ConnectAccount");
 			    button && button->isEnabled()) {
 				button->click();
 			}

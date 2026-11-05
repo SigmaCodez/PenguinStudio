@@ -1,8 +1,8 @@
 # Platform connections and Wayland
 
-![English stream details dock in Penguin Studio 0.7.5](images/current/stream-details-en.png)
+![English stream details dock in Penguin Studio 0.7.6](images/current/stream-details-en.png)
 
-Current 0.7.5 interface before sign-in. This preview contains no account information.
+Current 0.7.6 interface before sign-in. This preview contains no account information.
 
 ## Twitch
 
@@ -11,9 +11,9 @@ Current 0.7.5 interface before sign-in. This preview contains no account informa
 3. Current details load automatically after connection and when opening the dock. Unsaved edits are retained. You can also select **Load current stream details** manually, then edit the title/category and select **Update stream details**.
 4. Open **Docks → Stream chat → Twitch**. Packages with Qt WebEngine offer the original platform chat. Select **Use integrated chat** for API-based messages and moderation using the connected account. Its right-click menu moderates messages, **Chat settings** controls chat modes, and **Chat participants** shows connected/recent chatters and session bans. Integrated chat displays plain text and emote names. See the [chat guide](CHAT.md) for sign-in differences and platform limitations.
 
-The maintainer's public Twitch application ID is bundled with Penguin Studio. The application must remain registered with client type **Public**; no client secret is embedded. Device authorization requests `channel:manage:broadcast`, `user:read:chat`, `user:write:chat`, `moderator:read:chatters`, `moderator:manage:chat_messages`, `moderator:manage:banned_users` and `moderator:manage:chat_settings`. Existing accounts should reconnect once to grant the new moderation permissions. The module validates tokens after connection and periodically while connected, and refreshes them before expiration. Access tokens and chat history remain in memory. Refresh tokens are saved in the system keyring and exchanged for a new access token on startup. Rotated refresh tokens replace the saved value. Disconnect disables automatic sign-in and deletes the saved credentials. Revoking the application itself is done in Twitch account settings.
+The maintainer's public Twitch application ID is bundled with Penguin Studio. The application must remain registered with client type **Public**; no client secret is embedded. Device authorization requests `channel:read:stream_key`, `channel:manage:broadcast`, `user:read:chat`, `user:write:chat`, `moderator:read:chatters`, `moderator:manage:chat_messages`, `moderator:manage:banned_users` and `moderator:manage:chat_settings`. Existing accounts should reconnect once to grant the new moderation permissions. The module validates tokens after connection and periodically while connected, and refreshes them before expiration. Access tokens and chat history remain in memory. Refresh tokens are saved in the system keyring and exchanged for a new access token on startup. Rotated refresh tokens replace the saved value. Disconnect disables automatic sign-in and deletes the saved credentials. Revoking the application itself is done in Twitch account settings.
 
-The integrated chat uses Twitch EventSub WebSockets and the Send Chat Message API, with bounded history and authenticated HTTPS requests that do not follow redirects. An API failure is shown in the dock; it never falls back to sending unauthenticated messages. This login manages chat and metadata; broadcast destinations and their stream keys remain a separate setup step.
+The integrated chat uses Twitch EventSub WebSockets and the Send Chat Message API, with bounded history and authenticated HTTPS requests that do not follow redirects. An API failure is shown in the dock; it never falls back to sending unauthenticated messages. The same account also supplies streaming access in the auto-configuration wizard as described below.
 
 References: [device grant](https://dev.twitch.tv/docs/authentication/getting-tokens-oauth/#device-code-grant-flow), [channel update API](https://dev.twitch.tv/docs/api/reference/#modify-channel-information), [chat authentication](https://dev.twitch.tv/docs/chat/authenticating), [WebSocket lifecycle](https://dev.twitch.tv/docs/eventsub/handling-websocket-events/).
 
@@ -88,7 +88,7 @@ and [refresh-token expiration](https://developers.google.com/identity/protocols/
 
 ## Other destinations
 
-The first-launch wizard includes Twitch, YouTube, Kick, Facebook Live, TikTok LIVE and custom RTMP(S). Open the selected creator dashboard, then enter the server and stream key provided for that account. Some providers require access approval or account eligibility before exposing stream keys. No universal OAuth or metadata API exists across all these services.
+The first-launch wizard includes Twitch, YouTube, Kick, Facebook Live, TikTok LIVE and custom RTMP(S). The wizard offers Twitch/YouTube account setup directly on its Stream Information page. For other services or the manual alternative, open the selected creator dashboard and enter its server and stream key. Some providers require access approval or account eligibility before exposing stream keys. No universal OAuth or metadata API exists across all these services.
 
 ## Wayland
 
@@ -104,4 +104,4 @@ The **Broadcast destinations** dock still keeps stream keys session-only. The in
 
 ## Optional sign-in during setup
 
-The first-start connection assistant offers Twitch and YouTube sign-in, with an explicit option to skip by continuing. The destination configuration page also has an optional account button. These open the same native account controls as the Stream details dock, so there is one account state per provider. Closing the account dialog returns to the wizard. Both providers use browser authorization. Official packages include the required application configuration; custom YouTube builds can use Advanced application settings. Account authorization does not itself configure a video-stream destination or start broadcasting.
+The first-start connection assistant offers Twitch and YouTube sign-in, with an explicit option to skip by continuing. The destination configuration page also has an optional account button. These open the same native account controls as the Stream details dock, so there is one account state per provider. Closing the account dialog returns to the wizard. Both providers use browser authorization. Official packages include the required application configuration; custom YouTube builds can use Advanced application settings. Account authorization alone does not start broadcasting. In Penguin Studio 0.7.6, the Stream Information page offers **Connect Account (recommended)** and **Use Stream Key**. After browser authorization, **Use this account** retrieves Twitch streaming access or the secure ingestion details of the selected, already configured YouTube encoder broadcast. Older Twitch grants may require **Reconnect** to grant stream-key access. YouTube broadcasts without a bound stream must first be configured in YouTube Studio. No broadcast is created, bound or transitioned by this setup. YouTube account setup disables the bandwidth test to avoid sending test video to the selected broadcast. The resolved key follows the standard wizard/profile persistence workflow; it is not displayed on the connected-account page. See `docs/validation/wizard-account-0.7.5-local2.md` for local test scope.

@@ -17,16 +17,16 @@ Penguin Studio brings a redesigned production workspace, native multi-destinatio
 
 ![Penguin Studio modern workspace with searchable layers and scenes, audio channel strips and an integrated inspector](docs/images/current/workspace-en.png)
 
-These English previews show the real 0.7.5 application with synthetic demo media. See the [workspace guide](docs/WORKSPACE.md) for the controls and layout.
+These English previews show the real 0.7.6 application with synthetic demo media. See the [workspace guide](docs/WORKSPACE.md) for the controls and layout.
 
 > Development preview. See [verification status](docs/VERIFICATION.md) for completed checks and remaining release tests, and [packaging](docs/PACKAGING.md) for development downloads and supported build targets. Validate your devices and streaming accounts before relying on this build for a live show.
 
-## What is new in 0.7.5
+## What is new in 0.7.6
 
-- Integrated Twitch chat keeps existing message rows, selection and reading position instead of rebuilding the complete history.
-- YouTube reload cancels obsolete requests, avoids overlapping message polls and uses bounded message-ID indices for duplicate detection.
-- Disconnect cancels only the chat view's own requests; delayed Twitch send controls cannot affect a later account session.
-- The classic workspace, original platform web views and Wayland preview fix remain available. See [chat](docs/CHAT.md) and [release notes](docs/releases/0.7.5.md) for validation and limits.
+- Connect Twitch or YouTube directly in the auto-configuration wizard. Manual stream-key entry remains optional.
+- Use an existing YouTube encoder broadcast without copying its ingestion details; setup does not start broadcasting.
+- Chat rejects malformed or interrupted successful responses, and YouTube reload recovers after an expired token is replaced.
+- Reload follows the selected chat mode: original website or integrated API chat. See [release notes](docs/releases/0.7.6.md) for validation and limits.
 
 ## What is included
 
@@ -45,7 +45,7 @@ These English previews show the real 0.7.5 application with synthetic demo media
 
 ## Get started
 
-**Current release: [Penguin Studio 0.7.5](docs/releases/0.7.5.md)** — faster integrated-chat updates, stable Twitch selection and reading position, and reliable YouTube reloads.
+**Current release: [Penguin Studio 0.7.6](docs/releases/0.7.6.md)** — faster integrated-chat updates, stable Twitch selection and reading position, and reliable YouTube reloads.
 
 Camera processing offers **Automatic**, **GPU** and **CPU**, with automatic CPU fallback. The optional Ubuntu 26.04 or 26.10 AMD runtime add-on enables primary GPU matting on the tested RX 9070 XT; hand preservation stays on CPU. Other package/hardware combinations retain CPU processing unless a compatible runtime is provided. See [camera GPU setup](docs/PACKAGING.md#optional-amd-camera-gpu-runtime).
 

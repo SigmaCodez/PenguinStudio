@@ -1,0 +1,39 @@
+{
+  "public_version": "0.7.5",
+  "local_package": "0.7.5-1+ubuntu26.04.local1",
+  "date": "2026-11-04",
+  "build_kind": "platform module rebuilt against installed release SDK; other package payload unchanged",
+  "package_sha256": "07279658ac5c8ced8a2540ec0770b0e09ebee503849b28d220558981dd69a83a",
+  "module_sha256": "4c0f2b437a23c0bc7057f0109d4e5ddedb3f86bd48dbffbb2438b7b5d7d95e5e",
+  "installation": "system-wide installed and verified",
+  "tests": {
+    "workspace": 237,
+    "recording_loopback": 35,
+    "preview_webengine": 8,
+    "chat_fixtures": "passed",
+    "twitch_history": "passed",
+    "reload_routing": "passed",
+    "platform_flow": "passed",
+    "asan_ubsan": "passed (detect_leaks=0 for Qt)",
+    "release_publication_portable_python": 13,
+    "website_python": 12,
+    "installed_workspace": 237
+  },
+  "gui_exit_codes": {
+    "workspace": 0,
+    "recording_loopback": 0,
+    "preview_webengine": 0,
+    "installed_workspace": 0
+  },
+  "full_video_decode": "passed for workspace, preview, recording and received local stream",
+  "public_version_changed": false,
+  "published": false,
+  "source_sha256": {
+    "plugins/penguin-platforms/chat-view.hpp": "8341957382b26aca5ca83d6c7f4595a062ffe335117f0d2267b9cab961a6667f",
+    "plugins/penguin-platforms/twitch-chat.hpp": "fc576a0df34f84bf1bdcef8142b85d7fe56ed7e0ad8f9a119a9d335b0da20f29",
+    "plugins/penguin-platforms/youtube-chat.hpp": "400b3ea23728f50268d6dd3fb111cddcc964fe5b4eeaba7d0e97a346f7416abb",
+    "plugins/penguin-platforms/web-chat.hpp": "a57ca453188a827c6a7e00fa0b6fa005d3adda8d67e5e8c11a8411b043f09314",
+    "plugins/penguin-platforms/penguin-platforms.cpp": "7f79d044207cb85c8cd701a74e5654517a69cad20462a830c464264d46c4a4a3"
+  },
+  "installed_integrity": "dpkg verify clean; platform module byte-identical"
+}

@@ -1,4 +1,6 @@
 #include "AutoConfigStreamPage.hpp"
+#include "../../shared/penguin-account-setup.hpp"
+#include <QSignalBlocker>
 #include "AutoConfig.hpp"
 #include "ui_AutoConfigStreamPage.h"
 
@@ -68,6 +70,10 @@ AutoConfigStreamPage::AutoConfigStreamPage(QWidget *parent) : QWizardPage(parent
 	connect(ui->service, &QComboBox::currentIndexChanged, this, &AutoConfigStreamPage::UpdateMoreInfoLink);
 
 	connect(ui->useStreamKeyAdv, &QPushButton::clicked, this, [&]() {
+		if (!PenguinProvider().isEmpty() && PenguinAccountAction()) {
+			on_useStreamKey_clicked();
+			return;
+		}
 		ui->streamKeyWidget->setVisible(true);
 		ui->streamKeyLabel->setVisible(true);
 		ui->useStreamKeyAdv->setVisible(false);
@@ -80,7 +86,22 @@ AutoConfigStreamPage::AutoConfigStreamPage(QWidget *parent) : QWizardPage(parent
 	connect(ui->regionOther, &QCheckBox::toggled, this, &AutoConfigStreamPage::UpdateCompleted);
 }
 
-AutoConfigStreamPage::~AutoConfigStreamPage() {}
+AutoConfigStreamPage::~AutoConfigStreamPage() { delete accountSetup.data(); }
+
+QString AutoConfigStreamPage::PenguinProvider() const
+{
+	if (IsCustomService()) return {};
+	const auto service = ui->service->currentText();
+	if (service == "Twitch") return "twitch";
+	if (service.startsWith("YouTube")) return "youtube";
+	return {};
+}
+
+QAction *AutoConfigStreamPage::PenguinAccountAction() const
+{
+	return OBSBasic::Get()->findChild<QAction *>("penguinConnectAccountAction");
+}
+
 
 bool AutoConfigStreamPage::isComplete() const
 {
@@ -145,6 +166,10 @@ bool AutoConfigStreamPage::validatePage()
 		wiz->server = ui->server->currentData().toString().toStdString();
 	}
 
+	if (accountConnected && !accountServer.isEmpty()) {
+		wiz->server = accountServer.toStdString();
+		wiz->serverName = accountServer.toStdString();
+	}
 	wiz->bandwidthTest = ui->doBandwidthTest->isChecked();
 	wiz->startingBitrate = (int)obs_data_get_int(settings, "bitrate");
 	wiz->idealBitrate = wiz->startingBitrate;
@@ -325,6 +350,29 @@ void AutoConfigStreamPage::OnAuthConnected()
 
 void AutoConfigStreamPage::on_connectAccount_clicked()
 {
+	const auto provider = PenguinProvider();
+	if (auto *action = PenguinAccountAction(); action && !provider.isEmpty()) {
+		delete accountSetup.data();
+		accountSetup = new PenguinAccountSetupRequest(this);
+		accountSetup->provider = provider;
+		const auto service = ui->service->currentText();
+		accountSetup->complete = [this, service](const QString &server, const QString &key, const QString &label) {
+			if (ui->service->currentText() != service || key.isEmpty()) return;
+			auth.reset();
+			accountConnected = true;
+			manualKey = false;
+			accountServer = server;
+			accountLabel = label;
+			ui->key->setEchoMode(QLineEdit::Password);
+			ui->key->setText(key);
+			ServiceChanged();
+		};
+		action->setProperty("penguinSetupRequest", QVariant::fromValue(static_cast<QObject *>(accountSetup.data())));
+		action->setData(provider);
+		action->trigger();
+		return;
+	}
+
 	std::string service = ui->service->currentText().toStdString();
 
 	OAuth::DeleteCookies(service);
@@ -342,6 +390,16 @@ void AutoConfigStreamPage::on_connectAccount_clicked()
 
 void AutoConfigStreamPage::on_disconnectAccount_clicked()
 {
+	if (accountConnected) {
+		delete accountSetup.data();
+		accountConnected = manualKey = false;
+		accountServer.clear();
+		accountLabel.clear();
+		ui->key->clear();
+		ServiceChanged();
+		return;
+	}
+
 	QMessageBox::StandardButton button;
 
 	button = OBSMessageBox::question(this, QTStr(DISCONNECT_COMFIRM_TITLE), QTStr(DISCONNECT_COMFIRM_TEXT));
@@ -376,6 +434,16 @@ void AutoConfigStreamPage::on_disconnectAccount_clicked()
 
 void AutoConfigStreamPage::on_useStreamKey_clicked()
 {
+	if (!PenguinProvider().isEmpty() && PenguinAccountAction()) {
+		delete accountSetup.data();
+		if (accountConnected) ui->key->clear();
+		accountConnected = false;
+		manualKey = true;
+		accountServer.clear();
+		accountLabel.clear();
+		ServiceChanged();
+	}
+
 	ui->stackedWidget->setCurrentIndex((int)Section::StreamKey);
 	UpdateCompleted();
 }
@@ -404,6 +472,23 @@ static inline bool is_external_oauth(const std::string &service)
 
 void AutoConfigStreamPage::reset_service_ui_fields(std::string &service)
 {
+	if (!PenguinProvider().isEmpty() && PenguinAccountAction()) {
+		ui->stackedWidget->setCurrentIndex(accountConnected || manualKey ? (int)Section::StreamKey : (int)Section::Connect);
+		ui->streamKeyWidget->setVisible(manualKey);
+		ui->streamKeyLabel->setVisible(manualKey);
+		ui->connectAccount2->setVisible(manualKey);
+		ui->useStreamKeyAdv->setVisible(accountConnected);
+		ui->connectedAccountLabel->setVisible(accountConnected);
+		ui->connectedAccountText->setVisible(accountConnected);
+		ui->connectedAccountText->setTextFormat(Qt::PlainText);
+		ui->connectedAccountText->setWordWrap(true);
+		ui->connectedAccountText->setText(accountLabel);
+		ui->disconnectAccount->setVisible(accountConnected);
+		ui->disconnectAccount->setText("Change account");
+		return;
+	}
+	ui->disconnectAccount->setText(QTStr("Basic.AutoConfig.StreamPage.DisconnectAccount"));
+
 #ifdef YOUTUBE_ENABLED
 	// when account is already connected:
 	OAuthStreamKey *a = reinterpret_cast<OAuthStreamKey *>(auth.get());
@@ -452,6 +537,26 @@ void AutoConfigStreamPage::ServiceChanged()
 		return;
 	}
 
+	const auto selectedService = ui->service->currentText();
+	if (!setupService.isEmpty() && setupService != selectedService) {
+		delete accountSetup.data();
+		accountConnected = manualKey = false;
+		accountServer.clear();
+		accountLabel.clear();
+		ui->key->clear();
+		auth.reset();
+	}
+	setupService = selectedService;
+	const bool lockBandwidth = accountConnected && PenguinProvider() == "youtube";
+	{
+		QSignalBlocker block(ui->doBandwidthTest);
+		if (lockBandwidth && !bandwidthLocked) previousBandwidthTest = ui->doBandwidthTest->isChecked();
+		if (lockBandwidth) ui->doBandwidthTest->setChecked(false);
+		else if (bandwidthLocked) ui->doBandwidthTest->setChecked(previousBandwidthTest);
+	}
+	bandwidthLocked = lockBandwidth;
+	ui->doBandwidthTest->setEnabled(!lockBandwidth);
+	ui->doBandwidthTest->setToolTip(lockBandwidth ? "Bandwidth testing is disabled for this YouTube account to avoid sending test video to your broadcast." : QString());
 	std::string service = ui->service->currentText().toStdString();
 	bool regionBased = service == "Twitch";
 	bool testBandwidth = ui->doBandwidthTest->isChecked();
@@ -525,7 +630,7 @@ void AutoConfigStreamPage::ServiceChanged()
 
 	OBSBasic *main = OBSBasic::Get();
 
-	if (main->auth) {
+	if (main->auth && (PenguinProvider().isEmpty() || !PenguinAccountAction())) {
 		auto system_auth_service = main->auth->service();
 		bool service_check = service.find(system_auth_service) != std::string::npos;
 #ifdef YOUTUBE_ENABLED
