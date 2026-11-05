@@ -1,0 +1,76 @@
+{
+    "checks": [
+        {
+            "name": "Legacy destination restored",
+            "passed": true
+        },
+        {
+            "name": "Account destination asks for sign-in instead of a key",
+            "passed": true
+        },
+        {
+            "name": "Shared sign-in immediately configures existing output",
+            "passed": true
+        },
+        {
+            "name": "Destination editor opens",
+            "passed": true
+        },
+        {
+            "name": "Editor reuses sign-in with no manual key field",
+            "passed": true
+        },
+        {
+            "name": "Manual alternative clears hidden account key",
+            "passed": true
+        },
+        {
+            "name": "Account refresh cannot overwrite manual input",
+            "passed": true
+        },
+        {
+            "name": "Manual destination survives account disconnect",
+            "passed": true
+        },
+        {
+            "name": "Manual selection is retained when editing",
+            "passed": true
+        },
+        {
+            "name": "Output editor requests streaming account setup",
+            "passed": true
+        },
+        {
+            "name": "Account completion fills streaming access and hides manual key",
+            "passed": true
+        },
+        {
+            "name": "Provider switch cancels old request and uses the matching account",
+            "passed": true
+        },
+        {
+            "name": "YouTube output is ready without copying a key",
+            "passed": true
+        },
+        {
+            "name": "Disconnect invalidates account-based output credentials",
+            "passed": true
+        },
+        {
+            "name": "Account propagation never starts outputs",
+            "passed": true
+        },
+        {
+            "name": "Saved destinations contain mode but no credentials",
+            "passed": true
+        },
+        {
+            "name": "New destinations reuse the current account",
+            "passed": true
+        },
+        {
+            "name": "Both providers can remain configured together",
+            "passed": true
+        }
+    ]
+}

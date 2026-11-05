@@ -35,6 +35,9 @@
   </branding>
   <content_rating type="oars-1.1"/>
   <releases>
+    <release version="0.7.7" date="2026-11-05">
+      <description><p>Share Twitch and YouTube account streaming access with broadcast destinations while retaining optional manual stream keys.</p></description>
+    </release>
     <release version="0.7.6" date="2026-11-05">
       <description><p>Connect Twitch and YouTube in the setup wizard, with optional manual stream keys, and improve integrated chat recovery.</p></description>
     </release>

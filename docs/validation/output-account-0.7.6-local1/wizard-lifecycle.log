@@ -1,0 +1,13 @@
+error: Tried to call obs_frontend_get_main_window with no callbacks!
+error: Tried to call obs_frontend_get_main_window with no callbacks!
+error: Tried to call obs_frontend_get_main_window with no callbacks!
+error: Tried to call obs_frontend_get_main_window with no callbacks!
+error: Tried to call obs_frontend_get_main_window with no callbacks!
+This plugin does not support propagateSizeHints()
+error: Tried to call obs_frontend_get_main_window with no callbacks!
+error: Tried to call obs_frontend_get_main_window with no callbacks!
+This plugin does not support raise()
+error: Tried to call obs_frontend_get_main_window with no callbacks!
+This plugin does not support propagateSizeHints()
+error: Tried to call obs_frontend_get_main_window with no callbacks!
+PASS: asynchronous wizard/warnings, parent destruction, shutdown cancellation, duplicate guard, first-run dismissal and frontend unload

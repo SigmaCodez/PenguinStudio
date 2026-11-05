@@ -1,0 +1,12 @@
+{
+  "package_sha256": "fb1c097f037e66ba76e224ee9765426e69ff6834c0a1cb30c9ce81056c082bef",
+  "public_version": "0.7.6",
+  "local_package": "0.7.6-1+ubuntu26.04.local1",
+  "source_sha256": {
+    "shared/penguin-streaming-access.hpp": "ef683c6899f341e743a437049c0ae77d3368bec7206c1fa96ed359afed9f876f",
+    "plugins/penguin-platforms/penguin-platforms.cpp": "be2d653ccc45e66ec6eb268e969f81738275d5f4150a78187ddf312565c946e0",
+    "plugins/penguin-outputs/penguin-outputs.cpp": "38e566c47a652762181ce8759c92c2ad1a3f38b8bb042dec0b7543ca44dcae4e",
+    "plugins/penguin-outputs/tests/output-safety.cpp": "0852d0ccc0f4cb097efb04c7b00a49852738ccb08db1ac4b84104c1afc530054",
+    "test/penguin-output-account.cpp": "149a826afd4c122e3974d018f7276e9fd5a7e9ce39e5b40c51ee5e0ce01ba2ea"
+  }
+}

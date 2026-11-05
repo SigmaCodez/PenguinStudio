@@ -67,8 +67,11 @@ hit the local tmpfs user quota; removing regenerable candidate build objects
 allowed verification to resume and finish. No package mismatch was found.
 
 The verified Ubuntu package and manifests are archived in `dist/releases/0.7.6/`.
-The system-wide `pkexec apt-get --no-remove` transaction currently awaits normal
-Ubuntu administrator confirmation; the last verified installed version is still
-`0.7.5-1+ubuntu26.04.local2`. Installed-0.7.6 verification is therefore pending.
+The system-wide `pkexec apt-get --no-remove` transaction completed after normal
+Ubuntu administrator confirmation on 2026-11-05. The installed version is
+`0.7.6-1+ubuntu26.04`; package integrity verification is clean, the installed
+executable matches the tested release artifact and reports Penguin Studio 0.7.6
+with OBS 33.0.0. The full GUI suites above tested the exact package before
+installation; no separate installed GUI-suite result is claimed here.
 There are no passwordless authorization changes, and no new optional AMD runtime
 is installed. Historical release descriptions and evidence remain unchanged.

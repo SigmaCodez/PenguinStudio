@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 #include "../../frontend/utility/PenguinHardwareEncoder.hpp"
 #include "creator-tools.hpp"
+#include "../../shared/penguin-account-setup.hpp"
+#include "../../shared/penguin-streaming-access.hpp"
+#include <QCheckBox>
+#include <QSignalBlocker>
 #include "upload-rate.hpp"
 #include <util/platform.h>
 #include <QMainWindow>
@@ -98,6 +102,7 @@ struct Destination {
 	QString encoder = QStringLiteral("obs_x264");
 	Layout layout = Layout::Landscape;
 	int bitrate = 6000;
+ bool useAccount = true;
 };
 
 QJsonObject SavedDestination(const Destination &destination)
@@ -108,7 +113,21 @@ QJsonObject SavedDestination(const Destination &destination)
 		{QStringLiteral("server"), destination.server},
 		{QStringLiteral("encoder"), destination.encoder},
 		{QStringLiteral("layout"), static_cast<int>(destination.layout)},
-		{QStringLiteral("bitrate"), destination.bitrate}};
+		{QStringLiteral("bitrate"), destination.bitrate},
+  {QStringLiteral("useAccount"), destination.useAccount}};
+}
+
+QString AccountProvider(const QString &platform)
+{
+ return platform == "Twitch" ? "twitch" : platform == "YouTube" ? "youtube" : QString();
+}
+
+void ApplyAccount(Destination &destination, const PenguinStreamingAccess::Access &access)
+{
+ if (!destination.useAccount || AccountProvider(destination.platform).isEmpty()) return;
+ destination.key = access.key;
+ if (!access.key.isEmpty()) destination.server = access.server.isEmpty() && destination.platform == "Twitch"
+  ? QString::fromUtf8(Presets[0].server) : access.server;
 }
 
 bool HasEncoder(const QString &id, const char *codec)
@@ -159,12 +178,52 @@ class ConnectionWizard final : public QWizard {
 	QComboBox *layout;
 	QComboBox *encoder;
 	QSpinBox *bitrate;
+ QCheckBox *useAccount;
+ QLabel *accountStatus;
+ QFormLayout *connectionForm;
+ QPointer<PenguinStreamingAccess> streaming;
+ QPointer<PenguinAccountSetupRequest> accountRequest;
+
+ void RefreshAccess() {
+  const bool supported = !AccountProvider(platform->currentText()).isEmpty();
+  useAccount->setVisible(supported);
+  const bool accountMode = supported && useAccount->isChecked();
+  connectionForm->setRowVisible(key, !accountMode);
+  server->setReadOnly(accountMode);
+  accountStatus->setVisible(accountMode);
+  if (accountMode) {
+   const auto access = streaming ? streaming->Read(AccountProvider(platform->currentText())) : PenguinStreamingAccess::Access{};
+   key->setText(access.key);
+   if (!access.key.isEmpty()) server->setText(access.server.isEmpty() ? QString::fromUtf8(Presets[0].server) : access.server);
+   accountStatus->setText(!access.key.isEmpty() ? "Account connected — ready for streaming" :
+    access.status.isEmpty() ? "Sign in to use this destination. A manual stream key is optional." : access.status);
+  }
+ }
+ void ConnectAccount() {
+  auto *main = static_cast<QWidget *>(obs_frontend_get_main_window());
+  auto *action = main ? main->findChild<QAction *>("penguinConnectAccountAction") : nullptr;
+  const auto provider = AccountProvider(platform->currentText());
+  if (!action || provider.isEmpty()) return;
+  delete accountRequest.data();
+  accountRequest = new PenguinAccountSetupRequest(this);
+  accountRequest->provider = provider;
+  accountRequest->complete = [this, provider](const QString &endpoint, const QString &secret, const QString &label) {
+   if (provider != AccountProvider(platform->currentText()) || secret.isEmpty()) return;
+   { QSignalBlocker block(useAccount); useAccount->setChecked(true); }
+   if (streaming) streaming->Update(provider, {endpoint, secret, label, {}});
+   RefreshAccess();
+  };
+  action->setProperty("penguinSetupRequest", QVariant::fromValue(static_cast<QObject *>(accountRequest.data())));
+  action->setData(provider);
+  action->trigger();
+ }
 
 public:
 	explicit ConnectionWizard(QWidget *parent, bool welcome, const Destination *existing = nullptr)
 		: QWizard(parent)
 	{
-		setWindowTitle(Text(welcome ? "Penguin.Wizard" : "Penguin.Add"));
+		setObjectName("penguinDestinationWizard");
+  setWindowTitle(Text(welcome ? "Penguin.Wizard" : "Penguin.Add"));
 		setWizardStyle(QWizard::ModernStyle);
 		const QPixmap logo(QStringLiteral(":/res/images/penguin-studio.png"));
 		if (!logo.isNull()) {
@@ -189,22 +248,17 @@ public:
 											 : "Penguin.Account.YouTube"),
 							       intro);
 				introLayout->addWidget(button);
-				connect(button, &QPushButton::clicked, this, [provider]() {
-					auto *main = static_cast<QWidget *>(obs_frontend_get_main_window());
-					if (main) {
-						if (auto *action =
-							    main->findChild<QAction *>("penguinConnectAccountAction")) {
-							action->setData(provider);
-							action->trigger();
-						}
-					}
-				});
+    connect(button, &QPushButton::clicked, this, [this, provider]() {
+     platform->setCurrentText(provider == "twitch" ? "Twitch" : "YouTube");
+     ConnectAccount();
+    });
 			}
 			addPage(intro);
 		}
 		auto *page = new QWizardPage;
 		page->setTitle(Text("Penguin.Connect"));
 		auto *form = new QFormLayout(page);
+  connectionForm = form;
 		auto *connectionNote = new QLabel(Text("Penguin.ConnectionNote"));
 		connectionNote->setWordWrap(true);
 		form->addRow(connectionNote);
@@ -216,6 +270,8 @@ public:
 		server = new QLineEdit;
 		server->setPlaceholderText(QStringLiteral("rtmps://server.example/app"));
 		key = new QLineEdit;
+  key->setObjectName("penguinDestinationKey");
+  platform->setObjectName("penguinDestinationPlatform");
 		key->setEchoMode(QLineEdit::Password);
 		layout = new QComboBox;
 		layout->addItems(
@@ -244,17 +300,23 @@ public:
 					    platform->currentText() == "YouTube");
 		};
 		connect(platform, &QComboBox::currentIndexChanged, this, enableAccount);
-		connect(account, &QPushButton::clicked, this, [this]() {
-			auto *main = static_cast<QWidget *>(obs_frontend_get_main_window());
-			if (main) {
-				if (auto *a = main->findChild<QAction *>("penguinConnectAccountAction")) {
-					a->setData(platform->currentText().toLower());
-					a->trigger();
-				}
-			}
-		});
-		enableAccount();
-		form->addRow(Text("Penguin.Server"), server);
+  account->setObjectName("penguinDestinationConnect");
+  connect(account, &QPushButton::clicked, this, [this]() { ConnectAccount(); });
+  enableAccount();
+  useAccount = new QCheckBox("Use connected account (recommended)", page);
+  useAccount->setObjectName("penguinDestinationUseAccount");
+  useAccount->setChecked(existing ? existing->useAccount : true);
+  form->addRow(useAccount);
+  accountStatus = new QLabel(page);
+  accountStatus->setTextFormat(Qt::PlainText);
+  accountStatus->setWordWrap(true);
+  form->addRow(accountStatus);
+  streaming = PenguinStreamingAccess::Get(static_cast<QWidget *>(obs_frontend_get_main_window()));
+  if (streaming) streaming->Subscribe(this, [this] { RefreshAccess(); });
+  connect(useAccount, &QCheckBox::toggled, this, [this] {
+   delete accountRequest.data(); key->clear(); RefreshAccess();
+  });
+  form->addRow(Text("Penguin.Server"), server);
 		form->addRow(Text("Penguin.Key"), key);
 		form->addRow(Text("Penguin.Orientation"), layout);
 		form->addRow(Text("Penguin.Encoder"), encoder);
@@ -267,7 +329,9 @@ public:
 		connect(platform, &QComboBox::currentIndexChanged, this, [this, dashboard](int index) {
 			name->setText(QString::fromUtf8(Presets[index].name));
 			server->setText(QString::fromUtf8(Presets[index].server));
-			key->clear();
+			delete accountRequest.data();
+   key->clear();
+   RefreshAccess();
 			dashboard->setEnabled(*Presets[index].dashboard != '\0');
 		});
 		connect(dashboard, &QPushButton::clicked, this, [this]() {
@@ -296,6 +360,7 @@ public:
 		encoder->setCurrentIndex(encoderIndex >= 0 ? encoderIndex : 0);
 		bitrate->setValue(initial.bitrate);
 		dashboard->setEnabled(*Presets[platform->currentIndex()].dashboard != '\0');
+  RefreshAccess();
 	}
 
 	Destination Value() const
@@ -306,7 +371,8 @@ public:
 			key->text().trimmed(),
 			encoder->currentData().toString(),
 			static_cast<Layout>(layout->currentIndex()),
-			bitrate->value()};
+			bitrate->value(),
+   useAccount->isChecked() && !AccountProvider(platform->currentText()).isEmpty()};
 	}
 
 	bool validateCurrentPage() override
@@ -505,6 +571,7 @@ struct RunningOutput {
 
 struct Entry {
 	Destination destination;
+ quint64 accountRevision = ~quint64(0);
 	std::unique_ptr<RunningOutput> running;
 	QString status;
 };
@@ -572,6 +639,7 @@ class OutputDock final : public QWidget {
 	UploadRate primaryRate;
 	uint64_t lastUploadSample = 0;
 	bool primaryStarting = false;
+ QPointer<PenguinStreamingAccess> streaming;
 
 	void UpdateUpload(bool force = false)
 	{
@@ -654,6 +722,7 @@ class OutputDock final : public QWidget {
 			d.layout =
 				static_cast<Layout>(std::clamp(object.value(QStringLiteral("layout")).toInt(), 0, 2));
 			d.bitrate = std::clamp(object.value(QStringLiteral("bitrate")).toInt(6000), 500, 50000);
+   d.useAccount = object.value("useAccount").toBool(true);
 			entry->status = Text("Penguin.NeedsKey");
 			entries.push_back(std::move(entry));
 		}
@@ -678,8 +747,19 @@ class OutputDock final : public QWidget {
 		}
 	}
 
-	void Refresh()
-	{
+ void Refresh()
+ {
+  if (streaming) for (auto &entry : entries) {
+   auto &d = entry->destination;
+   const auto provider = AccountProvider(d.platform);
+   if (entry->running || !d.useAccount || provider.isEmpty()) continue;
+   const auto access = streaming->Read(provider);
+   if (entry->accountRevision == access.revision) continue;
+   entry->accountRevision = access.revision;
+   ApplyAccount(d, access);
+   entry->status = !d.key.isEmpty() ? "Ready (connected account)" :
+    access.status.isEmpty() ? "Sign in to " + d.platform : access.status;
+  }
 		const int selected = Selected();
 		destinations->clear();
 		for (const auto &entry : entries) {
@@ -756,6 +836,7 @@ class OutputDock final : public QWidget {
 					existing = entries.back().get();
 				}
 				existing->destination = wizard->Value();
+    existing->accountRevision = ~quint64(0);
 				existing->status =
 					Text(existing->destination.key.isEmpty() ? "Penguin.NeedsKey" : "Penguin.Idle");
 			}
@@ -775,7 +856,11 @@ class OutputDock final : public QWidget {
 		if (entry.running || shuttingDown) {
 			return;
 		}
-		QString error = Validate(entry.destination, true);
+  if (entry.destination.useAccount && !AccountProvider(entry.destination.platform).isEmpty() && entry.destination.key.isEmpty()) {
+   Configure(false, &entry);
+   return;
+  }
+  QString error = Validate(entry.destination, true);
 		auto running = std::make_unique<RunningOutput>();
 		if (error.isEmpty()) {
 			error = running->Initialize(entry.destination);
@@ -915,6 +1000,7 @@ public:
 		box->addWidget(add);
 		auto *actions = new QHBoxLayout;
 		edit = new QPushButton(Text("Penguin.EditShort"));
+  edit->setObjectName("penguinEditDestination");
 		edit->setToolTip(Text("Penguin.Edit"));
 		remove = new QPushButton(Text("Penguin.Remove"));
 		for (auto *button : {edit, remove}) {
@@ -996,8 +1082,10 @@ public:
 			uploadLabel->setContentsMargins(10, 5, 10, 5);
 			main->statusBar()->addPermanentWidget(uploadLabel);
 		}
-		Load();
-		Refresh();
+  streaming = PenguinStreamingAccess::Get(static_cast<QWidget *>(obs_frontend_get_main_window()));
+  if (streaming) streaming->Subscribe(this, [this] { if (!shuttingDown) Refresh(); });
+  Load();
+  Refresh();
 	}
 
 	~OutputDock() override { delete uploadLabel.data(); }

@@ -11,6 +11,36 @@ The initial request was to inspect the code and create this file. The user then
 explicitly authorized fixing the three reviewed chat bugs, testing them and
 installing a local build for review, with no publication.
 
+## Latest release work — 0.7.7 approved
+
+The user explicitly approved publishing the tested Output-account fix on
+2026-11-05. Version 0.7.7 is being prepared from main
+`25e9cd52423322e75a39ba2025d188610f88ce19`; see
+`docs/validation/release-0.7.7.md` for candidate and final package results.
+The installed reviewed build is `0.7.6-1+ubuntu26.04.local1` until a subsequent
+verified installation is recorded. No new installation is implied by publication.
+
+## Reviewed local correction — account-based Output destinations
+
+Installed **0.7.6-1+ubuntu26.04.local1** on 2026-11-05. This is the reviewed input to the approved 0.7.7 release. The user correctly reported that
+sign-in configured the primary wizard but the Output dock still asked for a key.
+The platform module now shares resolved streaming access with existing/new
+Twitch and YouTube destinations. Account mode hides manual key entry, reconnect
+and disconnect update inactive targets, and manual destinations retain their
+own input. Running outputs are never automatically reconfigured or started.
+Session keys are not written to destination JSON; saved account sessions restore
+through the existing keychain workflow. YouTube still needs a configured encoder
+broadcast; old Twitch grants may need reconnecting for stream-key access.
+
+Checks: 18 new Output-account GUI assertions, 237 workspace, 35 recording/local
+RTMP, eight preview/WebEngine, output-safety/provider ASan/UBSan and wizard
+lifecycle tests pass. Final GUI runs close cleanly, videos decode, installation
+integrity is clean and both installed modules match the tested files. See
+`docs/validation/output-account-0.7.6-local1.md`. The new English screenshot uses
+synthetic accounts. The user confirmed that the wizard was open and reported that the fix worked.
+The user then explicitly approved publication and requested this handoff update.
+The specific provider(s) tested were not stated; do not infer exhaustive coverage.
+
 ## Latest status — 0.7.6 published
 
 The user explicitly approved publication on 2026-11-05 after local2 installation
@@ -27,11 +57,11 @@ received stream fully decode. The public Ubuntu download matches that tested
 CI artifact. See `docs/validation/release-0.7.6.md` for final download checks.
 Real provider consent or live streaming success is not inferred from approval.
 
-System-wide installation was requested through normal `pkexec apt-get` and is
-awaiting the user's Ubuntu administrator confirmation. Last verified installed
-version remains `0.7.5-1+ubuntu26.04.local2`. Do not claim installed 0.7.6 validation
-until that transaction completes. The verified release DEB and manifests are
-archived in `dist/releases/0.7.6/`. No passwordless rules or password storage.
+System-wide installation of `0.7.6-1+ubuntu26.04` completed on 2026-11-05
+through normal Ubuntu administrator confirmation. `dpkg --verify penguin-studio`
+is clean; the installed executable matches the fully tested release artifact
+and reports Penguin Studio 0.7.6 / OBS 33.0.0. No passwordless rules or password
+storage. The release DEB and manifests are archived in `dist/releases/0.7.6/`.
 
 Release work used `/tmp/penguin-release-076/repo`, based on GitHub main
 `52865ccce337e5237ba038b146ef65c12b1bcd65`. The original checkout retains its older
@@ -124,7 +154,7 @@ version increment, commit, push, tag, GitHub release or website deployment occur
 
 ## Current checkout
 
-- Product version in `packaging/version.txt`: **0.7.6**.
+- Product version in `packaging/version.txt`: **0.7.7**.
 - Branch: `codex/rust-camera-preprocessing`.
 - Local HEAD: `b018b3a7326a8dc921da3612335118499a4b6fc7`
   (`Fix Creator tools linkage in native release tests`).
