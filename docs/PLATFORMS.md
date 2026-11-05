@@ -1,8 +1,8 @@
 # Platform connections and Wayland
 
-![English stream details dock in Penguin Studio 0.7.6](images/current/stream-details-en.png)
+![English stream details dock in Penguin Studio 0.7.7](images/current/stream-details-en.png)
 
-Current 0.7.6 interface before sign-in. This preview contains no account information.
+Current 0.7.7 interface before sign-in. This preview contains no account information.
 
 ## Twitch
 
@@ -104,4 +104,14 @@ The **Broadcast destinations** dock still keeps stream keys session-only. The in
 
 ## Optional sign-in during setup
 
-The first-start connection assistant offers Twitch and YouTube sign-in, with an explicit option to skip by continuing. The destination configuration page also has an optional account button. These open the same native account controls as the Stream details dock, so there is one account state per provider. Closing the account dialog returns to the wizard. Both providers use browser authorization. Official packages include the required application configuration; custom YouTube builds can use Advanced application settings. Account authorization alone does not start broadcasting. In Penguin Studio 0.7.6, the Stream Information page offers **Connect Account (recommended)** and **Use Stream Key**. After browser authorization, **Use this account** retrieves Twitch streaming access or the secure ingestion details of the selected, already configured YouTube encoder broadcast. Older Twitch grants may require **Reconnect** to grant stream-key access. YouTube broadcasts without a bound stream must first be configured in YouTube Studio. No broadcast is created, bound or transitioned by this setup. YouTube account setup disables the bandwidth test to avoid sending test video to the selected broadcast. The resolved key follows the standard wizard/profile persistence workflow; it is not displayed on the connected-account page. See `docs/validation/wizard-account-0.7.5-local2.md` for local test scope.
+The first-start connection assistant offers Twitch and YouTube sign-in, with an explicit option to skip by continuing. The destination configuration page also has an optional account button. These open the same native account controls as the Stream details dock, so there is one account state per provider. Closing the account dialog returns to the wizard. Both providers use browser authorization. Official packages include the required application configuration; custom YouTube builds can use Advanced application settings. Account authorization alone does not start broadcasting. In Penguin Studio 0.7.7, the Stream Information page offers **Connect Account (recommended)** and **Use Stream Key**. After browser authorization, **Use this account** retrieves Twitch streaming access or the secure ingestion details of the selected, already configured YouTube encoder broadcast. Older Twitch grants may require **Reconnect** to grant stream-key access. YouTube broadcasts without a bound stream must first be configured in YouTube Studio. No broadcast is created, bound or transitioned by this setup. YouTube account setup disables the bandwidth test to avoid sending test video to the selected broadcast. The resolved key follows the standard wizard/profile persistence workflow; it is not displayed on the connected-account page. See `docs/validation/wizard-account-0.7.5-local2.md` for local test scope.
+
+## Account-based broadcast destinations
+
+Penguin Studio 0.7.7 extends the shared account login to the
+Broadcast destinations dock. Existing and new Twitch/YouTube targets can obtain
+streaming access from the selected account automatically. Manual stream-key
+setup remains optional. Destination settings save the chosen mode, never the
+session key; account access is resolved again after session restoration. Running
+outputs keep their settings until stopped. See [local validation](validation/output-account-0.7.6-local1.md).
+Manual destinations retain their own credentials when the signed-in account changes.

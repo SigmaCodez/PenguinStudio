@@ -113,5 +113,33 @@ int main()
 		ended.stopped.store(true);
 	}
 	Require(lifecycle.front() == "release-output", "already-stopped output must not be stopped again");
+ {
+  QObject owner, observer;
+  auto *shared = PenguinStreamingAccess::Get(&owner);
+  Require(shared == PenguinStreamingAccess::Get(&owner), "all consumers share one account state");
+  int changes = 0;
+  shared->Subscribe(&observer, [&] { ++changes; });
+  const auto revision = shared->Update("twitch", {{}, "synthetic-account-key", "Test", {}});
+  Destination account;
+  account.platform = "Twitch";
+  ApplyAccount(account, shared->Read("twitch"));
+  Require(account.key == "synthetic-account-key" && account.server.startsWith("rtmps://"), "account resolves Twitch destination without manual key");
+  Require(!QJsonDocument(SavedDestination(account)).toJson().contains("synthetic-account-key"), "account key never persists in destination JSON");
+  account.useAccount = false;
+  account.key = "manual-key";
+  ApplyAccount(account, shared->Read("twitch"));
+  Require(account.key == "manual-key", "manual credentials are not overwritten by account updates");
+  account.useAccount = true;
+  shared->Update("twitch", {});
+  ApplyAccount(account, shared->Read("twitch"));
+  Require(account.key.isEmpty() && shared->Read("twitch").revision > revision && changes == 2, "disconnect clears account credentials and notifies consumers");
+  auto *deleted = new QObject;
+  shared->Subscribe(deleted, [] { Require(false, "deleted consumer must not be called"); });
+  delete deleted;
+  shared->Update("youtube", {"rtmps://example.invalid/live", "youtube-key", "Broadcast", {}});
+  account.platform = "YouTube";
+  ApplyAccount(account, shared->Read("youtube"));
+  Require(account.key == "youtube-key" && account.server == "rtmps://example.invalid/live", "YouTube keeps its resolved broadcast endpoint");
+ }
 	std::cout << "PASS: destination validation, key omission and failed/live/stopped output destruction\n";
 }

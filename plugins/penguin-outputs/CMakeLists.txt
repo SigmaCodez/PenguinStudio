@@ -12,6 +12,10 @@ set_target_properties_obs(penguin-outputs PROPERTIES FOLDER plugins/penguin-outp
 
 option(PENGUIN_BUILD_TESTS "Build offline Penguin output safety checks" OFF)
 if(PENGUIN_BUILD_TESTS AND OS_LINUX)
+  add_library(penguin-output-account MODULE ../../test/penguin-output-account.cpp)
+  target_link_libraries(penguin-output-account PRIVATE OBS::libobs OBS::frontend-api Qt::Widgets)
+  set_target_properties(penguin-output-account PROPERTIES PREFIX "")
+
   add_executable(penguin-upload-rate tests/upload-rate.cpp)
   target_compile_options(penguin-upload-rate PRIVATE -UNDEBUG)
 

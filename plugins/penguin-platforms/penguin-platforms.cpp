@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 // Native metadata controls and original platform chat views without an X11 dependency.
 #include "../../shared/penguin-account-setup.hpp"
+#include "../../shared/penguin-streaming-access.hpp"
 #include "oauth-helpers.hpp"
 #include "twitch-chat.hpp"
 #include "youtube-chat.hpp"
@@ -1341,16 +1342,25 @@ void CreateDock()
 		};
 	}
 	QPointer<PenguinChat::WebsiteChat> twitchWeb(twitchWebsite), youtubeWeb(youtubeWebsite);
-	twitchPane->chatLocation = [twitchWeb](const QString &id) {
-		if (twitchWeb) {
-			twitchWeb->SetLocation(id);
-		}
-	};
-	youtubePane->chatLocation = [youtubeWeb](const QString &id) {
-		if (youtubeWeb) {
-			youtubeWeb->SetLocation(id);
-		}
-	};
+ QPointer<PenguinStreamingAccess> streaming = PenguinStreamingAccess::Get(parent);
+ const auto resolveStreaming = [streaming](QPointer<PlatformPane> pane, const QString &provider, const QString &identity) {
+  if (!streaming || !pane) return;
+  if (identity.isEmpty()) { streaming->Update(provider, {}); return; }
+  const auto revision = streaming->Update(provider, {{}, {}, {}, "Loading streaming access…"});
+  pane->PrepareStream([streaming, provider, revision](const QString &server, const QString &key,
+                                                    const QString &label, const QString &error) {
+   if (!streaming || streaming->Read(provider).revision != revision) return;
+   streaming->Update(provider, {server, error.isEmpty() ? key : QString(), label, error});
+  });
+ };
+ twitchPane->chatLocation = [twitchWeb, resolveStreaming, pane = QPointer<PlatformPane>(twitchPane)](const QString &id) {
+  if (twitchWeb) twitchWeb->SetLocation(id);
+  resolveStreaming(pane, "twitch", id);
+ };
+ youtubePane->chatLocation = [youtubeWeb, resolveStreaming, pane = QPointer<PlatformPane>(youtubePane)](const QString &id) {
+  if (youtubeWeb) youtubeWeb->SetLocation(id);
+  resolveStreaming(pane, "youtube", id);
+ };
 	addPlatform(twitchPane, QStringLiteral("Twitch"));
 	addPlatform(youtubePane, QStringLiteral("YouTube"));
 	layout->addWidget(tabs, 1);
@@ -1407,7 +1417,9 @@ void CreateDock()
 					if (!setup || !guarded || !guarded->isVisible()) return;
 					use->setProperty("pending", false);
 					if (!error.isEmpty()) { hint->setText(error); return; }
-					if (setup->complete) setup->complete(server, key, label);
+					if (auto *shared = PenguinStreamingAccess::Get(static_cast<QWidget *>(obs_frontend_get_main_window())))
+      shared->Update(setup->provider, {server, key, label, {}});
+     if (setup->complete) setup->complete(server, key, label);
 					guarded->accept();
 				});
 			});
