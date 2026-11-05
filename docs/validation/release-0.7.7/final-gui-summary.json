@@ -1,0 +1,44 @@
+{
+  "source_commit": "1a3d226d19f92cb8a37d2878ba58a678078db1bc",
+  "suites": [
+    {
+      "suite": "workspace",
+      "assertions": 237,
+      "passed": true,
+      "exit_code": 0,
+      "obs_memory_leaks": 0,
+      "decoded_videos": [
+        "captures/recordings/2026-11-05 13-27-16.mkv"
+      ]
+    },
+    {
+      "suite": "creator",
+      "assertions": 35,
+      "passed": true,
+      "exit_code": 0,
+      "obs_memory_leaks": 0,
+      "decoded_videos": [
+        "captures/recordings/2026-11-05 13-27-48.mkv",
+        "captures/received.flv"
+      ]
+    },
+    {
+      "suite": "preview",
+      "assertions": 8,
+      "passed": true,
+      "exit_code": 0,
+      "obs_memory_leaks": 0,
+      "decoded_videos": [
+        "captures/recordings/2026-11-05 13-28-47.mkv"
+      ]
+    },
+    {
+      "suite": "account",
+      "assertions": 18,
+      "passed": true,
+      "exit_code": 0,
+      "obs_memory_leaks": 0,
+      "decoded_videos": []
+    }
+  ]
+}

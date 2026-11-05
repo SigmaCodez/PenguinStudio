@@ -1,0 +1,145 @@
+{
+    "checks": [
+        {
+            "name": "Upload status is visible while offline",
+            "passed": true
+        },
+        {
+            "name": "Output monitor sleeps while offline",
+            "passed": true
+        },
+        {
+            "name": "Creator tools opens",
+            "passed": true
+        },
+        {
+            "name": "Privacy action exists",
+            "passed": true
+        },
+        {
+            "name": "Privacy activated",
+            "passed": true
+        },
+        {
+            "name": "New audio source protected while private",
+            "passed": true
+        },
+        {
+            "name": "Persistent privacy toolbar control exists",
+            "passed": true
+        },
+        {
+            "name": "Privacy shares main action layout",
+            "passed": true
+        },
+        {
+            "name": "Privacy matches recording button height",
+            "passed": true
+        },
+        {
+            "name": "Privacy icon retained in active state",
+            "passed": true
+        },
+        {
+            "name": "Privacy released",
+            "passed": true
+        },
+        {
+            "name": "Loopback stream is active",
+            "passed": true
+        },
+        {
+            "name": "Upload reports measured nonzero bitrate",
+            "passed": true
+        },
+        {
+            "name": "Output monitor wakes for streaming",
+            "passed": true
+        },
+        {
+            "name": "Session summary reflects active recording",
+            "passed": true
+        },
+        {
+            "name": "Session summary contains output metrics and privacy state",
+            "passed": true
+        },
+        {
+            "name": "Safe diagnostics action is available",
+            "passed": true
+        },
+        {
+            "name": "Recording resilience advice is present",
+            "passed": true
+        },
+        {
+            "name": "Chapter action available during recording",
+            "passed": true
+        },
+        {
+            "name": "Chapter capability reported honestly",
+            "passed": true
+        },
+        {
+            "name": "Chapter name retained on unsupported output",
+            "passed": true
+        },
+        {
+            "name": "Audio source list populated",
+            "passed": true
+        },
+        {
+            "name": "Measured audio produces suggestion",
+            "passed": true
+        },
+        {
+            "name": "Limiter added",
+            "passed": true
+        },
+        {
+            "name": "Optional noise suppression added",
+            "passed": true
+        },
+        {
+            "name": "Undo preserves later manual volume",
+            "passed": true
+        },
+        {
+            "name": "Existing user compressor preserved",
+            "passed": true
+        },
+        {
+            "name": "No duplicate compressor created",
+            "passed": true
+        },
+        {
+            "name": "Undo removes assistant filter",
+            "passed": true
+        },
+        {
+            "name": "Visible button labels fit their contents",
+            "passed": true
+        },
+        {
+            "name": "Recording stopped",
+            "passed": true
+        },
+        {
+            "name": "Upload resets after streaming stops",
+            "passed": true
+        },
+        {
+            "name": "Output monitor returns to sleep",
+            "passed": true
+        },
+        {
+            "name": "Session summary reflects stopped recording",
+            "passed": true
+        },
+        {
+            "name": "Chapter action disabled after recording stops",
+            "passed": true
+        }
+    ],
+    "platform": "wayland"
+}
